@@ -22,11 +22,13 @@ public class AverageDistanceObjective implements
 {
 	/**
 	 * Evaluates the given subset solution using the given data, by computing the
-	 * average distance between all pairs of selected items. If less than two items are
-	 * selected, this method always returns 0.
+	 * average distance between all pairs of selected items. If less than two
+	 * items are selected, this method always returns 0.
 	 * 
-	 * @param solution the subset solution to be evaluated 
-	 * @param data the distance matrix
+	 * @param solution
+	 *          the subset solution to be evaluated
+	 * @param data
+	 *          the distance matrix
 	 */
 	@Override
 	public double evaluate(SubsetSolution solution, DistanceMatrixData data)
