@@ -13,27 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-package org.corehunter.tests;
+package org.corehunter;
 
-import org.corehunter.objectives.AverageDistanceObjective;
-import org.jamesframework.core.problems.solutions.SubsetSolution;
-import org.junit.Test;
+import org.jamesframework.core.problems.datatypes.SubsetData;
 
 /**
+ * Base interface for all Genotype Variant Data. Implementation should not 
+ * implement this interface directly but use one of the sub-interfaces
+ * 
  * @author Guy Davenport
  *
  */
-public class AverageDistanceObjectiveTest extends TestData
+public interface GenotypeVariantData extends SubsetData
 {
-
-	@Test
-	public void test()
-	{
-		AverageDistanceObjective objective = new AverageDistanceObjective() ;
-		
-		SubsetSolution solution = new SubsetSolution(SET, SUBSET) ;
-		
-		objective.evaluate(solution, DATA) ;
-	}
-
+	/**
+	 * Gets the total number of markers used in this dataset for which there are 
+	 * frequency values
+	 *
+	 * @return the total number of markers used in this datase
+	 */
+	public int getNumberOfMarkers() ;
 }

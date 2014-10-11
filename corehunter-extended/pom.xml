@@ -11,7 +11,7 @@
 
 	<artifactId>corehunter-extended</artifactId>
 
-	<name>Core Hunter with extended structures</name>
+	<name>Core Hunter with extended data structures</name>
 
 	<dependencies>
 		<dependency>

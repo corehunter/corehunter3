@@ -33,10 +33,10 @@ public interface DistanceMatrixData extends SubsetData
 	/**
 	 * Gets the distance between two entities 
 	 * 
-	 * @param index1 the index of the first entity
-	 * @param index2 the index of the first entity
-	 * @return
+	 * @param idX the id of the first entity
+	 * @param idY the id of the second entity
+	 * @return the distance between two entities 
 	 */
-  public double getDistance(int index1, int index2);
+  public double getDistance(int idX, int idY);
 
 }

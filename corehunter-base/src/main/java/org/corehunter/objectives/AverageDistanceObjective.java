@@ -8,23 +8,26 @@
  * KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  *******************************************************************************/
-package org.corehunter;
+package org.corehunter.objectives;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import org.corehunter.DistanceMatrixData;
 import org.jamesframework.core.problems.objectives.Objective;
 import org.jamesframework.core.problems.solutions.SubsetSolution;
 
 public class AverageDistanceObjective implements
     Objective<SubsetSolution, DistanceMatrixData>
 {
-
-	// Evaluates the given subset solution using the given data, by computing the
-	// average
-	// distance between all pairs of selected items. If less than two items are
-	// selected,
-	// this method always returns 0.
+	/**
+	 * Evaluates the given subset solution using the given data, by computing the
+	 * average distance between all pairs of selected items. If less than two items are
+	 * selected, this method always returns 0.
+	 * 
+	 * @param solution the subset solution to be evaluated 
+	 * @param data the distance matrix
+	 */
 	@Override
 	public double evaluate(SubsetSolution solution, DistanceMatrixData data)
 	{

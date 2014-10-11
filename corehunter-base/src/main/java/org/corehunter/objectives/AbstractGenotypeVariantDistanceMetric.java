@@ -13,27 +13,45 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-package org.corehunter.tests;
+package org.corehunter.objectives;
 
-import org.corehunter.objectives.AverageDistanceObjective;
-import org.jamesframework.core.problems.solutions.SubsetSolution;
-import org.junit.Test;
+import java.util.Set;
+
+import org.corehunter.DistanceMatrixData;
+import org.corehunter.GenotypeVariantData;
 
 /**
  * @author Guy Davenport
  *
  */
-public class AverageDistanceObjectiveTest extends TestData
+public abstract class AbstractGenotypeVariantDistanceMetric<
+	GenotypeVariantDataType extends GenotypeVariantData> implements DistanceMatrixData
 {
+	private GenotypeVariantDataType data ;
 
-	@Test
-	public void test()
+	public AbstractGenotypeVariantDistanceMetric(GenotypeVariantDataType data)
+  {
+	  super();
+	  
+	  setData(data) ;
+  }
+
+	/* (non-Javadoc)
+	 * @see org.jamesframework.core.problems.datatypes.SubsetData#getIDs()
+	 */
+  @Override
+  public final Set<Integer> getIDs()
+  {
+	  return data.getIDs();
+  }
+
+	public final GenotypeVariantDataType getData()
 	{
-		AverageDistanceObjective objective = new AverageDistanceObjective() ;
-		
-		SubsetSolution solution = new SubsetSolution(SET, SUBSET) ;
-		
-		objective.evaluate(solution, DATA) ;
+		return data;
 	}
 
+	protected final void setData(GenotypeVariantDataType data)
+	{
+		this.data = data;
+	}
 }
