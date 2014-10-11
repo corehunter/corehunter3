@@ -10,7 +10,7 @@
  *******************************************************************************/
 package org.corehunter.objectives.multiallelic;
 
-import org.corehunter.MultiAllelicGenotypeVariantData;
+import org.corehunter.data.MultiAllelicGenotypeVariantData;
 import org.jamesframework.core.problems.objectives.Objective;
 import org.jamesframework.core.problems.solutions.SubsetSolution;
 

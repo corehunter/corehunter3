@@ -13,7 +13,7 @@ package org.corehunter.objectives;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.corehunter.DistanceMatrixData;
+import org.corehunter.data.DistanceMatrixData;
 import org.jamesframework.core.problems.objectives.Objective;
 import org.jamesframework.core.problems.solutions.SubsetSolution;
 

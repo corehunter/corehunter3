@@ -12,8 +12,8 @@ package org.corehunter.objectives.multiallelic;
 
 import java.util.Set;
 
-import org.corehunter.DistanceMatrixData;
-import org.corehunter.GenotypeVariantData;
+import org.corehunter.data.DistanceMatrixData;
+import org.corehunter.data.GenotypeVariantData;
 
 /**
  * @author Guy Davenport

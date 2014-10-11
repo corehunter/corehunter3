@@ -13,7 +13,7 @@ package org.corehunter.tests;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.corehunter.DistanceMatrixData;
+import org.corehunter.data.DistanceMatrixData;
 import org.corehunter.simple.SimpleDistanceMatrixData;
 
 /**

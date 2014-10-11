@@ -10,7 +10,7 @@
  *******************************************************************************/
 package org.corehunter.objectives.multiallelic;
 
-import org.corehunter.MultiAllelicGenotypeVariantData;
+import org.corehunter.data.MultiAllelicGenotypeVariantData;
 
 /**
  * @author Guy Davenport

@@ -13,7 +13,7 @@ package org.corehunter.simple;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.corehunter.DistanceMatrixData;
+import org.corehunter.data.DistanceMatrixData;
 
 /**
  * @author Guy Davenport

@@ -12,6 +12,7 @@ package org.corehunter;
 
 import java.util.concurrent.TimeUnit;
 
+import org.corehunter.data.DistanceMatrixData;
 import org.jamesframework.core.problems.SubsetProblemWithData;
 import org.jamesframework.core.problems.objectives.Objective;
 import org.jamesframework.core.problems.solutions.SubsetSolution;
