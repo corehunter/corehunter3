@@ -14,7 +14,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.corehunter.data.DistanceMatrixData;
-import org.corehunter.simple.SimpleDistanceMatrixData;
+import org.corehunter.simple.NamedDistanceMatrixData;
 
 /**
  * @author Guy Davenport
@@ -50,7 +50,7 @@ public class TestData
 		SUBSET.add(3);
 	}
 
-	protected static final DistanceMatrixData	DATA	    = new SimpleDistanceMatrixData(
+	protected static final DistanceMatrixData	DATA	    = new NamedDistanceMatrixData(
 	                                                        NAMES, DISTANCES);
 
 }

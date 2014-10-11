@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.corehunter.simple;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import org.corehunter.data.DistanceMatrixData;
@@ -17,16 +18,27 @@ import org.corehunter.data.DistanceMatrixData;
 /**
  * @author Guy Davenport
  */
-public class SimpleDistanceMatrixData implements DistanceMatrixData
+public class NamedDistanceMatrixData implements DistanceMatrixData
 {
+	// item names
+	private final String[]	   names;
+	// distance matrix
 	private double[][]	       distances;
-	
+	// IDs
 	private final Set<Integer>	ids;
 
-	public SimpleDistanceMatrixData(Set<Integer> ids, double[][] distances)
+	public NamedDistanceMatrixData(String[] names, double[][] distances)
 	{
-		this.ids = ids;
+		this.names = names;
 		this.distances = distances;
+		// infer IDs: 0..N-1 in case of N items
+		// (indices in distance matrix and name array)
+		ids = new HashSet<Integer>();
+
+		for (int id = 0; id < names.length; id++)
+		{
+			ids.add(id);
+		}
 	}
 
 	/*
@@ -47,5 +59,10 @@ public class SimpleDistanceMatrixData implements DistanceMatrixData
 	public double getDistance(int index1, int index2)
 	{
 		return distances[index1][index2];
+	}
+
+	public String getName(int id)
+	{
+		return names[id];
 	}
 }
