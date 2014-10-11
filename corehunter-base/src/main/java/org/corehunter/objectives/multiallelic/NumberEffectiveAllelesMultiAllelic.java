@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2014 Guy Davenport Licensed under the Apache License, Version 2.0
+ * Copyright 2014 Herman De Beukelaer, Guy Davenport Licensed under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with the
  * License. You may obtain a copy of the License at
  * http://www.apache.org/licenses/LICENSE-2.0 Unless required by applicable law
@@ -8,7 +8,9 @@
  * KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  *******************************************************************************/
-package org.corehunter.objectives;
+package org.corehunter.objectives.multiallelic;
+
+import java.util.Iterator;
 
 import org.corehunter.MultiAllelicGenotypeVariantData;
 import org.jamesframework.core.problems.objectives.Objective;
@@ -17,10 +19,9 @@ import org.jamesframework.core.problems.solutions.SubsetSolution;
 /**
  * @author Guy Davenport
  */
-public class ShannonsDiversityMultiAllelic implements
+public class NumberEffectiveAllelesMultiAllelic implements
     Objective<SubsetSolution, MultiAllelicGenotypeVariantData>
 {
-
 	/*
 	 * (non-Javadoc)
 	 * @see org.jamesframework.core.problems.objectives.Objective#evaluate(org.
@@ -30,8 +31,43 @@ public class ShannonsDiversityMultiAllelic implements
 	public double evaluate(SubsetSolution solution,
 	    MultiAllelicGenotypeVariantData data)
 	{
-		// TODO Auto-generated method stub
-		return 0;
+		double score = 0;
+
+		int numberOfMarkers = data.getNumberOfMarkers();
+		int numberOfAlleles;
+
+		double lociTerm = 0;
+		double lociTotal = 0;
+		double Pla = 0;
+		double diversityTotal = 0;
+
+		Iterator<Integer> iterator = solution.getSelectedIDs().iterator();
+
+		while (iterator.hasNext())
+		{
+			for (int markerIndex = 0; markerIndex < numberOfMarkers; ++markerIndex)
+			{
+				numberOfAlleles = data.getNumberOfAllele(markerIndex);
+
+				lociTotal = 0.0;
+				lociTerm = 0.0;
+
+				for (int alleleIndex = 0; alleleIndex < numberOfAlleles; ++alleleIndex)
+				{
+					Pla = data.getAlelleFrequency(iterator.next(), markerIndex,
+					    alleleIndex);
+
+					lociTerm += Math.pow(Pla, 2);
+					lociTotal += Pla;
+
+					diversityTotal += (1.0 - (lociTerm / Math.pow(lociTotal, 2)));
+				}
+			}
+		}
+
+		score = (1.0 / (double) numberOfMarkers) * diversityTotal;
+
+		return score;
 	}
 
 	/*

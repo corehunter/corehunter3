@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2014 Guy Davenport Licensed under the Apache License, Version 2.0
+ * Copyright 2014 Herman De Beukelaer, Guy Davenport Licensed under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with the
  * License. You may obtain a copy of the License at
  * http://www.apache.org/licenses/LICENSE-2.0 Unless required by applicable law
@@ -8,9 +8,7 @@
  * KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  *******************************************************************************/
-package org.corehunter.objectives;
-
-import java.util.Iterator;
+package org.corehunter.objectives.multiallelic;
 
 import org.corehunter.MultiAllelicGenotypeVariantData;
 import org.jamesframework.core.problems.objectives.Objective;
@@ -19,9 +17,22 @@ import org.jamesframework.core.problems.solutions.SubsetSolution;
 /**
  * @author Guy Davenport
  */
-public class HetrozygousLociDiversityMultiAllelic implements
+public class CoverageMultiAllelic implements
     Objective<SubsetSolution, MultiAllelicGenotypeVariantData>
 {
+
+	ProportionNonInformativeAllelesMultiAllelic	pn;
+
+	/**
+	 * @param data
+	 */
+	public CoverageMultiAllelic()
+	{
+		super();
+
+		pn = new ProportionNonInformativeAllelesMultiAllelic();
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see org.jamesframework.core.problems.objectives.Objective#evaluate(org.
@@ -31,43 +42,7 @@ public class HetrozygousLociDiversityMultiAllelic implements
 	public double evaluate(SubsetSolution solution,
 	    MultiAllelicGenotypeVariantData data)
 	{
-		double score;
-
-		double diversityTotal = 0.0;
-		double lociTotal = 0.0;
-		double lociTerm = 0.0;
-		double Pla;
-
-		int numberOfMarkers = data.getNumberOfMarkers();
-		int numberOfAlleles;
-
-		Iterator<Integer> iterator = solution.getSelectedIDs().iterator();
-
-		while (iterator.hasNext())
-		{
-			for (int markerIndex = 0; markerIndex < numberOfMarkers; ++markerIndex)
-			{
-				numberOfAlleles = data.getNumberOfAllele(markerIndex);
-
-				lociTotal = 0.0;
-				lociTerm = 0.0;
-
-				for (int alleleIndex = 0; alleleIndex < numberOfAlleles; ++alleleIndex)
-				{
-					Pla = data.getAlelleFrequency(iterator.next(), markerIndex,
-					    alleleIndex);
-
-					lociTerm += Math.pow(Pla, 2);
-					lociTotal += Pla;
-
-					diversityTotal += (1.0 - (lociTerm / Math.pow(lociTotal, 2)));
-				}
-			}
-		}
-
-		score = (1.0 / (double) numberOfMarkers) * diversityTotal;
-
-		return score;
+		return 1.0 - pn.evaluate(solution, data);
 	}
 
 	/*
@@ -77,6 +52,7 @@ public class HetrozygousLociDiversityMultiAllelic implements
 	@Override
 	public boolean isMinimizing()
 	{
+		// TODO Auto-generated method stub
 		return false;
 	}
 

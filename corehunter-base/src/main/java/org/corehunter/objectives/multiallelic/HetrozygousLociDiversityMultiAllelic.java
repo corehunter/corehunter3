@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2014 Guy Davenport Licensed under the Apache License, Version 2.0
+ * Copyright 2014 Herman De Beukelaer, Guy Davenport Licensed under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with the
  * License. You may obtain a copy of the License at
  * http://www.apache.org/licenses/LICENSE-2.0 Unless required by applicable law
@@ -8,7 +8,7 @@
  * KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  *******************************************************************************/
-package org.corehunter.objectives;
+package org.corehunter.objectives.multiallelic;
 
 import java.util.Iterator;
 
@@ -19,7 +19,7 @@ import org.jamesframework.core.problems.solutions.SubsetSolution;
 /**
  * @author Guy Davenport
  */
-public class NumberEffectiveAllelesMultiAllelic implements
+public class HetrozygousLociDiversityMultiAllelic implements
     Objective<SubsetSolution, MultiAllelicGenotypeVariantData>
 {
 	/*
@@ -31,15 +31,15 @@ public class NumberEffectiveAllelesMultiAllelic implements
 	public double evaluate(SubsetSolution solution,
 	    MultiAllelicGenotypeVariantData data)
 	{
-		double score = 0;
+		double score;
+
+		double diversityTotal = 0.0;
+		double lociTotal = 0.0;
+		double lociTerm = 0.0;
+		double Pla;
 
 		int numberOfMarkers = data.getNumberOfMarkers();
 		int numberOfAlleles;
-
-		double lociTerm = 0;
-		double lociTotal = 0;
-		double Pla = 0;
-		double diversityTotal = 0;
 
 		Iterator<Integer> iterator = solution.getSelectedIDs().iterator();
 
@@ -77,7 +77,6 @@ public class NumberEffectiveAllelesMultiAllelic implements
 	@Override
 	public boolean isMinimizing()
 	{
-		// TODO Auto-generated method stub
 		return false;
 	}
 
