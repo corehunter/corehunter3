@@ -12,8 +12,8 @@ package org.corehunter;
 
 import java.util.concurrent.TimeUnit;
 
-import org.corehunter.data.DistanceMatrixData;
 import org.jamesframework.core.problems.SubsetProblemWithData;
+import org.jamesframework.core.problems.datatypes.SubsetData;
 import org.jamesframework.core.problems.objectives.Objective;
 import org.jamesframework.core.problems.solutions.SubsetSolution;
 import org.jamesframework.core.search.algo.RandomDescent;
@@ -24,15 +24,15 @@ import org.jamesframework.core.search.stopcriteria.MaxRuntime;
 /**
  * @author Guy Davenport
  */
-public class Corehunter
+public class Corehunter<DataType extends SubsetData>
 {
 	private long	                         timeLimit	= 60;
 	private SearchListener<SubsetSolution>	searchListener;
 
-	public SubsetSolution executeRandomDescent(DistanceMatrixData data,
-	    Objective<SubsetSolution, DistanceMatrixData> objective, int subsetSize)
+	public SubsetSolution executeRandomDescent(DataType data,
+	    Objective<SubsetSolution, DataType> objective, int subsetSize)
 	{
-		SubsetProblemWithData<DistanceMatrixData> problem = new SubsetProblemWithData<DistanceMatrixData>(
+		SubsetProblemWithData<DataType> problem = new SubsetProblemWithData<DataType>(
 		    objective, data, subsetSize);
 
 		RandomDescent<SubsetSolution> search = new RandomDescent<SubsetSolution>(

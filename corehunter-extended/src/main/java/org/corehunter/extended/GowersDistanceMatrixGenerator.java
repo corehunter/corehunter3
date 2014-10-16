@@ -15,6 +15,7 @@
  *******************************************************************************/
 package org.corehunter.extended;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.commons.lang3.ObjectUtils;
@@ -23,6 +24,7 @@ import org.corehunter.simple.SimpleDistanceMatrixData;
 
 import uno.informatics.model.ContinuousScale;
 import uno.informatics.model.Feature;
+import uno.informatics.model.FeatureDataset;
 import uno.informatics.model.Scale;
 
 /**
@@ -43,10 +45,17 @@ public class GowersDistanceMatrixGenerator implements DistanceMatrixGenerator
 	private int[] scaleTypes ;
 	private double[] ranges;
 	
+	public GowersDistanceMatrixGenerator(FeatureDataset dataset)
+	{
+		this(dataset.getValuesAsArray(), dataset.getFeaturesAsArray()) ;
+	}
+	
 	public GowersDistanceMatrixGenerator(Object[][] data, Feature[] features)
 	{
 		if (data == null || features == null)
 			throw new IllegalArgumentException("Features and data must be defined!") ;
+		
+		ids = new HashSet<Integer>() ;
 		
 		for (int id = 0; id < data.length; ++id)
 		{
@@ -73,6 +82,7 @@ public class GowersDistanceMatrixGenerator implements DistanceMatrixGenerator
 							scaleTypes[i] = DISCRETE_SCALE_TYPE ;
 							break;
 					}
+					break ;
 				case INTERVAL:
 				case ORDINAL:
 				case RATIO:
@@ -100,6 +110,7 @@ public class GowersDistanceMatrixGenerator implements DistanceMatrixGenerator
 							throw new IllegalArgumentException("Illegal scale type : " + features[i].getScale().getScaleType() + 
 									" for data type " + features[i].getScale().getDataType()) ;
 					}
+					break ;
 				case NONE:
 				default:
 					throw new IllegalArgumentException("Illegal scale type : " + features[i].getScale().getScaleType()) ;
@@ -121,11 +132,14 @@ public class GowersDistanceMatrixGenerator implements DistanceMatrixGenerator
 			
 			for (int j = i+1 ; j < data.length; ++j)
 			{
-				for (int k = 0 ; k < features.length; ++j)
+				for (int k = 0 ; k < features.length; ++k)
 				{
-					distances[i][j] = calculate(scaleTypes[k], ranges[k], data[i][k], data[j][k]) ;
-					distances[j][i] = distances[i][j] ;
-				}		
+					distances[i][j] = distances[i][j] + calculate(scaleTypes[k], ranges[k], data[i][k], data[j][k]) ;
+					
+				}	
+				
+				distances[i][j] = distances[i][j] / features.length ;
+				distances[j][i] = distances[i][j] ;
 			}		
 		}			
 		
