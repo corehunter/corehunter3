@@ -18,13 +18,21 @@ package org.corehunter.extended.test;
 import static org.junit.Assert.assertEquals;
 
 import java.util.Iterator;
+import java.util.List;
 
 import org.corehunter.data.DistanceMatrixData;
 import org.corehunter.extended.GowersDistanceMatrixGenerator;
 import org.junit.Test;
 
+import uno.informatics.data.dataset.DatasetException;
+import uno.informatics.data.feature.ColumnFeature;
+import uno.informatics.data.feature.array.ArrayFeatureDataset;
+import uno.informatics.data.io.FileProperties;
+import uno.informatics.data.io.FileType;
+import uno.informatics.data.utils.DatasetUtils;
 import uno.informatics.model.DataType;
 import uno.informatics.model.Feature;
+import uno.informatics.model.FeatureDataset;
 import uno.informatics.model.ScaleType;
 
 /**
@@ -34,6 +42,11 @@ import uno.informatics.model.ScaleType;
 public class GowersDistanceMatrixGeneratorTest
 {
 
+	private static final String DATA_FILE = "Datos_11_25_2013.csv";
+	private static final String UID = "test";
+	private static final String NAME = "test";
+	private static final String DESCRIPTION = "test";
+	
 	private static final Object[][] DATA = new Object[][] {
 				new Object[] {1, 1.0, "1", true},
 				new Object[] {2, 3.0, "2", true},
@@ -94,5 +107,34 @@ public class GowersDistanceMatrixGeneratorTest
 			}
 		}
 	}
+	
+	public void testGenerateDistanceMatrixFromFile() 
+	{
+		try
+    {
+	    FileProperties fileProperties = new FileProperties(GowersDistanceMatrixGeneratorTest.class.getResource(DATA_FILE).getPath(), FileType.CSV) ;
+	    
+	    fileProperties.setColumnHeaderPosition(0) ;
+	    fileProperties.setDataPosition(1) ;
+	    
+	    List<ColumnFeature> features = DatasetUtils.generateDatasetFeatures(fileProperties, null, 10) ;
+	    
+	    FeatureDataset dataset = 
+	    		ArrayFeatureDataset.createFeatureDataset(UID, NAME, DESCRIPTION, DatasetUtils.createFeatures(features), fileProperties) ;
+	    
+			GowersDistanceMatrixGenerator generator = new GowersDistanceMatrixGenerator(dataset) ;
+			
+	    DistanceMatrixData data = generator.generateDistanceMatrix() ;
+	    
+	    
 
+    }
+    catch (DatasetException e)
+    {
+	    // TODO Auto-generated catch block
+	    e.printStackTrace();
+    }
+		
+		
+	}
 }
