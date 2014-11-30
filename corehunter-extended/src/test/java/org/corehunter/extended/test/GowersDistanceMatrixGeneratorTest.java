@@ -29,10 +29,12 @@ import uno.informatics.data.feature.ColumnFeature;
 import uno.informatics.data.feature.array.ArrayFeatureDataset;
 import uno.informatics.data.io.FileProperties;
 import uno.informatics.data.io.FileType;
+import uno.informatics.data.matrix.array.DoubleArrayMatrixDataset;
 import uno.informatics.data.utils.DatasetUtils;
 import uno.informatics.model.DataType;
 import uno.informatics.model.Feature;
 import uno.informatics.model.FeatureDataset;
+import uno.informatics.model.MatrixDataset;
 import uno.informatics.model.ScaleType;
 
 /**
@@ -42,7 +44,9 @@ import uno.informatics.model.ScaleType;
 public class GowersDistanceMatrixGeneratorTest
 {
 
-	private static final String DATA_FILE = "Datos_11_25_2013.csv";
+	private static final String DATA_FILE = "/Datos_11_25_2013.csv";
+	private static final String MATRIX_FILE = "/matrix.csv";
+	
 	private static final String UID = "test";
 	private static final String NAME = "test";
 	private static final String DESCRIPTION = "test";
@@ -63,12 +67,15 @@ public class GowersDistanceMatrixGeneratorTest
 		};
 	
 	private static final double[][] MATRIX = new double[][] {
-			new double[] {0.0, 0.6, 0.55, 0.15, 0.65},
-			new double[] {0.6, 0.0, 0.45, 0.55, 0.55},
-			new double[] {0.55, 0.45, 0.0, 0.35, 0.6},
-			new double[] {0.15, 0.55, 0.35, 0.0, 0.4},
-			new double[] {0.65, 0.55, 0.6, 0.4, 0.0}
+			new double[] {1.0, 0.6, 0.55, 0.15, 0.65},
+			new double[] {0.6, 1.0, 0.45, 0.55, 0.55},
+			new double[] {0.55, 0.45, 1.0, 0.35, 0.6},
+			new double[] {0.15, 0.55, 0.35, 1.0, 0.4},
+			new double[] {0.65, 0.55, 0.6, 0.4, 1.0}
 	};
+	
+	private static final double DELTA = 0.0000001;
+	
 	
 	/**
 	 * Test method for {@link org.corehunter.extended.test.GowersDistanceMatrixGenerator#GowersDistanceMatrixGenerator(java.lang.Object[][], uno.informatics.model.Feature[])}.
@@ -108,6 +115,7 @@ public class GowersDistanceMatrixGeneratorTest
 		}
 	}
 	
+	@Test
 	public void testGenerateDistanceMatrixFromFile() 
 	{
 		try
@@ -119,14 +127,33 @@ public class GowersDistanceMatrixGeneratorTest
 	    
 	    List<ColumnFeature> features = DatasetUtils.generateDatasetFeatures(fileProperties, null, 10) ;
 	    
+	    ColumnFeature rowHeaderFeature = features.remove(0) ;
+	    
+	    fileProperties.setRowHeaderPosition(0) ;
+	    
 	    FeatureDataset dataset = 
-	    		ArrayFeatureDataset.createFeatureDataset(UID, NAME, DESCRIPTION, DatasetUtils.createFeatures(features), fileProperties) ;
+	    		ArrayFeatureDataset.createFeatureDataset(UID, NAME, DESCRIPTION, DatasetUtils.createFeatures(features), fileProperties, rowHeaderFeature) ;
 	    
 			GowersDistanceMatrixGenerator generator = new GowersDistanceMatrixGenerator(dataset) ;
 			
 	    DistanceMatrixData data = generator.generateDistanceMatrix() ;
 	    
+	    Feature elementFeature = null ;
 	    
+	    fileProperties = new FileProperties(GowersDistanceMatrixGeneratorTest.class.getResource(MATRIX_FILE).getPath(), FileType.CSV) ;
+	    
+	    fileProperties.setColumnHeaderPosition(0) ;
+	    fileProperties.setDataPosition(1) ;
+	    fileProperties.setRowHeaderPosition(0) ;
+	    
+			MatrixDataset<Double> matrix = 
+	    		DoubleArrayMatrixDataset.createMatrixDataset(
+	    				UID, NAME, DESCRIPTION, elementFeature, 
+	    				fileProperties, rowHeaderFeature, rowHeaderFeature);
+			
+			for (int x = 0 ; x < features.size() ; ++x)
+				for (int y = 0 ; y < features.size() ; ++y)
+					assertEquals("x="+x+" y="+y, (double)matrix.getValue(x, y), 1 - data.getDistance(x, y), DELTA) ;
 
     }
     catch (DatasetException e)
@@ -134,7 +161,5 @@ public class GowersDistanceMatrixGeneratorTest
 	    // TODO Auto-generated catch block
 	    e.printStackTrace();
     }
-		
-		
 	}
 }

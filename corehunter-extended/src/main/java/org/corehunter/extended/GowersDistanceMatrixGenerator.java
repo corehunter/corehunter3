@@ -95,9 +95,9 @@ public class GowersDistanceMatrixGenerator implements DistanceMatrixGenerator
 						case INTEGER:
 						case LONG:
 						case SHORT:
-							ranges[i] = calculateRange(features[i].getScale()) ;
+							ranges[i] = calculateRange(data, i, features[i].getScale()) ;
 							
-							if (ranges[i] >= 0)
+							if (ranges[i] > 0)
 								scaleTypes[i] = RANGED_SCALE_TYPE ;
 							else
 								scaleTypes[i] = DISCRETE_SCALE_TYPE ; // default to discrete 
@@ -124,42 +124,86 @@ public class GowersDistanceMatrixGenerator implements DistanceMatrixGenerator
 	public DistanceMatrixData generateDistanceMatrix()
 	{
 		double[][] distances = new double[ids.size()][ids.size()];
+		double[][] weights = new double[ids.size()][ids.size()];
 		
 		for (int i = 0 ; i < data.length ; ++i)
 		{
 			if (data[i].length != features.length)
 				throw new IllegalArgumentException("Number of features must match number of elements in a row!") ;
 			
-			for (int j = i+1 ; j < data.length; ++j)
+			double distance = 0.0 ;
+			double weight = 0.0 ;
+			
+			for (int j = i ; j < data.length; ++j)
 			{
 				for (int k = 0 ; k < features.length; ++k)
 				{
-					distances[i][j] = distances[i][j] + calculate(scaleTypes[k], ranges[k], data[i][k], data[j][k]) ;
+					distance = distance(scaleTypes[k], ranges[k], data[i][k], data[j][k]) ;
+					weight = weight(scaleTypes[k], ranges[k], data[i][k], data[j][k]) ;
 					
+					distances[i][j] = distances[i][j] + (distance * weight) ;
+					weights[i][j] = weights[i][j] + weight ;
 				}	
 				
-				distances[i][j] = distances[i][j] / features.length ;
+				distances[i][j] = distances[i][j] / weights[i][j] ;
 				distances[j][i] = distances[i][j] ;
-			}		
+			}	
 		}			
 		
 		return new SimpleDistanceMatrixData(ids, distances) ;
 	}
 	
 	/**
+	 * @param data 
 	 * @param scale
 	 * @return
 	 */
-  private double calculateRange(Scale scale)
+  private double calculateRange(Object[][] data, int index, Scale scale)
   {
   	if (scale instanceof ContinuousScale)
   		return ((ContinuousScale)scale).getMaximumValue().doubleValue() - ((ContinuousScale)scale).getMinimumValue().doubleValue();
   	else
-  		return 0;
+  		return calculateRange(data, index);
+  }
+	
+	/**
+	 * @param data
+	 * @param index
+	 * @return
+	 */
+  private double calculateRange(Object[][] data, int index)
+  {
+  	double max = Double.MIN_VALUE;
+  	double min = Double.MAX_VALUE;
+  	double value ;
+  	
+  	boolean valid = true ;
+
+  	for (int i = 0 ; i < data.length &&valid ; ++i)
+  	{
+  		if (data[i][index] instanceof Number)
+  		{
+  			value = ((Number)data[i][index]).doubleValue() ;
+  			
+  			if (value > max)
+  				max = value ;
+  			
+  			if (value < min)
+  				min = value ;
+  		}
+  		else
+  		{
+  			valid = false ;
+  		}
+  	}
+  	
+  	if (valid)
+  		return max - min ;
+  	else
+  		return 0.0 ;
   }
 
-	
-	private double calculate(int scaleType, double range, Object elementA, Object elementB)
+	private double distance(int scaleType, double range, Object elementA, Object elementB)
 	{
 		if (elementA != null && elementB != null)
 		{
@@ -176,9 +220,30 @@ public class GowersDistanceMatrixGenerator implements DistanceMatrixGenerator
 					else
 						return 0;
 				case RANGED_SCALE_TYPE:
-					return 1 - (Math.abs(((Number) elementA).doubleValue() - ((Number) elementB).doubleValue()) / range) ;
+					return 1.0 - (Math.abs(((Number) elementA).doubleValue() - ((Number) elementB).doubleValue()) / range) ;
 				default:
 					break;
+			}
+		}
+
+		return 0;
+	}
+	
+	private double weight(int scaleType, double range, Object elementA, Object elementB)
+	{
+		if (elementA != null && elementB != null)
+		{
+			switch (scaleType)
+			{
+				case BINARY_SCALE_TYPE:
+					if ((Boolean)elementA || (Boolean)elementB)
+						return 1;
+					else
+						return 0;
+				case DISCRETE_SCALE_TYPE:
+				case RANGED_SCALE_TYPE:
+				default:
+						return 1;
 			}
 		}
 
