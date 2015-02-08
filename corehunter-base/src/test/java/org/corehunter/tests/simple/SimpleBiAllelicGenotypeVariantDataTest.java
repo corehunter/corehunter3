@@ -16,43 +16,24 @@
 package org.corehunter.tests.simple;
 
 import static org.junit.Assert.*;
+import static org.corehunter.tests.TestData.* ;
 
 import java.util.Iterator;
 
 import org.corehunter.simple.SimpleBiAllelicGenotypeVariantData;
-import org.corehunter.tests.TestData;
+
 import org.junit.Test;
 
 /**
  * @author Guy Davenport
  *
  */
-public class SimpleBiAllelicGenotypeVariantDataTest extends TestData
+public class SimpleBiAllelicGenotypeVariantDataTest
 {
-	private static final String[] MARKER_NAMES = new String [] 
-			{
-				"mk1",
-				"mk2",
-				"mk3",
-				"mk4",
-				"mk5",
-				"mk6",
-				"mk7"
-			};
-	
-	private static final int[][] ALLELES = new int [][] 
-			{
-		new int [] {1,0,2,1,1,0,0},
-		new int [] {2,0,2,0,1,2,1},
-		new int [] {1,0,1,0,1,1,0},
-		new int [] {1,0,1,1,1,2,2},
-		new int [] {1,0,2,0,1,2,0}
-	};
-
 	@Test
 	public void test()
 	{
-		SimpleBiAllelicGenotypeVariantData data = new SimpleBiAllelicGenotypeVariantData(NAMES, MARKER_NAMES, ALLELES) ;
+		SimpleBiAllelicGenotypeVariantData data = new SimpleBiAllelicGenotypeVariantData(NAMES, MARKER_NAMES, ALLELE_SCORES) ;
 		
 		assertEquals("Ids not correct!", SET, data.getIDs()) ;
 		
@@ -78,7 +59,7 @@ public class SimpleBiAllelicGenotypeVariantDataTest extends TestData
 			
 			for (int j = 0; j < size; j++)
 			{
-				assertEquals("Alele["+index+"]["+j+"] not correct!", ALLELES[index][j], data.getAlleleScore(index, j)) ;
+				assertEquals("Alele["+index+"]["+j+"] not correct!", ALLELE_SCORES[index][j], data.getAlleleScore(index, j)) ;
 			}		
 			
 			++ i ;

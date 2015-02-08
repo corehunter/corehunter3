@@ -21,7 +21,7 @@ public class CoverageMultiAllelic implements
     Objective<SubsetSolution, MultiAllelicGenotypeVariantData>
 {
 
-	ProportionNonInformativeAllelesMultiAllelic	pn;
+	private ProportionNonInformativeAllelesMultiAllelic	pn;
 
 	/**
 	 * @param data
@@ -55,5 +55,4 @@ public class CoverageMultiAllelic implements
 		// TODO Auto-generated method stub
 		return false;
 	}
-
 }

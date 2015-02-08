@@ -30,6 +30,7 @@ public class SimpleMultiAllelicGenotypeVariantData extends AbstractNamedSubsetDa
 	private int[] numberOfAlleles;
 	private String[] markerNames;
 	private String[][] alleleNames;
+	private int totalNumberAlleles;
 
 	/**
 	 * @param names
@@ -54,6 +55,8 @@ public class SimpleMultiAllelicGenotypeVariantData extends AbstractNamedSubsetDa
 	  if (names.length != alleleFrequencies.length)
 	  	throw new IllegalArgumentException("Number of allele frequency entries don't match number of names!") ;
 	  
+	  totalNumberAlleles = 0 ;
+	  
 	  if (alleleFrequencies.length > 0)
 	  {
 		  numberOfMarkers = markerNames.length ;
@@ -71,6 +74,8 @@ public class SimpleMultiAllelicGenotypeVariantData extends AbstractNamedSubsetDa
 			  this.markerNames[j] = markerNames[j] ;
 			  
 			  numberOfAlleles[j] = alleleNames[j].length ; 
+			  
+			  totalNumberAlleles = totalNumberAlleles + numberOfAlleles[j] ;
 			  
 			  this.alleleNames[j] = new String[numberOfAlleles[j]] ;
 			  
@@ -133,6 +138,15 @@ public class SimpleMultiAllelicGenotypeVariantData extends AbstractNamedSubsetDa
   public int getNumberOfAlleles(int markerIndex)
   {
 	  return numberOfAlleles[markerIndex];
+  }
+  
+	/* (non-Javadoc)
+	 * @see org.corehunter.data.MultiAllelicGenotypeVariantData#getTotalNumberAlleles()
+	 */
+  @Override
+  public int getTotalNumberAlleles()
+  {
+	  return totalNumberAlleles;
   }
 
 	/* (non-Javadoc)

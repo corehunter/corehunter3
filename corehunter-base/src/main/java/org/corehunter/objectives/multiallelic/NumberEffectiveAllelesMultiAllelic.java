@@ -80,5 +80,4 @@ public class NumberEffectiveAllelesMultiAllelic implements
 		// TODO Auto-generated method stub
 		return false;
 	}
-
 }

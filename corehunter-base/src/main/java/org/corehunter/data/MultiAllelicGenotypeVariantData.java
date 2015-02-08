@@ -49,4 +49,11 @@ public interface MultiAllelicGenotypeVariantData extends GenotypeVariantData
 	 * @return the number of alleles for a given marker
 	 */
 	public int getNumberOfAlleles(int markerIndex);
+	
+	/**
+	 * Get the total number of allele across all markers
+	 * 
+	 * @return the total number of allele across all markers
+	 */
+  public int getTotalNumberAlleles() ;
 }

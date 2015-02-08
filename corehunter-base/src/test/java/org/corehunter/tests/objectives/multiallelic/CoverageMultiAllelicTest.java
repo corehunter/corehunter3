@@ -13,37 +13,37 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-package org.corehunter.tests.simple;
+package org.corehunter.tests.objectives.multiallelic;
 
 import static org.junit.Assert.*;
+import static org.corehunter.tests.TestData.* ;
 
-import org.corehunter.simple.SimpleDistanceMatrixData;
-import org.corehunter.tests.TestData;
+import org.corehunter.objectives.multiallelic.CoverageMultiAllelic;
+import org.corehunter.simple.SimpleMultiAllelicGenotypeVariantData;
+import org.jamesframework.core.problems.solutions.SubsetSolution;
 import org.junit.Test;
 
 /**
  * @author Guy Davenport
  *
  */
-public class SimpleDistanceMatrixDataTest extends TestData
+public class CoverageMultiAllelicTest
 {
-
+	/**
+	 * Test method for {@link org.corehunter.objectives.distance.multiallelic.CavalliSforzaEdwardsDistanceMultiAllelic#getDistance(int, int)}.
+	 */
 	@Test
 	public void test()
 	{
-		SimpleDistanceMatrixData data = new SimpleDistanceMatrixData(SET, DISTANCES) ;
-		
-		assertEquals("Ids not correct!", SET, data.getIDs()) ;
+		SimpleMultiAllelicGenotypeVariantData data = 
+				new SimpleMultiAllelicGenotypeVariantData(NAMES, MARKER_NAMES, ALLELE_NAMES, ALLELES) ;
 
-		int size = data.getIDs().size() ;
+		CoverageMultiAllelic distanceMetric = 
+				new CoverageMultiAllelic() ;
+
+		assertEquals("Evaluation for subset 1 is not correct!", COVERAGE_SUBSET1, 
+				distanceMetric.evaluate(new SubsetSolution(data.getIDs(), SUBSET1), data), PRECISION) ;
 		
-		for (int i = 0; i < size; i++)
-		{
-			for (int j = 0; j < size; j++)
-			{
-				assertEquals("Distance["+i+"]["+j+"] not correct!", DISTANCES[i][j], data.getDistance(i, j), PRECISION) ;
-			}		
-		}
 	}
 
 }

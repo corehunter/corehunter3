@@ -44,5 +44,4 @@ public class ProportionNonInformativeAllelesMultiAllelic implements
 		// TODO Auto-generated method stub
 		return false;
 	}
-
 }

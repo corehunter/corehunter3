@@ -26,7 +26,7 @@ public class AverageDistanceObjectiveTest extends TestData
 	{
 		AverageDistanceObjective objective = new AverageDistanceObjective();
 
-		SubsetSolution solution = new SubsetSolution(SET, SUBSET);
+		SubsetSolution solution = new SubsetSolution(SET, SUBSET1);
 
 		objective.evaluate(solution, DATA);
 	}

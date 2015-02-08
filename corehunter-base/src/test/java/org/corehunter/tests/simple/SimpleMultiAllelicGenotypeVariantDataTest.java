@@ -16,6 +16,7 @@
 package org.corehunter.tests.simple;
 
 import static org.junit.Assert.*;
+import static org.corehunter.tests.TestData.* ;
 
 import java.util.Iterator;
 
@@ -28,87 +29,8 @@ import org.junit.Test;
  * @author Guy Davenport
  *
  */
-public class SimpleMultiAllelicGenotypeVariantDataTest extends TestData
+public class SimpleMultiAllelicGenotypeVariantDataTest
 {
-	private static final String[] MARKER_NAMES = new String [] 
-			{
-				"mk1",
-				"mk2",
-				"mk3",
-				"mk4",
-				"mk5",
-				"mk6",
-				"mk7"
-			};
-	
-	private static final double[][][] ALLELES = new double [][][]
-	{
-	    new double[][] 
-	    { 
-	    		new double[] { 0.33, 0.33, 0.33 },
-	    		new double[] { 0.5, 0.5 }, 
-	    		new double[] { 0, 0.5, 0.5 },
-	    		new double[] { 0.25, 0.25, 0.25, 0.25 },
-	    		new double[] { 0.33, 0.33, 0.33 }, 
-	    		new double[] { 0.0, 1.0 },
-	    		new double[] { 1.0, 0.0 } 
-	    },
-	    new double[][] 
-	    { 
-	    		new double[] { 0.33, 0.33, 0.33 },
-	    		new double[] { 0.5, 0.5 }, 
-	    		new double[] { 0, 0.5, 0.5 },
-	    		new double[] { 0.25, 0.25, 0.25, 0.25 },
-	    		new double[] { 0.33, 0.33, 0.33 }, 
-	    		new double[] { 0.0, 1.0 },
-	    		new double[] { 1.0, 0.0 } 
-	    },
-	    new double[][] 
-	    { 
-	    		new double[] { 0.33, 0.33, 0.33 },
-	    		new double[] { 0.5, 0.5 }, 
-	    		new double[] { 0, 0.5, 0.5 },
-	    		new double[] { 0.25, 0.25, 0.25, 0.25 },
-	    		new double[] { 0.33, 0.33, 0.33 }, 
-	    		new double[] { 0.0, 1.0 },
-	    		new double[] { 1.0, 0.0 } 
-	    },
-	    new double[][] 
-	    { 
-	    		new double[] { 0.33, 0.33, 0.33 },
-	    		new double[] { 0.5, 0.5 }, 
-	    		new double[] { 0, 0.5, 0.5 },
-	    		new double[] { 0.25, 0.25, 0.25, 0.25 },
-	    		new double[] { 0.33, 0.33, 0.33 }, 
-	    		new double[] { 0.0, 1.0 },
-	    		new double[] { 1.0, 0.0 } 
-	    },
-	    new double[][] 
-	    { 
-	    		new double[] { 0.33, 0.33, 0.33 },
-	    		new double[] { 0.5, 0.5 }, 
-	    		new double[] { 0, 0.5, 0.5 },
-	    		new double[] { 0.25, 0.25, 0.25, 0.25 },
-	    		new double[] { 0.33, 0.33, 0.33 }, 
-	    		new double[] { 0.0, 1.0 },
-	    		new double[] { 1.0, 0.0 } 
-	    }
-	};
-
-	private static final String[][] ALLELE_NAMES = new String [][] 
-			{
-		new String [] {"mk1-1","mk1-2","mk1-3"},
-		new String [] {"mk2-1","mk2-2"},
-		new String [] {"mk3-1","mk3-2","mk3-3"},
-		new String [] {"mk4-1","mk4-2","mk4-3","mk4-3"},
-		new String [] {"mk5-1","mk5-2","mk5-3"},
-		new String [] {"mk6-1","mk6-2"},
-		new String [] {"mk7-1","mk7-2"}
-	};
-
-	private static final double PRESCISION = 0;
-
-
 	@Test
 	public void test()
 	{
@@ -145,7 +67,7 @@ public class SimpleMultiAllelicGenotypeVariantDataTest extends TestData
 			{
 				for (int k = 0; k < data.getNumberOfAlleles(j); k++)
 				{
-					assertEquals("Alele["+index+"]["+j+"] not correct!", ALLELES[i][j][k], data.getAlelleFrequency(index, j, k), PRESCISION) ;
+					assertEquals("Alele["+index+"]["+j+"] not correct!", ALLELES[i][j][k], data.getAlelleFrequency(index, j, k), PRECISION) ;
 				}
 			}		
 		

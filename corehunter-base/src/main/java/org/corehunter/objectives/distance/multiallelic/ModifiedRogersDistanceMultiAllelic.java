@@ -8,22 +8,22 @@
  * KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  *******************************************************************************/
-package org.corehunter.objectives.multiallelic;
+package org.corehunter.objectives.distance.multiallelic;
 
 import org.corehunter.data.MultiAllelicGenotypeVariantData;
+import org.corehunter.objectives.distance.AbstractGenotypeVariantDistanceMetric;
 
 /**
  * @author Guy Davenport
  */
-public class CavalliSforzaEdwardsDistanceMultiAllelic extends
+public class ModifiedRogersDistanceMultiAllelic extends
     AbstractGenotypeVariantDistanceMetric<MultiAllelicGenotypeVariantData>
 {
 
 	/**
 	 * @param data
 	 */
-	public CavalliSforzaEdwardsDistanceMultiAllelic(
-	    MultiAllelicGenotypeVariantData data)
+	public ModifiedRogersDistanceMultiAllelic(MultiAllelicGenotypeVariantData data)
 	{
 		super(data);
 	}
@@ -42,9 +42,6 @@ public class CavalliSforzaEdwardsDistanceMultiAllelic extends
 
 		double markerSqDiff = 0;
 		double sumMarkerSqDiff = 0;
-		double sqrtDiff = 0;
-		double Pxla;
-		double Pyla;
 
 		for (int markerIndex = 0; markerIndex < numberOfMarkers; ++markerIndex)
 		{
@@ -52,13 +49,14 @@ public class CavalliSforzaEdwardsDistanceMultiAllelic extends
 
 			for (int alleleIndex = 0; alleleIndex < numberOfAlleles; ++alleleIndex)
 			{
-				Pxla = getData().getAlelleFrequency(idX, markerIndex, alleleIndex);
-				Pyla = getData().getAlelleFrequency(idY, markerIndex, alleleIndex);
+				double Pxla = getData().getAlelleFrequency(idX, markerIndex,
+				    alleleIndex);
+				double Pyla = getData().getAlelleFrequency(idY, markerIndex,
+				    alleleIndex);
 
 				if (Pxla >= 0 && Pyla >= 0)
 				{
-					sqrtDiff = Math.sqrt(Pxla) - Math.sqrt(Pyla);
-					markerSqDiff += (sqrtDiff) * (sqrtDiff);
+					markerSqDiff += (Pxla - Pyla) * (Pxla - Pyla);
 				}
 			}
 

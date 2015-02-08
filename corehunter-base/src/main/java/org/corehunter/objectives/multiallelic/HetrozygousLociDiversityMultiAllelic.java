@@ -79,5 +79,4 @@ public class HetrozygousLociDiversityMultiAllelic implements
 	{
 		return false;
 	}
-
 }

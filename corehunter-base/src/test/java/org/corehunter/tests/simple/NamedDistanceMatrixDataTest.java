@@ -15,17 +15,20 @@
  *******************************************************************************/
 package org.corehunter.tests.simple;
 
-import static org.junit.Assert.*;
+import static org.corehunter.tests.TestData.DISTANCES;
+import static org.corehunter.tests.TestData.NAMES;
+import static org.corehunter.tests.TestData.PRECISION;
+import static org.corehunter.tests.TestData.SET;
+import static org.junit.Assert.assertEquals;
 
 import org.corehunter.simple.NamedDistanceMatrixData;
-import org.corehunter.tests.TestData;
 import org.junit.Test;
 
 /**
  * @author Guy Davenport
  *
  */
-public class NamedDistanceMatrixDataTest extends TestData
+public class NamedDistanceMatrixDataTest
 {
 
 	@Test
@@ -43,7 +46,7 @@ public class NamedDistanceMatrixDataTest extends TestData
 			
 			for (int j = 0; j < size; j++)
 			{
-				assertEquals("Distance["+i+"]["+i+"] not correct!", DISTANCES[i][j], data.getDistance(i, j), PRECISION) ;
+				assertEquals("Distance["+i+"]["+j+"] not correct!", DISTANCES[i][j], data.getDistance(i, j), PRECISION) ;
 			}		
 		}
 	}

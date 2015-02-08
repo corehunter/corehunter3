@@ -30,7 +30,7 @@ public class ShannonsDiversityMultiAllelic implements
 	public double evaluate(SubsetSolution solution,
 	    MultiAllelicGenotypeVariantData data)
 	{
-		// TODO Auto-generated method stub
+
 		return 0;
 	}
 
@@ -44,5 +44,4 @@ public class ShannonsDiversityMultiAllelic implements
 		// TODO Auto-generated method stub
 		return false;
 	}
-
 }
