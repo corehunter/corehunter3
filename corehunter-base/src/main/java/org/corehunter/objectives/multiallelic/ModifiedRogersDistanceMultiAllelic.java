@@ -44,7 +44,7 @@ public class ModifiedRogersDistanceMultiAllelic extends
 
 		for (int markerIndex = 0; markerIndex < numberOfMarkers; ++markerIndex)
 		{
-			numberOfAlleles = getData().getNumberOfAllele(markerIndex);
+			numberOfAlleles = getData().getNumberOfAlleles(markerIndex);
 
 			for (int alleleIndex = 0; alleleIndex < numberOfAlleles; ++alleleIndex)
 			{

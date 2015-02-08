@@ -47,7 +47,7 @@ public class NumberEffectiveAllelesMultiAllelic implements
 		{
 			for (int markerIndex = 0; markerIndex < numberOfMarkers; ++markerIndex)
 			{
-				numberOfAlleles = data.getNumberOfAllele(markerIndex);
+				numberOfAlleles = data.getNumberOfAlleles(markerIndex);
 
 				lociTotal = 0.0;
 				lociTerm = 0.0;

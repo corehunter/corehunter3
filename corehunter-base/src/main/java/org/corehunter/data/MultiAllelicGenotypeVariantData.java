@@ -11,7 +11,7 @@
 package org.corehunter.data;
 
 /**
- * Data contains relative frequencies of markers that two or more alleles. If
+ * Data contains relative frequencies of markers that have two or more alleles. If
  * all the markers used in these data have two and only two alleles, such as
  * classic SNP data, then it more efficient to use
  * {@link BiAllelicGenotypeVariantData}
@@ -33,7 +33,7 @@ public interface MultiAllelicGenotypeVariantData extends GenotypeVariantData
 	 * @param alleleIndex
 	 *          the index of the allele for the given marker within the range 0 to
 	 *          m-1, where m is the total number of alleles for a given marker and
-	 *          is returned by {@link #getNumberOfAllele(int)}
+	 *          is returned by {@link #getNumberOfAlleles(int)}
 	 * @return the relative frequency of an allele for a given marker in a given
 	 *         entity
 	 */
@@ -48,5 +48,5 @@ public interface MultiAllelicGenotypeVariantData extends GenotypeVariantData
 	 *          {@link #getNumberOfMarkers()}
 	 * @return the number of alleles for a given marker
 	 */
-	public int getNumberOfAllele(int markerIndex);
+	public int getNumberOfAlleles(int markerIndex);
 }

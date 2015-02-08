@@ -14,7 +14,8 @@ import org.jamesframework.core.problems.datatypes.SubsetData;
 
 /**
  * Base interface for all Genotype Variant Data. Implementation should not
- * implement this interface directly but use one of the sub-interfaces
+ * implement this interface directly but use one of the sub-interfaces 
+ * {@link MultiAllelicGenotypeVariantData} or {@link BiAllelicGenotypeVariantData}
  * 
  * @author Guy Davenport
  */

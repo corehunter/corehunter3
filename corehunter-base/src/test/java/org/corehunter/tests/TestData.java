@@ -21,6 +21,8 @@ import org.corehunter.simple.NamedDistanceMatrixData;
  */
 public class TestData
 {
+	protected static final double PRECISION = 0.000000001 ; 
+	
 	protected static final double[][]	        DISTANCES	= new double[][] {
 	    new double[] { 1.0, 0.8, 0.6, 0.4, 0.2 },
 	    new double[] { 0.8, 1.0, 0.8, 0.6, 0.4 },

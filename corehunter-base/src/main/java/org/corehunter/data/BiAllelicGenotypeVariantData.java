@@ -13,8 +13,7 @@ package org.corehunter.data;
 /**
  * Data contains the allele score for markers have two and only two alleles. If
  * any of the markers used in these data that three or more alleles, such as
- * classic SSR data, then it more efficient to use
- * {@link MultiAllelicGenotypeVariantData}
+ * classic SSR data, then {@link MultiAllelicGenotypeVariantData} must be used
  * 
  * @author Guy Davenport
  */

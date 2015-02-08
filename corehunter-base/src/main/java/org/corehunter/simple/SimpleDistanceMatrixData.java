@@ -10,7 +10,12 @@
  *******************************************************************************/
 package org.corehunter.simple;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 
 import org.corehunter.data.DistanceMatrixData;
 
@@ -19,13 +24,43 @@ import org.corehunter.data.DistanceMatrixData;
  */
 public class SimpleDistanceMatrixData implements DistanceMatrixData
 {
-	private double[][]	       distances;
+	private double[][] distances;
 	
-	private final Set<Integer>	ids;
+	private Set<Integer> ids;
+	private Map<Integer, Integer> idMap;
 
 	public SimpleDistanceMatrixData(Set<Integer> ids, double[][] distances)
 	{
-		this.ids = ids;
+	  if (ids == null)
+	  	throw new IllegalArgumentException("ids not defined!") ;
+	  
+		this.ids = new TreeSet<Integer>(ids);
+		
+		idMap = new HashMap<Integer, Integer>() ;
+		
+	  if (distances == null)
+	  	throw new IllegalArgumentException("Distances not defined!") ;
+	  
+	  if (this.ids.size() != distances.length)
+	  	throw new IllegalArgumentException("Number of ids do not match number of distances!") ;
+	  
+		this.distances = new double[distances.length][distances.length] ;
+
+		Iterator<Integer> iterator = this.ids.iterator() ;
+
+		for (int i = 0; i < distances.length; i++)
+		{
+			idMap.put(i, iterator.next());
+			
+			if (distances.length != distances[i].length)
+		  	throw new IllegalArgumentException("Number of distances do not match number of ids in row  :" + i + "!") ;
+			
+			for (int j = 0; j < distances[i].length; j++)
+			{
+				this.distances[i][j] = distances[i][j] ;
+			}		
+		}
+		
 		this.distances = distances;
 	}
 
@@ -44,8 +79,8 @@ public class SimpleDistanceMatrixData implements DistanceMatrixData
 	 * @see org.corehunter.DistanceMatrixData#getDistance(int, int)
 	 */
 	@Override
-	public double getDistance(int index1, int index2)
+	public double getDistance(int idX, int idY)
 	{
-		return distances[index1][index2];
+		return distances[idX][idY];
 	}
 }

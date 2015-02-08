@@ -10,45 +10,38 @@
  *******************************************************************************/
 package org.corehunter.simple;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import org.corehunter.data.DistanceMatrixData;
+import org.corehunter.data.NamedSubsetData;
 
 /**
  * @author Guy Davenport
  */
-public class NamedDistanceMatrixData implements DistanceMatrixData
+public class NamedDistanceMatrixData extends AbstractNamedSubsetData implements DistanceMatrixData, NamedSubsetData
 {
-	// item names
-	private final String[]	   names;
 	// distance matrix
-	private double[][]	       distances;
-	// IDs
-	private final Set<Integer>	ids;
+	private double[][] distances;
 
 	public NamedDistanceMatrixData(String[] names, double[][] distances)
 	{
-		this.names = names;
-		this.distances = distances;
-		// infer IDs: 0..N-1 in case of N items
-		// (indices in distance matrix and name array)
-		ids = new HashSet<Integer>();
+		super(names) ;
+		
+		this.distances = new double[distances.length][distances.length] ;
+		
+	  if (getIDs().size() != distances.length)
+	  	throw new IllegalArgumentException("Number of ids do not match number of distances!") ;
 
-		for (int id = 0; id < names.length; id++)
+		for (int i = 0; i < distances.length; i++)
 		{
-			ids.add(id);
+			if (distances.length != distances[i].length)
+		  	throw new IllegalArgumentException("Number of distances do not match number of ids in row  :" + i + "!") ;
+			
+			for (int j = 0; j < distances[i].length; j++)
+			{
+				this.distances[i][j] = distances[i][j] ;
+			}		
 		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.jamesframework.core.problems.datatypes.SubsetData#getIDs()
-	 */
-	@Override
-	public Set<Integer> getIDs()
-	{
-		return ids;
+		
+		this.distances = distances;
 	}
 
 	/*
@@ -56,13 +49,8 @@ public class NamedDistanceMatrixData implements DistanceMatrixData
 	 * @see org.corehunter.DistanceMatrixData#getDistance(int, int)
 	 */
 	@Override
-	public double getDistance(int index1, int index2)
+	public double getDistance(int idX, int idY)
 	{
-		return distances[index1][index2];
-	}
-
-	public String getName(int id)
-	{
-		return names[id];
+		return distances[idX][idY];
 	}
 }
