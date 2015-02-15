@@ -20,9 +20,7 @@ import static org.corehunter.tests.TestData.* ;
 
 import java.util.Iterator;
 
-import org.corehunter.simple.SimpleBiAllelicGenotypeVariantData;
 import org.corehunter.simple.SimpleMultiAllelicGenotypeVariantData;
-import org.corehunter.tests.TestData;
 import org.junit.Test;
 
 /**
