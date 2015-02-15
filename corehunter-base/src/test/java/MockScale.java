@@ -13,13 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-package org.corehunter.extended.test;
+
 
 import uno.informatics.model.DataType;
-import uno.informatics.model.Feature;
-import uno.informatics.model.Method;
 import uno.informatics.model.OntologyTerm;
-import uno.informatics.model.Property;
 import uno.informatics.model.Scale;
 import uno.informatics.model.ScaleType;
 
@@ -27,48 +24,20 @@ import uno.informatics.model.ScaleType;
  * @author Guy Davenport
  *
  */
-public class MockFeaure implements Feature
+public class MockScale implements Scale
 {
-	private Scale scale;
-
-	public MockFeaure()
-  {
-	  super();
-	  
-  }
-
-
+	private DataType dataType ;
+	private ScaleType scaleType ;
 	/**
 	 * @param dataType
 	 * @param scaleType
 	 */
-  public MockFeaure(DataType dataType, ScaleType scaleType)
+  public MockScale(DataType dataType, ScaleType scaleType)
   {
-  	scale = new MockScale(dataType, scaleType) ;
+	  this.dataType = dataType ;
+	  this.scaleType = scaleType ;
   }
-  
-	/**
-	 * @param dataType
-	 * @param scaleType
-	 * @param min
-	 * @param max
-	 */
-  public MockFeaure(DataType dataType, ScaleType scaleType, double min, double max)
-  {
-  	scale = new MockRangeScale(dataType, scaleType, min, max) ;
-  }
-  
-	/**
-	 * @param dataType
-	 * @param scaleType
-	 * @param min
-	 * @param max
-	 */
-  public MockFeaure(DataType dataType, ScaleType scaleType, int min, int max)
-  {
-  	scale = new MockRangeScale(dataType, scaleType, min, max) ;
-  }
-  
+
 	/* (non-Javadoc)
 	 * @see uno.informatics.model.Identifier#getAbbreviation()
 	 */
@@ -155,7 +124,6 @@ public class MockFeaure implements Feature
 	@Override
 	public String getDescription()
 	{
-		
 		return null;
 	}
 
@@ -170,60 +138,40 @@ public class MockFeaure implements Feature
 	}
 
 	/* (non-Javadoc)
-	 * @see uno.informatics.model.Feature#getProperty()
+	 * @see uno.informatics.model.Scale#getDataType()
 	 */
 	@Override
-	public Property getProperty()
+	public DataType getDataType()
 	{
 		
-		return null;
+		return dataType;
 	}
 
 	/* (non-Javadoc)
-	 * @see uno.informatics.model.Feature#setProperty(uno.informatics.model.Property)
+	 * @see uno.informatics.model.Scale#setDataType(uno.informatics.model.DataType)
 	 */
 	@Override
-	public void setProperty(Property value)
-	{
-		
-
-	}
-
-	/* (non-Javadoc)
-	 * @see uno.informatics.model.Feature#getScale()
-	 */
-	@Override
-	public Scale getScale()
-	{
-		
-		return scale ;
-	}
-
-	/* (non-Javadoc)
-	 * @see uno.informatics.model.Feature#setScale(uno.informatics.model.Scale)
-	 */
-	@Override
-	public void setScale(Scale value)
+	public void setDataType(DataType dataType)
 	{
 		
 
 	}
 
 	/* (non-Javadoc)
-	 * @see uno.informatics.model.Feature#getMethod()
+	 * @see uno.informatics.model.Scale#getScaleType()
 	 */
 	@Override
-	public Method getMethod()
+	public ScaleType getScaleType()
 	{
 		
-		return null;
+		return scaleType ;
 	}
 
 	/* (non-Javadoc)
-	 * @see uno.informatics.model.Feature#setMethod(uno.informatics.model.Method)
+	 * @see uno.informatics.model.Scale#setScaleType(uno.informatics.model.ScaleType)
 	 */
 	@Override
-	public void setMethod(Method value)
+	public void setScaleType(ScaleType scaleType)
 	{
 		
 

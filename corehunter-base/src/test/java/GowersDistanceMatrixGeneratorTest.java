@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-package org.corehunter.extended.test;
+
 
 import static org.junit.Assert.assertEquals;
 
@@ -21,7 +21,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.corehunter.data.DistanceMatrixData;
-import org.corehunter.extended.GowersDistanceMatrixGenerator;
+import org.corehunter.distance.GowersDistanceMatrixGenerator;
 import org.junit.Test;
 
 import uno.informatics.data.dataset.DatasetException;

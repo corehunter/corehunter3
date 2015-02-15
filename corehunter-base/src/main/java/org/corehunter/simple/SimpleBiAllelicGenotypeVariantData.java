@@ -25,43 +25,57 @@ import org.corehunter.data.NamedGenotypeVariantData;
 public class SimpleBiAllelicGenotypeVariantData extends AbstractNamedSubsetData
     implements BiAllelicGenotypeVariantData, NamedGenotypeVariantData
 {
-	private int[][] alleles ;
+	private int[][] alleleScores ;
 	private int numberOfMarkers;
 	private String[] markerNames;
 	
 	/**
 	 * @param names
 	 */
-  public SimpleBiAllelicGenotypeVariantData(String[] names, String[] markerNames, int[][] alleles)
+  public SimpleBiAllelicGenotypeVariantData(String[] names, String[] markerNames, int[][] alleleScores)
   {
 	  super(names);
 
 	  if (markerNames == null)
 	  	throw new IllegalArgumentException("Marker names not defined!") ;
 	  
-	  if (alleles == null)
+	  if (alleleScores == null)
 	  	throw new IllegalArgumentException("Alleles not deifned!") ;
 	  
-	  if (names.length != alleles.length)
-	  	throw new IllegalArgumentException("Number of alleles don't match number of names!") ;
+	  if (names.length != alleleScores.length)
+	  	throw new IllegalArgumentException("Number of alleleScores don't match number of names!") ;
 	  
-	  if (alleles.length > 0)
+	  if (alleleScores.length > 0)
 	  {
-		  numberOfMarkers = alleles[0].length ;
+		  numberOfMarkers = alleleScores[0].length ;
 		  
 		  if (numberOfMarkers != markerNames.length)
 		  	throw new IllegalArgumentException("Number of marker names don't match number of markers!") ;
 		  
-		  this.markerNames = markerNames ;
+		  this.markerNames = new String[numberOfMarkers] ;
 		  
-		  for (int i = 1 ; i < alleles.length ; ++i)
+		  this.alleleScores = new int[alleleScores.length][numberOfMarkers] ;
+		  
+		  for (int j = 1 ; j < numberOfMarkers ; ++j)
 		  {
-			  if (numberOfMarkers != alleles[i].length)
+		  	this.markerNames[j] = markerNames[j] ;
+		  }
+		  
+		  for (int i = 1 ; i < alleleScores.length ; ++i)
+		  {
+			  if (numberOfMarkers != alleleScores[i].length)
 			  	throw new IllegalArgumentException("Number of markers don't match for id : " + i) ;
+			  
+			  for (int j = 1 ; j < numberOfMarkers ; ++j)
+			  {
+			  	this.alleleScores[i][j] = alleleScores[i][j] ;
+			  }
 		  }
 	  }
-	  
-	  this.alleles = alleles ;
+	  else
+	  {
+		  this.alleleScores = new int[0][0] ;
+	  }
   }
 
 	/* (non-Javadoc)
@@ -79,7 +93,7 @@ public class SimpleBiAllelicGenotypeVariantData extends AbstractNamedSubsetData
 	@Override
 	public int getAlleleScore(int id, int markerIndex)
 	{
-		return alleles[id][markerIndex];
+		return alleleScores[id][markerIndex];
 	}
 
 	/* (non-Javadoc)

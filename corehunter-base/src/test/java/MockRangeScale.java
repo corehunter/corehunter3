@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-package org.corehunter.extended.test;
+
 
 import uno.informatics.model.ContinuousScale;
 import uno.informatics.model.DataType;
