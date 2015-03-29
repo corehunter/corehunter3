@@ -22,10 +22,10 @@ import org.apache.commons.lang3.ObjectUtils;
 import org.corehunter.data.DistanceMatrixData;
 import org.corehunter.simple.SimpleDistanceMatrixData;
 
-import uno.informatics.model.ContinuousScale;
-import uno.informatics.model.Feature;
-import uno.informatics.model.FeatureDataset;
-import uno.informatics.model.Scale;
+import uno.informatics.common.model.ContinuousScale;
+import uno.informatics.common.model.Feature;
+import uno.informatics.common.model.FeatureDataset;
+import uno.informatics.common.model.Scale;
 
 /**
  * @author Guy Davenport

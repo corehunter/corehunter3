@@ -1,3 +1,4 @@
+package org.corehunter.tests.distance;
 /*******************************************************************************
  * Copyright 2014 Guy Davenport
  *
@@ -22,6 +23,7 @@ import java.util.List;
 
 import org.corehunter.data.DistanceMatrixData;
 import org.corehunter.distance.GowersDistanceMatrixGenerator;
+import org.corehunter.tests.MockFeaure;
 import org.junit.Test;
 
 import uno.informatics.data.dataset.DatasetException;
@@ -31,11 +33,11 @@ import uno.informatics.data.io.FileProperties;
 import uno.informatics.data.io.FileType;
 import uno.informatics.data.matrix.array.DoubleArrayMatrixDataset;
 import uno.informatics.data.utils.DatasetUtils;
-import uno.informatics.model.DataType;
-import uno.informatics.model.Feature;
-import uno.informatics.model.FeatureDataset;
-import uno.informatics.model.MatrixDataset;
-import uno.informatics.model.ScaleType;
+import uno.informatics.common.model.DataType;
+import uno.informatics.common.model.Feature;
+import uno.informatics.common.model.FeatureDataset;
+import uno.informatics.common.model.MatrixDataset;
+import uno.informatics.common.model.ScaleType;
 
 /**
  * @author Guy Davenport

@@ -1,3 +1,4 @@
+package org.corehunter.tests;
 /*******************************************************************************
  * Copyright 2014 Guy Davenport
  *
@@ -15,10 +16,10 @@
  *******************************************************************************/
 
 
-import uno.informatics.model.DataType;
-import uno.informatics.model.OntologyTerm;
-import uno.informatics.model.Scale;
-import uno.informatics.model.ScaleType;
+import uno.informatics.common.model.DataType;
+import uno.informatics.common.model.OntologyTerm;
+import uno.informatics.common.model.Scale;
+import uno.informatics.common.model.ScaleType;
 
 /**
  * @author Guy Davenport
