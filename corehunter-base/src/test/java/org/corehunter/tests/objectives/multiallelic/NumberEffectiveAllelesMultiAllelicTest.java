@@ -18,8 +18,8 @@ package org.corehunter.tests.objectives.multiallelic;
 import static org.junit.Assert.*;
 import static org.corehunter.tests.TestData.* ;
 
+import org.corehunter.data.simple.SimpleMultiAllelicGenotypeVariantData;
 import org.corehunter.objectives.multiallelic.NumberEffectiveAllelesMultiAllelic;
-import org.corehunter.simple.SimpleMultiAllelicGenotypeVariantData;
 import org.jamesframework.core.problems.solutions.SubsetSolution;
 import org.junit.Test;
 

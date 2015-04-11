@@ -14,7 +14,7 @@ import static org.junit.Assert.assertEquals;
 
 import org.corehunter.Corehunter;
 import org.corehunter.data.DistanceMatrixData;
-import org.corehunter.objectives.AverageDistanceObjective;
+import org.corehunter.objectives.distance.AverageDistanceObjective;
 import org.jamesframework.core.problems.solutions.SubsetSolution;
 import org.junit.Test;
 

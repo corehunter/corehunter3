@@ -24,8 +24,8 @@ import static org.corehunter.tests.TestData.PRECISION;
 import static org.corehunter.tests.TestData.SUBSET1;
 import static org.junit.Assert.assertEquals;
 
+import org.corehunter.data.simple.SimpleMultiAllelicGenotypeVariantData;
 import org.corehunter.objectives.multiallelic.HetrozygousLociDiversityMultiAllelic;
-import org.corehunter.simple.SimpleMultiAllelicGenotypeVariantData;
 import org.jamesframework.core.problems.solutions.SubsetSolution;
 import org.junit.Test;
 

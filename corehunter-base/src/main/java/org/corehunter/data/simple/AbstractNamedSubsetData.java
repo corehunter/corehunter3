@@ -8,7 +8,7 @@
  * KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  *******************************************************************************/
-package org.corehunter.simple;
+package org.corehunter.data.simple;
 
 import java.util.HashSet;
 import java.util.Set;

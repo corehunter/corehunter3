@@ -20,7 +20,7 @@ import java.util.Set;
 
 import org.apache.commons.lang3.ObjectUtils;
 import org.corehunter.data.DistanceMatrixData;
-import org.corehunter.simple.SimpleDistanceMatrixData;
+import org.corehunter.data.simple.SimpleDistanceMatrixData;
 
 import uno.informatics.common.model.ContinuousScale;
 import uno.informatics.common.model.Feature;

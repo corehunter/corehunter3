@@ -14,7 +14,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.corehunter.data.DistanceMatrixData;
-import org.corehunter.simple.NamedDistanceMatrixData;
+import org.corehunter.data.simple.NamedDistanceMatrixData;
 
 /**
  * @author Guy Davenport

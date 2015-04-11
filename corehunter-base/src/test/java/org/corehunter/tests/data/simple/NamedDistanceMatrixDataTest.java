@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-package org.corehunter.tests.simple;
+package org.corehunter.tests.data.simple;
 
 import static org.corehunter.tests.TestData.DISTANCES;
 import static org.corehunter.tests.TestData.NAMES;
@@ -21,7 +21,7 @@ import static org.corehunter.tests.TestData.PRECISION;
 import static org.corehunter.tests.TestData.SET;
 import static org.junit.Assert.assertEquals;
 
-import org.corehunter.simple.NamedDistanceMatrixData;
+import org.corehunter.data.simple.NamedDistanceMatrixData;
 import org.junit.Test;
 
 /**
@@ -32,7 +32,7 @@ public class NamedDistanceMatrixDataTest
 {
 
 	@Test
-	public void test()
+	public void inMemoryTest()
 	{
 		NamedDistanceMatrixData data = new NamedDistanceMatrixData(NAMES, DISTANCES) ;
 		

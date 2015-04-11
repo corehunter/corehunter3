@@ -20,8 +20,8 @@ import static org.corehunter.tests.TestData.* ;
 
 import java.util.Iterator;
 
+import org.corehunter.data.simple.SimpleMultiAllelicGenotypeVariantData;
 import org.corehunter.objectives.distance.multiallelic.CavalliSforzaEdwardsDistanceMultiAllelic;
-import org.corehunter.simple.SimpleMultiAllelicGenotypeVariantData;
 import org.junit.Test;
 
 /**

@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-package org.corehunter.tests.simple;
+package org.corehunter.tests.data.simple;
 
 import static org.junit.Assert.*;
 
-import org.corehunter.simple.SimpleDistanceMatrixData;
+import org.corehunter.data.simple.SimpleDistanceMatrixData;
 import org.corehunter.tests.TestData;
 import org.junit.Test;
 
@@ -29,7 +29,7 @@ public class SimpleDistanceMatrixDataTest extends TestData
 {
 
 	@Test
-	public void test()
+	public void inMemoryTest()
 	{
 		SimpleDistanceMatrixData data = new SimpleDistanceMatrixData(SET, DISTANCES) ;
 		

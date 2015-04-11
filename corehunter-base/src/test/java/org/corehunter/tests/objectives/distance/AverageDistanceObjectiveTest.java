@@ -8,9 +8,9 @@
  * KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  *******************************************************************************/
-package org.corehunter.tests.objectives;
+package org.corehunter.tests.objectives.distance;
 
-import org.corehunter.objectives.AverageDistanceObjective;
+import org.corehunter.objectives.distance.AverageDistanceObjective;
 import org.corehunter.tests.TestData;
 import org.jamesframework.core.problems.solutions.SubsetSolution;
 import org.junit.Test;

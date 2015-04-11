@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-package org.corehunter.tests.simple;
+package org.corehunter.tests.data.simple;
 
 import static org.junit.Assert.*;
 import static org.corehunter.tests.TestData.* ;
 
 import java.util.Iterator;
 
-import org.corehunter.simple.SimpleMultiAllelicGenotypeVariantData;
+import org.corehunter.data.simple.SimpleMultiAllelicGenotypeVariantData;
 import org.junit.Test;
 
 /**
@@ -30,7 +30,7 @@ import org.junit.Test;
 public class SimpleMultiAllelicGenotypeVariantDataTest
 {
 	@Test
-	public void test()
+	public void inMemoryTest()
 	{
 		SimpleMultiAllelicGenotypeVariantData data = new SimpleMultiAllelicGenotypeVariantData(NAMES, MARKER_NAMES, ALLELE_NAMES, ALLELES) ;
 		

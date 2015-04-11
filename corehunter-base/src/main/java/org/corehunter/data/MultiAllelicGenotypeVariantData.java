@@ -13,7 +13,7 @@ package org.corehunter.data;
 /**
  * Data contains relative frequencies of markers that have two or more alleles. If
  * all the markers used in these data have two and only two alleles, such as
- * classic SNP data, then it more efficient to use
+ * SNP data, then it more efficient to use
  * {@link BiAllelicGenotypeVariantData}
  * 
  * @author Guy Davenport
