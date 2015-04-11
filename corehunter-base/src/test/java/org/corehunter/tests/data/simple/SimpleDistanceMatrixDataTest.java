@@ -15,7 +15,7 @@
  *******************************************************************************/
 package org.corehunter.tests.data.simple;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import org.corehunter.data.simple.SimpleDistanceMatrixData;
 import org.corehunter.tests.TestData;
@@ -31,8 +31,11 @@ public class SimpleDistanceMatrixDataTest extends TestData
 	@Test
 	public void inMemoryTest()
 	{
-		SimpleDistanceMatrixData data = new SimpleDistanceMatrixData(SET, DISTANCES) ;
-		
+		testData(new SimpleDistanceMatrixData(SET, DISTANCES)) ;
+	}
+	
+	private void testData(SimpleDistanceMatrixData data)
+	{		
 		assertEquals("Ids not correct!", SET, data.getIDs()) ;
 
 		int size = data.getIDs().size() ;

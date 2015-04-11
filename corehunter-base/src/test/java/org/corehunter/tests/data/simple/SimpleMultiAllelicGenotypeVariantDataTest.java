@@ -32,8 +32,11 @@ public class SimpleMultiAllelicGenotypeVariantDataTest
 	@Test
 	public void inMemoryTest()
 	{
-		SimpleMultiAllelicGenotypeVariantData data = new SimpleMultiAllelicGenotypeVariantData(NAMES, MARKER_NAMES, ALLELE_NAMES, ALLELES) ;
-		
+		testData(new SimpleMultiAllelicGenotypeVariantData(NAMES, MARKER_NAMES, ALLELE_NAMES, ALLELES)) ;
+	}
+	
+	private void testData(SimpleMultiAllelicGenotypeVariantData data)
+	{
 		assertEquals("Ids not correct!", SET, data.getIDs()) ;
 		
 		assertEquals("Number of marker is not correct!", MARKER_NAMES.length, data.getNumberOfMarkers()) ;

@@ -15,8 +15,11 @@
  *******************************************************************************/
 package org.corehunter.tests.data.simple;
 
-import static org.junit.Assert.*;
-import static org.corehunter.tests.TestData.* ;
+import static org.corehunter.tests.TestData.ALLELE_SCORES;
+import static org.corehunter.tests.TestData.MARKER_NAMES;
+import static org.corehunter.tests.TestData.NAMES;
+import static org.corehunter.tests.TestData.SET;
+import static org.junit.Assert.assertEquals;
 
 import java.util.Iterator;
 
@@ -32,8 +35,11 @@ public class SimpleBiAllelicGenotypeVariantDataTest
 	@Test
 	public void inMemoryTest()
 	{
-		SimpleBiAllelicGenotypeVariantData data = new SimpleBiAllelicGenotypeVariantData(NAMES, MARKER_NAMES, ALLELE_SCORES) ;
-		
+		testData(new SimpleBiAllelicGenotypeVariantData(NAMES, MARKER_NAMES, ALLELE_SCORES)) ;
+	}
+	
+	private void testData(SimpleBiAllelicGenotypeVariantData data)
+	{		
 		assertEquals("Ids not correct!", SET, data.getIDs()) ;
 		
 		assertEquals("Number of marker is not correct!", MARKER_NAMES.length, data.getNumberOfMarkers()) ;

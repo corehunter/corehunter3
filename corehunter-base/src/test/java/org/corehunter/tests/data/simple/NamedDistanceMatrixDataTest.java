@@ -34,8 +34,11 @@ public class NamedDistanceMatrixDataTest
 	@Test
 	public void inMemoryTest()
 	{
-		NamedDistanceMatrixData data = new NamedDistanceMatrixData(NAMES, DISTANCES) ;
-		
+		testData(new NamedDistanceMatrixData(NAMES, DISTANCES)) ;
+	}
+	
+	private void testData(NamedDistanceMatrixData data)
+	{		
 		assertEquals("Ids not correct!", SET, data.getIDs()) ;
 
 		int size = data.getIDs().size() ;
