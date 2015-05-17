@@ -18,10 +18,13 @@ package org.corehunter.tests.data.simple;
 import static org.junit.Assert.*;
 import static org.corehunter.tests.TestData.* ;
 
+import java.io.IOException;
 import java.util.Iterator;
 
 import org.corehunter.data.simple.SimpleMultiAllelicGenotypeVariantData;
 import org.junit.Test;
+
+import uno.informatics.common.io.FileProperties;
 
 /**
  * @author Guy Davenport
@@ -29,10 +32,27 @@ import org.junit.Test;
  */
 public class SimpleMultiAllelicGenotypeVariantDataTest
 {
+	private static final String TXT_FILE = "/multiallelic.txt";
+
 	@Test
 	public void inMemoryTest()
 	{
 		testData(new SimpleMultiAllelicGenotypeVariantData(NAMES, MARKER_NAMES, ALLELE_NAMES, ALLELES)) ;
+	}
+	
+	@Test
+	public void loadFromFileTest()
+	{
+		try
+    {
+	    testData(SimpleMultiAllelicGenotypeVariantData.readData(new FileProperties(SimpleMultiAllelicGenotypeVariantDataTest.class.getResource(TXT_FILE).getFile()))) ;
+    }
+    catch (IOException e)
+    {
+	    // TODO Auto-generated catch block
+	    e.printStackTrace();
+	    fail(e.getMessage()) ;
+    }
 	}
 	
 	private void testData(SimpleMultiAllelicGenotypeVariantData data)

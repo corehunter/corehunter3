@@ -11,6 +11,8 @@
 package org.corehunter.data.simple;
 
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 import org.corehunter.data.NamedSubsetData;
@@ -40,6 +42,29 @@ public class AbstractNamedSubsetData implements NamedSubsetData
 		{
 			ids.add(id);
 			this.names[id] = names[id] ;
+		}
+	}
+	
+	public AbstractNamedSubsetData(List<String> names)
+	{
+	  if (names == null)
+	  	throw new IllegalArgumentException("Names not defined!") ;
+	  
+		this.names = new String[names.size()] ;
+
+		// infer IDs: 0..N-1 in case of N items
+		// (indices in distance matrix and name array)
+		ids = new HashSet<Integer>();
+
+		Iterator<String> iterator = names.iterator() ;
+		
+		int id = 0 ;
+		
+		while (iterator.hasNext())
+		{
+			ids.add(id);
+			this.names[id] = iterator.next() ;
+			++id ;
 		}
 	}
 
