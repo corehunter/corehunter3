@@ -43,6 +43,7 @@ public class SimpleMultiAllelicGenotypeVariantData extends AbstractNamedSubsetDa
 	private String[] markerNames;
 	private String[][] alleleNames;
 	private int totalNumberAlleles;
+	
 
 	/**
 	 * @param names
