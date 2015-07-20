@@ -59,9 +59,9 @@ public class NumberEffectiveAllelesMultiAllelic implements
 					    alleleIndex);
 
 					summedAlleleFrequencySquared = summedAlleleFrequencySquared + Math.pow(alleleFrequency, 2);
-
-					total = Math.sqrt(summedAlleleFrequencySquared) ;
 				}
+				
+				total = total + Math.sqrt(summedAlleleFrequencySquared) ;
 			}
 		}
 		

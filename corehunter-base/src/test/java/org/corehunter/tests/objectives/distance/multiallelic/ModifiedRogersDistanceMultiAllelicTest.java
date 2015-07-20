@@ -28,6 +28,7 @@ import java.util.Iterator;
 
 import org.corehunter.data.simple.SimpleMultiAllelicGenotypeVariantData;
 import org.corehunter.objectives.distance.multiallelic.ModifiedRogersDistanceMultiAllelic;
+import org.junit.Assert;
 import org.junit.Test;
 
 /**
@@ -47,9 +48,9 @@ public class ModifiedRogersDistanceMultiAllelicTest
 		ModifiedRogersDistanceMultiAllelic distanceMetric = 
 				new ModifiedRogersDistanceMultiAllelic(data) ;
 		
-		assertEquals("Data is not correct!", data, distanceMetric.getData()) ;
+		Assert.assertEquals("Data is not correct!", data, distanceMetric.getData()) ;
 		
-		assertEquals("Ids not correct!", SET, distanceMetric.getIDs()) ;
+		Assert.assertEquals("Ids not correct!", SET, distanceMetric.getIDs()) ;
 
 		Iterator<Integer> iteratorX = distanceMetric.getIDs().iterator() ;
 		Iterator<Integer> iteratorY ;
@@ -80,5 +81,4 @@ public class ModifiedRogersDistanceMultiAllelicTest
 			++i ;
 		}
 	}
-
 }

@@ -85,7 +85,37 @@ public class TestData
 	    		new double[] { 0.33, 0.33, 0.33 },
 	    		new double[] { 0.5, 0.5 }, 
 	    		new double[] { 0, 0.5, 0.5 },
+	    		new double[] { 0.0, 0.0, 0.5, 0.5 },
+	    		new double[] { 0.33, 0.33, 0.33 }, 
+	    		new double[] { 0.0, 1.0 },
+	    		new double[] { 1.0, 0.0 } 
+	    },
+	    new double[][] 
+	    { 
+	    		new double[] { 1, 0.0, 0.0 },
+	    		new double[] { 0.5, 0.5 }, 
+	    		new double[] { 0, 0.5, 0.5 },
+	    		new double[] { 1.0, 0.0, 0.0, 0.0 },
+	    		new double[] { 0.33, 0.33, 0.33 }, 
+	    		new double[] { 1.0, 0.0 },
+	    		new double[] { 0.0, 1.0 } 
+	    },
+	    new double[][] 
+	    { 
+	    		new double[] { 0.5, 0.0, 0.4 },
+	    		new double[] { 0.5, 0.5 }, 
+	    		new double[] { 0, 0.5, 0.5 },
 	    		new double[] { 0.25, 0.25, 0.25, 0.25 },
+	    		new double[] { 0.0, 0.5, 0.5 }, 
+	    		new double[] { 0.0, 1.0 },
+	    		new double[] { 1.0, 0.0 } 
+	    },
+	    new double[][] 
+	    { 
+	    		new double[] { 0.33, 0.33, 0.33 },
+	    		new double[] { 1.0, 0.0 }, 
+	    		new double[] { 0.5, 0.0, 0.5 },
+	    		new double[] { 0.0, 0.0, 1.0, 0.0 },
 	    		new double[] { 0.33, 0.33, 0.33 }, 
 	    		new double[] { 0.0, 1.0 },
 	    		new double[] { 1.0, 0.0 } 
@@ -95,40 +125,10 @@ public class TestData
 	    		new double[] { 0.33, 0.33, 0.33 },
 	    		new double[] { 0.5, 0.5 }, 
 	    		new double[] { 0, 0.5, 0.5 },
-	    		new double[] { 0.25, 0.25, 0.25, 0.25 },
+	    		new double[] { 0.5, 0.0, 0.5, 0.0 },
 	    		new double[] { 0.33, 0.33, 0.33 }, 
-	    		new double[] { 0.0, 1.0 },
-	    		new double[] { 1.0, 0.0 } 
-	    },
-	    new double[][] 
-	    { 
-	    		new double[] { 0.33, 0.33, 0.33 },
-	    		new double[] { 0.5, 0.5 }, 
-	    		new double[] { 0, 0.5, 0.5 },
-	    		new double[] { 0.25, 0.25, 0.25, 0.25 },
-	    		new double[] { 0.33, 0.33, 0.33 }, 
-	    		new double[] { 0.0, 1.0 },
-	    		new double[] { 1.0, 0.0 } 
-	    },
-	    new double[][] 
-	    { 
-	    		new double[] { 0.33, 0.33, 0.33 },
-	    		new double[] { 0.5, 0.5 }, 
-	    		new double[] { 0, 0.5, 0.5 },
-	    		new double[] { 0.25, 0.25, 0.25, 0.25 },
-	    		new double[] { 0.33, 0.33, 0.33 }, 
-	    		new double[] { 0.0, 1.0 },
-	    		new double[] { 1.0, 0.0 } 
-	    },
-	    new double[][] 
-	    { 
-	    		new double[] { 0.33, 0.33, 0.33 },
-	    		new double[] { 0.5, 0.5 }, 
-	    		new double[] { 0, 0.5, 0.5 },
-	    		new double[] { 0.25, 0.25, 0.25, 0.25 },
-	    		new double[] { 0.33, 0.33, 0.33 }, 
-	    		new double[] { 0.0, 1.0 },
-	    		new double[] { 1.0, 0.0 } 
+	    		new double[] { 1.0, 0.0 },
+	    		new double[] { 0.0, 1.0 } 
 	    }
 	};
 
@@ -137,34 +137,36 @@ public class TestData
 		new String [] {"mk1-1","mk1-2","mk1-3"},
 		new String [] {"mk2-1","mk2-2"},
 		new String [] {"mk3-1","mk3-2","mk3-3"},
-		new String [] {"mk4-1","mk4-2","mk4-3","mk4-3"},
+		new String [] {"mk4-1","mk4-2","mk4-3","mk4-4"},
 		new String [] {"mk5-1","mk5-2","mk5-3"},
 		new String [] {"mk6-1","mk6-2"},
 		new String [] {"mk7-1","mk7-2"}
 	};
 	
 	public static final double[][] CAVALLI_SFORZA_EDWARDS_DISTANCES	= new double[][] {
-    new double[] { 0.0, 0.8, 0.6, 0.4, 0.2 },
-    new double[] { 0.8, 0.0, 0.8, 0.6, 0.4 },
-    new double[] { 0.6, 0.8, 0.0, 0.9, 0.6 },
-    new double[] { 0.4, 0.6, 0.9, 0.0, 0.8 },
-    new double[] { 0.2, 0.4, 0.6, 0.8, 0.0 }	      };
+    new double[] {0.0, 1.1918656532286669, 0.6489245625096675, 0.8806598328310853, 0.8451542547285167},
+    new double[] {1.1918656532286669, 0.0, 1.0175629857867965, 1.4243377137815967, 0.766753734228849},
+    new double[] {0.6489245625096675, 1.0175629857867965, 0.0, 1.0712814791124459, 0.9217779105618619},
+    new double[] {0.8806598328310853, 1.4243377137815967, 1.0712814791124459, 0.0, 1.0973300186058448},
+    new double[] {0.8451542547285167, 0.766753734228849, 0.9217779105618619, 1.0973300186058448, 0.0}
+    };
 	
 	public static final double[][] MODIFIED_ROGERS_DISTANCES	= new double[][] {
-    new double[] { 0.0, 0.8, 0.6, 0.4, 0.2 },
-    new double[] { 0.8, 0.0, 0.8, 0.6, 0.4 },
-    new double[] { 0.6, 0.8, 0.0, 0.9, 0.6 },
-    new double[] { 0.4, 0.6, 0.9, 0.0, 0.8 },
-    new double[] { 0.2, 0.4, 0.6, 0.8, 0.0 }	      };
+    new double[] {0.0, 1.0910970887793887, 0.4224926034855522, 0.7319250547113999, 0.7559289460184545},
+    new double[] {1.0910970887793887, 0.0, 0.9399886017546019, 1.3138520247185916, 0.6900776353839783},
+    new double[] {0.4224926034855522, 0.9399886017546019, 0.0	, 0.8451119959592845, 0.7791478862009629},
+    new double[] {0.7319250547113999, 1.3138520247185916, 0.8451119959592845, 0.0, 0.9819805060619657	},
+    new double[] {0.7559289460184545, 0.6900776353839783, 0.7791478862009629, 0.9819805060619657, 0.0}
+    };
 	
-	public static final Evaluation COVERAGE_SUBSET1	= SimpleEvaluation.WITH_VALUE(1.0) ;
+	public static final Evaluation COVERAGE_SUBSET1	= SimpleEvaluation.WITH_VALUE(1.0 - 0.10526315789473684) ;
 
-	public static final Evaluation HETROZYGOUS_LOCI_DIVERSITY_SUBSET1	= SimpleEvaluation.WITH_VALUE(1.0) ;
+	public static final Evaluation HETROZYGOUS_LOCI_DIVERSITY_SUBSET1	= SimpleEvaluation.WITH_VALUE(0.6695142857142857) ;
 	
-	public static final Evaluation NUMBER_EFFECTIVE_ALLELES_SUBSET1	= SimpleEvaluation.WITH_VALUE(1.0) ;
+	public static final Evaluation NUMBER_EFFECTIVE_ALLELES_SUBSET1	= SimpleEvaluation.WITH_VALUE(1.5874132973549906) ;
+	
+	public static final Evaluation PROPORTION_NON_INFORMATIVE_ALLELES_SUBSET1	= SimpleEvaluation.WITH_VALUE(0.10526315789473684) ;
 
-	public static final Evaluation PROPORTION_NON_INFORMATIVE_ALLELES_SUBSET1	= SimpleEvaluation.WITH_VALUE(1.0) ;
-
-	public static final Evaluation SHANNONS_DIVERSITY_SUBSET1	= SimpleEvaluation.WITH_VALUE(1.0) ;
+	public static final Evaluation SHANNONS_DIVERSITY_SUBSET1	= SimpleEvaluation.WITH_VALUE(7.067124962942098) ;
 
 }

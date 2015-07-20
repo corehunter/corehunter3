@@ -39,7 +39,7 @@ public class SimpleMultiAllelicGenotypeVariantData extends AbstractNamedSubsetDa
 {
 	private double[][][] alleleFrequencies ;
 	private int numberOfMarkers;
-	private int[] numberOfAlleles;
+	private int[] numberOfAllelesForMarker;
 	private String[] markerNames;
 	private String[][] alleleNames;
 	private int totalNumberAlleles;
@@ -77,7 +77,7 @@ public class SimpleMultiAllelicGenotypeVariantData extends AbstractNamedSubsetDa
 	  {
 		  numberOfMarkers = markerNames.length ;
 		  
-		  numberOfAlleles = new int[numberOfMarkers] ;
+		  numberOfAllelesForMarker = new int[numberOfMarkers] ;
 		  
 		  this.markerNames = new String[numberOfMarkers] ;
 		  this.alleleNames = new String[numberOfMarkers][] ;
@@ -89,13 +89,13 @@ public class SimpleMultiAllelicGenotypeVariantData extends AbstractNamedSubsetDa
 			  
 			  this.markerNames[j] = markerNames[j] ;
 			  
-			  numberOfAlleles[j] = alleleNames[j].length ; 
+			  numberOfAllelesForMarker[j] = alleleNames[j].length ; 
 			  
-			  totalNumberAlleles = totalNumberAlleles + numberOfAlleles[j] ;
+			  totalNumberAlleles = totalNumberAlleles + numberOfAllelesForMarker[j] ;
 			  
-			  this.alleleNames[j] = new String[numberOfAlleles[j]] ;
+			  this.alleleNames[j] = new String[numberOfAllelesForMarker[j]] ;
 			  
-			  for (int k = 0 ; k < numberOfAlleles[j] ; ++k)
+			  for (int k = 0 ; k < numberOfAllelesForMarker[j] ; ++k)
 			  	this.alleleNames[j][k] = alleleNames[j][k] ;
 		  }
 
@@ -108,12 +108,12 @@ public class SimpleMultiAllelicGenotypeVariantData extends AbstractNamedSubsetDa
 
 			  for (int j = 0 ; j < numberOfMarkers ; ++j)
 			  {
-				  if (numberOfAlleles[j] != alleleFrequencies[0][j].length)
+				  if (numberOfAllelesForMarker[j] != alleleFrequencies[0][j].length)
 				  	throw new IllegalArgumentException("Number of alleles for marker " + j + "  at entry id : " + i + "!") ;
 				  
-				  this.alleleFrequencies[i][j] = new double[numberOfAlleles[j]] ;
+				  this.alleleFrequencies[i][j] = new double[numberOfAllelesForMarker[j]] ;
 				  		
-				  for (int k = 0 ; k < numberOfAlleles[j] ; ++k)
+				  for (int k = 0 ; k < numberOfAllelesForMarker[j] ; ++k)
 				  {
 				  	this.alleleFrequencies[i][j][k] = alleleFrequencies[i][j][k] ; 
 				  }
@@ -124,7 +124,7 @@ public class SimpleMultiAllelicGenotypeVariantData extends AbstractNamedSubsetDa
 	  {
 	  	this.markerNames = new String[0] ;
 	  	this.alleleNames = new String[0][0] ;
-	  	this.numberOfAlleles = new int[0] ;
+	  	this.numberOfAllelesForMarker = new int[0] ;
 	  	this.alleleFrequencies = new double[0][0][0] ;
 	  }
   }
@@ -165,85 +165,86 @@ public class SimpleMultiAllelicGenotypeVariantData extends AbstractNamedSubsetDa
 	  {
 		  numberOfMarkers = markerNames.size() ;
 		  
-		  numberOfAlleles = new int[numberOfMarkers] ;
+		  numberOfAllelesForMarker = new int[numberOfMarkers] ;
 		  
 		  this.markerNames = new String[numberOfMarkers] ;
 		  this.alleleNames = new String[numberOfMarkers][] ;
 		  
-		  Iterator<String> iterator1 = markerNames.iterator() ;
-		  Iterator<List<String>> iterator2 = alleleNames.iterator() ;
+		  Iterator<String> markerNamesIterator = markerNames.iterator() ;
+		  Iterator<List<String>> alleleNameIterator = alleleNames.iterator() ;
 		  
 		  String markerName ;
 		  List<String> alleleNamesForMarker ;
 		  
-		  int j = 0 ;
+		  int markerIndex = 0 ;
 		  
-		  while (iterator1.hasNext() && iterator2.hasNext())
+		  while (markerNamesIterator.hasNext() && alleleNameIterator.hasNext())
 		  {
-		  	markerName = iterator1.next() ;
-		  	alleleNamesForMarker = iterator2.next() ;
+		  	markerName = markerNamesIterator.next() ;
+		  	alleleNamesForMarker = alleleNameIterator.next() ;
 		  	
 			  if (alleleNamesForMarker == null)
-			  	throw new IllegalArgumentException("Allele names not defined for marker : " + j + "!") ;
+			  	throw new IllegalArgumentException("Allele names not defined for marker : " + markerIndex + "!") ;
 			  
-			  this.markerNames[j] = markerName;
+			  this.markerNames[markerIndex] = markerName;
 			  
-			  numberOfAlleles[j] = alleleNamesForMarker.size() ; 
+			  numberOfAllelesForMarker[markerIndex] = alleleNamesForMarker.size() ; 
 			  
-			  totalNumberAlleles = totalNumberAlleles + numberOfAlleles[j] ;
+			  totalNumberAlleles = totalNumberAlleles + numberOfAllelesForMarker[markerIndex] ;
 			  
-			  this.alleleNames[j] = new String[numberOfAlleles[j]] ;
+			  this.alleleNames[markerIndex] = new String[numberOfAllelesForMarker[markerIndex]] ;
 			  
-			  for (int k = 0 ; k < numberOfAlleles[j] ; ++k)
-			  	this.alleleNames[j][k] = alleleNamesForMarker.get(k);
+			  for (int k = 0 ; k < numberOfAllelesForMarker[markerIndex] ; ++k)
+			  	this.alleleNames[markerIndex][k] = alleleNamesForMarker.get(k);
 			  
-			  ++j ;
+			  ++markerIndex ;
 		  }
 
 		  this.alleleFrequencies = new double[frequencies.size()][numberOfMarkers][] ;
 		  
-		  Iterator<List<List<Double>>> iterator3 = frequencies.iterator() ;
-		  Iterator<List<Double>> iterator4 ;
+		  Iterator<List<List<Double>>> frequenciesIterator = frequencies.iterator() ;
+		  Iterator<List<Double>> frequencyIterator ;
 		  
-		  int i = 0 ;
-		  j = 0 ;
-		  
+		  int index = 0 ;
+
 		  List<List<Double>> markerFrequencies ;
 		  List<Double> alleleFrequencies ;
 		  		
-		  while(iterator3.hasNext())
+		  while(frequenciesIterator.hasNext())
 		  {
-		  	markerFrequencies = iterator3.next() ;
+		  	markerFrequencies = frequenciesIterator.next() ;
 		  	
 			  if (numberOfMarkers != markerFrequencies.size())
-			  	throw new IllegalArgumentException("Number of markers don't match allele frequencies for id : " + i + "!") ; 	
+			  	throw new IllegalArgumentException("Number of markers don't match allele frequencies for id : " + index + "!") ; 	
 			  
-			  iterator4 = markerFrequencies.iterator() ;
+			  frequencyIterator = markerFrequencies.iterator() ;
+			  
+			  markerIndex = 0 ;
 
-			  while(iterator4.hasNext())
+			  while(frequencyIterator.hasNext())
 			  {
-			  	alleleFrequencies = iterator4.next() ;
+			  	alleleFrequencies = frequencyIterator.next() ;
 			  	
-				  if (numberOfAlleles[j] != alleleFrequencies.size())
-				  	throw new IllegalArgumentException("Number of alleles for marker " + j + "  at entry id : " + i + "!") ;
+				  if (numberOfAllelesForMarker[markerIndex] != alleleFrequencies.size())
+				  	throw new IllegalArgumentException("Number of alleles for marker " + markerIndex + " is : " + alleleFrequencies.size() + " but was expected to be " + numberOfAllelesForMarker[markerIndex]) ;
 				  
-				  this.alleleFrequencies[i][j] = new double[numberOfAlleles[j]] ;
+				  this.alleleFrequencies[index][markerIndex] = new double[numberOfAllelesForMarker[markerIndex]] ;
 				  		
-				  for (int k = 0 ; k < numberOfAlleles[j] ; ++k)
+				  for (int alleleIndex = 0 ; alleleIndex < numberOfAllelesForMarker[markerIndex] ; ++alleleIndex)
 				  {
-				  	this.alleleFrequencies[i][j][k] = alleleFrequencies.get(k) ; 
+				  	this.alleleFrequencies[index][markerIndex][alleleIndex] = alleleFrequencies.get(alleleIndex) ; 
 				  }
 				  
-				  ++j ;
+				  ++markerIndex ;
 			  }
-			  ++i ;
+			  ++index ;
 		  }
 	  }
 	  else
 	  {
 	  	this.markerNames = new String[0] ;
 	  	this.alleleNames = new String[0][0] ;
-	  	this.numberOfAlleles = new int[0] ;
+	  	this.numberOfAllelesForMarker = new int[0] ;
 	  	this.alleleFrequencies = new double[0][0][0] ;
 	  }
   }
@@ -272,7 +273,7 @@ public class SimpleMultiAllelicGenotypeVariantData extends AbstractNamedSubsetDa
   @Override
   public int getNumberOfAlleles(int markerIndex)
   {
-	  return numberOfAlleles[markerIndex];
+	  return numberOfAllelesForMarker[markerIndex];
   }
   
 	/* (non-Javadoc)
@@ -329,7 +330,7 @@ public class SimpleMultiAllelicGenotypeVariantData extends AbstractNamedSubsetDa
 		List<String> names = null ;
 		List<String> markerNames = new LinkedList<String>() ;
 		String markerName = null ;
-		String lastMarkerName ;
+		String lastMarkerName = null ;
 		String alleleName ;
 		List<String> markerAlleleNames = new LinkedList<String>() ;
 		List<List<String>> alleleNames = new LinkedList<List<String>>() ;
@@ -366,23 +367,18 @@ public class SimpleMultiAllelicGenotypeVariantData extends AbstractNamedSubsetDa
 					for (int i = 0 ; i < columnCount ; ++i)
 						frequencies.add(new LinkedList<List<Double>>()) ;
 					
-					reader.nextRow() ;
-					
-					++row ;
-
 					if (fileProperties.getDataPosition() > INVALID_INDEX) 
 						while (row < fileProperties.getDataPosition() && reader.nextRow())
 							++row ;		
 					
-					Iterator<Double> iterator ;
-					int i = 0 ;
-					int k = 0 ;
+					Iterator<Double> frequencyIterator ;
+					int markerIndex = -1 ;
+					int index = 0 ;
 					
 					while (reader.nextRow())
 					{					
 						reader.nextColumn() ;
 						
-						lastMarkerName = markerName ;
 						markerName = reader.getCellAsString() ;
 						
 						reader.nextColumn() ;
@@ -396,44 +392,44 @@ public class SimpleMultiAllelicGenotypeVariantData extends AbstractNamedSubsetDa
 						if (frequencies.size() != columnCount)
 							throw new IOException("Rows are not all the same size!") ;
 						
-						if (lastMarkerName != markerName)
+						if (lastMarkerName == null || !lastMarkerName.equals(markerName))
 						{
 							markerAlleleNames = new LinkedList<String>() ;
 							alleleNames.add(markerAlleleNames) ;
 							markerNames.add(markerName) ;
 							
-							k = 0 ;	
-							
-							iterator = alleleFrequencies.iterator() ;
+							index = 0 ;
 
-							i = 0 ;
+							frequencyIterator = alleleFrequencies.iterator() ;
 							
-							while(iterator.hasNext())
+							while(frequencyIterator.hasNext())
 							{
 								markerFrequencies = new LinkedList<Double>() ;
-								markerFrequencies.add(iterator.next()) ;
+								markerFrequencies.add(frequencyIterator.next()) ;
 								
-								frequencies.get(i).add(markerFrequencies) ;
+								frequencies.get(index).add(markerFrequencies) ;
 								
-								++i ;
+								++index ;
 							}	
+							
+							++markerIndex ;
 						}
 						else
 						{
-							iterator = alleleFrequencies.iterator() ;
+							frequencyIterator = alleleFrequencies.iterator() ;
 							
-							i = 0 ;
-							
-							while(iterator.hasNext())
+							index = 0 ;
+		
+							while(frequencyIterator.hasNext())
 							{
-								frequencies.get(i).get(k).add(iterator.next()) ;
-								++i ;
+								frequencies.get(index).get(markerIndex).add(frequencyIterator.next()) ;
+								++index ;
 							}
-							
-							++k ;
 						}
 						
 						markerAlleleNames.add(alleleName) ;
+						
+						lastMarkerName = markerName ;
 
 						++row ;
 					}

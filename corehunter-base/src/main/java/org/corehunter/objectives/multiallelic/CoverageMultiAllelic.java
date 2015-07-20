@@ -54,7 +54,6 @@ public class CoverageMultiAllelic implements
 	@Override
 	public boolean isMinimizing()
 	{
-		// TODO Auto-generated method stub
 		return false;
 	}
 }

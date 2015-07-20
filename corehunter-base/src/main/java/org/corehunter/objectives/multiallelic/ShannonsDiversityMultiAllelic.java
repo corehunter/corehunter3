@@ -10,6 +10,8 @@
  *******************************************************************************/
 package org.corehunter.objectives.multiallelic;
 
+import java.util.Iterator;
+
 import org.corehunter.data.MultiAllelicGenotypeVariantData;
 import org.jamesframework.core.problems.objectives.Objective;
 import org.jamesframework.core.problems.objectives.evaluations.Evaluation;
@@ -32,8 +34,35 @@ public class ShannonsDiversityMultiAllelic implements
 	public Evaluation evaluate(SubsetSolution solution,
 	    MultiAllelicGenotypeVariantData data)
 	{
+		int numberOfMarkers = data.getNumberOfMarkers();
+		int numberOfAlleles;
 
-		return SimpleEvaluation.WITH_VALUE(0);
+		double summedDiversity = 0;
+		double alleleFrequency = 0;
+		Integer id ;
+
+		Iterator<Integer> iterator = solution.getSelectedIDs().iterator();
+
+		while (iterator.hasNext())
+		{
+			id =  iterator.next() ;
+			
+			for (int markerIndex = 0; markerIndex < numberOfMarkers; ++markerIndex)
+			{
+				numberOfAlleles = data.getNumberOfAlleles(markerIndex);
+
+				for (int alleleIndex = 0; alleleIndex < numberOfAlleles; ++alleleIndex)
+				{
+					alleleFrequency = data.getAlelleFrequency(id, markerIndex,
+					    alleleIndex);
+
+					if (alleleFrequency > 0)
+						summedDiversity = summedDiversity + (alleleFrequency * Math.log(alleleFrequency)) ;
+				}
+			}
+		}
+		
+		return SimpleEvaluation.WITH_VALUE(-summedDiversity) ;
 	}
 
 	/*
@@ -43,7 +72,6 @@ public class ShannonsDiversityMultiAllelic implements
 	@Override
 	public boolean isMinimizing()
 	{
-		// TODO Auto-generated method stub
 		return false;
 	}
 }

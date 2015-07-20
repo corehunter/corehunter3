@@ -10,6 +10,8 @@
  *******************************************************************************/
 package org.corehunter.objectives.multiallelic;
 
+import java.util.Iterator;
+
 import org.corehunter.data.MultiAllelicGenotypeVariantData;
 import org.jamesframework.core.problems.objectives.Objective;
 import org.jamesframework.core.problems.objectives.evaluations.Evaluation;
@@ -32,7 +34,38 @@ public class ProportionNonInformativeAllelesMultiAllelic implements
 	public Evaluation evaluate(SubsetSolution solution,
 	    MultiAllelicGenotypeVariantData data)
 	{
-		return SimpleEvaluation.WITH_VALUE(0);
+		int numberOfMarkers = data.getNumberOfMarkers();
+	
+		int numberOfAlleles;
+
+		double alleleCount = 0;
+		double alleleFrequency = 0;
+		boolean found ;
+		
+		for (int markerIndex = 0; markerIndex < numberOfMarkers; ++markerIndex)
+		{
+			numberOfAlleles = data.getNumberOfAlleles(markerIndex);
+
+			for (int alleleIndex = 0; alleleIndex < numberOfAlleles; ++alleleIndex)
+			{
+				found = false ;
+				
+				Iterator<Integer> iterator = solution.getSelectedIDs().iterator();
+				
+				while (!found && iterator.hasNext())
+				{
+					alleleFrequency = data.getAlelleFrequency(iterator.next(), markerIndex,
+					    alleleIndex);
+
+					found = alleleFrequency > 0 ;
+				}
+				
+				if (found)
+					++alleleCount ;
+			}
+		}	
+		
+		return SimpleEvaluation.WITH_VALUE(1 - (alleleCount / (double)data.getTotalNumberAlleles())) ;
 	}
 
 	/*
@@ -42,7 +75,6 @@ public class ProportionNonInformativeAllelesMultiAllelic implements
 	@Override
 	public boolean isMinimizing()
 	{
-		// TODO Auto-generated method stub
 		return false;
 	}
 }

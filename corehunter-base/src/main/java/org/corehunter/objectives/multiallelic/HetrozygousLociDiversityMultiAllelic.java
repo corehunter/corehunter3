@@ -33,10 +33,11 @@ public class HetrozygousLociDiversityMultiAllelic implements
 	public Evaluation evaluate(SubsetSolution solution,
 	    MultiAllelicGenotypeVariantData data)
 	{
-		double diversityTotal = 0.0;
-		double lociTotal = 0.0;
-		double lociTerm = 0.0;
-		double Pla;
+		double summedAlleleFrequencySquared = 0.0;
+		double total = 0.0;
+		Integer id ;
+		
+		double alleleFrequency;
 
 		int numberOfMarkers = data.getNumberOfMarkers();
 		int numberOfAlleles;
@@ -45,27 +46,27 @@ public class HetrozygousLociDiversityMultiAllelic implements
 
 		while (iterator.hasNext())
 		{
+			id =  iterator.next() ;
+			
 			for (int markerIndex = 0; markerIndex < numberOfMarkers; ++markerIndex)
 			{
 				numberOfAlleles = data.getNumberOfAlleles(markerIndex);
 
-				lociTotal = 0.0;
-				lociTerm = 0.0;
+				summedAlleleFrequencySquared = 0.0;
 
 				for (int alleleIndex = 0; alleleIndex < numberOfAlleles; ++alleleIndex)
 				{
-					Pla = data.getAlelleFrequency(iterator.next(), markerIndex,
+					alleleFrequency = data.getAlelleFrequency(id, markerIndex,
 					    alleleIndex);
 
-					lociTerm += Math.pow(Pla, 2);
-					lociTotal += Pla;
-
-					diversityTotal += (1.0 - (lociTerm / Math.pow(lociTotal, 2)));
+					summedAlleleFrequencySquared = summedAlleleFrequencySquared + Math.pow(alleleFrequency, 2);			
 				}
+				
+				total = total + (1.0  - summedAlleleFrequencySquared) ;
 			}
 		}
 
-		return SimpleEvaluation.WITH_VALUE((1.0 / (double) numberOfMarkers) * diversityTotal);
+		return SimpleEvaluation.WITH_VALUE(total / (double)numberOfMarkers) ;
 	}
 
 	/*

@@ -69,13 +69,15 @@ public class SimpleMultiAllelicGenotypeVariantDataTest
 		
 		int size = data.getIDs().size() ;
 		
-		for (int j = 0; j < data.getNumberOfMarkers(); j++)
+		for (int markerIndex = 0; markerIndex < data.getNumberOfMarkers(); markerIndex++)
 		{
-			assertEquals("Marker name for "+j+" is not correct!", MARKER_NAMES[j], data.getMarkerName(j)) ;
+			assertEquals("Marker name for "+markerIndex+" is not correct!", MARKER_NAMES[markerIndex], data.getMarkerName(markerIndex)) ;
 			
-			for (int k = 0; k < data.getNumberOfAlleles(j); k++)
+			assertEquals("Number of alelles for marker index : "+markerIndex+" is not correct!", ALLELE_NAMES[markerIndex].length, data.getNumberOfAlleles(markerIndex)) ;
+			
+			for (int alleleIndex = 0; alleleIndex < data.getNumberOfAlleles(markerIndex); alleleIndex++)
 			{
-				assertEquals("Allele name for marker "+j+" allele "+k+" is not correct!", ALLELE_NAMES[j][k], data.getAlleleName(j, k)) ;
+				assertEquals("Allele name for marker "+markerIndex+" allele "+alleleIndex+" is not correct!", ALLELE_NAMES[markerIndex][alleleIndex], data.getAlleleName(markerIndex, alleleIndex)) ;
 			}
 		}
 		
@@ -90,12 +92,11 @@ public class SimpleMultiAllelicGenotypeVariantDataTest
 			
 			assertEquals("Name for "+ index +" is not correct!", NAMES[i], data.getName(index)) ;
 
-			for (int j = 0; j < size; j++)
+			for (int markerIndex = 0; markerIndex < size; markerIndex++)
 			{
-				for (int k = 0; k < data.getNumberOfAlleles(j); k++)
+				for (int alleleIndex = 0; alleleIndex < data.getNumberOfAlleles(markerIndex); alleleIndex++)
 				{
-					assertEquals("Alele["+index+"]["+j+"] not correct!", ALLELES[i][j][k], data.getAlelleFrequency(index, j, k), PRECISION) ;
-				}
+ 				}
 			}		
 		
 			++ i ;
