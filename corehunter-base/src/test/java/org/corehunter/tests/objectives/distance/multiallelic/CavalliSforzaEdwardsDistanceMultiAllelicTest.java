@@ -15,8 +15,14 @@
  *******************************************************************************/
 package org.corehunter.tests.objectives.distance.multiallelic;
 
-import static org.junit.Assert.*;
-import static org.corehunter.tests.TestData.* ;
+import static org.corehunter.tests.TestData.ALLELES;
+import static org.corehunter.tests.TestData.ALLELE_NAMES;
+import static org.corehunter.tests.TestData.CAVALLI_SFORZA_EDWARDS_DISTANCES;
+import static org.corehunter.tests.TestData.MARKER_NAMES;
+import static org.corehunter.tests.TestData.NAMES;
+import static org.corehunter.tests.TestData.PRECISION;
+import static org.corehunter.tests.TestData.SET;
+import static org.junit.Assert.assertEquals;
 
 import java.util.Iterator;
 

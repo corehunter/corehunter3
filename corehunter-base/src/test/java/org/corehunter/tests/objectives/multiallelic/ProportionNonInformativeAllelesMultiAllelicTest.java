@@ -15,19 +15,24 @@
  *******************************************************************************/
 package org.corehunter.tests.objectives.multiallelic;
 
-import static org.junit.Assert.*;
-import static org.corehunter.tests.TestData.* ;
+import static org.corehunter.tests.TestData.ALLELES;
+import static org.corehunter.tests.TestData.ALLELE_NAMES;
+import static org.corehunter.tests.TestData.MARKER_NAMES;
+import static org.corehunter.tests.TestData.NAMES;
+import static org.corehunter.tests.TestData.PRECISION;
+import static org.corehunter.tests.TestData.PROPORTION_NON_INFORMATIVE_ALLELES_SUBSET1;
+import static org.corehunter.tests.TestData.SUBSET1;
 
 import org.corehunter.data.simple.SimpleMultiAllelicGenotypeVariantData;
 import org.corehunter.objectives.multiallelic.ProportionNonInformativeAllelesMultiAllelic;
-import org.jamesframework.core.problems.solutions.SubsetSolution;
+import org.jamesframework.core.subset.SubsetSolution;
 import org.junit.Test;
 
 /**
  * @author Guy Davenport
  *
  */
-public class ProportionNonInformativeAllelesMultiAllelicTest
+public class ProportionNonInformativeAllelesMultiAllelicTest extends EvaluationTest
 {
 	/**
 	 * Test method for {@link org.corehunter.objectives.distance.multiallelic.CavalliSforzaEdwardsDistanceMultiAllelic#getDistance(int, int)}.

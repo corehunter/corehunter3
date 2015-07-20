@@ -12,31 +12,33 @@ package org.corehunter;
 
 import java.util.concurrent.TimeUnit;
 
-import org.jamesframework.core.problems.SubsetProblemWithData;
-import org.jamesframework.core.problems.datatypes.SubsetData;
+import org.jamesframework.core.problems.datatypes.IntegerIdentifiedData;
 import org.jamesframework.core.problems.objectives.Objective;
-import org.jamesframework.core.problems.solutions.SubsetSolution;
+import org.jamesframework.core.subset.SubsetProblem;
+import org.jamesframework.core.subset.SubsetSolution;
 import org.jamesframework.core.search.algo.RandomDescent;
 import org.jamesframework.core.search.listeners.SearchListener;
-import org.jamesframework.core.search.neigh.subset.SingleSwapNeighbourhood;
 import org.jamesframework.core.search.stopcriteria.MaxRuntime;
+import org.jamesframework.core.subset.neigh.SinglePerturbationNeighbourhood;
 
 /**
+ * Provides support for executing pre-defined core subset searches. 
+ * Can be re-used.
+ * 
  * @author Guy Davenport
  */
-public class Corehunter<DataType extends SubsetData>
+public class Corehunter<DataType extends IntegerIdentifiedData>
 {
 	private long	                         timeLimit	= 60;
-	private SearchListener<SubsetSolution>	searchListener;
-
+	
 	public SubsetSolution executeRandomDescent(DataType data,
-	    Objective<SubsetSolution, DataType> objective, int subsetSize)
+	    Objective<SubsetSolution, DataType> objective, int subsetSize, SearchListener<SubsetSolution> searchListener)
 	{
-		SubsetProblemWithData<DataType> problem = new SubsetProblemWithData<DataType>(
-		    objective, data, subsetSize);
+		SubsetProblem<DataType> problem = new SubsetProblem<DataType>(
+				data, objective, subsetSize);
 
 		RandomDescent<SubsetSolution> search = new RandomDescent<SubsetSolution>(
-		    problem, new SingleSwapNeighbourhood());
+		    problem, new SinglePerturbationNeighbourhood());
 
 		search.addStopCriterion(new MaxRuntime(timeLimit, TimeUnit.SECONDS));
 
@@ -60,16 +62,5 @@ public class Corehunter<DataType extends SubsetData>
 	public final void setTimeLimit(long timeLimit)
 	{
 		this.timeLimit = timeLimit;
-	}
-
-	public final SearchListener<SubsetSolution> getSearchListener()
-	{
-		return searchListener;
-	}
-
-	public final void setSearchListener(
-	    SearchListener<SubsetSolution> searchListener)
-	{
-		this.searchListener = searchListener;
 	}
 }

@@ -10,17 +10,17 @@
  *******************************************************************************/
 package org.corehunter.data;
 
-import org.jamesframework.core.problems.datatypes.SubsetData;
+import org.jamesframework.core.problems.datatypes.IntegerIdentifiedData;
 
 /**
- * Extends SubsetData to introduce the concept of a distance that indicates how
+ * Extends IntegerIdentifiedData to introduce the concept of a distance that indicates how
  * closely two entries are similar to each other. A value of zero for the
  * distance indicates that specific measure used to evaluate the distance can
  * differentiate between the two entities
  * 
  * @author Guy Davenport
  */
-public interface DistanceMatrixData extends SubsetData
+public interface DistanceMatrixData extends IntegerIdentifiedData
 {
 
 	/**

@@ -56,17 +56,17 @@ public class SimpleBiAllelicGenotypeVariantData extends AbstractNamedSubsetData
 		  
 		  this.alleleScores = new int[alleleScores.length][numberOfMarkers] ;
 		  
-		  for (int j = 1 ; j < numberOfMarkers ; ++j)
+		  for (int j = 0 ; j < numberOfMarkers ; ++j)
 		  {
 		  	this.markerNames[j] = markerNames[j] ;
 		  }
 		  
-		  for (int i = 1 ; i < alleleScores.length ; ++i)
+		  for (int i = 0 ; i < alleleScores.length ; ++i)
 		  {
 			  if (numberOfMarkers != alleleScores[i].length)
 			  	throw new IllegalArgumentException("Number of markers don't match for id : " + i) ;
 			  
-			  for (int j = 1 ; j < numberOfMarkers ; ++j)
+			  for (int j = 0 ; j < numberOfMarkers ; ++j)
 			  {
 			  	this.alleleScores[i][j] = alleleScores[i][j] ;
 			  }

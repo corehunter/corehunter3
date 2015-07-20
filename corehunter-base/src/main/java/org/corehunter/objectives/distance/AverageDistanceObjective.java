@@ -12,10 +12,16 @@ package org.corehunter.objectives.distance;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import org.corehunter.data.DistanceMatrixData;
+import org.jamesframework.core.exceptions.IncompatibleDeltaEvaluationException;
 import org.jamesframework.core.problems.objectives.Objective;
-import org.jamesframework.core.problems.solutions.SubsetSolution;
+import org.jamesframework.core.problems.objectives.evaluations.Evaluation;
+import org.jamesframework.core.problems.objectives.evaluations.SimpleEvaluation;
+import org.jamesframework.core.search.neigh.Move;
+import org.jamesframework.core.subset.SubsetSolution;
+import org.jamesframework.core.subset.neigh.moves.SubsetMove;
 
 public class AverageDistanceObjective implements
     Objective<SubsetSolution, DistanceMatrixData>
@@ -31,31 +37,101 @@ public class AverageDistanceObjective implements
 	 *          the distance matrix
 	 */
 	@Override
-	public double evaluate(SubsetSolution solution, DistanceMatrixData data)
+	public Evaluation evaluate(SubsetSolution solution, DistanceMatrixData data)
 	{
-		if (solution.getNumSelectedIDs() < 2)
-		{
-			return 0.0;
-		}
-		else
-		{
-			// at least two items selected: compute average distance
-			List<Integer> ids = new ArrayList<Integer>(solution.getSelectedIDs());
-			int id1, id2, numDist = 0;
-			double sumDist = 0.0;
-			for (int i = 0; i < ids.size(); i++)
-			{
-				id1 = ids.get(i);
-				for (int j = i + 1; j < ids.size(); j++)
-				{
-					id2 = ids.get(j);
-					sumDist += data.getDistance(id1, id2);
-					numDist++;
-				}
-			}
-			return sumDist / numDist;
-		}
+    double value = 0.0;
+    if(solution.getNumSelectedIDs() >= 2){
+        // at least two items selected: compute average distance
+        int numDist = 0;
+        double sumDist = 0.0;
+        Integer[] selected = new Integer[solution.getNumSelectedIDs()];
+        solution.getSelectedIDs().toArray(selected);
+        for(int i=0; i<selected.length; i++){
+            for(int j=i+1; j<selected.length; j++){
+                sumDist += data.getDistance(selected[i], selected[j]);
+                numDist++;
+            }
+        }
+        value = sumDist/numDist;
+    }
+    return SimpleEvaluation.WITH_VALUE(value);
 	}
+	
+	 public Evaluation evaluate(Move move, SubsetSolution curSolution, Evaluation curEvaluation, DistanceMatrixData data) {
+     // check move type
+     if(!(move instanceof SubsetMove)){
+         throw new IncompatibleDeltaEvaluationException("Core subset objective should be used in combination "
+                                             + "with neighbourhoods that generate moves of type SubsetMove.");
+     }
+     // cast move
+     SubsetMove subsetMove = (SubsetMove) move;
+
+     // get current evaluation
+     double curEval = curEvaluation.getValue();
+     // undo average to get sum of distances
+     int numSelected = curSolution.getNumSelectedIDs();
+     int numDistances = numSelected * (numSelected-1) / 2;
+     double sumDist = curEval * numDistances;
+
+     // get set of added and removed IDs
+     Set<Integer> added = subsetMove.getAddedIDs();
+     Set<Integer> removed = subsetMove.getDeletedIDs();
+     // infer list of retained IDs
+     List<Integer> retained = new ArrayList<>(curSolution.getSelectedIDs());
+     retained.removeAll(removed);
+
+     // subtract distances from removed items to retained items
+     for(int rem : removed){
+         for(int ret : retained){
+             sumDist -= data.getDistance(rem, ret);
+             numDistances--;
+         }
+     }
+
+     // subtract distances from removed to other removed items
+     for(int rem1 : removed){
+         for(int rem2 : removed){
+             // account for each distinct pair only once
+             if(rem1 < rem2){
+                 sumDist -= data.getDistance(rem1, rem2);
+                 numDistances--;
+             }
+         }
+     }
+
+     // add distances from new items to retained items
+     for(int add : added){
+         for(int ret : retained){
+             sumDist += data.getDistance(add, ret);
+             numDistances++;
+         }
+     }
+
+     // add distances from new items to other new items
+     for(int add1 : added){
+         for(int add2 : added){
+             // account for each distinct pair only once
+             if(add1 < add2){
+                 sumDist += data.getDistance(add1, add2);
+                 numDistances++;
+             }
+         }
+     }
+
+     double newEval;
+     if(numDistances > 0){
+         // take average based on updated number of distances
+         newEval = sumDist / numDistances;
+     } else {
+         // no distances (less than two items remain selected)
+         newEval = 0.0;
+     }
+
+     // return new evaluation
+     return SimpleEvaluation.WITH_VALUE(newEval);
+
+ }
+
 
 	@Override
 	public boolean isMinimizing()

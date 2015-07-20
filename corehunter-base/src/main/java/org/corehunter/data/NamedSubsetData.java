@@ -15,13 +15,15 @@
  *******************************************************************************/
 package org.corehunter.data;
 
-import org.jamesframework.core.problems.datatypes.SubsetData;
+import org.jamesframework.core.problems.datatypes.IntegerIdentifiedData;
 
 /**
+ * Extends IntegerIdentifiedData to introduce the concept of a name associated
+ * with each entry
+ * 
  * @author Guy Davenport
- *
  */
-public interface NamedSubsetData extends SubsetData
+public interface NamedSubsetData extends IntegerIdentifiedData
 {
 	/**
 	 * Gets the name of an entry by id

@@ -10,7 +10,7 @@
  *******************************************************************************/
 package org.corehunter.data;
 
-import org.jamesframework.core.problems.datatypes.SubsetData;
+import org.jamesframework.core.problems.datatypes.IntegerIdentifiedData;
 
 /**
  * Base interface for all Genotype Variant Data. Implementation should not
@@ -19,7 +19,7 @@ import org.jamesframework.core.problems.datatypes.SubsetData;
  * 
  * @author Guy Davenport
  */
-public interface GenotypeVariantData extends SubsetData
+public interface GenotypeVariantData extends IntegerIdentifiedData
 {
 	/**
 	 * Gets the total number of markers used in this dataset for which there are

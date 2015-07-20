@@ -14,7 +14,9 @@ import java.util.Iterator;
 
 import org.corehunter.data.MultiAllelicGenotypeVariantData;
 import org.jamesframework.core.problems.objectives.Objective;
-import org.jamesframework.core.problems.solutions.SubsetSolution;
+import org.jamesframework.core.problems.objectives.evaluations.Evaluation;
+import org.jamesframework.core.problems.objectives.evaluations.SimpleEvaluation;
+import org.jamesframework.core.subset.SubsetSolution;
 
 /**
  * @author Guy Davenport
@@ -28,46 +30,42 @@ public class NumberEffectiveAllelesMultiAllelic implements
 	 * jamesframework.core.problems.solutions.Solution, java.lang.Object)
 	 */
 	@Override
-	public double evaluate(SubsetSolution solution,
+	public Evaluation evaluate(SubsetSolution solution,
 	    MultiAllelicGenotypeVariantData data)
 	{
-		double score = 0;
-
 		int numberOfMarkers = data.getNumberOfMarkers();
 		int numberOfAlleles;
 
-		double lociTerm = 0;
-		double lociTotal = 0;
-		double Pla = 0;
-		double diversityTotal = 0;
+		double summedAlleleFrequencySquared = 0;
+		double alleleFrequency = 0;
+		double total = 0;
+		Integer id ;
 
 		Iterator<Integer> iterator = solution.getSelectedIDs().iterator();
 
 		while (iterator.hasNext())
 		{
+			id =  iterator.next() ;
+			
 			for (int markerIndex = 0; markerIndex < numberOfMarkers; ++markerIndex)
 			{
 				numberOfAlleles = data.getNumberOfAlleles(markerIndex);
 
-				lociTotal = 0.0;
-				lociTerm = 0.0;
+				summedAlleleFrequencySquared = 0.0;
 
 				for (int alleleIndex = 0; alleleIndex < numberOfAlleles; ++alleleIndex)
 				{
-					Pla = data.getAlelleFrequency(iterator.next(), markerIndex,
+					alleleFrequency = data.getAlelleFrequency(id, markerIndex,
 					    alleleIndex);
 
-					lociTerm += Math.pow(Pla, 2);
-					lociTotal += Pla;
+					summedAlleleFrequencySquared = summedAlleleFrequencySquared + Math.pow(alleleFrequency, 2);
 
-					diversityTotal += (1.0 - (lociTerm / Math.pow(lociTotal, 2)));
+					total = Math.sqrt(summedAlleleFrequencySquared) ;
 				}
 			}
 		}
-
-		score = (1.0 / (double) numberOfMarkers) * diversityTotal;
-
-		return score;
+		
+		return SimpleEvaluation.WITH_VALUE(total / (double)numberOfMarkers) ;
 	}
 
 	/*
@@ -77,7 +75,6 @@ public class NumberEffectiveAllelesMultiAllelic implements
 	@Override
 	public boolean isMinimizing()
 	{
-		// TODO Auto-generated method stub
 		return false;
 	}
 }

@@ -14,7 +14,9 @@ import java.util.Iterator;
 
 import org.corehunter.data.MultiAllelicGenotypeVariantData;
 import org.jamesframework.core.problems.objectives.Objective;
-import org.jamesframework.core.problems.solutions.SubsetSolution;
+import org.jamesframework.core.problems.objectives.evaluations.Evaluation;
+import org.jamesframework.core.problems.objectives.evaluations.SimpleEvaluation;
+import org.jamesframework.core.subset.SubsetSolution;
 
 /**
  * @author Guy Davenport
@@ -28,11 +30,9 @@ public class HetrozygousLociDiversityMultiAllelic implements
 	 * jamesframework.core.problems.solutions.Solution, java.lang.Object)
 	 */
 	@Override
-	public double evaluate(SubsetSolution solution,
+	public Evaluation evaluate(SubsetSolution solution,
 	    MultiAllelicGenotypeVariantData data)
 	{
-		double score;
-
 		double diversityTotal = 0.0;
 		double lociTotal = 0.0;
 		double lociTerm = 0.0;
@@ -65,9 +65,7 @@ public class HetrozygousLociDiversityMultiAllelic implements
 			}
 		}
 
-		score = (1.0 / (double) numberOfMarkers) * diversityTotal;
-
-		return score;
+		return SimpleEvaluation.WITH_VALUE((1.0 / (double) numberOfMarkers) * diversityTotal);
 	}
 
 	/*

@@ -12,7 +12,9 @@ package org.corehunter.objectives.multiallelic;
 
 import org.corehunter.data.MultiAllelicGenotypeVariantData;
 import org.jamesframework.core.problems.objectives.Objective;
-import org.jamesframework.core.problems.solutions.SubsetSolution;
+import org.jamesframework.core.problems.objectives.evaluations.Evaluation;
+import org.jamesframework.core.problems.objectives.evaluations.SimpleEvaluation;
+import org.jamesframework.core.subset.SubsetSolution;
 
 /**
  * @author Guy Davenport
@@ -39,10 +41,10 @@ public class CoverageMultiAllelic implements
 	 * jamesframework.core.problems.solutions.Solution, java.lang.Object)
 	 */
 	@Override
-	public double evaluate(SubsetSolution solution,
+	public Evaluation evaluate(SubsetSolution solution,
 	    MultiAllelicGenotypeVariantData data)
 	{
-		return 1.0 - pn.evaluate(solution, data);
+		return SimpleEvaluation.WITH_VALUE(1.0 - pn.evaluate(solution, data).getValue());
 	}
 
 	/*

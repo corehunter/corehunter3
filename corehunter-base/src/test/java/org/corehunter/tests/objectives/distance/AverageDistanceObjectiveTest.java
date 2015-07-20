@@ -12,7 +12,7 @@ package org.corehunter.tests.objectives.distance;
 
 import org.corehunter.objectives.distance.AverageDistanceObjective;
 import org.corehunter.tests.TestData;
-import org.jamesframework.core.problems.solutions.SubsetSolution;
+import org.jamesframework.core.subset.SubsetSolution;
 import org.junit.Test;
 
 /**

@@ -15,7 +15,7 @@ import static org.junit.Assert.assertEquals;
 import org.corehunter.Corehunter;
 import org.corehunter.data.DistanceMatrixData;
 import org.corehunter.objectives.distance.AverageDistanceObjective;
-import org.jamesframework.core.problems.solutions.SubsetSolution;
+import org.jamesframework.core.subset.SubsetSolution;
 import org.junit.Test;
 
 /**
@@ -36,7 +36,7 @@ public class CorehunterTest extends TestData
 		corehunter.setTimeLimit(2);
 
 		SubsetSolution result = corehunter.executeRandomDescent(DATA,
-		    new AverageDistanceObjective(), 2);
+		    new AverageDistanceObjective(), 2, null);
 
 		assertEquals(SUBSET1, result.getSelectedIDs());
 	}

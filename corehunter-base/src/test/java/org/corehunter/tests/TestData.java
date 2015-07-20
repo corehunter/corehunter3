@@ -15,6 +15,8 @@ import java.util.TreeSet;
 
 import org.corehunter.data.DistanceMatrixData;
 import org.corehunter.data.simple.NamedDistanceMatrixData;
+import org.jamesframework.core.problems.objectives.evaluations.Evaluation;
+import org.jamesframework.core.problems.objectives.evaluations.SimpleEvaluation;
 
 /**
  * @author Guy Davenport
@@ -155,14 +157,14 @@ public class TestData
     new double[] { 0.4, 0.6, 0.9, 0.0, 0.8 },
     new double[] { 0.2, 0.4, 0.6, 0.8, 0.0 }	      };
 	
-	public static final double COVERAGE_SUBSET1	= 1.0 ;
+	public static final Evaluation COVERAGE_SUBSET1	= SimpleEvaluation.WITH_VALUE(1.0) ;
 
-	public static final double HETROZYGOUS_LOCI_DIVERSITY_SUBSET1	= 1.0 ;
+	public static final Evaluation HETROZYGOUS_LOCI_DIVERSITY_SUBSET1	= SimpleEvaluation.WITH_VALUE(1.0) ;
 	
-	public static final double NUMBER_EFFECTIVE_ALLELES_SUBSET1	= 1.0 ;
+	public static final Evaluation NUMBER_EFFECTIVE_ALLELES_SUBSET1	= SimpleEvaluation.WITH_VALUE(1.0) ;
 
-	public static final double PROPORTION_NON_INFORMATIVE_ALLELES_SUBSET1	= 1.0 ;
+	public static final Evaluation PROPORTION_NON_INFORMATIVE_ALLELES_SUBSET1	= SimpleEvaluation.WITH_VALUE(1.0) ;
 
-	public static final double SHANNONS_DIVERSITY_SUBSET1	= 1.0 ;
+	public static final Evaluation SHANNONS_DIVERSITY_SUBSET1	= SimpleEvaluation.WITH_VALUE(1.0) ;
 
 }

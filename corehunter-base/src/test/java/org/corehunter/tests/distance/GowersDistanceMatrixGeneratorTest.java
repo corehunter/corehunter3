@@ -26,11 +26,6 @@ import org.corehunter.distance.GowersDistanceMatrixGenerator;
 import org.corehunter.tests.MockFeaure;
 import org.junit.Test;
 
-import uno.informatics.data.dataset.DatasetException;
-import uno.informatics.data.feature.ColumnFeature;
-import uno.informatics.data.feature.array.ArrayFeatureDataset;
-import uno.informatics.data.matrix.array.DoubleArrayMatrixDataset;
-import uno.informatics.data.utils.DatasetUtils;
 import uno.informatics.common.io.FileProperties;
 import uno.informatics.common.io.FileType;
 import uno.informatics.common.model.DataType;
@@ -38,6 +33,11 @@ import uno.informatics.common.model.Feature;
 import uno.informatics.common.model.FeatureDataset;
 import uno.informatics.common.model.MatrixDataset;
 import uno.informatics.common.model.ScaleType;
+import uno.informatics.data.dataset.DatasetException;
+import uno.informatics.data.feature.ColumnFeature;
+import uno.informatics.data.feature.array.ArrayFeatureDataset;
+import uno.informatics.data.matrix.array.DoubleArrayMatrixDataset;
+import uno.informatics.data.utils.DatasetUtils;
 
 /**
  * @author Guy Davenport

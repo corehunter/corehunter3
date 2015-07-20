@@ -15,13 +15,19 @@
  *******************************************************************************/
 package org.corehunter.tests.objectives.distance.multiallelic;
 
-import static org.junit.Assert.*;
-import static org.corehunter.tests.TestData.* ;
+import static org.corehunter.tests.TestData.ALLELES;
+import static org.corehunter.tests.TestData.ALLELE_NAMES;
+import static org.corehunter.tests.TestData.MARKER_NAMES;
+import static org.corehunter.tests.TestData.MODIFIED_ROGERS_DISTANCES;
+import static org.corehunter.tests.TestData.NAMES;
+import static org.corehunter.tests.TestData.PRECISION;
+import static org.corehunter.tests.TestData.SET;
+import static org.junit.Assert.assertEquals;
 
 import java.util.Iterator;
 
 import org.corehunter.data.simple.SimpleMultiAllelicGenotypeVariantData;
-import org.corehunter.objectives.distance.multiallelic.CavalliSforzaEdwardsDistanceMultiAllelic;
+import org.corehunter.objectives.distance.multiallelic.ModifiedRogersDistanceMultiAllelic;
 import org.junit.Test;
 
 /**
@@ -38,8 +44,8 @@ public class ModifiedRogersDistanceMultiAllelicTest
 	{
 		SimpleMultiAllelicGenotypeVariantData data = new SimpleMultiAllelicGenotypeVariantData(NAMES, MARKER_NAMES, ALLELE_NAMES, ALLELES) ;
 
-		CavalliSforzaEdwardsDistanceMultiAllelic distanceMetric = 
-				new CavalliSforzaEdwardsDistanceMultiAllelic(data) ;
+		ModifiedRogersDistanceMultiAllelic distanceMetric = 
+				new ModifiedRogersDistanceMultiAllelic(data) ;
 		
 		assertEquals("Data is not correct!", data, distanceMetric.getData()) ;
 		
