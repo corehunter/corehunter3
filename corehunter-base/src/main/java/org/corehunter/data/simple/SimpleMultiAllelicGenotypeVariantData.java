@@ -23,10 +23,8 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-
 import org.corehunter.data.MultiAllelicGenotypeVariantData;
 import org.corehunter.data.NamedAllelicGenotypeVariantData;
-import org.jamesframework.core.subset.SubsetSolution;
 
 import uno.informatics.common.io.FileProperties;
 import uno.informatics.common.io.IOUtilities;

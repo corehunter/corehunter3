@@ -18,6 +18,10 @@
 			<artifactId>james-core</artifactId>
 		</dependency>
 		<dependency>
+		    <groupId>uno.informatics.common</groupId>
+		    <artifactId>informatics-utils</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>uno.informatics.common</groupId>
 			<artifactId>informatics-model-api</artifactId>
 		</dependency>

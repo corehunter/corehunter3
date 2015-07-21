@@ -17,6 +17,7 @@ import org.jamesframework.core.problems.objectives.Objective;
 import org.jamesframework.core.subset.SubsetProblem;
 import org.jamesframework.core.subset.SubsetSolution;
 import org.jamesframework.core.search.algo.RandomDescent;
+import org.jamesframework.core.search.algo.ParallelTempering;
 import org.jamesframework.core.search.listeners.SearchListener;
 import org.jamesframework.core.search.stopcriteria.MaxRuntime;
 import org.jamesframework.core.subset.neigh.SinglePerturbationNeighbourhood;
