@@ -22,7 +22,7 @@ import org.jamesframework.core.subset.SubsetSolution;
  * @author Guy Davenport
  */
 public class ProportionNonInformativeAllelesMultiAllelic implements
-    Objective<SubsetSolution, MultiAllelicGenotypeVariantData>
+	Objective<SubsetSolution, MultiAllelicGenotypeVariantData>
 {
 
 	/*

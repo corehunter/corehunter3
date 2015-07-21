@@ -10,8 +10,6 @@
  *******************************************************************************/
 package org.corehunter.objectives.multiallelic;
 
-import java.util.Iterator;
-
 import org.corehunter.data.MultiAllelicGenotypeVariantData;
 import org.jamesframework.core.problems.objectives.Objective;
 import org.jamesframework.core.problems.objectives.evaluations.Evaluation;
@@ -22,7 +20,7 @@ import org.jamesframework.core.subset.SubsetSolution;
  * @author Guy Davenport
  */
 public class HetrozygousLociDiversityMultiAllelic implements
-    Objective<SubsetSolution, MultiAllelicGenotypeVariantData>
+	Objective<SubsetSolution, MultiAllelicGenotypeVariantData>
 {
 	/*
 	 * (non-Javadoc)
@@ -33,37 +31,29 @@ public class HetrozygousLociDiversityMultiAllelic implements
 	public Evaluation evaluate(SubsetSolution solution,
 	    MultiAllelicGenotypeVariantData data)
 	{
-		double summedAlleleFrequencySquared = 0.0;
+		double summedAverageAlleleFrequencySquared = 0.0;
 		double total = 0.0;
-		Integer id ;
-		
-		double alleleFrequency;
+
+		double averageAlleleFrequency;
 
 		int numberOfMarkers = data.getNumberOfMarkers();
 		int numberOfAlleles;
 
-		Iterator<Integer> iterator = solution.getSelectedIDs().iterator();
-
-		while (iterator.hasNext())
+		for (int markerIndex = 0; markerIndex < numberOfMarkers; ++markerIndex)
 		{
-			id =  iterator.next() ;
-			
-			for (int markerIndex = 0; markerIndex < numberOfMarkers; ++markerIndex)
+			numberOfAlleles = data.getNumberOfAlleles(markerIndex);
+
+			summedAverageAlleleFrequencySquared = 0.0;
+
+			for (int alleleIndex = 0; alleleIndex < numberOfAlleles; ++alleleIndex)
 			{
-				numberOfAlleles = data.getNumberOfAlleles(markerIndex);
+				averageAlleleFrequency = data.getAverageAlelleFrequency(solution.getSelectedIDs(), markerIndex,
+						alleleIndex);
 
-				summedAlleleFrequencySquared = 0.0;
-
-				for (int alleleIndex = 0; alleleIndex < numberOfAlleles; ++alleleIndex)
-				{
-					alleleFrequency = data.getAlelleFrequency(id, markerIndex,
-					    alleleIndex);
-
-					summedAlleleFrequencySquared = summedAlleleFrequencySquared + Math.pow(alleleFrequency, 2);			
-				}
-				
-				total = total + (1.0  - summedAlleleFrequencySquared) ;
+				summedAverageAlleleFrequencySquared = summedAverageAlleleFrequencySquared + Math.pow(averageAlleleFrequency, 2);			
 			}
+
+			total = total + (1.0  - summedAverageAlleleFrequencySquared) ;
 		}
 
 		return SimpleEvaluation.WITH_VALUE(total / (double)numberOfMarkers) ;

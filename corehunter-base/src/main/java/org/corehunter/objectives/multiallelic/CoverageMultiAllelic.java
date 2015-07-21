@@ -20,7 +20,7 @@ import org.jamesframework.core.subset.SubsetSolution;
  * @author Guy Davenport
  */
 public class CoverageMultiAllelic implements
-    Objective<SubsetSolution, MultiAllelicGenotypeVariantData>
+	Objective<SubsetSolution, MultiAllelicGenotypeVariantData> 
 {
 
 	private ProportionNonInformativeAllelesMultiAllelic	pn;

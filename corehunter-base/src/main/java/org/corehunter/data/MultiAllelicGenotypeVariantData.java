@@ -10,6 +10,11 @@
  *******************************************************************************/
 package org.corehunter.data;
 
+import java.util.Collection;
+import java.util.Iterator;
+
+import org.jamesframework.core.subset.SubsetSolution;
+
 /**
  * Data contains relative frequencies of markers that have two or more alleles. If
  * all the markers used in these data have two and only two alleles, such as
@@ -21,7 +26,7 @@ package org.corehunter.data;
 public interface MultiAllelicGenotypeVariantData extends GenotypeVariantData
 {
 	/**
-	 * Gets the relative frequency of an allele for the given entity (sample)
+	 * Gets the relative frequency of an allele for the given entity (sample/accession)
 	 * 
 	 * @param entityId
 	 *          the id of the entity, must be one of the ids returned by
@@ -40,6 +45,25 @@ public interface MultiAllelicGenotypeVariantData extends GenotypeVariantData
 	public double getAlelleFrequency(int id, int markerIndex, int alleleIndex);
 
 	/**
+	 * Gets the average frequency of an allele for the given entities (samples/accession)
+	 * 
+	 * @param entityIds
+	 *          the ids of the entity, must be a subset of the ids returned by
+	 *          {@link #getIDs()}
+	 * @param markerIndex
+	 *          the index of the marker within the range 0 to n-1, where n is the
+	 *          total number of markers and is returned by
+	 *          {@link #getNumberOfMarkers()}
+	 * @param alleleIndex
+	 *          the index of the allele for the given marker within the range 0 to
+	 *          m-1, where m is the total number of alleles for a given marker and
+	 *          is returned by {@link #getNumberOfAlleles(int)}
+	 * @return the relative frequency of an allele for a given marker in a given
+	 *         entity
+	 */
+  public double getAverageAlelleFrequency(Collection<Integer> entityIds, int markerIndex, int alleleIndex) ;
+  
+	/**
 	 * Gets the number of alleles for a given marker
 	 * 
 	 * @param markerIndex
@@ -56,4 +80,6 @@ public interface MultiAllelicGenotypeVariantData extends GenotypeVariantData
 	 * @return the total number of allele across all markers
 	 */
   public int getTotalNumberAlleles() ;
+
+
 }

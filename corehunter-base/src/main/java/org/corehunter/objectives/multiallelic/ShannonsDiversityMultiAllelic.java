@@ -22,9 +22,8 @@ import org.jamesframework.core.subset.SubsetSolution;
  * @author Guy Davenport
  */
 public class ShannonsDiversityMultiAllelic implements
-    Objective<SubsetSolution, MultiAllelicGenotypeVariantData>
+	Objective<SubsetSolution, MultiAllelicGenotypeVariantData>
 {
-
 	/*
 	 * (non-Javadoc)
 	 * @see org.jamesframework.core.problems.objectives.Objective#evaluate(org.
@@ -39,27 +38,19 @@ public class ShannonsDiversityMultiAllelic implements
 
 		double summedDiversity = 0;
 		double alleleFrequency = 0;
-		Integer id ;
 
-		Iterator<Integer> iterator = solution.getSelectedIDs().iterator();
-
-		while (iterator.hasNext())
+		for (int markerIndex = 0; markerIndex < numberOfMarkers; ++markerIndex)
 		{
-			id =  iterator.next() ;
-			
-			for (int markerIndex = 0; markerIndex < numberOfMarkers; ++markerIndex)
+			numberOfAlleles = data.getNumberOfAlleles(markerIndex);
+
+			for (int alleleIndex = 0; alleleIndex < numberOfAlleles; ++alleleIndex)
 			{
-				numberOfAlleles = data.getNumberOfAlleles(markerIndex);
+				alleleFrequency = data.getAverageAlelleFrequency(solution.getSelectedIDs(), markerIndex,
+					    alleleIndex) / numberOfMarkers ;
 
-				for (int alleleIndex = 0; alleleIndex < numberOfAlleles; ++alleleIndex)
-				{
-					alleleFrequency = data.getAlelleFrequency(id, markerIndex,
-					    alleleIndex);
-
-					if (alleleFrequency > 0)
-						summedDiversity = summedDiversity + (alleleFrequency * Math.log(alleleFrequency)) ;
+				if (alleleFrequency > 0)
+					summedDiversity = summedDiversity + (alleleFrequency * Math.log(alleleFrequency)) ;
 				}
-			}
 		}
 		
 		return SimpleEvaluation.WITH_VALUE(-summedDiversity) ;

@@ -19,12 +19,14 @@ import static uno.informatics.common.Constants.INVALID_INDEX;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
 import org.corehunter.data.MultiAllelicGenotypeVariantData;
 import org.corehunter.data.NamedAllelicGenotypeVariantData;
+import org.jamesframework.core.subset.SubsetSolution;
 
 import uno.informatics.common.io.FileProperties;
 import uno.informatics.common.io.IOUtilities;
@@ -266,6 +268,28 @@ public class SimpleMultiAllelicGenotypeVariantData extends AbstractNamedSubsetDa
   {
 	  return alleleFrequencies[id][markerIndex][alleleIndex];
   }
+  
+	/* (non-Javadoc)
+	 * @see org.corehunter.data.MultiAllelicGenotypeVariantData#getAverageAlelleFrequency(Collection<Integer>, int, int)
+	 */
+	@Override
+	public double getAverageAlelleFrequency(Collection<Integer> entityIds,
+		int markerIndex, int alleleIndex)
+	{
+		Iterator<Integer> iterator = entityIds.iterator();
+		
+		double summedAlleleFrequency = 0.0;
+		Integer id ;
+
+		while (iterator.hasNext())
+		{
+			id =  iterator.next() ;
+			
+			summedAlleleFrequency = summedAlleleFrequency + getAlelleFrequency(id, markerIndex, alleleIndex) ;
+		}
+		
+		return summedAlleleFrequency / entityIds.size() ;
+	}
 
 	/* (non-Javadoc)
 	 * @see org.corehunter.data.MultiAllelicGenotypeVariantData#getNumberOfAllele(int)
