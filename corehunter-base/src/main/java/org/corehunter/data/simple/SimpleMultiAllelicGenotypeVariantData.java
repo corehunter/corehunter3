@@ -15,7 +15,7 @@
  *******************************************************************************/
 package org.corehunter.data.simple;
 
-import static uno.informatics.common.Constants.INVALID_INDEX;
+import static uno.informatics.common.Constants.UNKNOWN_INDEX;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -340,11 +340,11 @@ public class SimpleMultiAllelicGenotypeVariantData extends AbstractNamedSubsetDa
 		if (fileProperties.getFileType() == null)
 			throw new IOException("File type not defined!") ;
 		
-		if (fileProperties.getRowHeaderPosition() > INVALID_INDEX && 
-				fileProperties.getDataPosition() > INVALID_INDEX && 
-				fileProperties.getDataPosition() <= fileProperties.getColumnHeaderPosition())
+		if (fileProperties.getRowHeaderPosition() > UNKNOWN_INDEX && 
+				fileProperties.getDataRowPosition() > UNKNOWN_INDEX && 
+				fileProperties.getDataRowPosition() <= fileProperties.getColumnHeaderPosition())
 			throw new IOException("Column header position : " + 
-					fileProperties.getDataPosition() + " must be before data position : " + fileProperties.getColumnHeaderPosition()) ;
+					fileProperties.getDataRowPosition() + " must be before data position : " + fileProperties.getColumnHeaderPosition()) ;
 
 		if (!fileProperties.getFile().exists())
 			throw new IOException("File does not exist : " + fileProperties.getFile()) ;
@@ -372,7 +372,7 @@ public class SimpleMultiAllelicGenotypeVariantData extends AbstractNamedSubsetDa
 
 				if (reader.nextRow())
 				{
-					if (fileProperties.getRowHeaderPosition() > INVALID_INDEX) 
+					if (fileProperties.getRowHeaderPosition() > UNKNOWN_INDEX) 
 						while (row < fileProperties.getRowHeaderPosition() && reader.nextRow())
 							++row ;	
 					
@@ -389,8 +389,8 @@ public class SimpleMultiAllelicGenotypeVariantData extends AbstractNamedSubsetDa
 					for (int i = 0 ; i < columnCount ; ++i)
 						frequencies.add(new LinkedList<List<Double>>()) ;
 					
-					if (fileProperties.getDataPosition() > INVALID_INDEX) 
-						while (row < fileProperties.getDataPosition() && reader.nextRow())
+					if (fileProperties.getDataRowPosition() > UNKNOWN_INDEX) 
+						while (row < fileProperties.getDataRowPosition() && reader.nextRow())
 							++row ;		
 					
 					Iterator<Double> frequencyIterator ;

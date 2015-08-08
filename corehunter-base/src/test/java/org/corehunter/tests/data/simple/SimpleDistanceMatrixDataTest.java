@@ -16,10 +16,16 @@
 package org.corehunter.tests.data.simple;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
+import java.io.IOException;
 
 import org.corehunter.data.simple.SimpleDistanceMatrixData;
+import org.corehunter.data.simple.SimpleMultiAllelicGenotypeVariantData;
 import org.corehunter.tests.TestData;
 import org.junit.Test;
+
+import uno.informatics.common.io.FileProperties;
 
 /**
  * @author Guy Davenport
@@ -27,11 +33,43 @@ import org.junit.Test;
  */
 public class SimpleDistanceMatrixDataTest extends TestData
 {
-
+	private static final String TXT_FILE1 = "/distances.txt" ;
+	private static final String TXT_FILE2 = "/distances_with_names.txt";
+	
 	@Test
 	public void inMemoryTest()
 	{
 		testData(new SimpleDistanceMatrixData(SET, DISTANCES)) ;
+	}
+	
+	@Test
+	public void loadFromFileTest1()
+	{
+		try
+    {
+	    testData(SimpleDistanceMatrixData.readData(new FileProperties(SimpleDistanceMatrixDataTest.class.getResource(TXT_FILE1).getFile()))) ;
+    }
+    catch (IOException e)
+    {
+	    // TODO Auto-generated catch block
+	    e.printStackTrace();
+	    fail(e.getMessage()) ;
+    }
+	}
+	
+	@Test
+	public void loadFromFileTest2()
+	{
+		try
+    {
+	    testData(SimpleDistanceMatrixData.readData(new FileProperties(SimpleDistanceMatrixDataTest.class.getResource(TXT_FILE2).getFile()))) ;
+    }
+    catch (IOException e)
+    {
+	    // TODO Auto-generated catch block
+	    e.printStackTrace();
+	    fail(e.getMessage()) ;
+    }
 	}
 	
 	private void testData(SimpleDistanceMatrixData data)

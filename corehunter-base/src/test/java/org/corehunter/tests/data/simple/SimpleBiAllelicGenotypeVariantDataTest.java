@@ -50,7 +50,7 @@ public class SimpleBiAllelicGenotypeVariantDataTest
 	{
 		try
     {
-	    testData(SimpleBiAllelicGenotypeVariantData.readData(new FileProperties(SimpleMultiAllelicGenotypeVariantDataTest.class.getResource(TXT_FILE).getFile()))) ;
+	    testData(SimpleBiAllelicGenotypeVariantData.readData(new FileProperties(SimpleBiAllelicGenotypeVariantData.class.getResource(TXT_FILE).getFile()))) ;
     }
     catch (IOException e)
     {

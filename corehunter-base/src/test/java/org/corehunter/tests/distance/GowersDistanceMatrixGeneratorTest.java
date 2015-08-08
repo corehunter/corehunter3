@@ -125,7 +125,7 @@ public class GowersDistanceMatrixGeneratorTest
 	    FileProperties fileProperties = new FileProperties(GowersDistanceMatrixGeneratorTest.class.getResource(DATA_FILE).getPath(), FileType.CSV) ;
 	    
 	    fileProperties.setColumnHeaderPosition(0) ;
-	    fileProperties.setDataPosition(1) ;
+	    fileProperties.setDataRowPosition(1) ;
 	    
 	    List<ColumnFeature> features = DatasetUtils.generateDatasetFeatures(fileProperties, null, 10) ;
 	    
@@ -145,7 +145,7 @@ public class GowersDistanceMatrixGeneratorTest
 	    fileProperties = new FileProperties(GowersDistanceMatrixGeneratorTest.class.getResource(MATRIX_FILE).getPath(), FileType.CSV) ;
 	    
 	    fileProperties.setColumnHeaderPosition(0) ;
-	    fileProperties.setDataPosition(1) ;
+	    fileProperties.setDataRowPosition(1) ;
 	    fileProperties.setRowHeaderPosition(0) ;
 	    
 			MatrixDataset<Double> matrix = 

@@ -20,9 +20,14 @@ import static org.corehunter.tests.TestData.NAMES;
 import static org.corehunter.tests.TestData.PRECISION;
 import static org.corehunter.tests.TestData.SET;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
+import java.io.IOException;
 
 import org.corehunter.data.simple.NamedDistanceMatrixData;
 import org.junit.Test;
+
+import uno.informatics.common.io.FileProperties;
 
 /**
  * @author Guy Davenport
@@ -30,11 +35,43 @@ import org.junit.Test;
  */
 public class NamedDistanceMatrixDataTest
 {
-
+	private static final String TXT_FILE1 = "/distances.txt" ;
+	private static final String TXT_FILE2 = "/distances_with_names.txt";
+	
 	@Test
 	public void inMemoryTest()
 	{
 		testData(new NamedDistanceMatrixData(NAMES, DISTANCES)) ;
+	}
+	
+	@Test
+	public void loadFromFileTest1()
+	{
+		try
+    {
+	    testData(NamedDistanceMatrixData.readData(new FileProperties(NamedDistanceMatrixDataTest.class.getResource(TXT_FILE1).getFile()))) ;
+    }
+    catch (IOException e)
+    {
+	    // TODO Auto-generated catch block
+	    e.printStackTrace();
+	    fail(e.getMessage()) ;
+    }
+	}
+	
+	@Test
+	public void loadFromFileTest2()
+	{
+		try
+    {
+	    testData(NamedDistanceMatrixData.readData(new FileProperties(NamedDistanceMatrixDataTest.class.getResource(TXT_FILE2).getFile()))) ;
+    }
+    catch (IOException e)
+    {
+	    // TODO Auto-generated catch block
+	    e.printStackTrace();
+	    fail(e.getMessage()) ;
+    }
 	}
 	
 	private void testData(NamedDistanceMatrixData data)
