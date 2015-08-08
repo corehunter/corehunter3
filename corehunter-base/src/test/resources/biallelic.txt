@@ -1,0 +1,6 @@
+	mk1	mk2	mk3	mk4	mk5	mk6	mk7
+Name1	1	0	2	1	1	0	0
+Name2	2	0	2	0	1	2	1
+Name3	1	0	1	0	1	1	0
+Name4	1	0	1	1	1	2	2
+Name5	1	0	2	0	1	2	0

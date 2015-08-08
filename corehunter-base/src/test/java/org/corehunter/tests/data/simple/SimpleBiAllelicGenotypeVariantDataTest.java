@@ -20,11 +20,15 @@ import static org.corehunter.tests.TestData.MARKER_NAMES;
 import static org.corehunter.tests.TestData.NAMES;
 import static org.corehunter.tests.TestData.SET;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
+import java.io.IOException;
 import java.util.Iterator;
 
 import org.corehunter.data.simple.SimpleBiAllelicGenotypeVariantData;
 import org.junit.Test;
+
+import uno.informatics.common.io.FileProperties;
 
 /**
  * @author Guy Davenport
@@ -32,10 +36,28 @@ import org.junit.Test;
  */
 public class SimpleBiAllelicGenotypeVariantDataTest
 {
+	
+	private static final String TXT_FILE = "/biallelic.txt";
+	
 	@Test
 	public void inMemoryTest()
 	{
 		testData(new SimpleBiAllelicGenotypeVariantData(NAMES, MARKER_NAMES, ALLELE_SCORES)) ;
+	}
+	
+	@Test
+	public void loadFromFileTest()
+	{
+		try
+    {
+	    testData(SimpleBiAllelicGenotypeVariantData.readData(new FileProperties(SimpleMultiAllelicGenotypeVariantDataTest.class.getResource(TXT_FILE).getFile()))) ;
+    }
+    catch (IOException e)
+    {
+	    // TODO Auto-generated catch block
+	    e.printStackTrace();
+	    fail(e.getMessage()) ;
+    }
 	}
 	
 	private void testData(SimpleBiAllelicGenotypeVariantData data)
