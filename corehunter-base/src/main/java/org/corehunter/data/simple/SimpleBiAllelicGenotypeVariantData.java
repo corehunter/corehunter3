@@ -197,10 +197,10 @@ public class SimpleBiAllelicGenotypeVariantData extends AbstractNamedSubsetData
 		if (fileProperties.getFileType() == null)
 			throw new IOException("File type not defined!") ;
 		
-		if (fileProperties.getColumnHeaderPosition() <= UNKNOWN_INDEX) 
+		if (!fileProperties.hasColumnHeader()) 
 				throw new IOException("Column headers must be defined!") ;
 		
-		if (fileProperties.getRowHeaderPosition() <= UNKNOWN_INDEX) 
+		if (!fileProperties.hasRowHeader()) 
 			throw new IOException("Row headers must be defined!") ;
 		
 		if (fileProperties.getDataRowPosition() <= fileProperties.getColumnHeaderPosition())
@@ -246,6 +246,23 @@ public class SimpleBiAllelicGenotypeVariantData extends AbstractNamedSubsetData
 					if (fileProperties.getDataRowPosition() > UNKNOWN_INDEX) 
 						while (row < fileProperties.getDataRowPosition() && reader.nextRow())
 							++row ;		
+					
+					reader.nextColumn() ;	
+					
+					name = reader.getCellAsString() ;
+					
+					names.add(name) ;
+					
+					reader.nextColumn() ;	
+
+					alleleScoresRow = reader.getRowCellsAsInt() ;
+
+					if (alleleScoresRow.size() != columnCount)
+						throw new IOException("Rows are not all the same size!") ;
+					
+					alleleScores.add(alleleScoresRow) ;
+
+					++row ;
 					
 					while (reader.nextRow())
 					{				

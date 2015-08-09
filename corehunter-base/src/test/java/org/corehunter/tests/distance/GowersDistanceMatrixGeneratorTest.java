@@ -17,6 +17,7 @@ package org.corehunter.tests.distance;
 
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 import java.util.Iterator;
 import java.util.List;
@@ -122,16 +123,13 @@ public class GowersDistanceMatrixGeneratorTest
 	{
 		try
     {
-	    FileProperties fileProperties = new FileProperties(GowersDistanceMatrixGeneratorTest.class.getResource(DATA_FILE).getPath(), FileType.CSV) ;
-	    
-	    fileProperties.setColumnHeaderPosition(0) ;
-	    fileProperties.setDataRowPosition(1) ;
+	    FileProperties fileProperties = new FileProperties(GowersDistanceMatrixGeneratorTest.class.getResource(DATA_FILE).getPath(), FileType.CSV, true) ;
 	    
 	    List<ColumnFeature> features = DatasetUtils.generateDatasetFeatures(fileProperties, null, 10) ;
 	    
 	    ColumnFeature rowHeaderFeature = features.remove(0) ;
 	    
-	    fileProperties.setRowHeaderPosition(0) ;
+	    fileProperties = new FileProperties(GowersDistanceMatrixGeneratorTest.class.getResource(DATA_FILE).getPath(), FileType.CSV, true, true) ;
 	    
 	    FeatureDataset dataset = 
 	    		ArrayFeatureDataset.createFeatureDataset(UID, NAME, DESCRIPTION, DatasetUtils.createFeatures(features), fileProperties, rowHeaderFeature) ;
@@ -160,8 +158,8 @@ public class GowersDistanceMatrixGeneratorTest
     }
     catch (DatasetException e)
     {
-	    // TODO Auto-generated catch block
 	    e.printStackTrace();
+	    fail(e.getMessage()) ;
     }
 	}
 }

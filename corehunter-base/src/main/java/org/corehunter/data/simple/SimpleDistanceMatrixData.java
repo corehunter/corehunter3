@@ -11,6 +11,7 @@
 package org.corehunter.data.simple;
 
 import static uno.informatics.common.Constants.UNKNOWN_INDEX;
+import static uno.informatics.common.Constants.UNKNOWN_COUNT;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -166,16 +167,15 @@ public class SimpleDistanceMatrixData implements DistanceMatrixData
 			throw new IOException("File does not exist : " + fileProperties.getFile()) ;
 		
 		List<String> columnNames = new LinkedList<String>() ;
-		List<String> rowNames = new LinkedList<String>() ;
-		
-		String name ;
-		
+
 		List<Double> distancesScoresRow ;
 		List<List<Double>> distances ;
 		
 		Set<Integer> ids = new HashSet<Integer>() ;
 		
 		int row = 0 ;
+		int column = 0 ;
+		int id = 0 ;
 		
 		try
 		{
@@ -183,7 +183,7 @@ public class SimpleDistanceMatrixData implements DistanceMatrixData
 
 			if (reader != null && reader.ready())
 			{
-				int columnCount = 0 ;
+				int columnCount = UNKNOWN_COUNT ;
 
 				if (reader.nextRow())
 				{
@@ -192,13 +192,20 @@ public class SimpleDistanceMatrixData implements DistanceMatrixData
 						while (row < fileProperties.getRowHeaderPosition() && reader.nextRow())
 							++row ;	
 					
-						reader.nextColumn() ;
-						reader.nextColumn() ;
+						column = 0 ;
+						
+						if (fileProperties.getDataColumnPosition() > UNKNOWN_INDEX) 
+							while (column < fileProperties.getDataColumnPosition() && reader.nextColumn())
+								++column ;	
+						
+						reader.nextColumn() ;	
 					
 						columnNames = reader.getRowCellsAsString() ;
 					
 						columnCount = columnNames.size() ;
 					}
+					
+					column = 0 ;	
 					
 					distances = new LinkedList<List<Double>>() ;
 					
@@ -206,18 +213,37 @@ public class SimpleDistanceMatrixData implements DistanceMatrixData
 						while (row < fileProperties.getDataRowPosition() && reader.nextRow())
 							++row ;		
 					
+					// read first data row
+					
+					if (fileProperties.getDataColumnPosition() > UNKNOWN_INDEX) 
+						while (column < fileProperties.getDataColumnPosition() && reader.nextColumn())
+							++column ;	
+					
+					reader.nextColumn() ;	
+
+					distancesScoresRow = reader.getRowCellsAsDouble() ;
+					
+					if (columnCount == UNKNOWN_COUNT)
+						columnCount = distancesScoresRow.size() ;
+
+					if (distancesScoresRow.size() != columnCount)
+						throw new IOException("Rows are not all the same size!") ;
+					
+					distances.add(distancesScoresRow) ;
+					ids.add(id) ;
+
+					++row ;
+					++id ;
+					
 					while (reader.nextRow())
 					{				
+						column = 0 ;
+						
+						if (fileProperties.getDataColumnPosition() > UNKNOWN_INDEX) 
+							while (column < fileProperties.getDataColumnPosition() && reader.nextColumn())
+								++column ;	
+						
 						reader.nextColumn() ;	
-						
-						name = reader.getCellAsString() ;
-						
-						if (fileProperties.getRowHeaderPosition() > UNKNOWN_INDEX) 
-						{
-							rowNames.add(name) ;
-						
-							reader.nextColumn() ;	
-						}
 
 						distancesScoresRow = reader.getRowCellsAsDouble() ;
 
@@ -225,9 +251,10 @@ public class SimpleDistanceMatrixData implements DistanceMatrixData
 							throw new IOException("Rows are not all the same size!") ;
 						
 						distances.add(distancesScoresRow) ;
-						ids.add(row) ;
+						ids.add(id) ;
 
 						++row ;
+						++id ;
 					}
 				}
 				else

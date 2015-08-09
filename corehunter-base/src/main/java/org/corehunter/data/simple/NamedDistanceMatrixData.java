@@ -10,6 +10,7 @@
  *******************************************************************************/
 package org.corehunter.data.simple;
 
+import static uno.informatics.common.Constants.UNKNOWN_COUNT;
 import static uno.informatics.common.Constants.UNKNOWN_INDEX;
 
 import java.io.IOException;
@@ -17,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+
 import org.corehunter.data.DistanceMatrixData;
 import org.corehunter.data.NamedSubsetData;
 
@@ -121,6 +123,12 @@ public class NamedDistanceMatrixData extends AbstractNamedSubsetData implements 
 		if (fileProperties.getFileType() == null)
 			throw new IOException("File type not defined!") ;
 		
+		if (!fileProperties.hasColumnHeader()) 
+			throw new IOException("No column headers") ;
+		
+		if (!fileProperties.hasRowHeader()) 
+			throw new IOException("No row headers") ;
+		
 		if (fileProperties.getRowHeaderPosition() > UNKNOWN_INDEX && 
 				fileProperties.getDataRowPosition() > UNKNOWN_INDEX && 
 				fileProperties.getDataRowPosition() <= fileProperties.getColumnHeaderPosition())
@@ -130,15 +138,13 @@ public class NamedDistanceMatrixData extends AbstractNamedSubsetData implements 
 		if (!fileProperties.getFile().exists())
 			throw new IOException("File does not exist : " + fileProperties.getFile()) ;
 		
-		List<String> names = new LinkedList<String>() ;
-		List<String> markerNames = new LinkedList<String>() ;
-		
-		String name ;
-		
+		List<String> columnNames = new LinkedList<String>() ;
+
 		List<Double> distancesScoresRow ;
 		List<List<Double>> distances ;
-
+		
 		int row = 0 ;
+		int column = 0 ;
 		
 		try
 		{
@@ -146,20 +152,29 @@ public class NamedDistanceMatrixData extends AbstractNamedSubsetData implements 
 
 			if (reader != null && reader.ready())
 			{
-				int columnCount = 0 ;
+				int columnCount = UNKNOWN_COUNT ;
 
 				if (reader.nextRow())
 				{
 					if (fileProperties.getRowHeaderPosition() > UNKNOWN_INDEX) 
+					{
 						while (row < fileProperties.getRowHeaderPosition() && reader.nextRow())
 							++row ;	
 					
-					reader.nextColumn() ;
-					reader.nextColumn() ;
+						column = 0 ;
+						
+						if (fileProperties.getDataColumnPosition() > UNKNOWN_INDEX) 
+							while (column < fileProperties.getDataColumnPosition() && reader.nextColumn())
+								++column ;	
+						
+						reader.nextColumn() ;	
 					
-					markerNames = reader.getRowCellsAsString() ;
+						columnNames = reader.getRowCellsAsString() ;
 					
-					columnCount = markerNames.size() ;
+						columnCount = columnNames.size() ;
+					}
+					
+					column = 0 ;	
 					
 					distances = new LinkedList<List<Double>>() ;
 					
@@ -167,13 +182,33 @@ public class NamedDistanceMatrixData extends AbstractNamedSubsetData implements 
 						while (row < fileProperties.getDataRowPosition() && reader.nextRow())
 							++row ;		
 					
+					// read first data row
+					
+					if (fileProperties.getDataColumnPosition() > UNKNOWN_INDEX) 
+						while (column < fileProperties.getDataColumnPosition() && reader.nextColumn())
+							++column ;	
+					
+					reader.nextColumn() ;	
+
+					distancesScoresRow = reader.getRowCellsAsDouble() ;
+					
+					if (columnCount == UNKNOWN_COUNT)
+						columnCount = distancesScoresRow.size() ;
+
+					if (distancesScoresRow.size() != columnCount)
+						throw new IOException("Rows are not all the same size!") ;
+					
+					distances.add(distancesScoresRow) ;
+					
+					++row ;
+					
 					while (reader.nextRow())
 					{				
-						reader.nextColumn() ;	
+						column = 0 ;
 						
-						name = reader.getCellAsString() ;
-						
-						names.add(name) ;
+						if (fileProperties.getDataColumnPosition() > UNKNOWN_INDEX) 
+							while (column < fileProperties.getDataColumnPosition() && reader.nextColumn())
+								++column ;	
 						
 						reader.nextColumn() ;	
 
@@ -183,7 +218,7 @@ public class NamedDistanceMatrixData extends AbstractNamedSubsetData implements 
 							throw new IOException("Rows are not all the same size!") ;
 						
 						distances.add(distancesScoresRow) ;
-						
+
 						++row ;
 					}
 				}
@@ -200,7 +235,7 @@ public class NamedDistanceMatrixData extends AbstractNamedSubsetData implements 
 			if (reader != null)
 				reader.close() ;
 			
-			return new NamedDistanceMatrixData(names, distances) ;
+			return new NamedDistanceMatrixData(columnNames, distances) ;
 
 		}
 		catch (IOException e)

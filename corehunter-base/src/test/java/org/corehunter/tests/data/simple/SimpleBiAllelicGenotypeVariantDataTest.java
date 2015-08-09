@@ -50,11 +50,10 @@ public class SimpleBiAllelicGenotypeVariantDataTest
 	{
 		try
     {
-	    testData(SimpleBiAllelicGenotypeVariantData.readData(new FileProperties(SimpleBiAllelicGenotypeVariantData.class.getResource(TXT_FILE).getFile()))) ;
+	    testData(SimpleBiAllelicGenotypeVariantData.readData(new FileProperties(SimpleBiAllelicGenotypeVariantData.class.getResource(TXT_FILE).getFile(), 0, 1, 0, 2))) ;
     }
     catch (IOException e)
     {
-	    // TODO Auto-generated catch block
 	    e.printStackTrace();
 	    fail(e.getMessage()) ;
     }

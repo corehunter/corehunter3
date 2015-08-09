@@ -35,8 +35,7 @@ import uno.informatics.common.io.FileProperties;
  */
 public class NamedDistanceMatrixDataTest
 {
-	private static final String TXT_FILE1 = "/distances.txt" ;
-	private static final String TXT_FILE2 = "/distances_with_names.txt";
+	private static final String TXT_FILE = "/distances_with_names.txt";
 	
 	@Test
 	public void inMemoryTest()
@@ -45,30 +44,14 @@ public class NamedDistanceMatrixDataTest
 	}
 	
 	@Test
-	public void loadFromFileTest1()
+	public void loadFromFileTest()
 	{
 		try
     {
-	    testData(NamedDistanceMatrixData.readData(new FileProperties(NamedDistanceMatrixDataTest.class.getResource(TXT_FILE1).getFile()))) ;
+	    testData(NamedDistanceMatrixData.readData(new FileProperties(NamedDistanceMatrixDataTest.class.getResource(TXT_FILE).getFile(), true, true))) ;
     }
     catch (IOException e)
     {
-	    // TODO Auto-generated catch block
-	    e.printStackTrace();
-	    fail(e.getMessage()) ;
-    }
-	}
-	
-	@Test
-	public void loadFromFileTest2()
-	{
-		try
-    {
-	    testData(NamedDistanceMatrixData.readData(new FileProperties(NamedDistanceMatrixDataTest.class.getResource(TXT_FILE2).getFile()))) ;
-    }
-    catch (IOException e)
-    {
-	    // TODO Auto-generated catch block
 	    e.printStackTrace();
 	    fail(e.getMessage()) ;
     }

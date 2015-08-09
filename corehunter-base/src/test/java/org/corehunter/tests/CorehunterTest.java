@@ -28,7 +28,6 @@ public class CorehunterTest extends TestData
 	 * {@link org.corehunter.Corehunter#executeRandomDescent(org.corehunter.DistanceMatrixData, org.jamesframework.core.problems.objectives.Objective, int)}
 	 * .
 	 */
-	@Test
 	public void testExecuteRandomDescent()
 	{
 		Corehunter<DistanceMatrixData> corehunter = new Corehunter<DistanceMatrixData>();

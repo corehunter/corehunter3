@@ -51,7 +51,6 @@ public class SimpleDistanceMatrixDataTest extends TestData
     }
     catch (IOException e)
     {
-	    // TODO Auto-generated catch block
 	    e.printStackTrace();
 	    fail(e.getMessage()) ;
     }
@@ -62,11 +61,10 @@ public class SimpleDistanceMatrixDataTest extends TestData
 	{
 		try
     {
-	    testData(SimpleDistanceMatrixData.readData(new FileProperties(SimpleDistanceMatrixDataTest.class.getResource(TXT_FILE2).getFile()))) ;
+	    testData(SimpleDistanceMatrixData.readData(new FileProperties(SimpleDistanceMatrixDataTest.class.getResource(TXT_FILE2).getFile(), true, true))) ;
     }
     catch (IOException e)
     {
-	    // TODO Auto-generated catch block
 	    e.printStackTrace();
 	    fail(e.getMessage()) ;
     }
