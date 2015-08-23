@@ -44,9 +44,9 @@ public class SimpleBiAllelicGenotypeVariantData extends AbstractNamedSubsetData
 	/**
 	 * @param names
 	 */
-  public SimpleBiAllelicGenotypeVariantData(String[] names, String[] markerNames, int[][] alleleScores)
+  public SimpleBiAllelicGenotypeVariantData(String name, String[] itemNames, String[] markerNames, int[][] alleleScores)
   {
-	  super(names);
+    super(name, itemNames) ;
 
 	  if (markerNames == null)
 	  	throw new IllegalArgumentException("Marker names not defined!") ;
@@ -54,7 +54,7 @@ public class SimpleBiAllelicGenotypeVariantData extends AbstractNamedSubsetData
 	  if (alleleScores == null)
 	  	throw new IllegalArgumentException("Alleles not deifned!") ;
 	  
-	  if (names.length != alleleScores.length)
+	  if (getNames().length != alleleScores.length)
 	  	throw new IllegalArgumentException("Number of alleleScores don't match number of names!") ;
 	  
 	  if (alleleScores.length > 0)
@@ -90,10 +90,10 @@ public class SimpleBiAllelicGenotypeVariantData extends AbstractNamedSubsetData
 	  }
   }
 
-	public SimpleBiAllelicGenotypeVariantData(List<String> names,
+	public SimpleBiAllelicGenotypeVariantData(String name, List<String> itemNames,
 		List<String> markerNames, List<List<Integer>> alleleScores)
 	{
-		super(names) ;
+		super(name, itemNames) ;
 		
 	  if (markerNames == null)
 	  	throw new IllegalArgumentException("Marker names not defined!") ;
@@ -101,7 +101,7 @@ public class SimpleBiAllelicGenotypeVariantData extends AbstractNamedSubsetData
 	  if (alleleScores == null)
 	  	throw new IllegalArgumentException("Alleles not deifned!") ;
 	  
-	  if (names.size() != alleleScores.size())
+	  if (getNames().length != alleleScores.size())
 	  	throw new IllegalArgumentException("Number of alleleScores don't match number of names!") ;
 	  
 	  if (alleleScores.size() > 0)
@@ -210,7 +210,7 @@ public class SimpleBiAllelicGenotypeVariantData extends AbstractNamedSubsetData
 		if (!fileProperties.getFile().exists())
 			throw new IOException("File does not exist : " + fileProperties.getFile()) ;
 		
-		List<String> names = new LinkedList<String>() ;
+		List<String> itemsNames = new LinkedList<String>() ;
 		List<String> markerNames = new LinkedList<String>() ;
 		
 		String name ;
@@ -251,7 +251,7 @@ public class SimpleBiAllelicGenotypeVariantData extends AbstractNamedSubsetData
 					
 					name = reader.getCellAsString() ;
 					
-					names.add(name) ;
+					itemsNames.add(name) ;
 					
 					reader.nextColumn() ;	
 
@@ -270,7 +270,7 @@ public class SimpleBiAllelicGenotypeVariantData extends AbstractNamedSubsetData
 						
 						name = reader.getCellAsString() ;
 						
-						names.add(name) ;
+						itemsNames.add(name) ;
 						
 						reader.nextColumn() ;	
 
@@ -297,7 +297,7 @@ public class SimpleBiAllelicGenotypeVariantData extends AbstractNamedSubsetData
 			if (reader != null)
 				reader.close() ;
 			
-			return new SimpleBiAllelicGenotypeVariantData(names, markerNames, alleleScores) ;
+			return new SimpleBiAllelicGenotypeVariantData(fileProperties.getFile().getName(), itemsNames, markerNames, alleleScores) ;
 
 		}
 		catch (IOException e)

@@ -17,6 +17,7 @@ package org.corehunter.tests.data.simple;
 
 import static org.corehunter.tests.TestData.ALLELE_SCORES;
 import static org.corehunter.tests.TestData.MARKER_NAMES;
+import static org.corehunter.tests.TestData.NAME;
 import static org.corehunter.tests.TestData.NAMES;
 import static org.corehunter.tests.TestData.SET;
 import static org.junit.Assert.assertEquals;
@@ -42,7 +43,7 @@ public class SimpleBiAllelicGenotypeVariantDataTest
 	@Test
 	public void inMemoryTest()
 	{
-		testData(new SimpleBiAllelicGenotypeVariantData(NAMES, MARKER_NAMES, ALLELE_SCORES)) ;
+		testData(new SimpleBiAllelicGenotypeVariantData(NAME, NAMES, MARKER_NAMES, ALLELE_SCORES)) ;
 	}
 	
 	@Test

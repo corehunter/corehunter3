@@ -17,40 +17,47 @@ import java.util.Set;
 
 import org.corehunter.data.NamedSubsetData;
 
+import uno.informatics.common.model.Dataset;
+import uno.informatics.common.model.impl.EntityImpl;
+
 /**
  * @author Guy Davenport
  */
-public class AbstractNamedSubsetData implements NamedSubsetData
+public class AbstractNamedSubsetData extends EntityImpl implements NamedSubsetData, Dataset
 {
 	// item names
-	private final String[] names;
+	private final String[] itemNames;
 
 	private final Set<Integer>	ids;
 
-	public AbstractNamedSubsetData(String[] names)
+	public AbstractNamedSubsetData(String name, String[] itemNames)
 	{
-	  if (names == null)
+	  super(name) ;
+	  
+	  if (itemNames == null)
 	  	throw new IllegalArgumentException("Names not defined!") ;
 	  
-		this.names = new String[names.length] ;
+		this.itemNames = new String[itemNames.length] ;
 
 		// infer IDs: 0..N-1 in case of N items
 		// (indices in distance matrix and name array)
 		ids = new HashSet<Integer>();
 
-		for (int id = 0; id < names.length; id++)
+		for (int id = 0; id < itemNames.length; id++)
 		{
 			ids.add(id);
-			this.names[id] = names[id] ;
+			this.itemNames[id] = itemNames[id] ;
 		}
 	}
 	
-	public AbstractNamedSubsetData(List<String> names)
-	{
+	public AbstractNamedSubsetData(String name, List<String> names)
+  {
+    super(name) ;
+    
 	  if (names == null)
 	  	throw new IllegalArgumentException("Names not defined!") ;
 	  
-		this.names = new String[names.size()] ;
+		this.itemNames = new String[names.size()] ;
 
 		// infer IDs: 0..N-1 in case of N items
 		// (indices in distance matrix and name array)
@@ -63,7 +70,7 @@ public class AbstractNamedSubsetData implements NamedSubsetData
 		while (iterator.hasNext())
 		{
 			ids.add(id);
-			this.names[id] = iterator.next() ;
+			this.itemNames[id] = iterator.next() ;
 			++id ;
 		}
 	}
@@ -85,6 +92,11 @@ public class AbstractNamedSubsetData implements NamedSubsetData
 	//@Override // TODO why is @Override causing an error?
 	public final String getName(int id)
 	{
-		return names[id];
-	}
+		return itemNames[id];
+  }
+  
+  public final String[] getNames()
+  {
+    return itemNames;
+  }
 }

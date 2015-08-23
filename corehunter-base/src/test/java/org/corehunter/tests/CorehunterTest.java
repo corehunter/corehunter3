@@ -10,12 +10,6 @@
  *******************************************************************************/
 package org.corehunter.tests;
 
-import static org.junit.Assert.assertEquals;
-
-import org.corehunter.Corehunter;
-import org.corehunter.data.DistanceMatrixData;
-import org.corehunter.objectives.distance.AverageDistanceObjective;
-import org.jamesframework.core.subset.SubsetSolution;
 import org.junit.Test;
 
 /**
@@ -23,22 +17,6 @@ import org.junit.Test;
  */
 public class CorehunterTest extends TestData
 {
-	/**
-	 * Test method for
-	 * {@link org.corehunter.Corehunter#executeRandomDescent(org.corehunter.DistanceMatrixData, org.jamesframework.core.problems.objectives.Objective, int)}
-	 * .
-	 */
-	public void testExecuteRandomDescent()
-	{
-		Corehunter<DistanceMatrixData> corehunter = new Corehunter<DistanceMatrixData>();
-
-		corehunter.setTimeLimit(2);
-
-		SubsetSolution result = corehunter.executeRandomDescent(DATA,
-		    new AverageDistanceObjective(), 2, null);
-
-		assertEquals(SUBSET1, result.getSelectedIDs());
-	}
 
 	/**
 	 * Test method for {@link org.corehunter.Corehunter#getTimeLimit()}.

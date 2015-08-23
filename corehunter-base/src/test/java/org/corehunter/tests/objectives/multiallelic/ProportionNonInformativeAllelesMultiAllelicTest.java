@@ -18,6 +18,7 @@ package org.corehunter.tests.objectives.multiallelic;
 import static org.corehunter.tests.TestData.ALLELES;
 import static org.corehunter.tests.TestData.ALLELE_NAMES;
 import static org.corehunter.tests.TestData.MARKER_NAMES;
+import static org.corehunter.tests.TestData.NAME;
 import static org.corehunter.tests.TestData.NAMES;
 import static org.corehunter.tests.TestData.PRECISION;
 import static org.corehunter.tests.TestData.PROPORTION_NON_INFORMATIVE_ALLELES_SUBSET1;
@@ -41,7 +42,7 @@ public class ProportionNonInformativeAllelesMultiAllelicTest extends EvaluationT
 	public void test()
 	{
 		SimpleMultiAllelicGenotypeVariantData data = 
-				new SimpleMultiAllelicGenotypeVariantData(NAMES, MARKER_NAMES, ALLELE_NAMES, ALLELES) ;
+				new SimpleMultiAllelicGenotypeVariantData(NAME, NAMES, MARKER_NAMES, ALLELE_NAMES, ALLELES) ;
 
 		ProportionNonInformativeAllelesMultiAllelic objective = 
 				new ProportionNonInformativeAllelesMultiAllelic() ;

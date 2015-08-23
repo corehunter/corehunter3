@@ -16,6 +16,7 @@
 package org.corehunter.tests.data.simple;
 
 import static org.corehunter.tests.TestData.DISTANCES;
+import static org.corehunter.tests.TestData.NAME;
 import static org.corehunter.tests.TestData.NAMES;
 import static org.corehunter.tests.TestData.PRECISION;
 import static org.corehunter.tests.TestData.SET;
@@ -40,7 +41,7 @@ public class NamedDistanceMatrixDataTest
 	@Test
 	public void inMemoryTest()
 	{
-		testData(new NamedDistanceMatrixData(NAMES, DISTANCES)) ;
+		testData(new NamedDistanceMatrixData(NAME, NAMES, DISTANCES)) ;
 	}
 	
 	@Test

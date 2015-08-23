@@ -31,6 +31,9 @@ public class TestData
 	    new double[] { 0.6, 0.8, 1.0, 0.9, 0.6 },
 	    new double[] { 0.4, 0.6, 0.9, 1.0, 0.8 },
 	    new double[] { 0.2, 0.4, 0.6, 0.8, 1.0 }	      };
+	    
+	    
+	public static final String              NAME      = "Dataset Name" ;
 
 	public static final String[]	          NAMES	    = new String[] { "Name1",
 	    "Name2", "Name3", "Name4", "Name5"	            };
@@ -54,7 +57,7 @@ public class TestData
 		SUBSET1.add(3);
 	}
 
-	public static final DistanceMatrixData	DATA	    = new NamedDistanceMatrixData(
+	public static final NamedDistanceMatrixData	DATA	    = new NamedDistanceMatrixData(NAME,
 	                                                        NAMES, DISTANCES);
 
 	

@@ -48,14 +48,11 @@ public class SimpleMultiAllelicGenotypeVariantData extends AbstractNamedSubsetDa
 	/**
 	 * @param names
 	 */
-  public SimpleMultiAllelicGenotypeVariantData(String[] names, String[] markerNames, 
+  public SimpleMultiAllelicGenotypeVariantData(String name, String[] itemNames, String[] markerNames, 
   		String[][] alleleNames, double[][][] alleleFrequencies)
   {
-	  super(names);
+    super(name, itemNames) ;
 
-	  if (names == null)
-	  	throw new IllegalArgumentException("Names not defined!") ;
-	  
 	  if (markerNames == null)
 	  	throw new IllegalArgumentException("Marker names not defined!") ;
 	  
@@ -65,7 +62,7 @@ public class SimpleMultiAllelicGenotypeVariantData extends AbstractNamedSubsetDa
 	  if (alleleFrequencies == null)
 	  	throw new IllegalArgumentException("Allele Frequency entries not deifned!") ;
 	  
-	  if (names.length != alleleFrequencies.length)
+	  if (itemNames.length != alleleFrequencies.length)
 	  	throw new IllegalArgumentException("Number of allele frequency entries don't match number of names!") ;
 	  
 	  if (markerNames.length != alleleNames.length)
@@ -135,14 +132,11 @@ public class SimpleMultiAllelicGenotypeVariantData extends AbstractNamedSubsetDa
 	 * @param alleleNames2
 	 * @param frequencies
 	 */
-  public SimpleMultiAllelicGenotypeVariantData(List<String> names,
+  public SimpleMultiAllelicGenotypeVariantData(String name, List<String> itemNames,
       List<String> markerNames, List<List<String>> alleleNames,
       List<List<List<Double>>> frequencies)
   {
-	  super(names);
-
-	  if (names == null)
-	  	throw new IllegalArgumentException("Names not defined!") ;
+    super(name, itemNames) ;
 	  
 	  if (markerNames == null)
 	  	throw new IllegalArgumentException("Marker names not defined!") ;
@@ -153,7 +147,7 @@ public class SimpleMultiAllelicGenotypeVariantData extends AbstractNamedSubsetDa
 	  if (frequencies == null)
 	  	throw new IllegalArgumentException("Allele Frequency entries not deifned!") ;
 	  
-	  if (names.size() != frequencies.size())
+	  if (this.getNames().length != frequencies.size())
 	  	throw new IllegalArgumentException("Number of allele frequency entries don't match number of names!") ;
 	  
 	  if (markerNames.size() != alleleNames.size())
@@ -349,7 +343,7 @@ public class SimpleMultiAllelicGenotypeVariantData extends AbstractNamedSubsetDa
 		if (!fileProperties.getFile().exists())
 			throw new IOException("File does not exist : " + fileProperties.getFile()) ;
 		
-		List<String> names = null ;
+		List<String> itemNames = null ;
 		List<String> markerNames = new LinkedList<String>() ;
 		String markerName = null ;
 		String lastMarkerName = null ;
@@ -380,9 +374,9 @@ public class SimpleMultiAllelicGenotypeVariantData extends AbstractNamedSubsetDa
 					reader.nextColumn() ;
 					reader.nextColumn() ;
 					
-					names = reader.getRowCellsAsString() ;
+					itemNames = reader.getRowCellsAsString() ;
 					
-					columnCount = names.size() ;
+					columnCount = itemNames.size() ;
 					
 					frequencies = new ArrayList<List<List<Double>>>(columnCount) ;
 					
@@ -469,7 +463,7 @@ public class SimpleMultiAllelicGenotypeVariantData extends AbstractNamedSubsetDa
 			if (reader != null)
 				reader.close() ;
 			
-			return new SimpleMultiAllelicGenotypeVariantData(names, markerNames, alleleNames, frequencies) ;
+			return new SimpleMultiAllelicGenotypeVariantData(fileProperties.getFile().getName(), itemNames, markerNames, alleleNames, frequencies) ;
 
 		}
 		catch (IOException e)

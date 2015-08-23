@@ -18,6 +18,7 @@ package org.corehunter.tests.data.simple;
 import static org.corehunter.tests.TestData.ALLELES;
 import static org.corehunter.tests.TestData.ALLELE_NAMES;
 import static org.corehunter.tests.TestData.MARKER_NAMES;
+import static org.corehunter.tests.TestData.NAME;
 import static org.corehunter.tests.TestData.NAMES;
 import static org.corehunter.tests.TestData.SET;
 import static org.junit.Assert.assertEquals;
@@ -42,7 +43,7 @@ public class SimpleMultiAllelicGenotypeVariantDataTest
 	@Test
 	public void inMemoryTest()
 	{
-		testData(new SimpleMultiAllelicGenotypeVariantData(NAMES, MARKER_NAMES, ALLELE_NAMES, ALLELES)) ;
+		testData(new SimpleMultiAllelicGenotypeVariantData(NAME, NAMES, MARKER_NAMES, ALLELE_NAMES, ALLELES)) ;
 	}
 	
 	@Test

@@ -19,6 +19,7 @@ import static org.corehunter.tests.TestData.ALLELES;
 import static org.corehunter.tests.TestData.ALLELE_NAMES;
 import static org.corehunter.tests.TestData.CAVALLI_SFORZA_EDWARDS_DISTANCES;
 import static org.corehunter.tests.TestData.MARKER_NAMES;
+import static org.corehunter.tests.TestData.NAME;
 import static org.corehunter.tests.TestData.NAMES;
 import static org.corehunter.tests.TestData.PRECISION;
 import static org.corehunter.tests.TestData.SET;
@@ -43,7 +44,7 @@ public class CavalliSforzaEdwardsDistanceMultiAllelicTest
 	@Test
 	public void test()
 	{
-		SimpleMultiAllelicGenotypeVariantData data = new SimpleMultiAllelicGenotypeVariantData(NAMES, MARKER_NAMES, ALLELE_NAMES, ALLELES) ;
+		SimpleMultiAllelicGenotypeVariantData data = new SimpleMultiAllelicGenotypeVariantData(NAME, NAMES, MARKER_NAMES, ALLELE_NAMES, ALLELES) ;
 
 		CavalliSforzaEdwardsDistanceMultiAllelic distanceMetric = 
 				new CavalliSforzaEdwardsDistanceMultiAllelic(data) ;
