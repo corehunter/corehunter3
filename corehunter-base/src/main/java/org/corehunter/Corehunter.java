@@ -74,8 +74,6 @@ public class Corehunter
     else
     {
       // TOOD other types of data
-      
-      return null;
     }
     
     if (search != null)
