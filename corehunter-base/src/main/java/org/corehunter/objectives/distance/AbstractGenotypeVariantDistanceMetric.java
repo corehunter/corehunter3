@@ -12,14 +12,13 @@ package org.corehunter.objectives.distance;
 
 import java.util.Set;
 
-import org.corehunter.data.DistanceMatrixData;
 import org.corehunter.data.GenotypeVariantData;
 
 /**
  * @author Guy Davenport
  */
 public abstract class AbstractGenotypeVariantDistanceMetric<GenotypeVariantDataType extends GenotypeVariantData>
-    implements DistanceMatrixData
+    implements GenotypeVariantDistanceMetric<GenotypeVariantDataType>
 {
 	private GenotypeVariantDataType	data;
 
@@ -40,6 +39,11 @@ public abstract class AbstractGenotypeVariantDistanceMetric<GenotypeVariantDataT
 		return data.getIDs();
 	}
 
+	 /*
+   * (non-Javadoc)
+   * @see org.corehunter.objectives.distance.GenotypeVariantDistanceMetric.SubsetData#getData()
+   */
+  @Override
 	public final GenotypeVariantDataType getData()
 	{
 		return data;

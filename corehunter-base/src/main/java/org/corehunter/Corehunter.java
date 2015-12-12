@@ -12,9 +12,21 @@ package org.corehunter;
 
 import java.util.concurrent.TimeUnit;
 
+import org.corehunter.data.BiAllelicGenotypeVariantData;
 import org.corehunter.data.DistanceMatrixData;
+import org.corehunter.data.MultiAllelicGenotypeVariantData;
 import org.corehunter.distance.GowersDistanceMatrixGenerator;
 import org.corehunter.objectives.distance.AverageDistanceObjective;
+import org.corehunter.objectives.distance.GenotypeVariantDistanceMetric;
+import org.corehunter.objectives.distance.biallelic.CavalliSforzaEdwardsDistanceBiAllelic;
+import org.corehunter.objectives.distance.biallelic.ModifiedRogersDistanceBiAllelic;
+import org.corehunter.objectives.distance.multiallelic.CavalliSforzaEdwardsDistanceMultiAllelic;
+import org.corehunter.objectives.distance.multiallelic.ModifiedRogersDistanceMultiAllelic;
+import org.corehunter.objectives.multiallelic.CoverageMultiAllelic;
+import org.corehunter.objectives.multiallelic.HetrozygousLociDiversityMultiAllelic;
+import org.corehunter.objectives.multiallelic.NumberEffectiveAllelesMultiAllelic;
+import org.corehunter.objectives.multiallelic.ProportionNonInformativeAllelesMultiAllelic;
+import org.corehunter.objectives.multiallelic.ShannonsDiversityMultiAllelic;
 import org.jamesframework.core.problems.datatypes.IntegerIdentifiedData;
 import org.jamesframework.core.problems.objectives.Objective;
 import org.jamesframework.core.subset.SubsetProblem;
@@ -56,49 +68,172 @@ public class Corehunter
         
     if (arguments.getDataset() instanceof FeatureDataset)
     {      
-      search = createAverageGowersDistanceSearch(arguments) ;
-          
-      search.addStopCriterion(new MaxRuntime(timeLimit, TimeUnit.SECONDS));
-      
-      if (searchListener != null)
-        search.addSearchListener(searchListener);
-        
-      // start search
-      search.start();
-      
-      // dispose search
-      search.dispose();
-      
-
+      search = createGowersDistanceSearch((FeatureDataset)arguments.getDataset(), arguments) ;
     }
     else
     {
-      // TOOD other types of data
+      if (arguments.getDataset() instanceof DistanceMatrixData)
+      {      
+        search = createDistanceSearch((DistanceMatrixData)arguments.getDataset(), arguments) ;
+      }
+      else
+      {
+        if (arguments.getDataset() instanceof MultiAllelicGenotypeVariantData)
+        {      
+          search = createMultiAllelicGenotypeSearch((MultiAllelicGenotypeVariantData)arguments.getDataset(), arguments) ;
+        }
+        else
+        {
+          if (arguments.getDataset() instanceof BiAllelicGenotypeVariantData)
+          {      
+            search = createBiAllelicGenotypeSearch((BiAllelicGenotypeVariantData)arguments.getDataset(), arguments) ;
+          }
+          else
+          {
+            // TOOD other types of data
+          }
+        }
+      }
     }
+    
+    search.addStopCriterion(new MaxRuntime(timeLimit, TimeUnit.SECONDS));
+    
+    if (searchListener != null)
+      search.addSearchListener(searchListener);
+      
+    // start search
+    search.start();
+    
+    // dispose search
+    search.dispose();
     
     if (search != null)
       return search.getBestSolution();
     else
-      return null ;
-      
-    
+      return null ; 
   }
-  
-  protected Search<SubsetSolution> createAverageGowersDistanceSearch(CorehunterArguments arguments)
+
+  protected Search<SubsetSolution> createGowersDistanceSearch(FeatureDataset dataset, CorehunterArguments arguments)
   {
     GowersDistanceMatrixGenerator generator = new GowersDistanceMatrixGenerator(
         (FeatureDataset) arguments.getDataset());
         
-    DistanceMatrixData data = generator.generateDistanceMatrix();
-
-    Objective<SubsetSolution, DistanceMatrixData> objective = new AverageDistanceObjective();
+    DistanceMatrixData distanceMatrix = generator.generateDistanceMatrix() ;
     
+    return createDistanceSearch(distanceMatrix, arguments) ;
+  }
+  
+  protected Search<SubsetSolution> createMultiAllelicGenotypeSearch(MultiAllelicGenotypeVariantData dataset,
+      CorehunterArguments arguments)
+  {
+    switch (arguments.getObjective())
+    {
+      case CE:
+        return createMultiAllelicGenotypeDistanceSearch(new CavalliSforzaEdwardsDistanceMultiAllelic(dataset), dataset, arguments) ;
+      case CV:
+        return createMultiAllelicGenotypeSearch(new CoverageMultiAllelic(), dataset, arguments) ;
+      case GD:
+        throw new IllegalArgumentException("Invalid objective for multiallelic data : " + arguments.getObjective()) ;
+      case HE:
+        return createMultiAllelicGenotypeSearch(new HetrozygousLociDiversityMultiAllelic(), dataset, arguments) ;
+      case MR:
+        return createMultiAllelicGenotypeDistanceSearch(new ModifiedRogersDistanceMultiAllelic(dataset), dataset, arguments) ;
+      case NE:
+        return createMultiAllelicGenotypeSearch(new NumberEffectiveAllelesMultiAllelic(), dataset, arguments) ;
+      case PN:
+        return createMultiAllelicGenotypeSearch(new ProportionNonInformativeAllelesMultiAllelic(), dataset, arguments) ;
+      case SH:
+        return createMultiAllelicGenotypeSearch(new ShannonsDiversityMultiAllelic(), dataset, arguments) ;
+      default:
+        throw new IllegalArgumentException("Unknown objective : " + arguments.getObjective()) ;   
+    }
+  }
+  
+
+  private Search<SubsetSolution> createBiAllelicGenotypeSearch(BiAllelicGenotypeVariantData dataset,
+      CorehunterArguments arguments)
+  {
+    switch (arguments.getObjective())
+    {
+      case CE:
+        return createBiAllelicGenotypeDistanceSearch(new CavalliSforzaEdwardsDistanceBiAllelic(dataset), dataset, arguments) ;
+      case CV:
+        return createBiAllelicGenotypeSearch(new CoverageBiAllelic(), dataset, arguments) ;
+      case GD:
+        throw new IllegalArgumentException("Invalid objective for multiallelic data : " + arguments.getObjective()) ;
+      case HE:
+        return createBiAllelicGenotypeSearch(new HetrozygousLociDiversityBiAllelic(), dataset, arguments) ;
+      case MR:
+        return createBiAllelicGenotypeDistanceSearch(new ModifiedRogersDistanceBiAllelic(dataset), dataset, arguments) ;
+      case NE:
+        return createBiAllelicGenotypeSearch(new NumberEffectiveAllelesBiAllelic(), dataset, arguments) ;
+      case PN:
+        return createBiAllelicGenotypeSearch(new ProportionNonInformativeAllelesBiAllelic(), dataset, arguments) ;
+      case SH:
+        return createBiAllelicGenotypeSearch(new ShannonsDiversityBiAllelic(), dataset, arguments) ;
+      default:
+        throw new IllegalArgumentException("Unknown objective : " + arguments.getObjective()) ;   
+    }
+  }
+  
+  private Search<SubsetSolution> createMultiAllelicGenotypeDistanceSearch(
+      GenotypeVariantDistanceMetric<MultiAllelicGenotypeVariantData> genotypeVariantDistanceMetric,
+      MultiAllelicGenotypeVariantData dataset, CorehunterArguments arguments)
+  {
+    return createDistanceSearch(genotypeVariantDistanceMetric, arguments) ;
+  }
+
+  private Search<SubsetSolution> createMultiAllelicGenotypeSearch(
+      Objective<SubsetSolution, MultiAllelicGenotypeVariantData> objective,
+      MultiAllelicGenotypeVariantData dataset, CorehunterArguments arguments)
+  {
+    SubsetProblem<MultiAllelicGenotypeVariantData> problem;
+    
+    if (arguments.getMinimumSubsetSize() == arguments.getMaximumSubsetSize())
+      problem = new SubsetProblem<MultiAllelicGenotypeVariantData>(dataset, objective, arguments.getMinimumSubsetSize());
+    else
+      problem = new SubsetProblem<MultiAllelicGenotypeVariantData>(dataset, objective, arguments.getMinimumSubsetSize(),
+          arguments.getMaximumSubsetSize());
+          
+    RandomDescent<SubsetSolution> search = new RandomDescent<SubsetSolution>(problem,
+        new SinglePerturbationNeighbourhood());
+    
+    return search ;
+  }
+  
+  private Search<SubsetSolution> createBiAllelicGenotypeDistanceSearch(
+      GenotypeVariantDistanceMetric<MultiAllelicGenotypeVariantData> genotypeVariantDistanceMetric,
+      BiAllelicGenotypeVariantData dataset, CorehunterArguments arguments)
+  {
+    return createDistanceSearch(genotypeVariantDistanceMetric, arguments) ;
+  }
+
+  private Search<SubsetSolution> createBiAllelicGenotypeSearch(
+      Objective<SubsetSolution, BiAllelicGenotypeVariantData> objective,
+      BiAllelicGenotypeVariantData dataset, CorehunterArguments arguments)
+  {
+    SubsetProblem<BiAllelicGenotypeVariantData> problem;
+    
+    if (arguments.getMinimumSubsetSize() == arguments.getMaximumSubsetSize())
+      problem = new SubsetProblem<BiAllelicGenotypeVariantData>(dataset, objective, arguments.getMinimumSubsetSize());
+    else
+      problem = new SubsetProblem<BiAllelicGenotypeVariantData>(dataset, objective, arguments.getMinimumSubsetSize(),
+          arguments.getMaximumSubsetSize());
+          
+    RandomDescent<SubsetSolution> search = new RandomDescent<SubsetSolution>(problem,
+        new SinglePerturbationNeighbourhood());
+    
+    return search ;
+  }
+  
+  private Search<SubsetSolution> createDistanceSearch(DistanceMatrixData dataset, CorehunterArguments arguments)
+  {
     SubsetProblem<DistanceMatrixData> problem;
     
     if (arguments.getMinimumSubsetSize() == arguments.getMaximumSubsetSize())
-      problem = new SubsetProblem<DistanceMatrixData>(data, objective, arguments.getMinimumSubsetSize());
+      problem = new SubsetProblem<DistanceMatrixData>(dataset, new AverageDistanceObjective(), arguments.getMinimumSubsetSize());
     else
-      problem = new SubsetProblem<DistanceMatrixData>(data, objective, arguments.getMinimumSubsetSize(),
+      problem = new SubsetProblem<DistanceMatrixData>(dataset, new AverageDistanceObjective(), arguments.getMinimumSubsetSize(),
           arguments.getMaximumSubsetSize());
           
     RandomDescent<SubsetSolution> search = new RandomDescent<SubsetSolution>(problem,

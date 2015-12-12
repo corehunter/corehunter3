@@ -11,9 +11,6 @@
 package org.corehunter.data;
 
 import java.util.Collection;
-import java.util.Iterator;
-
-import org.jamesframework.core.subset.SubsetSolution;
 
 /**
  * Data contains relative frequencies of markers that have two or more alleles. If
