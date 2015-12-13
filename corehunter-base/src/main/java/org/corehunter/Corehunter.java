@@ -16,6 +16,11 @@ import org.corehunter.data.BiAllelicGenotypeVariantData;
 import org.corehunter.data.DistanceMatrixData;
 import org.corehunter.data.MultiAllelicGenotypeVariantData;
 import org.corehunter.distance.GowersDistanceMatrixGenerator;
+import org.corehunter.objectives.biallelic.CoverageBiAllelic;
+import org.corehunter.objectives.biallelic.HetrozygousLociDiversityBiAllelic;
+import org.corehunter.objectives.biallelic.NumberEffectiveAllelesBiAllelic;
+import org.corehunter.objectives.biallelic.ProportionNonInformativeAllelesBiAllelic;
+import org.corehunter.objectives.biallelic.ShannonsDiversityBiAllelic;
 import org.corehunter.objectives.distance.AverageDistanceObjective;
 import org.corehunter.objectives.distance.GenotypeVariantDistanceMetric;
 import org.corehunter.objectives.distance.biallelic.CavalliSforzaEdwardsDistanceBiAllelic;
@@ -62,35 +67,43 @@ public class Corehunter
     return execute(null);
   }
   
-  public SubsetSolution execute(SearchListener<SubsetSolution> searchListener)
+  public SubsetSolution execute(CorehunterListener listener)
   {
     Search<SubsetSolution> search = null ; 
+    
+    if (arguments.getDataset() == null)
+      throw new IllegalArgumentException("Dataset not defined!") ;
         
+    // Phenotypic data where the distance matrix is generated before 
     if (arguments.getDataset() instanceof FeatureDataset)
     {      
-      search = createGowersDistanceSearch((FeatureDataset)arguments.getDataset(), arguments) ;
+      search = createGowersDistanceSearch((FeatureDataset)arguments.getDataset(), arguments, listener) ;
     }
     else
     {
+      // Any data for which a distance matrix has already been generated
       if (arguments.getDataset() instanceof DistanceMatrixData)
       {      
         search = createDistanceSearch((DistanceMatrixData)arguments.getDataset(), arguments) ;
       }
       else
       {
+        // MultiAllelicGenotypeVariantData
         if (arguments.getDataset() instanceof MultiAllelicGenotypeVariantData)
         {      
           search = createMultiAllelicGenotypeSearch((MultiAllelicGenotypeVariantData)arguments.getDataset(), arguments) ;
         }
         else
         {
+          // BiAllelicGenotypeVariantData
           if (arguments.getDataset() instanceof BiAllelicGenotypeVariantData)
           {      
             search = createBiAllelicGenotypeSearch((BiAllelicGenotypeVariantData)arguments.getDataset(), arguments) ;
           }
           else
           {
-            // TOOD other types of data
+            // TODO support for combined genotype / phenotype, this could be via DistanceMatrixData or some other specific dataset type
+            throw new IllegalArgumentException("Dataset type not supported by Core Hunter : " + arguments.getDataset().getClass()) ;
           }
         }
       }
@@ -98,8 +111,8 @@ public class Corehunter
     
     search.addStopCriterion(new MaxRuntime(timeLimit, TimeUnit.SECONDS));
     
-    if (searchListener != null)
-      search.addSearchListener(searchListener);
+    if (listener != null)
+      search.addSearchListener(listener);
       
     // start search
     search.start();
@@ -107,18 +120,19 @@ public class Corehunter
     // dispose search
     search.dispose();
     
-    if (search != null)
-      return search.getBestSolution();
-    else
-      return null ; 
+    return search.getBestSolution(); 
   }
 
-  protected Search<SubsetSolution> createGowersDistanceSearch(FeatureDataset dataset, CorehunterArguments arguments)
+  protected Search<SubsetSolution> createGowersDistanceSearch(FeatureDataset dataset, CorehunterArguments arguments, CorehunterListener listener)
   {
     GowersDistanceMatrixGenerator generator = new GowersDistanceMatrixGenerator(
         (FeatureDataset) arguments.getDataset());
         
+    listener.preprocessingStarted("Generating distance matrix using gowers distance.");
+    
     DistanceMatrixData distanceMatrix = generator.generateDistanceMatrix() ;
+    
+    listener.preprocessingStopped("Distance matrix generated.");
     
     return createDistanceSearch(distanceMatrix, arguments) ;
   }
