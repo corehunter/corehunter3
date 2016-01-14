@@ -4,6 +4,10 @@ sudo: false
 
 jdk: oraclejdk8
 
-script: mvn verify
+script:
+  - mvn test # unit tests
+  - mvn -Dcheckstyle.skip verify # integration tests (repeats unit tests)
+  - mvn checkstyle:check # check style
 
-after_success: mvn coveralls:report
+after_success:
+  - mvn coveralls:report # report test coverage (will only succeed in integration test mode)
