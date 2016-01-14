@@ -32,13 +32,11 @@ import org.corehunter.objectives.multiallelic.HetrozygousLociDiversityMultiAllel
 import org.corehunter.objectives.multiallelic.NumberEffectiveAllelesMultiAllelic;
 import org.corehunter.objectives.multiallelic.ProportionNonInformativeAllelesMultiAllelic;
 import org.corehunter.objectives.multiallelic.ShannonsDiversityMultiAllelic;
-import org.jamesframework.core.problems.datatypes.IntegerIdentifiedData;
 import org.jamesframework.core.problems.objectives.Objective;
 import org.jamesframework.core.subset.SubsetProblem;
 import org.jamesframework.core.subset.SubsetSolution;
 import org.jamesframework.core.search.Search;
 import org.jamesframework.core.search.algo.RandomDescent;
-import org.jamesframework.core.search.listeners.SearchListener;
 import org.jamesframework.core.search.stopcriteria.MaxRuntime;
 import org.jamesframework.core.subset.neigh.SinglePerturbationNeighbourhood;
 
