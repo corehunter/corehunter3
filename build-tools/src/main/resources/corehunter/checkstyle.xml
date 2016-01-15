@@ -63,7 +63,7 @@
             != , + , += , ? , } , << , <<= , >> , >>= , * , *=
             
             do , while , for , if , then , else , try , catch , finally
-            return , switch , synchronized, assert
+            return , switch , synchronized , assert
             
             Whitespace is also required around a list of statements.
             
