@@ -4,6 +4,9 @@ sudo: false
 
 jdk: oraclejdk8
 
+install:
+  - mvn install -DskipTests=true -Dmaven.javadoc.skip=true -B -V
+
 script:
   - mvn test # unit tests
   - mvn -Dcheckstyle.skip verify # integration tests (repeats unit tests)
