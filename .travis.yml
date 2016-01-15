@@ -4,13 +4,17 @@ sudo: false
 
 jdk: oraclejdk8
 
+# set up build matrix to split unit and integration tests and checkstyle verification
+env:
+  - COMMAND=test # unit tests
+  - COMMAND="-Dcheckstyle.skip verify" # integration tests (repeats unit tests)
+  - COMMAND=checkstyle:check # check style
+
 install:
   - mvn install -DskipTests -Dmaven.javadoc.skip -Dcheckstyle.skip -B -V
 
 script:
-  - mvn test # unit tests
-  - mvn -Dcheckstyle.skip verify # integration tests (repeats unit tests)
-  - mvn checkstyle:check # check style
+  - mvn $COMMAND
 
 after_success:
-  - mvn coveralls:report # report test coverage (will only succeed in integration test mode)
+  - mvn coveralls:report # report test coverage (will only actually succeed in integration test mode)
