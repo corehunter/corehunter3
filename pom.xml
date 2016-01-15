@@ -13,7 +13,6 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <informatics.data.version>1.0.0-SNAPSHOT</informatics.data.version>
     </properties>
 
     <distributionManagement>
@@ -47,6 +46,7 @@
     <modules>
         <module>corehunter-base</module>
         <module>corehunter-extended</module>
+        <module>build-tools</module>
     </modules>
 
     <dependencyManagement>
@@ -354,15 +354,22 @@
                     <artifactId>maven-checkstyle-plugin</artifactId>
                     <version>2.17</version>
                     <dependencies>
+                        <!-- upgrade to latest checkstyle version at runtime -->
                         <dependency>
                             <groupId>com.puppycrawl.tools</groupId>
                             <artifactId>checkstyle</artifactId>
                             <version>6.14.1</version>
                         </dependency>
+                        <!-- include build tools containing module wide checkstyle rules -->
+                        <dependency>
+                            <groupId>org.corehunter</groupId>
+                            <artifactId>build-tools</artifactId>
+                            <version>3.0.0-SNAPSHOT</version>
+                        </dependency>
                     </dependencies>
                     <configuration>
-                        <configLocation>google_checks.xml</configLocation>
-                        <violationSeverity>warning</violationSeverity>
+                        <configLocation>corehunter/checkstyle.xml</configLocation>
+                        <headerLocation>corehunter/LICENSE.txt</headerLocation>
                     </configuration>
                 </plugin>
                     
@@ -411,7 +418,8 @@
                     </reportSet>
                 </reportSets>
                 <configuration>
-                    <configLocation>google_checks.xml</configLocation>
+                    <configLocation>corehunter/checkstyle.xml</configLocation>
+                    <headerLocation>corehunter/LICENSE.txt</headerLocation>
                     <linkXRef>false</linkXRef>                
                 </configuration>
             </plugin>
