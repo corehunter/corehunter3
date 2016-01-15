@@ -17,4 +17,5 @@ script:
   - mvn $COMMAND
 
 after_success:
-  - mvn coveralls:report # report test coverage (will only actually succeed in integration test mode)
+  # report test coverage (will only actually succeed in integration test mode)
+  - mvn org.eluder.coveralls:coveralls-maven-plugin:report
