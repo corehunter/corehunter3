@@ -17,5 +17,7 @@ script:
   - mvn $COMMAND
 
 after_success:
-  # report test coverage (will only actually succeed in integration test mode)
-  - mvn org.eluder.coveralls:coveralls-maven-plugin:report
+  # report test coverage
+  # NOTE: will only actually succeed in integration test mode)
+  # NOTE: only for commits, skipped for pull requests
+  - if [ $TRAVIS_PULL_REQUEST == "false" ]; then mvn org.eluder.coveralls:coveralls-maven-plugin:report; fi
