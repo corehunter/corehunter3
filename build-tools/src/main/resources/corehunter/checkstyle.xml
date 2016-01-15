@@ -111,22 +111,6 @@
         <module name="UpperEll"/>
         
         <!--
-            The order of modifiers should conform to the suggestions in the Java Language specification:
-                1.  public
-                2.  protected
-                3.  private
-                4.  abstract
-                5.  static
-                6.  final
-                7.  transient
-                8.  volatile
-                9.  synchronized
-                10. native
-                11. strictfp
-         -->
-        <module name="ModifierOrder"/>
-        
-        <!--
             Checks for empty line separators after header, package, all import declarations, fields,
             constructors, methods, nested classes, static initializers and instance initializers.
             It is not required to insert a blank line between subsequent field declarations.
