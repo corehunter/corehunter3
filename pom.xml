@@ -145,7 +145,7 @@
                 <executions>
                     <execution>
                         <id>add-it-source</id>
-                        <phase>pre-integration-test</phase>
+                        <phase>generate-test-sources</phase>
                         <goals>
                             <goal>add-test-source</goal>
                         </goals>
@@ -165,7 +165,7 @@
                 <executions>
                     <execution>
                         <id>add-it-resources</id>
-                        <phase>pre-integration-test</phase>
+                        <phase>generate-test-resources</phase>
                         <goals>
                             <goal>copy-resources</goal>
                         </goals>
@@ -282,7 +282,7 @@
                     <!-- compile integration test classes -->
                     <execution>
                         <id>compile-integration-test</id>
-                        <phase>pre-integration-test</phase>
+                        <phase>test-compile</phase>
                         <goals>
                             <goal>testCompile</goal>
                         </goals>
