@@ -8,7 +8,7 @@ jdk: oraclejdk8
 env:
   - COMMAND=test # unit tests
   - COMMAND="-Dcheckstyle.skip verify" # integration tests (repeats unit tests)
-  - COMMAND=checkstyle:check # check style
+  - COMMAND="generate-test-sources checkstyle:check" # check style
 
 install:
   - mvn install -DskipTests -Dmaven.javadoc.skip -Dcheckstyle.skip -B -V
