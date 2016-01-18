@@ -28,11 +28,11 @@ import uno.informatics.common.model.ScaleType;
  * @author Guy Davenport
  *
  */
-public class MockFeaure implements Feature
+public class MockFeature implements Feature
 {
 	private Scale scale;
 
-	public MockFeaure()
+	public MockFeature()
   {
 	  super();
 	  
@@ -43,7 +43,7 @@ public class MockFeaure implements Feature
 	 * @param dataType
 	 * @param scaleType
 	 */
-  public MockFeaure(DataType dataType, ScaleType scaleType)
+  public MockFeature(DataType dataType, ScaleType scaleType)
   {
   	scale = new MockScale(dataType, scaleType) ;
   }
@@ -54,7 +54,7 @@ public class MockFeaure implements Feature
 	 * @param min
 	 * @param max
 	 */
-  public MockFeaure(DataType dataType, ScaleType scaleType, double min, double max)
+  public MockFeature(DataType dataType, ScaleType scaleType, double min, double max)
   {
   	scale = new MockRangeScale(dataType, scaleType, min, max) ;
   }
@@ -65,7 +65,7 @@ public class MockFeaure implements Feature
 	 * @param min
 	 * @param max
 	 */
-  public MockFeaure(DataType dataType, ScaleType scaleType, int min, int max)
+  public MockFeature(DataType dataType, ScaleType scaleType, int min, int max)
   {
   	scale = new MockRangeScale(dataType, scaleType, min, max) ;
   }

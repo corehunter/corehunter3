@@ -24,7 +24,7 @@ import java.util.List;
 
 import org.corehunter.data.DistanceMatrixData;
 import org.corehunter.distance.GowersDistanceMatrixGenerator;
-import org.corehunter.tests.MockFeaure;
+import org.corehunter.tests.MockFeature;
 import org.junit.Test;
 
 import uno.informatics.common.io.FileProperties;
@@ -39,6 +39,8 @@ import uno.informatics.data.feature.ColumnFeature;
 import uno.informatics.data.feature.array.ArrayFeatureDataset;
 import uno.informatics.data.matrix.array.DoubleArrayMatrixDataset;
 import uno.informatics.data.utils.DatasetUtils;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 /**
  * @author Guy Davenport
@@ -63,10 +65,10 @@ public class GowersDistanceMatrixGeneratorTest
 			};
 	
 	private static final Feature[] FEATURES = new Feature[] {
-		new MockFeaure(DataType.INTEGER, ScaleType.INTERVAL, 0, 5),  
-		new MockFeaure(DataType.DOUBLE, ScaleType.RATIO, 0.0, 5.0), 
-		new MockFeaure(DataType.STRING, ScaleType.NOMINAL), 
-		new MockFeaure(DataType.BOOLEAN, ScaleType.NOMINAL)
+		new MockFeature(DataType.INTEGER, ScaleType.INTERVAL, 0, 5),  
+		new MockFeature(DataType.DOUBLE, ScaleType.RATIO, 0.0, 5.0), 
+		new MockFeature(DataType.STRING, ScaleType.NOMINAL), 
+		new MockFeature(DataType.BOOLEAN, ScaleType.NOMINAL)
 		};
 	
 	private static final double[][] MATRIX = new double[][] {
