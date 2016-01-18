@@ -287,11 +287,7 @@
                             <goal>testCompile</goal>
                         </goals>
                         <configuration>
-                            <testIncludes>
-                                <testInclude>**/IT*.java</testInclude>
-                                <testInclude>**/*IT.java</testInclude>
-                                <testInclude>**/*ITCase.java</testInclude>
-                            </testIncludes>
+                            <testSource>src/integration-test</testSource>
                             <outputDirectory>${project.build.directory}/test-classes</outputDirectory>
                         </configuration>
                     </execution>
