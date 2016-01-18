@@ -188,10 +188,14 @@
             <property name="format" value="^[A-Z][0-9]?$|^[A-Z][a-zA-Z0-9]*T$|^[A-Z][a-zA-Z0-9]*Type$"/>
         </module>
         
-        <!-- Enforce camel case. Static variables and methods tagged with @Override are ignored. -->
+        <!-- 
+            Enforce camel case. Static variables and methods tagged with @Override are ignored.
+            Also, the abbreviation "IT" for "integration test" is allowed.
+        -->
         <module name="AbbreviationAsWordInName">
             <property name="allowedAbbreviationLength" value="1"/>
             <property name="ignoreFinal" value="false"/>
+            <property name="allowedAbbreviations" value="IT"/>
         </module>
         
         <!-- Verifies that there are no finalize() methods defined in a class. -->
