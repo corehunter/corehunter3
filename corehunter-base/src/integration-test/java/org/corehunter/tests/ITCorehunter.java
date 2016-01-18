@@ -16,6 +16,7 @@
 /* specific language governing permissions and limitations      */
 /* under the License.                                           */
 /*--------------------------------------------------------------*/
+
 package org.corehunter.tests;
 
 import static org.junit.Assert.assertEquals;
