@@ -32,7 +32,7 @@ public interface BiAllelicGenotypeVariantData extends GenotypeVariantData {
      * for homozygote for one allele and 2 is used for homozygote for one allele. 1 is used to denote heterozygotes. It
      * is not important which allele is encoded as 0 or 2, as long as it is consistent for a specific marker.
      *
-     * @param entityId    the id of the entity, must be one of the ids returned by {@link #getIDs()}
+     * @param entityId    the id of the entity, must be one of the IDs returned by {@link #getIDs()}
      * @param markerIndex the index of the marker within the range 0 to n-1, where n is the total number of markers and
      *                    is returned by {@link #getNumberOfMarkers()}
      * @return the allele score of the marker for the given entity, must be 0, 1 or 2.
