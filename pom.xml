@@ -369,7 +369,7 @@
                     </dependencies>
                     <configuration>
                         <configLocation>corehunter/checkstyle.xml</configLocation>
-                        <includeTestResources>true</includeTestResources>
+                        <includeTestSourceDirectory>true</includeTestSourceDirectory>
                     </configuration>
                 </plugin>
                     
@@ -419,7 +419,7 @@
                 </reportSets>
                 <configuration>
                     <configLocation>corehunter/checkstyle.xml</configLocation>
-                    <includeTestResources>true</includeTestResources>
+                    <includeTestSourceDirectory>true</includeTestSourceDirectory>
                     <linkXRef>false</linkXRef>                
                 </configuration>
             </plugin>
