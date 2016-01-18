@@ -4,7 +4,7 @@
           "http://www.puppycrawl.com/dtds/configuration_1_3.dtd">
 
 <!--
-    Compatible with checkstyle v6.7.
+    Compatible with checkstyle v6.14.1.
  -->
 
 <module name = "Checker">
