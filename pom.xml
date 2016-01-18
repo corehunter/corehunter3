@@ -369,7 +369,7 @@
                     </dependencies>
                     <configuration>
                         <configLocation>corehunter/checkstyle.xml</configLocation>
-                        <headerLocation>corehunter/LICENSE.txt</headerLocation>
+                        <includeTestResources>true</includeTestResources>
                     </configuration>
                 </plugin>
                     
@@ -419,7 +419,7 @@
                 </reportSets>
                 <configuration>
                     <configLocation>corehunter/checkstyle.xml</configLocation>
-                    <headerLocation>corehunter/LICENSE.txt</headerLocation>
+                    <includeTestResources>true</includeTestResources>
                     <linkXRef>false</linkXRef>                
                 </configuration>
             </plugin>
