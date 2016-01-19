@@ -13,7 +13,6 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <informatics.data.version>1.0.0-SNAPSHOT</informatics.data.version>
     </properties>
 
     <distributionManagement>
@@ -47,6 +46,7 @@
     <modules>
         <module>corehunter-base</module>
         <module>corehunter-extended</module>
+        <module>build-tools</module>
     </modules>
 
     <dependencyManagement>
@@ -145,7 +145,7 @@
                 <executions>
                     <execution>
                         <id>add-it-source</id>
-                        <phase>pre-integration-test</phase>
+                        <phase>generate-test-sources</phase>
                         <goals>
                             <goal>add-test-source</goal>
                         </goals>
@@ -165,7 +165,7 @@
                 <executions>
                     <execution>
                         <id>add-it-resources</id>
-                        <phase>pre-integration-test</phase>
+                        <phase>generate-test-resources</phase>
                         <goals>
                             <goal>copy-resources</goal>
                         </goals>
@@ -282,15 +282,15 @@
                     <!-- compile integration test classes -->
                     <execution>
                         <id>compile-integration-test</id>
-                        <phase>pre-integration-test</phase>
+                        <phase>test-compile</phase>
                         <goals>
                             <goal>testCompile</goal>
                         </goals>
                         <configuration>
                             <testIncludes>
-                                <testInclude>**/IT*.java</testInclude>
-                                <testInclude>**/*IT.java</testInclude>
-                                <testInclude>**/*ITCase.java</testInclude>
+                                <include>**/IT*.java</include>
+                                <include>**/*IT.java</include>
+                                <include>**/*ITCase.java</include>
                             </testIncludes>
                             <outputDirectory>${project.build.directory}/test-classes</outputDirectory>
                         </configuration>
@@ -298,17 +298,81 @@
                 </executions>
             </plugin>
             
-            <!-- Javadoc generation -->
+            <!-- Checkstyle plugin -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <version>2.10.3</version>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <version>2.17</version>
+                <executions>
+                    <!-- check and fail build upon violations as part of verify phase -->
+                    <execution>
+                        <id>verify</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            
+            <!-- 
+                Hack to enable Java 8 support for dependency report.
+                See https://github.com/RichardWarburton/lambda-behave/issues/31.
+            -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-project-info-reports-plugin</artifactId>
+                <version>2.8.1</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.apache.maven.shared</groupId>
+                        <artifactId>maven-shared-jar</artifactId>
+                        <version>1.2</version>
+                        <exclusions>
+                            <exclusion>
+                                <groupId>org.apache.bcel</groupId>
+                                <artifactId>bcel</artifactId>
+                            </exclusion>
+                        </exclusions>
+                    </dependency>
+                    <dependency>
+                        <groupId>com.google.code.findbugs</groupId>
+                        <artifactId>bcel-findbugs</artifactId>
+                        <version>6.0</version>
+                    </dependency>
+                </dependencies>
             </plugin>
             
         </plugins>
         
         <pluginManagement>
             <plugins>
+                
+                <!-- Checkstyle settings -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-checkstyle-plugin</artifactId>
+                    <version>2.17</version>
+                    <dependencies>
+                        <!-- upgrade to latest checkstyle version at runtime -->
+                        <dependency>
+                            <groupId>com.puppycrawl.tools</groupId>
+                            <artifactId>checkstyle</artifactId>
+                            <version>6.14.1</version>
+                        </dependency>
+                        <!-- include build tools containing module wide checkstyle rules -->
+                        <dependency>
+                            <groupId>org.corehunter</groupId>
+                            <artifactId>build-tools</artifactId>
+                            <version>3.0.0-SNAPSHOT</version>
+                        </dependency>
+                    </dependencies>
+                    <configuration>
+                        <configLocation>corehunter/checkstyle.xml</configLocation>
+                        <includeTestSourceDirectory>true</includeTestSourceDirectory>
+                    </configuration>
+                </plugin>
+                    
                 <plugin>
                     <artifactId>maven-jar-plugin</artifactId>
                     <version>2.6</version>
@@ -318,6 +382,7 @@
                         </archive>
                     </configuration>
                 </plugin>
+                
                 <plugin>
                     <groupId>org.apache.felix</groupId>
                     <artifactId>maven-bundle-plugin</artifactId>
@@ -332,9 +397,35 @@
                         </execution>
                     </executions>
                 </plugin>
+                
             </plugins>
         </pluginManagement>
         
     </build>
+    
+    <reporting>
+        <plugins>
+            
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <version>2.17</version>
+                <reportSets>
+                    <reportSet>
+                        <reports>
+                            <report>checkstyle</report>
+                        </reports>
+                    </reportSet>
+                </reportSets>
+                <configuration>
+                    <configLocation>corehunter/checkstyle.xml</configLocation>
+                    <includeTestSourceDirectory>true</includeTestSourceDirectory>
+                    <linkXRef>false</linkXRef>                
+                </configuration>
+            </plugin>
+            
+        </plugins>
+        
+    </reporting>
 
 </project>
