@@ -297,6 +297,22 @@
                 </executions>
             </plugin>
             
+            <!-- Verify that Javadoc can be generated on build -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>2.10.3</version>
+                <executions>
+                    <execution>
+                        <id>verify-javadoc</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>javadoc</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            
             <!-- 
                 Hack to enable Java 8 support for dependency report.
                 See https://github.com/RichardWarburton/lambda-behave/issues/31.
