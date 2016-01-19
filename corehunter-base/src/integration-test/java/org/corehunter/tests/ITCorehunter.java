@@ -19,12 +19,37 @@
 
 package org.corehunter.tests;
 
+import static org.junit.Assert.assertEquals;
+
+import org.corehunter.Corehunter;
+import org.corehunter.CorehunterArguments;
+import org.jamesframework.core.subset.SubsetSolution;
 import org.junit.Test;
 
 /**
  * @author Guy Davenport
  */
-public class CorehunterTest extends TestData {
+public class ITCorehunter extends TestData {
+
+    /**
+     * Test method for
+     * {@link org.corehunter.Corehunter#executeRandomDescent
+     * (org.corehunter.DistanceMatrixData, org.jamesframework.core.problems.objectives.Objective, int)}.
+     */
+    //@Test
+    public void testExecuteDistanceMatrix() {
+        CorehunterArguments arguments = new CorehunterArguments(2);
+
+        arguments.setDataset(DATA);
+
+        Corehunter corehunter = new Corehunter(arguments);
+
+        corehunter.setTimeLimit(2);
+
+        SubsetSolution result = corehunter.execute();
+
+        assertEquals(SUBSET1, result.getSelectedIDs());
+    }
 
     /**
      * Test method for {@link org.corehunter.Corehunter#getTimeLimit()}.
