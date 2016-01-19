@@ -32,7 +32,7 @@ public interface MultiAllelicGenotypeVariantData extends GenotypeVariantData {
     /**
      * Gets the relative frequency of an allele for the given entity (sample/accession)
      *
-     * @param entityId    the id of the entity, must be one of the IDs returned by {@link #getIDs()}
+     * @param id    the id of the entity, must be one of the IDs returned by {@link #getIDs()}
      * @param markerIndex the index of the marker within the range 0 to n-1, where n is the total number of markers and
      *                    is returned by {@link #getNumberOfMarkers()}
      * @param alleleIndex the index of the allele for the given marker within the range 0 to m-1, where m is the total

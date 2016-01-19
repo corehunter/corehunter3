@@ -25,9 +25,10 @@ package org.corehunter.data;
 public interface NamedAllelicGenotypeVariantData extends NamedGenotypeVariantData {
 
     /**
-     * Gets the name of an allele by alleleIndex
+     * Gets the name of an allele.
      *
-     * @param index of a allele
+     * @param markerIndex index of a marker
+     * @param alleleIndex index of an allele for the given marker
      * @return the name of an allele by index
      * @throws ArrayIndexOutOfBoundsException if the index is out of range
      */
