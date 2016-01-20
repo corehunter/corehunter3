@@ -81,9 +81,7 @@ public class GowersDistanceMatrixGeneratorTest {
     private static final double DELTA = 0.0000001;
 
     /**
-     * Test method for
-     * {@link org.corehunter.extended.test.GowersDistanceMatrixGenerator#GowersDistanceMatrixGenerator
-     * (java.lang.Object[][], uno.informatics.model.Feature[])}.
+     * Test method for {@link GowersDistanceMatrixGenerator#GowersDistanceMatrixGenerator(Object[][], Feature[])}.
      */
     @Test
     public void testGowersDistanceMatrixGenerator() {
@@ -91,7 +89,7 @@ public class GowersDistanceMatrixGeneratorTest {
     }
 
     /**
-     * Test method for {@link org.corehunter.extended.test.GowersDistanceMatrixGenerator#generateDistanceMatrix()}.
+     * Test method for {@link GowersDistanceMatrixGenerator#generateDistanceMatrix()}.
      */
     @Test
     public void testGenerateDistanceMatrix() {
