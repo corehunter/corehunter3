@@ -9,7 +9,8 @@ env:
   - COMMAND=test # unit tests
   - COMMAND="-Dcheckstyle.skip -Dmaven.javadoc.skip verify" # integration tests (repeats unit tests)
   - COMMAND="generate-test-sources checkstyle:check" # check style
-  - COMMAND=javadoc:javadoc # javadoc generation
+  - COMMAND=javadoc:javadoc # javadoc generation for main classes
+  - COMMAND="generate-test-sources javadoc:test-javadoc" # javadoc generation for test classes
 
 install:
   - mvn install -DskipTests -Dmaven.javadoc.skip -Dcheckstyle.skip -B -V

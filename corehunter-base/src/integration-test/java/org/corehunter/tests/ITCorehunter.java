@@ -32,9 +32,7 @@ import org.junit.Test;
 public class ITCorehunter extends TestData {
 
     /**
-     * Test method for
-     * {@link org.corehunter.Corehunter#executeRandomDescent
-     * (org.corehunter.DistanceMatrixData, org.jamesframework.core.problems.objectives.Objective, int)}.
+     * Test method for {@link Corehunter#execute()}.
      */
     //@Test
     public void testExecuteDistanceMatrix() {
@@ -66,22 +64,5 @@ public class ITCorehunter extends TestData {
     public void testSetTimeLimit() {
 
     }
-
-    /**
-     * Test method for {@link org.corehunter.Corehunter#getSearchListener()}.
-     */
-    @Test
-    public void testGetSearchListener() {
-
-    }
-
-    /**
-     * Test method for
-     * {@link org.corehunter.Corehunter#setSearchListener(org.jamesframework.core.search.listeners.SearchListener)} .
-     */
-    @Test
-    public void testSetSearchListener() {
-
-    }
-
+    
 }

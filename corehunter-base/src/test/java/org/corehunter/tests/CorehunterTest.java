@@ -42,21 +42,4 @@ public class CorehunterTest extends TestData {
 
     }
 
-    /**
-     * Test method for {@link org.corehunter.Corehunter#getSearchListener()}.
-     */
-    @Test
-    public void testGetSearchListener() {
-
-    }
-
-    /**
-     * Test method for
-     * {@link org.corehunter.Corehunter#setSearchListener(org.jamesframework.core.search.listeners.SearchListener)} .
-     */
-    @Test
-    public void testSetSearchListener() {
-
-    }
-
 }
