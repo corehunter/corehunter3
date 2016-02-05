@@ -1,0 +1,5 @@
+/corehunter-lib/target/
+/corehunter-cli/target/
+/coreanalyser-cli/target/
+/bin
+.DS_Store
