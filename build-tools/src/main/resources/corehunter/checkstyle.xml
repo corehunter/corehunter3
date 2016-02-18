@@ -48,36 +48,16 @@
             brace if that brace terminates a statement or the body of a method, constructor or
             named class. For example, there is no line break after the brace if it is followed
             by else or a comma.
-         -->
-        <module name="RightCurly"/>
-        <module name="RightCurly">
-            <property name="option" value="alone"/>
-            <property name="tokens" value="CLASS_DEF, METHOD_DEF, CTOR_DEF, LITERAL_FOR, LITERAL_WHILE, LITERAL_DO, STATIC_INIT, INSTANCE_INIT"/>
-        </module>
-        
-        <!--
-            Require whitespace around the following tokens:
-            
-            = , & , &= , | , |= , >>> , >>>= , ^ , ^= , : , / , /=
-            == , >= , > , && , { , <= , || , < , - , -= , % , %=
-            != , + , += , ? , } , << , <<= , >> , >>= , * , *=
-            
-            do , while , for , if , then , else , try , catch , finally
-            return , switch , synchronized , assert
-            
-            Whitespace is also required around a list of statements.
             
             An empty block or block-like construct may be closed immediately
             after it is opened, with no characters or line break in between ({}),
             unless it is part of a multi-block statement (one that directly contains
             multiple blocks: if/else-if/else or try/catch/finally).
-        -->
-        <module name="WhitespaceAround">
-            <property name="allowEmptyConstructors" value="true"/>
-            <property name="allowEmptyMethods" value="true"/>
-            <property name="allowEmptyTypes" value="true"/>
-            <property name="allowEmptyLoops" value="true"/>
-            <property name="allowEmptyLambdas" value="true"/>
+         -->
+        <module name="RightCurly"/>
+        <module name="RightCurly">
+            <property name="option" value="alone"/>
+            <property name="tokens" value="CLASS_DEF, METHOD_DEF, CTOR_DEF, LITERAL_FOR, LITERAL_WHILE, LITERAL_DO, STATIC_INIT, INSTANCE_INIT"/>
         </module>
         
         <!--
