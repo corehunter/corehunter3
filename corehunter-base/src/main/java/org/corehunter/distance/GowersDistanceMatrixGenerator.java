@@ -149,14 +149,16 @@ public class GowersDistanceMatrixGenerator implements DistanceMatrixGenerator {
     }
 
     private double calculateRange(Object[][] data, int index, Scale scale) {
-         return calculateRange(data, index, 
-                scale.getMinimumValue() != null ? scale.getMinimumValue().doubleValue() : Double.MIN_VALUE, 
-                scale.getMaximumValue() != null ? scale.getMaximumValue().doubleValue() : Double.MAX_VALUE);
+        if (scale.getMinimumValue() != null && scale.getMaximumValue() != null) {
+            return scale.getMaximumValue().doubleValue() - scale.getMinimumValue().doubleValue();
+        } else {
+            return calculateRange(data, index);
+        }
     }
 
-    private double calculateRange(Object[][] data, int index, double startingMin, double staritngMax) {
-        double max = startingMin;
-        double min = staritngMax;
+    private double calculateRange(Object[][] data, int index) {
+        double max = Double.MIN_VALUE;
+        double min = Double.MAX_VALUE;
         double value;
 
         boolean valid = true;

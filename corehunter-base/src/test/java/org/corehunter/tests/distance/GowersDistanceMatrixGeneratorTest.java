@@ -42,6 +42,7 @@ import uno.informatics.data.pojo.SimpleFeaturePojo;
 import uno.informatics.data.utils.DatasetUtils;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
 /**
@@ -49,7 +50,8 @@ import static org.junit.Assert.fail;
  */
 public class GowersDistanceMatrixGeneratorTest {
 
-    private static final String DATA_FILE = "/Datos_11_25_2013.csv";
+    private static final String DATA_FILE = "/phenotypic_data.csv";
+    private static final String DATA_FILE_WITH_TYPE = "/phenotypic_data_type.csv";
     private static final String MATRIX_FILE = "/matrix.csv";
 
     private static final String UID = "test";
@@ -115,7 +117,7 @@ public class GowersDistanceMatrixGeneratorTest {
         }
     }
 
-    @Test
+    //@Test TODO to fix this test we need a new expected matrix calculated in R where all values are treated as factors (Nominal)
     public void testGenerateDistanceMatrixFromFile() {
         try {
 
@@ -137,7 +139,57 @@ public class GowersDistanceMatrixGeneratorTest {
             fileProperties.setRowHeaderPosition(0);
             
             List<Feature> features = dataset.getFeatures() ;
-            Feature rowHeaderFeature = features.remove(0);
+            Feature rowHeaderFeature = dataset.getRowHeaderFeature() ;
+            
+            assertNotNull("Row headers need to be defined!", rowHeaderFeature) ;
+
+            MatrixDataset<Double> matrix
+                    = DoubleArrayMatrixDataset.createMatrixDataset(
+                            UID, NAME, DESCRIPTION, elementFeature,
+                            fileProperties, rowHeaderFeature, rowHeaderFeature);
+
+            for (int x = 0; x < features.size(); ++x) {
+                for (int y = 0; y < features.size(); ++y) {
+                    assertEquals(
+                            "x=" + x + " y=" + y,
+                            (double) matrix.getValue(x, y),
+                            1 - data.getDistance(x, y),
+                            DELTA
+                    );
+                }
+            }
+
+        } catch (DatasetException e) {
+            e.printStackTrace();
+            fail(e.getMessage());
+        }
+    }
+    
+    @Test
+    public void testGenerateDistanceMatrixFromFileWithType() {
+        try {
+
+            FeatureDataset dataset = ArrayFeatureDataset.readFeatureDatasetFromTextFile(
+                new File(GowersDistanceMatrixGeneratorTest.class.getResource(DATA_FILE_WITH_TYPE).getPath()), FileType.CSV) ;
+
+            GowersDistanceMatrixGenerator generator = new GowersDistanceMatrixGenerator(dataset);
+
+            DistanceMatrixData data = generator.generateDistanceMatrix();
+
+            Feature elementFeature = null;
+
+            FileProperties fileProperties = new FileProperties(
+                    GowersDistanceMatrixGeneratorTest.class.getResource(MATRIX_FILE).getPath(), FileType.CSV
+            );
+
+            fileProperties.setColumnHeaderPosition(0);
+            fileProperties.setDataRowPosition(1);
+            fileProperties.setRowHeaderPosition(0);
+            
+            List<Feature> features = dataset.getFeatures() ;
+            Feature rowHeaderFeature = dataset.getRowHeaderFeature() ;
+            
+            assertNotNull("Row headers need to be defined!", rowHeaderFeature) ;
 
             MatrixDataset<Double> matrix
                     = DoubleArrayMatrixDataset.createMatrixDataset(
