@@ -26,10 +26,9 @@ import org.apache.commons.lang3.ObjectUtils;
 import org.corehunter.data.DistanceMatrixData;
 import org.corehunter.data.simple.SimpleDistanceMatrixData;
 
-import uno.informatics.common.model.ContinuousScale;
-import uno.informatics.common.model.Feature;
-import uno.informatics.common.model.FeatureDataset;
-import uno.informatics.common.model.Scale;
+import uno.informatics.data.Feature;
+import uno.informatics.data.FeatureDataset;
+import uno.informatics.data.Scale;
 
 /**
  * @author Guy Davenport
@@ -68,11 +67,11 @@ public class GowersDistanceMatrixGenerator implements DistanceMatrixGenerator {
         ranges = new double[features.length];
 
         for (int i = 0; i < features.length; ++i) {
-            scales[i] = features[i].getScale();
+            scales[i] = features[i].getMethod().getScale();
 
-            switch (features[i].getScale().getScaleType()) {
+            switch (scales[i].getScaleType()) {
                 case NOMINAL:
-                    switch (features[i].getScale().getDataType()) {
+                    switch (scales[i].getDataType()) {
                         case BOOLEAN:
                             scaleTypes[i] = BINARY_SCALE_TYPE;
                             break;
@@ -84,7 +83,7 @@ public class GowersDistanceMatrixGenerator implements DistanceMatrixGenerator {
                 case INTERVAL:
                 case ORDINAL:
                 case RATIO:
-                    switch (features[i].getScale().getDataType()) {
+                    switch (scales[i].getDataType()) {
                         case BIG_DECIMAL:
                         case BIG_INTEGER:
                         case DOUBLE:
@@ -92,7 +91,7 @@ public class GowersDistanceMatrixGenerator implements DistanceMatrixGenerator {
                         case INTEGER:
                         case LONG:
                         case SHORT:
-                            ranges[i] = calculateRange(data, i, features[i].getScale());
+                            ranges[i] = calculateRange(data, i, scales[i]);
 
                             if (ranges[i] > 0) {
                                 scaleTypes[i] = RANGED_SCALE_TYPE;
@@ -102,17 +101,16 @@ public class GowersDistanceMatrixGenerator implements DistanceMatrixGenerator {
                             break;
                         case BOOLEAN:
                         case DATE:
-                        case LSID:
                         case STRING:
                         default:
                             throw new IllegalArgumentException("Illegal scale type : "
-                                    + features[i].getScale().getScaleType()
-                                    + " for data type " + features[i].getScale().getDataType());
+                                    + scales[i].getScaleType()
+                                    + " for data type " + scales[i].getDataType());
                     }
                     break;
                 case NONE:
                 default:
-                    throw new IllegalArgumentException("Illegal scale type : " + features[i].getScale().getScaleType());
+                    throw new IllegalArgumentException("Illegal scale type : " + scales[i].getScaleType());
             }
         }
 
@@ -151,17 +149,14 @@ public class GowersDistanceMatrixGenerator implements DistanceMatrixGenerator {
     }
 
     private double calculateRange(Object[][] data, int index, Scale scale) {
-        if (scale instanceof ContinuousScale) {
-            ContinuousScale cScale = (ContinuousScale) scale;
-            return cScale.getMaximumValue().doubleValue() - cScale.getMinimumValue().doubleValue();
-        } else {
-            return calculateRange(data, index);
-        }
+         return calculateRange(data, index, 
+                scale.getMinimumValue() != null ? scale.getMinimumValue().doubleValue() : Double.MIN_VALUE, 
+                scale.getMaximumValue() != null ? scale.getMaximumValue().doubleValue() : Double.MAX_VALUE);
     }
 
-    private double calculateRange(Object[][] data, int index) {
-        double max = Double.MIN_VALUE;
-        double min = Double.MAX_VALUE;
+    private double calculateRange(Object[][] data, int index, double startingMin, double staritngMax) {
+        double max = startingMin;
+        double min = staritngMax;
         double value;
 
         boolean valid = true;

@@ -19,25 +19,26 @@
 
 package org.corehunter.tests.distance;
 
+import java.io.File;
 import java.util.Iterator;
 import java.util.List;
 
 import org.corehunter.data.DistanceMatrixData;
 import org.corehunter.distance.GowersDistanceMatrixGenerator;
-import org.corehunter.tests.MockFeature;
 import org.junit.Test;
 
 import uno.informatics.common.io.FileProperties;
 import uno.informatics.common.io.FileType;
-import uno.informatics.common.model.DataType;
-import uno.informatics.common.model.Feature;
-import uno.informatics.common.model.FeatureDataset;
-import uno.informatics.common.model.MatrixDataset;
-import uno.informatics.common.model.ScaleType;
+import uno.informatics.data.DataType;
+import uno.informatics.data.Feature;
+import uno.informatics.data.FeatureDataset;
+import uno.informatics.data.MatrixDataset;
+import uno.informatics.data.ScaleType;
 import uno.informatics.data.dataset.DatasetException;
 import uno.informatics.data.feature.ColumnFeature;
 import uno.informatics.data.feature.array.ArrayFeatureDataset;
 import uno.informatics.data.matrix.array.DoubleArrayMatrixDataset;
+import uno.informatics.data.pojo.SimpleFeaturePojo;
 import uno.informatics.data.utils.DatasetUtils;
 
 import static org.junit.Assert.assertEquals;
@@ -64,10 +65,10 @@ public class GowersDistanceMatrixGeneratorTest {
     };
 
     private static final Feature[] FEATURES = new Feature[]{
-        new MockFeature(DataType.INTEGER, ScaleType.INTERVAL, 0, 5),
-        new MockFeature(DataType.DOUBLE, ScaleType.RATIO, 0.0, 5.0),
-        new MockFeature(DataType.STRING, ScaleType.NOMINAL),
-        new MockFeature(DataType.BOOLEAN, ScaleType.NOMINAL)
+        new SimpleFeaturePojo("feature1", DataType.INTEGER, ScaleType.INTERVAL, 0, 5),
+        new SimpleFeaturePojo("feature1", DataType.DOUBLE, ScaleType.RATIO, 0.0, 5.0),
+        new SimpleFeaturePojo("feature1", DataType.STRING, ScaleType.NOMINAL),
+        new SimpleFeaturePojo("feature1", DataType.BOOLEAN, ScaleType.NOMINAL)
     };
 
     private static final double[][] MATRIX = new double[][]{
@@ -117,21 +118,9 @@ public class GowersDistanceMatrixGeneratorTest {
     @Test
     public void testGenerateDistanceMatrixFromFile() {
         try {
-            FileProperties fileProperties = new FileProperties(
-                    GowersDistanceMatrixGeneratorTest.class.getResource(DATA_FILE).getPath(), FileType.CSV, true
-            );
 
-            List<ColumnFeature> features = DatasetUtils.generateDatasetFeatures(fileProperties, null, 10);
-
-            ColumnFeature rowHeaderFeature = features.remove(0);
-
-            fileProperties = new FileProperties(
-                    GowersDistanceMatrixGeneratorTest.class.getResource(DATA_FILE).getPath(), FileType.CSV, true, true
-            );
-
-            FeatureDataset dataset = ArrayFeatureDataset.createFeatureDataset(
-                    UID, NAME, DESCRIPTION, DatasetUtils.createFeatures(features), fileProperties, rowHeaderFeature
-            );
+            FeatureDataset dataset = ArrayFeatureDataset.readFeatureDatasetFromTextFile(
+                new File(GowersDistanceMatrixGeneratorTest.class.getResource(DATA_FILE).getPath()), FileType.CSV) ;
 
             GowersDistanceMatrixGenerator generator = new GowersDistanceMatrixGenerator(dataset);
 
@@ -139,13 +128,16 @@ public class GowersDistanceMatrixGeneratorTest {
 
             Feature elementFeature = null;
 
-            fileProperties = new FileProperties(
+            FileProperties fileProperties = new FileProperties(
                     GowersDistanceMatrixGeneratorTest.class.getResource(MATRIX_FILE).getPath(), FileType.CSV
             );
 
             fileProperties.setColumnHeaderPosition(0);
             fileProperties.setDataRowPosition(1);
             fileProperties.setRowHeaderPosition(0);
+            
+            List<Feature> features = dataset.getFeatures() ;
+            Feature rowHeaderFeature = features.remove(0);
 
             MatrixDataset<Double> matrix
                     = DoubleArrayMatrixDataset.createMatrixDataset(

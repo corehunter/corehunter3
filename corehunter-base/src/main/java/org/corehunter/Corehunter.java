@@ -50,7 +50,7 @@ import org.jamesframework.core.search.algo.RandomDescent;
 import org.jamesframework.core.search.stopcriteria.MaxRuntime;
 import org.jamesframework.core.subset.neigh.SinglePerturbationNeighbourhood;
 
-import uno.informatics.common.model.FeatureDataset;
+import uno.informatics.data.FeatureDataset;
 
 /**
  * Provides support for executing pre-defined core subset searches. Can be re-used.

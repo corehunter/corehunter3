@@ -26,13 +26,13 @@ import java.util.Set;
 
 import org.corehunter.data.NamedSubsetData;
 
-import uno.informatics.common.model.Dataset;
-import uno.informatics.common.model.impl.EntityImpl;
-
+import uno.informatics.data.Dataset;
+import uno.informatics.data.Study;
+import uno.informatics.data.pojo.EntityPojo;
 /**
  * @author Guy Davenport
  */
-public class AbstractNamedSubsetData extends EntityImpl implements NamedSubsetData, Dataset {
+public class AbstractNamedSubsetData extends EntityPojo implements NamedSubsetData, Dataset {
     
     // item names
     private final String[] itemNames;
@@ -102,5 +102,11 @@ public class AbstractNamedSubsetData extends EntityImpl implements NamedSubsetDa
 
     public final String[] getNames() {
         return itemNames;
+    }
+
+    @Override
+    public Study getStudy()
+    {
+      return null;
     }
 }
