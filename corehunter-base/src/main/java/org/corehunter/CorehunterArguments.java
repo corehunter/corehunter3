@@ -19,7 +19,7 @@
 
 package org.corehunter;
 
-import uno.informatics.common.model.Dataset;
+import uno.informatics.data.Dataset;
 
 public class CorehunterArguments {
 
