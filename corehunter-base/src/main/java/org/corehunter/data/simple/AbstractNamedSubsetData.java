@@ -29,6 +29,7 @@ import org.corehunter.data.NamedSubsetData;
 import uno.informatics.data.Dataset;
 import uno.informatics.data.Study;
 import uno.informatics.data.pojo.EntityPojo;
+
 /**
  * @author Guy Davenport
  */
@@ -105,8 +106,7 @@ public class AbstractNamedSubsetData extends EntityPojo implements NamedSubsetDa
     }
 
     @Override
-    public Study getStudy()
-    {
-      return null;
+    public Study getStudy(){
+        return null;
     }
 }

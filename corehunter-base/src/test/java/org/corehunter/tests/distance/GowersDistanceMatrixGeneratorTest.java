@@ -117,7 +117,8 @@ public class GowersDistanceMatrixGeneratorTest {
         }
     }
 
-    //@Test TODO to fix this test we need a new expected matrix calculated in R where all values are treated as factors (Nominal)
+    //@Test TODO to fix this test we need a new expected matrix calculated in R
+    //      where all values are treated as factors (Nominal)
     public void testGenerateDistanceMatrixFromFile() {
         try {
 
@@ -170,7 +171,9 @@ public class GowersDistanceMatrixGeneratorTest {
         try {
 
             FeatureDataset dataset = ArrayFeatureDataset.readFeatureDatasetFromTextFile(
-                new File(GowersDistanceMatrixGeneratorTest.class.getResource(DATA_FILE_WITH_TYPE).getPath()), FileType.CSV) ;
+                    new File(GowersDistanceMatrixGeneratorTest.class.getResource(DATA_FILE_WITH_TYPE).getPath()),
+                    FileType.CSV
+            );
 
             GowersDistanceMatrixGenerator generator = new GowersDistanceMatrixGenerator(dataset);
 
