@@ -32,13 +32,26 @@ public class StringUtils {
      * and only if both are single or double quotes.
      * 
      * @param str string to unquote
-     * @return unquoted string
+     * @return unquoted string, or <code>null</code> if input was <code>null</code>
      */
     public static String unquote(String str){
         if(str != null
              && ((str.startsWith("'") && str.endsWith("'"))
              || (str.startsWith("\"") && str.endsWith("\"")))){
             str = str.substring(1, str.length()-1);
+        }
+        return str;
+    }
+    
+    /**
+     * Trim leading and trailing whitespace from the given string.
+     * 
+     * @param str string to trim
+     * @return trimmed string, or <code>null</code> if input was <code>null</code>
+     */
+    public static String trim(String str){
+        if(str != null){
+            str = str.trim();
         }
         return str;
     }

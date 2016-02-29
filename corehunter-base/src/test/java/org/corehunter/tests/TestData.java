@@ -43,7 +43,7 @@ public class TestData {
     public static final String NAME = "Test Dataset";
 
     public static final String[] NAMES = new String[]{
-        "Name 1", "Name 2", "Name 3", "Name 4", "Name 5"
+        "Name 1", null, "Name 3", "Name 4", "Name 5"
     };
 
     public static final Set<Integer> SET = new TreeSet<>();
@@ -103,7 +103,7 @@ public class TestData {
             new double[]{0.0, 1.0}
         },
         new double[][]{
-            new double[]{0.5, 0.0, 0.4},
+            new double[]{0.6, 0.0, 0.4},
             new double[]{0.5, 0.5},
             new double[]{0, 0.5, 0.5},
             new double[]{0.25, 0.25, 0.25, 0.25},

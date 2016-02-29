@@ -27,7 +27,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Objects;
 
 import org.corehunter.data.DistanceMatrixData;
 import org.corehunter.data.matrix.SymmetricMatrixFormat;
@@ -77,12 +76,12 @@ public class SimpleDistanceMatrixData extends SimpleNamedData implements Distanc
      * The distance matrix should be symmetric with all rows of equal length.
      * Violating any of these requirements will produce an exception.
      * <p>
-     * Item names should either all be <code>null</code> (no names) or non <code>null</code> and unique.
-     * 
+     * Item names are optional, missing names should be encoded as <code>null</code>
+     * values in the name array.
      * 
      * @param itemNames item names
      * @param distances pairwise distances
-     * @throws IllegalArgumentException if an illegal distance matrix is given or names are not unique
+     * @throws IllegalArgumentException if an illegal distance matrix is given
      */
     public SimpleDistanceMatrixData(String[] itemNames, double[][] distances) {
         this("Precomputed distance matrix", itemNames, distances);
@@ -97,13 +96,13 @@ public class SimpleDistanceMatrixData extends SimpleNamedData implements Distanc
      * The distance matrix should be symmetric with all rows of equal length.
      * Violating any of these requirements will produce an exception.
      * <p>
-     * Item names should either all be <code>null</code> (no names) or non
-     * <code>null</code> and unique.
+     * Item names are optional, missing names should be encoded as <code>null</code>
+     * values in the name array.
      * 
      * @param name dataset name
      * @param itemNames item names
      * @param distances pairwise distances
-     * @throws IllegalArgumentException if an illegal distance matrix is given or names are not unique
+     * @throws IllegalArgumentException if an illegal distance matrix is given
      */
     public SimpleDistanceMatrixData(String name, String[] itemNames, double[][] distances) {
         
@@ -115,13 +114,6 @@ public class SimpleDistanceMatrixData extends SimpleNamedData implements Distanc
             throw new IllegalArgumentException("Number of names does not match number of distances.");
         }
         int n = itemNames.length;
-        
-        // validate names
-        if(Arrays.stream(itemNames).anyMatch(Objects::nonNull)
-                && (Arrays.stream(itemNames).anyMatch(Objects::isNull)
-                    || Arrays.stream(itemNames).distinct().count() < n)){
-            throw new IllegalArgumentException("Item names should be unique (or all null).");
-        }
         
         // validate distances and copy to internal array
         this.distances = new double[n][n];
@@ -251,7 +243,7 @@ public class SimpleDistanceMatrixData extends SimpleNamedData implements Distanc
                 reader.nextRow();
                 // read, trim and unquote names
                 names = Arrays.stream(reader.getRowCellsAsStringArray())
-                              .map(name -> StringUtils.unquote(name.trim()))
+                              .map(name -> StringUtils.unquote(StringUtils.trim(name)))
                               .toArray(n -> new String[n]);
                 // next row
                 r++;

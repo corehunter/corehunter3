@@ -51,7 +51,6 @@ public class SimpleDistanceMatrixDataTest {
     private static final String CSV_LOWER_DIAG_NAMES = "/distances/lower-diag-names.csv";
     
     private static final String[] ERRONEOUS_FILES = {
-        "/distances/err/duplicate-names.txt",
         "/distances/err/empty.txt",        
         "/distances/err/empty.txt",        
         "/distances/err/excessive-names.txt",        
@@ -73,7 +72,6 @@ public class SimpleDistanceMatrixDataTest {
         SymmetricMatrixFormat.FULL,
         SymmetricMatrixFormat.FULL,
         SymmetricMatrixFormat.FULL,
-        SymmetricMatrixFormat.FULL,
         SymmetricMatrixFormat.LOWER,
         SymmetricMatrixFormat.LOWER,
         SymmetricMatrixFormat.FULL,
@@ -89,7 +87,6 @@ public class SimpleDistanceMatrixDataTest {
     };
     
     private static final boolean[] ERRONEOUS_FILE_NAMES = {
-        true,
         true,
         false,
         true,
