@@ -19,17 +19,17 @@
 
 package org.corehunter.objectives.multiallelic;
 
-import org.corehunter.data.MultiAllelicGenotypeVariantData;
 import org.jamesframework.core.problems.objectives.Objective;
 import org.jamesframework.core.problems.objectives.evaluations.Evaluation;
 import org.jamesframework.core.problems.objectives.evaluations.SimpleEvaluation;
 import org.jamesframework.core.subset.SubsetSolution;
+import org.corehunter.data.GenotypeVariantData;
 
 /**
  * @author Guy Davenport
  */
 public class HetrozygousLociDiversityMultiAllelic
-        implements Objective<SubsetSolution, MultiAllelicGenotypeVariantData> {
+        implements Objective<SubsetSolution, GenotypeVariantData> {
 
     /*
      * (non-Javadoc)
@@ -38,7 +38,7 @@ public class HetrozygousLociDiversityMultiAllelic
      */
     @Override
     public Evaluation evaluate(SubsetSolution solution,
-            MultiAllelicGenotypeVariantData data) {
+            GenotypeVariantData data) {
         
         double summedAverageAlleleFrequencySquared;
         double total = 0.0;

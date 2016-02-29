@@ -22,7 +22,7 @@ package org.corehunter.tests;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.corehunter.data.simple.NamedDistanceMatrixData;
+import org.corehunter.data.simple.SimpleDistanceMatrixData;
 import org.jamesframework.core.problems.objectives.evaluations.Evaluation;
 import org.jamesframework.core.problems.objectives.evaluations.SimpleEvaluation;
 
@@ -31,19 +31,20 @@ import org.jamesframework.core.problems.objectives.evaluations.SimpleEvaluation;
  */
 public class TestData {
 
-    public static final double PRECISION = 0.000000001;
+    public static final double PRECISION = 1e-10;
 
     public static final double[][] DISTANCES = new double[][]{
-        new double[]{1.0, 0.8, 0.6, 0.4, 0.2},
-        new double[]{0.8, 1.0, 0.8, 0.6, 0.4},
-        new double[]{0.6, 0.8, 1.0, 0.9, 0.6},
-        new double[]{0.4, 0.6, 0.9, 1.0, 0.8},
-        new double[]{0.2, 0.4, 0.6, 0.8, 1.0}};
+        new double[]{0.0, 0.2, 0.4, 0.6, 0.8},
+        new double[]{0.2, 0.0, 0.2, 0.4, 0.6},
+        new double[]{0.4, 0.2, 0.0, 0.1, 0.4},
+        new double[]{0.6, 0.4, 0.1, 0.0, 0.2},
+        new double[]{0.8, 0.6, 0.4, 0.2, 0.0}};
 
-    public static final String NAME = "Dataset Name";
+    public static final String NAME = "Test Dataset";
 
-    public static final String[] NAMES = new String[]{"Name1",
-        "Name2", "Name3", "Name4", "Name5"};
+    public static final String[] NAMES = new String[]{
+        "Name 1", "Name 2", "Name 3", "Name 4", "Name 5"
+    };
 
     public static final Set<Integer> SET = new TreeSet<>();
 
@@ -62,8 +63,7 @@ public class TestData {
         SUBSET1.add(3);
     }
 
-    public static final NamedDistanceMatrixData DATA = new NamedDistanceMatrixData(NAME,
-            NAMES, DISTANCES);
+    public static final SimpleDistanceMatrixData DATA = new SimpleDistanceMatrixData(NAME, NAMES, DISTANCES);
 
     public static final String[] MARKER_NAMES = new String[]{
         "mk1",

@@ -27,18 +27,16 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import org.corehunter.data.MultiAllelicGenotypeVariantData;
-import org.corehunter.data.NamedAllelicGenotypeVariantData;
 
 import uno.informatics.common.io.FileProperties;
 import uno.informatics.common.io.IOUtilities;
 import uno.informatics.common.io.RowReader;
+import org.corehunter.data.GenotypeVariantData;
 
 /**
- * @author Guy Davenport
+ * @author Guy Davenport, Herman De Beukelaer
  */
-public class SimpleMultiAllelicGenotypeVariantData extends AbstractNamedSubsetData
-        implements MultiAllelicGenotypeVariantData, NamedAllelicGenotypeVariantData {
+public class SimpleGenotypeVariantData extends SimpleNamedData implements GenotypeVariantData {
 
     private double[][][] alleleFrequencies;
     private int numberOfMarkers;
@@ -47,7 +45,7 @@ public class SimpleMultiAllelicGenotypeVariantData extends AbstractNamedSubsetDa
     private String[][] alleleNames;
     private int totalNumberAlleles;
 
-    public SimpleMultiAllelicGenotypeVariantData(String name, String[] itemNames, String[] markerNames,
+    public SimpleGenotypeVariantData(String name, String[] itemNames, String[] markerNames,
             String[][] alleleNames, double[][][] alleleFrequencies) {
         super(name, itemNames);
 
@@ -129,7 +127,7 @@ public class SimpleMultiAllelicGenotypeVariantData extends AbstractNamedSubsetDa
         }
     }
 
-    public SimpleMultiAllelicGenotypeVariantData(String name, List<String> itemNames,
+    public SimpleGenotypeVariantData(String name, List<String> itemNames,
             List<String> markerNames, List<List<String>> alleleNames,
             List<List<List<Double>>> frequencies) {
         
@@ -255,7 +253,7 @@ public class SimpleMultiAllelicGenotypeVariantData extends AbstractNamedSubsetDa
     }
 
     /* (non-Javadoc)
-     * @see org.corehunter.data.MultiAllelicGenotypeVariantData#getAlelleFrequency(int, int, int)
+     * @see org.corehunter.data.GenotypeVariantData#getAlelleFrequency(int, int, int)
      */
     @Override
     public double getAlelleFrequency(int id, int markerIndex, int alleleIndex) {
@@ -263,7 +261,7 @@ public class SimpleMultiAllelicGenotypeVariantData extends AbstractNamedSubsetDa
     }
 
     /* (non-Javadoc)
-     * @see org.corehunter.data.MultiAllelicGenotypeVariantData#getAverageAlelleFrequency(Collection<Integer>, int, int)
+     * @see org.corehunter.data.GenotypeVariantData#getAverageAlelleFrequency(Collection<Integer>, int, int)
      */
     @Override
     public double getAverageAlelleFrequency(Collection<Integer> entityIds,
@@ -283,7 +281,7 @@ public class SimpleMultiAllelicGenotypeVariantData extends AbstractNamedSubsetDa
     }
 
     /* (non-Javadoc)
-     * @see org.corehunter.data.MultiAllelicGenotypeVariantData#getNumberOfAllele(int)
+     * @see org.corehunter.data.GenotypeVariantData#getNumberOfAllele(int)
      */
     @Override
     public int getNumberOfAlleles(int markerIndex) {
@@ -291,10 +289,10 @@ public class SimpleMultiAllelicGenotypeVariantData extends AbstractNamedSubsetDa
     }
 
     /* (non-Javadoc)
-     * @see org.corehunter.data.MultiAllelicGenotypeVariantData#getTotalNumberAlleles()
+     * @see org.corehunter.data.GenotypeVariantData#getTotalNumberOfAlleles()
      */
     @Override
-    public int getTotalNumberAlleles() {
+    public int getTotalNumberOfAlleles() {
         return totalNumberAlleles;
     }
 
@@ -316,7 +314,7 @@ public class SimpleMultiAllelicGenotypeVariantData extends AbstractNamedSubsetDa
         return alleleNames[markerIndex][alleleIndex];
     }
 
-    public final static SimpleMultiAllelicGenotypeVariantData readData(FileProperties fileProperties)
+    public final static SimpleGenotypeVariantData readData(FileProperties fileProperties)
             throws IOException {
         
         RowReader reader;
@@ -458,7 +456,7 @@ public class SimpleMultiAllelicGenotypeVariantData extends AbstractNamedSubsetDa
                 reader.close();
             }
 
-            return new SimpleMultiAllelicGenotypeVariantData(fileProperties.getFile().getName(),
+            return new SimpleGenotypeVariantData(fileProperties.getFile().getName(),
                                                              itemNames, markerNames, alleleNames, frequencies);
 
         } catch (IOException e) {

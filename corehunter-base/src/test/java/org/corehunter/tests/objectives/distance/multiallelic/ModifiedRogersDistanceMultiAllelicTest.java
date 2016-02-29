@@ -31,7 +31,7 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.Iterator;
 
-import org.corehunter.data.simple.SimpleMultiAllelicGenotypeVariantData;
+import org.corehunter.data.simple.SimpleGenotypeVariantData;
 import org.corehunter.objectives.distance.multiallelic.ModifiedRogersDistanceMultiAllelic;
 import org.junit.Assert;
 import org.junit.Test;
@@ -48,7 +48,7 @@ public class ModifiedRogersDistanceMultiAllelicTest {
      */
     @Test
     public void test() {
-        SimpleMultiAllelicGenotypeVariantData data = new SimpleMultiAllelicGenotypeVariantData(
+        SimpleGenotypeVariantData data = new SimpleGenotypeVariantData(
                 NAME, NAMES, MARKER_NAMES, ALLELE_NAMES, ALLELES
         );
 

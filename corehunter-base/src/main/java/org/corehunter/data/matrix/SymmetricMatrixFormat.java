@@ -17,19 +17,19 @@
 /* under the License.                                           */
 /*--------------------------------------------------------------*/
 
-package org.corehunter.data;
+package org.corehunter.data.matrix;
 
 /**
- * @author Guy Davenport
+ * Specifies the format in which a symmetric matrix is encoded in a file.
+ * Values are always stored row-wise. The format indicates whether redundant
+ * values are included or not.
+ * 
+ * @author Herman De Beukelaer
  */
-public interface NamedGenotypeVariantData extends GenotypeVariantData {
+public enum SymmetricMatrixFormat {
 
-    /**
-     * Gets the name of a marker by index
-     *
-     * @param markerIndex of a marker
-     * @return the name of an marker by index
-     * @throws ArrayIndexOutOfBoundsException if the index is out of range
-     */
-    public String getMarkerName(int markerIndex) throws ArrayIndexOutOfBoundsException;
+    FULL,           // full matrix
+    LOWER,          // lower triangular part without diagonal
+    LOWER_DIAG,     // lower triangular part with diagonal
+    
 }

@@ -58,4 +58,20 @@ public abstract class AbstractGenotypeVariantDistanceMetric<GenotypeVariantDataT
     protected final void setData(GenotypeVariantDataType data) {
         this.data = data;
     }
+    
+    @Override
+    public String getName(int id) {
+        throw new UnsupportedOperationException("Not supported yet."); 
+    }
+
+    @Override
+    public void setName(int id, String name) {
+        throw new UnsupportedOperationException("Not supported yet."); 
+    }
+
+    @Override
+    public int getDatasetSize() {
+        throw new UnsupportedOperationException("Not supported yet."); 
+    }
+    
 }

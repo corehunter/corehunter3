@@ -22,11 +22,11 @@ package org.corehunter.objectives.distance.biallelic;
 import java.util.Set;
 
 import org.corehunter.data.BiAllelicGenotypeVariantData;
-import org.corehunter.data.MultiAllelicGenotypeVariantData;
 import org.corehunter.objectives.distance.GenotypeVariantDistanceMetric;
+import org.corehunter.data.GenotypeVariantData;
 
 public class CavalliSforzaEdwardsDistanceBiAllelic
-        implements GenotypeVariantDistanceMetric<MultiAllelicGenotypeVariantData> {
+        implements GenotypeVariantDistanceMetric<GenotypeVariantData> {
 
     public CavalliSforzaEdwardsDistanceBiAllelic(BiAllelicGenotypeVariantData dataset) {
         // TODO Auto-generated constructor stub
@@ -45,9 +45,24 @@ public class CavalliSforzaEdwardsDistanceBiAllelic
     }
 
     @Override
-    public MultiAllelicGenotypeVariantData getData() {
+    public GenotypeVariantData getData() {
         // TODO Auto-generated method stub
         return null;
+    }
+
+    @Override
+    public String getName(int id) {
+        throw new UnsupportedOperationException("Not supported yet."); 
+    }
+
+    @Override
+    public void setName(int id, String name) {
+        throw new UnsupportedOperationException("Not supported yet."); 
+    }
+
+    @Override
+    public int getDatasetSize() {
+        throw new UnsupportedOperationException("Not supported yet."); 
     }
 
 }

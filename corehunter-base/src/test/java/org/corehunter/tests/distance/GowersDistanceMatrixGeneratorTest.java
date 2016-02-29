@@ -35,11 +35,9 @@ import uno.informatics.data.FeatureDataset;
 import uno.informatics.data.MatrixDataset;
 import uno.informatics.data.ScaleType;
 import uno.informatics.data.dataset.DatasetException;
-import uno.informatics.data.feature.ColumnFeature;
 import uno.informatics.data.feature.array.ArrayFeatureDataset;
 import uno.informatics.data.matrix.array.DoubleArrayMatrixDataset;
 import uno.informatics.data.pojo.SimpleFeaturePojo;
-import uno.informatics.data.utils.DatasetUtils;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;

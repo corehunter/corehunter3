@@ -17,20 +17,24 @@
 /* under the License.                                           */
 /*--------------------------------------------------------------*/
 
-package org.corehunter.data;
+package org.corehunter.data.simple;
 
 /**
- * @author Guy Davenport
+ * Combines all data used in Core Hunter.
+ * Includes marker data, phenotypic traits and/or a precomputed distance matrix.
+ * 
+ * @author Herman De Beukelaer
  */
-public interface NamedAllelicGenotypeVariantData extends NamedGenotypeVariantData {
+public class CoreHunterData extends SimpleNamedData {
 
     /**
-     * Gets the name of an allele.
-     *
-     * @param markerIndex index of a marker
-     * @param alleleIndex index of an allele for the given marker
-     * @return the name of an allele by index
-     * @throws ArrayIndexOutOfBoundsException if the index is out of range
+     * Initialize Core Hunter data set with n entries. IDs are set to [0, n-1].
+     * Names are set to <code>null</code> and updated if named data is added.
+     * 
+     * @param n dataset size
      */
-    public String getAlleleName(int markerIndex, int alleleIndex) throws ArrayIndexOutOfBoundsException;
+    public CoreHunterData(int n) {
+        super(n);
+    }
+
 }

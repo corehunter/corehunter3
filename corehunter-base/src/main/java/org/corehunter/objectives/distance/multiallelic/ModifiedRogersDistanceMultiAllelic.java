@@ -19,16 +19,16 @@
 
 package org.corehunter.objectives.distance.multiallelic;
 
-import org.corehunter.data.MultiAllelicGenotypeVariantData;
 import org.corehunter.objectives.distance.AbstractGenotypeVariantDistanceMetric;
+import org.corehunter.data.GenotypeVariantData;
 
 /**
  * @author Guy Davenport
  */
 public class ModifiedRogersDistanceMultiAllelic extends
-        AbstractGenotypeVariantDistanceMetric<MultiAllelicGenotypeVariantData> {
+        AbstractGenotypeVariantDistanceMetric<GenotypeVariantData> {
 
-    public ModifiedRogersDistanceMultiAllelic(MultiAllelicGenotypeVariantData data) {
+    public ModifiedRogersDistanceMultiAllelic(GenotypeVariantData data) {
         super(data);
     }
 

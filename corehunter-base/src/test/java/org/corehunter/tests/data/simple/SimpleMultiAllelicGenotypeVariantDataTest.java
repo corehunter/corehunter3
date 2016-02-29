@@ -31,7 +31,7 @@ import static org.junit.Assert.fail;
 import java.io.IOException;
 import java.util.Iterator;
 
-import org.corehunter.data.simple.SimpleMultiAllelicGenotypeVariantData;
+import org.corehunter.data.simple.SimpleGenotypeVariantData;
 import org.junit.Test;
 
 import uno.informatics.common.io.FileProperties;
@@ -45,13 +45,13 @@ public class SimpleMultiAllelicGenotypeVariantDataTest {
 
     @Test
     public void inMemoryTest() {
-        testData(new SimpleMultiAllelicGenotypeVariantData(NAME, NAMES, MARKER_NAMES, ALLELE_NAMES, ALLELES));
+        testData(new SimpleGenotypeVariantData(NAME, NAMES, MARKER_NAMES, ALLELE_NAMES, ALLELES));
     }
 
     @Test
     public void loadFromFileTest() {
         try {
-            testData(SimpleMultiAllelicGenotypeVariantData.readData(new FileProperties(
+            testData(SimpleGenotypeVariantData.readData(new FileProperties(
                     SimpleMultiAllelicGenotypeVariantDataTest.class.getResource(TXT_FILE).getFile()
             )));
         } catch (IOException e) {
@@ -60,7 +60,7 @@ public class SimpleMultiAllelicGenotypeVariantDataTest {
         }
     }
 
-    private void testData(SimpleMultiAllelicGenotypeVariantData data) {
+    private void testData(SimpleGenotypeVariantData data) {
         assertEquals("Ids not correct!", SET, data.getIDs());
 
         assertEquals("Number of marker is not correct!", MARKER_NAMES.length, data.getNumberOfMarkers());

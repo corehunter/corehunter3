@@ -21,17 +21,17 @@ package org.corehunter.objectives.multiallelic;
 
 import java.util.Iterator;
 
-import org.corehunter.data.MultiAllelicGenotypeVariantData;
 import org.jamesframework.core.problems.objectives.Objective;
 import org.jamesframework.core.problems.objectives.evaluations.Evaluation;
 import org.jamesframework.core.problems.objectives.evaluations.SimpleEvaluation;
 import org.jamesframework.core.subset.SubsetSolution;
+import org.corehunter.data.GenotypeVariantData;
 
 /**
  * @author Guy Davenport
  */
 public class ProportionNonInformativeAllelesMultiAllelic
-        implements Objective<SubsetSolution, MultiAllelicGenotypeVariantData> {
+        implements Objective<SubsetSolution, GenotypeVariantData> {
 
     /*
      * (non-Javadoc)
@@ -40,7 +40,7 @@ public class ProportionNonInformativeAllelesMultiAllelic
      */
     @Override
     public Evaluation evaluate(SubsetSolution solution,
-            MultiAllelicGenotypeVariantData data) {
+            GenotypeVariantData data) {
         int numberOfMarkers = data.getNumberOfMarkers();
 
         int numberOfAlleles;
@@ -68,7 +68,7 @@ public class ProportionNonInformativeAllelesMultiAllelic
             }
         }
 
-        return SimpleEvaluation.WITH_VALUE(1 - (alleleCount / (double) data.getTotalNumberAlleles()));
+        return SimpleEvaluation.WITH_VALUE(1 - (alleleCount / (double) data.getTotalNumberOfAlleles()));
     }
 
     /*

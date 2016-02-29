@@ -17,24 +17,30 @@
 /* under the License.                                           */
 /*--------------------------------------------------------------*/
 
-package org.corehunter.data;
+package org.corehunter.util;
 
 /**
- * A distance matrix that indicates how different each pair of entries is.
- * All values are between 0.0 and 1.0 where the former means that the specific
- * measure used to evaluate the distance can not differentiate between two entries.
- *
- * @author Guy Davenport, Herman De Beukelaer
+ * @author Herman De Beukelaer
  */
-public interface DistanceMatrixData extends NamedData {
+public class StringUtils {
 
+    private StringUtils(){}
+    
     /**
-     * Get the distance between two entries.
-     *
-     * @param idX the id of the first entry
-     * @param idY the id of the second entry
-     * @return the distance between two entries
+     * Removes single or double quote characters from a string.
+     * Only removes quotes at the beginning and end of a string
+     * and only if both are single or double quotes.
+     * 
+     * @param str string to unquote
+     * @return unquoted string
      */
-    public double getDistance(int idX, int idY);
-
+    public static String unquote(String str){
+        if(str != null
+             && ((str.startsWith("'") && str.endsWith("'"))
+             || (str.startsWith("\"") && str.endsWith("\"")))){
+            str = str.substring(1, str.length()-1);
+        }
+        return str;
+    }
+    
 }

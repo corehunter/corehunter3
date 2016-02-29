@@ -19,8 +19,6 @@
 
 package org.corehunter.distance;
 
-import java.util.HashSet;
-import java.util.Set;
 
 import org.apache.commons.lang3.ObjectUtils;
 import org.corehunter.data.DistanceMatrixData;
@@ -39,7 +37,6 @@ public class GowersDistanceMatrixGenerator implements DistanceMatrixGenerator {
     private static final int DISCRETE_SCALE_TYPE = 1;
     private static final int RANGED_SCALE_TYPE = 2;
 
-    private Set<Integer> ids;
     private Object[][] data;
     private Feature[] features;
 
@@ -54,12 +51,6 @@ public class GowersDistanceMatrixGenerator implements DistanceMatrixGenerator {
     public GowersDistanceMatrixGenerator(Object[][] data, Feature[] features) {
         if (data == null || features == null) {
             throw new IllegalArgumentException("Features and data must be defined!");
-        }
-
-        ids = new HashSet<>();
-
-        for (int id = 0; id < data.length; ++id) {
-            ids.add(id);
         }
 
         scales = new Scale[features.length];
@@ -120,10 +111,11 @@ public class GowersDistanceMatrixGenerator implements DistanceMatrixGenerator {
 
     @Override
     public DistanceMatrixData generateDistanceMatrix() {
-        double[][] distances = new double[ids.size()][ids.size()];
-        double[][] weights = new double[ids.size()][ids.size()];
+        int n = data.length;
+        double[][] distances = new double[n][n];
+        double[][] weights = new double[n][n];
 
-        for (int i = 0; i < data.length; ++i) {
+        for (int i = 0; i < n; ++i) {
             if (data[i].length != features.length) {
                 throw new IllegalArgumentException("Number of features must match number of elements in a row!");
             }
@@ -145,7 +137,7 @@ public class GowersDistanceMatrixGenerator implements DistanceMatrixGenerator {
             }
         }
 
-        return new SimpleDistanceMatrixData(ids, distances);
+        return new SimpleDistanceMatrixData(distances);
     }
 
     private double calculateRange(Object[][] data, int index, Scale scale) {

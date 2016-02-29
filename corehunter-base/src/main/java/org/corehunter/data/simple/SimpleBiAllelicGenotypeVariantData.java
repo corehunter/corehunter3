@@ -28,17 +28,16 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.corehunter.data.BiAllelicGenotypeVariantData;
-import org.corehunter.data.NamedGenotypeVariantData;
 
 import uno.informatics.common.io.FileProperties;
 import uno.informatics.common.io.IOUtilities;
 import uno.informatics.common.io.RowReader;
 
 /**
- * @author Guy Davenport
+ * @author Guy Davenport, Herman De Beukelaer
  */
-public class SimpleBiAllelicGenotypeVariantData extends AbstractNamedSubsetData
-        implements BiAllelicGenotypeVariantData, NamedGenotypeVariantData {
+public class SimpleBiAllelicGenotypeVariantData extends SimpleGenotypeVariantData
+                                                implements BiAllelicGenotypeVariantData {
 
     private int[][] alleleScores;
     private int numberOfMarkers;

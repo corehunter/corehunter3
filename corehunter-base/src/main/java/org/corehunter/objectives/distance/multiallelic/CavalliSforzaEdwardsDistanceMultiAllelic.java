@@ -19,17 +19,17 @@
 
 package org.corehunter.objectives.distance.multiallelic;
 
-import org.corehunter.data.MultiAllelicGenotypeVariantData;
 import org.corehunter.objectives.distance.AbstractGenotypeVariantDistanceMetric;
+import org.corehunter.data.GenotypeVariantData;
 
 /**
  * @author Guy Davenport
  */
 public class CavalliSforzaEdwardsDistanceMultiAllelic extends
-        AbstractGenotypeVariantDistanceMetric<MultiAllelicGenotypeVariantData> {
+        AbstractGenotypeVariantDistanceMetric<GenotypeVariantData> {
 
     public CavalliSforzaEdwardsDistanceMultiAllelic(
-            MultiAllelicGenotypeVariantData data) {
+            GenotypeVariantData data) {
         super(data);
     }
 
@@ -72,4 +72,5 @@ public class CavalliSforzaEdwardsDistanceMultiAllelic extends
 
         return distance;
     }
+
 }

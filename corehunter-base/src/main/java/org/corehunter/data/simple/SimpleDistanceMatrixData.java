@@ -19,280 +19,329 @@
 
 package org.corehunter.data.simple;
 
-import static uno.informatics.common.Constants.UNKNOWN_INDEX;
-import static uno.informatics.common.Constants.UNKNOWN_COUNT;
+import uno.informatics.common.Constants;
 
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.Arrays;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
 
 import org.corehunter.data.DistanceMatrixData;
-
+import org.corehunter.data.matrix.SymmetricMatrixFormat;
+import org.corehunter.util.StringUtils;
 import uno.informatics.common.io.FileProperties;
+
+import uno.informatics.common.io.FileType;
 import uno.informatics.common.io.IOUtilities;
 import uno.informatics.common.io.RowReader;
 
 /**
- * @author Guy Davenport
+ * Simple implementation of a distance matrix that stores all values in a two-dimensional double array.
+ * Row and column indices correspond to the assigned entry IDs.
+ * 
+ * @author Guy Davenport, Herman De Beukelaer
  */
-public class SimpleDistanceMatrixData implements DistanceMatrixData {
+public class SimpleDistanceMatrixData extends SimpleNamedData implements DistanceMatrixData {
 
+    // distance matrix
     private double[][] distances;
 
-    private Set<Integer> ids;
-    private Map<Integer, Integer> idMap;
+    /**
+     * Create distance matrix with given distances (two-dimensional array).
+     * Distances are copied to an internal data structure. The dataset name
+     * is set to "Precomputed distance matrix".
+     * 
+     * @param distances pairwise distances
+     */
+    public SimpleDistanceMatrixData(double[][] distances) {
+        // name of each item is set to null
+        this(new String[distances.length], distances);
+    }
+    
+    /**
+     * Create distance matrix data given the item names (array) and distances (two-dimensional array).
+     * Item names and distances are copied to internal data structures. The dataset name is set to
+     * "Precomputed distance matrix".
+     * 
+     * @param itemNames item names
+     * @param distances pairwise distances
+     */
+    public SimpleDistanceMatrixData(String[] itemNames, double[][] distances) {
+        this("Precomputed distance matrix", itemNames, distances);
+    }
+    
+    /**
+     * Create distance matrix data given the dataset name, item names (array)
+     * and distances (two-dimensional array). Item names and distances
+     * are copied to internal data structures.
+     * 
+     * @param name dataset name
+     * @param itemNames item names
+     * @param distances pairwise distances
+     */
+    public SimpleDistanceMatrixData(String name, String[] itemNames, double[][] distances) {
+        
+        // pass item and dataset names to parent
+        super(itemNames, name);
 
-    public SimpleDistanceMatrixData(Set<Integer> ids, double[][] distances) {
-        if (ids == null) {
-            throw new IllegalArgumentException("ids not defined!");
+        // check input
+        if (itemNames.length != distances.length) {
+            throw new IllegalArgumentException("Number of items does not match number of distances.");
         }
-
-        this.ids = new TreeSet<>(ids);
-
-        idMap = new HashMap<>();
-
-        if (distances == null) {
-            throw new IllegalArgumentException("Distances not defined!");
-        }
-
-        if (this.ids.size() != distances.length) {
-            throw new IllegalArgumentException("Number of ids do not match number of distances!");
-        }
-
-        this.distances = new double[distances.length][distances.length];
-
-        Iterator<Integer> iterator = this.ids.iterator();
+        int n = itemNames.length;
+        
+        // copy distances to internal array
+        this.distances = new double[n][n];
 
         for (int i = 0; i < distances.length; i++) {
-            idMap.put(i, iterator.next());
-
-            if (distances.length != distances[i].length) {
-                throw new IllegalArgumentException("Number of distances do not match "
-                                                 + "number of ids in row  :" + i + "!");
+            if (distances[i].length != n) {
+                throw new IllegalArgumentException(
+                        String.format("Number of distances in row %d does not match number of items.", i)
+                );
             }
-
-            for (int j = 0; j < distances[i].length; j++) {
-                this.distances[i][j] = distances[i][j];
-            }
+            System.arraycopy(distances[i], 0, this.distances[i], 0, distances[i].length);
         }
+        
     }
 
-    public SimpleDistanceMatrixData(Set<Integer> ids,
-            List<List<Double>> distances) {
-        if (ids == null) {
-            throw new IllegalArgumentException("ids not defined!");
-        }
-
-        this.ids = new TreeSet<>(ids);
-
-        idMap = new HashMap<>();
-
-        if (distances == null) {
-            throw new IllegalArgumentException("Distances not defined!");
-        }
-
-        if (this.ids.size() != distances.size()) {
-            throw new IllegalArgumentException("Number of ids do not match number of distances!");
-        }
-
-        this.distances = new double[distances.size()][distances.size()];
-
-        Iterator<Integer> idIterator = this.ids.iterator();
-        Iterator<List<Double>> distanceRowIterator = distances.iterator();
-        List<Double> distanceRow;
-        Iterator<Double> distanceIterator;
-
-        int i = 0;
-        int j = 0;
-
-        while (distanceRowIterator.hasNext()) {
-            idMap.put(i, idIterator.next());
-
-            distanceRow = distanceRowIterator.next();
-
-            distanceIterator = distanceRow.iterator();
-
-            if (this.ids.size() != distanceRow.size()) {
-                throw new IllegalArgumentException("Number of distances do not match "
-                                                 + "number of ids in row  :" + i + "!");
-            }
-
-            j = 0;
-
-            while (distanceIterator.hasNext()) {
-                this.distances[i][j] = distanceIterator.next();
-
-                ++j;
-            }
-
-            ++i;
-        }
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see org.jamesframework.core.problems.datatypes.SubsetData#getIDs()
+    /**
+     * Create distance matrix data given the dataset name, item names (list)
+     * and distances (nested list, row wise). Item names and distances
+     * are copied to internal data structures.
+     * 
+     * @param name dataset name
+     * @param itemNames item names
+     * @param distances pairwise distances
      */
-    @Override
-    public Set<Integer> getIDs() {
-        return ids;
+    public SimpleDistanceMatrixData(String name, List<String> itemNames, List<List<Double>> distances) {
+        this(name, itemNames.toArray(new String[0]), nestedListToArray(distances));
+    }
+    
+    private static double[][] nestedListToArray(List<List<Double>> distances){
+        double[][] distancesArray = new double[distances.size()][];
+        for(int i = 0; i < distances.size(); i++){
+            List<Double> row = distances.get(i);
+            distancesArray[i] = new double[row.size()];
+            for(int j = 0; j < row.size(); j++){
+                distancesArray[i][j] = row.get(j);
+            }
+        }
+        return distancesArray;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.corehunter.DistanceMatrixData#getDistance(int, int)
-     */
     @Override
     public double getDistance(int idX, int idY) {
         return distances[idX][idY];
     }
 
-    public static final SimpleDistanceMatrixData readData(
-            FileProperties fileProperties) throws IOException {
+    /**
+     * Read distance matrix data. Only file types {@link FileType#TXT} and {@link FileType#CSV} are allowed.
+     * Values are separated with a single tab (txt) or comma (csv) and should all be positive. If the matrix is
+     * provided in a format that includes diagonal values ({@link SymmetricMatrixFormat#FULL} or
+     * {@link SymmetricMatrixFormat#LOWER_DIAG}) these should equal zero. If the full matrix is specified it
+     * should be symmetric. Violating these requirements will produce an exception.
+     * <p>
+     * If <code>named</code> is <code>true</code> the first line of the file should contain the accession names.
+     * Leading and trailing whitespace is removed from accession names and they are unquoted if wrapped in single
+     * or double quotes after whitespace removal. If it is intended to start or end a name with whitespace this
+     * whitespace should be contained within quotes. When provided, names should be unique. If names are not provided
+     * they will all be set to <code>null</code>. The dataset name is set to the file name to which
+     * <code>filePath</code> points.
+     * 
+     * @param filePath file path
+     * @param type {@link FileType#TXT} or {@link FileType#CSV}
+     * @param format specifies how the symmetric distance matrix is encoded in the file
+     * @param named indicates whether a header row with accession names is included
+     * @return distance matrix data
+     * @throws IOException if the file can not be read or is not correctly formatted
+     */
+    public static final SimpleDistanceMatrixData readData(Path filePath, FileType type,
+                                                          SymmetricMatrixFormat format,
+                                                          boolean named) throws IOException {
         
-        RowReader reader;
-
-        if (fileProperties == null) {
-            throw new IOException("File properties not defined!");
+        // validate arguments
+        
+        if (filePath == null) {
+            throw new IllegalArgumentException("File path not defined.");
+        }
+        
+        if(!filePath.toFile().exists()){
+            throw new IOException("File does not exist : " + filePath + ".");
         }
 
-        if (fileProperties.getFile() == null) {
-            throw new IOException("File not defined!");
+        if(type == null){
+            throw new IllegalArgumentException("File type not defined.");
+        }
+        
+        if(type != FileType.TXT && type != FileType.CSV){
+            throw new IllegalArgumentException(
+                    String.format("Only file types TXT and CSV are supported. Got: %s.", type)
+            );
         }
 
-        if (fileProperties.getFileType() == null) {
-            throw new IOException("File type not defined!");
-        }
-
-        if (fileProperties.getRowHeaderPosition() > UNKNOWN_INDEX
-                && fileProperties.getDataRowPosition() > UNKNOWN_INDEX
-                && fileProperties.getDataRowPosition() <= fileProperties.getColumnHeaderPosition()) {
-            throw new IOException("Column header position : " + fileProperties.getDataRowPosition()
-                                + " must be before data position : " + fileProperties.getColumnHeaderPosition());
-        }
-
-        if (!fileProperties.getFile().exists()) {
-            throw new IOException("File does not exist : " + fileProperties.getFile());
-        }
-
-        List<String> columnNames;
-
-        List<Double> distancesScoresRow;
-        List<List<Double>> distances;
-
-        Set<Integer> ids = new HashSet<>();
-
-        int row = 0;
-        int column = 0;
-        int id = 0;
-
-        try {
-            reader = IOUtilities.createRowReader(fileProperties);
-
-            if (reader != null && reader.ready()) {
-                int columnCount = UNKNOWN_COUNT;
-
-                if (reader.nextRow()) {
-                    if (fileProperties.getRowHeaderPosition() > UNKNOWN_INDEX) {
-                        while (row < fileProperties.getRowHeaderPosition() && reader.nextRow()) {
-                            ++row;
-                        }
-
-                        column = 0;
-
-                        if (fileProperties.getDataColumnPosition() > UNKNOWN_INDEX) {
-                            while (column < fileProperties.getDataColumnPosition() && reader.nextColumn()) {
-                                ++column;
-                            }
-                        }
-
-                        reader.nextColumn();
-
-                        columnNames = reader.getRowCellsAsString();
-
-                        columnCount = columnNames.size();
-                    }
-
-                    column = 0;
-
-                    distances = new LinkedList<>();
-
-                    if (fileProperties.getDataRowPosition() > UNKNOWN_INDEX) {
-                        while (row < fileProperties.getDataRowPosition() && reader.nextRow()) {
-                            ++row;
-                        }
-                    }
-
-                    // read first data row
-                    if (fileProperties.getDataColumnPosition() > UNKNOWN_INDEX) {
-                        while (column < fileProperties.getDataColumnPosition() && reader.nextColumn()) {
-                            ++column;
-                        }
-                    }
-
-                    reader.nextColumn();
-
-                    distancesScoresRow = reader.getRowCellsAsDouble();
-
-                    if (columnCount == UNKNOWN_COUNT) {
-                        columnCount = distancesScoresRow.size();
-                    }
-
-                    if (distancesScoresRow.size() != columnCount) {
-                        throw new IOException("Rows are not all the same size!");
-                    }
-
-                    distances.add(distancesScoresRow);
-                    ids.add(id);
-
-                    ++row;
-                    ++id;
-
-                    while (reader.nextRow()) {
-                        column = 0;
-
-                        if (fileProperties.getDataColumnPosition() > UNKNOWN_INDEX) {
-                            while (column < fileProperties.getDataColumnPosition() && reader.nextColumn()) {
-                                ++column;
-                            }
-                        }
-
-                        reader.nextColumn();
-
-                        distancesScoresRow = reader.getRowCellsAsDouble();
-
-                        if (distancesScoresRow.size() != columnCount) {
-                            throw new IOException("Rows are not all the same size!");
-                        }
-
-                        distances.add(distancesScoresRow);
-                        ids.add(id);
-
-                        ++row;
-                        ++id;
-                    }
-                } else {
-                    distances = new ArrayList<>(0);
+        // row counter
+        int r = 0;
+        // read data from file
+        try (RowReader reader = IOUtilities.createRowReader(
+                new FileProperties(filePath.toFile(), type)
+            )) {
+            
+            if (reader == null || !reader.ready()) {
+                throw new IOException("Can not create reader for file " + filePath + ". File may be empty.");
+            }
+            
+            if(!reader.hasNextRow()){
+                throw new IOException("File is empty.");
+            }
+            
+            // read names if included
+            String[] names = null;
+            if(named){
+                // go to row with names
+                reader.nextRow();
+                // read, trim and unquote names
+                names = Arrays.stream(reader.getRowCellsAsStringArray())
+                              .map(name -> StringUtils.unquote(name.trim()))
+                              .toArray(n -> new String[n]);
+                // check uniqueness
+                if(Arrays.stream(names).distinct().count() < names.length){
+                    throw new IOException("Accession names should be unique");
                 }
-            } else {
-                distances = new ArrayList<>(0);
+                // next row
+                r++;
+            }
+            
+            // read data rows
+            List<List<Double>> rows = new ArrayList<>();
+            int rowCount, prevRowCount = Constants.UNKNOWN_COUNT;
+            while(reader.nextRow()){
+                                
+                // read row
+                List<Double> row = reader.getRowCellsAsDouble();
+                rowCount = row.size();
+                
+                // check number of values
+                checkNumValuesInRow(format, r, rowCount, prevRowCount);
+                
+                // store
+                rows.add(row);
+                
+                // next row
+                prevRowCount = rowCount;
+                r++;
+                
+            }
+            
+            if(rows.isEmpty()){
+                throw new IOException("No data rows in file.");
+            }
+            
+            // infer number of accessions
+            int n = rows.get(rows.size()-1).size();
+            if(format == SymmetricMatrixFormat.LOWER){
+                // diagonal not included
+                n++;
+            }
+            
+            // check number of rows
+            int expectedRows = (format == SymmetricMatrixFormat.LOWER) ? n-1 : n;
+            if(rows.size() != expectedRows){
+                throw new IOException(String.format(
+                        "Incorrect number of data rows. Expected: %d, actual: %d.",
+                        expectedRows, rows.size()
+                ));
+            }
+            
+            // check number of names
+            if(names != null && names.length != n){
+                throw new IOException(
+                        String.format("Incorrect number of names. Expected: %d, actual: %d.", n, names.length)
+                );
+            }
+            
+            // init distance matrix
+            double[][] dist = new double[n][n];
+            // skip first row if lower triangular encoding without diagonal
+            int s = (format == SymmetricMatrixFormat.LOWER) ? 1 : 0;
+            // fill matrix
+            Iterator<List<Double>> rowIterator = rows.iterator();
+            for(r = s; r < n; r++){
+                List<Double> row = rowIterator.next();
+                for(int c = 0; c < row.size(); c++){
+                    dist[r][c] = row.get(c);
+                }
+            }
+            
+            // validate/complete matrix
+            double delta = 1e-10;
+            for(r = 0; r < n; r++){
+                
+                // validate lower triangular part
+                for(int c = 0; c < r; c++){
+                    if(dist[r][c] < 0.0){
+                        throw new IOException("Values should be positive.");
+                    }
+                }
+                
+                // validate diagonal
+                if(dist[r][r] > delta){
+                    throw new IOException("All diagonal values should equal zero.");
+                }
+                
+                // validate or complete upper triangular part
+                for(int c = r+1; c < n; c++){
+                    
+                    if(format == SymmetricMatrixFormat.FULL){
+                        // validate
+                        if(Math.abs(dist[r][c] - dist[c][r]) > delta){
+                            throw new IOException("Full matrix should be symmetric.");
+                        }
+                    } else {
+                        // complete
+                        dist[r][c] = dist[c][r];
+                    }
+                    
+                }
             }
 
-            if (reader != null) {
-                reader.close();
+            if(names == null){
+                names = new String[n]; // all names null
             }
+            return new SimpleDistanceMatrixData(filePath.getFileName().toString(), names, dist);
 
-            return new SimpleDistanceMatrixData(ids, distances);
-
-        } catch (IOException e) {
-            throw new IOException("Error reading file at row : " + row + " due to " + e.getMessage(), e);
         }
     }
+    
+    private static void checkNumValuesInRow(SymmetricMatrixFormat format, int row,
+                                     int rowCount, int prevRowCount) throws IOException{
+        
+        int expected = Constants.UNKNOWN_COUNT;
+        switch(format){
+                
+            case FULL:
+                // same as previous row, if any
+                if(prevRowCount != Constants.UNKNOWN_COUNT){
+                    expected = prevRowCount;
+                }
+                break;
+            case LOWER_DIAG:
+            case LOWER:
+                // one more per row
+                expected = prevRowCount == Constants.UNKNOWN_COUNT ? 1 : prevRowCount + 1;
+                break;
+
+            default: throw new IOException("Unknown matrix format " + format + ".");
+
+        }
+        
+        if(expected != Constants.UNKNOWN_COUNT && expected != rowCount){
+            throw new IOException(String.format(
+                    "Incorrect number of values at row %d. Expected: %d, actual: %d", row, expected, rowCount
+            ));
+        }
+        
+    }
+    
 }
