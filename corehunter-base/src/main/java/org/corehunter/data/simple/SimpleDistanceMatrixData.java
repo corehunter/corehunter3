@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 
 import org.corehunter.data.DistanceMatrixData;
 import org.corehunter.data.matrix.SymmetricMatrixFormat;
@@ -45,15 +46,22 @@ import uno.informatics.common.io.RowReader;
  */
 public class SimpleDistanceMatrixData extends SimpleNamedData implements DistanceMatrixData {
 
+    private static final double DELTA = 1e-10;
+    
     // distance matrix
-    private double[][] distances;
+    private final double[][] distances;
 
     /**
      * Create distance matrix with given distances (two-dimensional array).
      * Distances are copied to an internal data structure. The dataset name
      * is set to "Precomputed distance matrix".
+     * <p>
+     * All values should be positive and the diagonal values equal to zero.
+     * The distance matrix should be symmetric with all rows of equal length.
+     * Violating any of these requirements will produce an exception.
      * 
      * @param distances pairwise distances
+     * @throws IllegalArgumentException if an illegal distance matrix is given
      */
     public SimpleDistanceMatrixData(double[][] distances) {
         // name of each item is set to null
@@ -64,9 +72,17 @@ public class SimpleDistanceMatrixData extends SimpleNamedData implements Distanc
      * Create distance matrix data given the item names (array) and distances (two-dimensional array).
      * Item names and distances are copied to internal data structures. The dataset name is set to
      * "Precomputed distance matrix".
+     * <p>
+     * All values should be positive and the diagonal values equal to zero.
+     * The distance matrix should be symmetric with all rows of equal length.
+     * Violating any of these requirements will produce an exception.
+     * <p>
+     * Item names should either all be <code>null</code> (no names) or non <code>null</code> and unique.
+     * 
      * 
      * @param itemNames item names
      * @param distances pairwise distances
+     * @throws IllegalArgumentException if an illegal distance matrix is given or names are not unique
      */
     public SimpleDistanceMatrixData(String[] itemNames, double[][] distances) {
         this("Precomputed distance matrix", itemNames, distances);
@@ -76,32 +92,64 @@ public class SimpleDistanceMatrixData extends SimpleNamedData implements Distanc
      * Create distance matrix data given the dataset name, item names (array)
      * and distances (two-dimensional array). Item names and distances
      * are copied to internal data structures.
+     * <p>
+     * All values should be positive and the diagonal values equal to zero.
+     * The distance matrix should be symmetric with all rows of equal length.
+     * Violating any of these requirements will produce an exception.
+     * <p>
+     * Item names should either all be <code>null</code> (no names) or non
+     * <code>null</code> and unique.
      * 
      * @param name dataset name
      * @param itemNames item names
      * @param distances pairwise distances
+     * @throws IllegalArgumentException if an illegal distance matrix is given or names are not unique
      */
     public SimpleDistanceMatrixData(String name, String[] itemNames, double[][] distances) {
         
         // pass item and dataset names to parent
         super(itemNames, name);
 
-        // check input
+        // check number of names/distances
         if (itemNames.length != distances.length) {
-            throw new IllegalArgumentException("Number of items does not match number of distances.");
+            throw new IllegalArgumentException("Number of names does not match number of distances.");
         }
         int n = itemNames.length;
         
-        // copy distances to internal array
+        // validate names
+        if(Arrays.stream(itemNames).anyMatch(Objects::nonNull)
+                && (Arrays.stream(itemNames).anyMatch(Objects::isNull)
+                    || Arrays.stream(itemNames).distinct().count() < n)){
+            throw new IllegalArgumentException("Item names should be unique (or all null).");
+        }
+        
+        // validate distances and copy to internal array
         this.distances = new double[n][n];
 
-        for (int i = 0; i < distances.length; i++) {
-            if (distances[i].length != n) {
+        for (int r = 0; r < n; r++) {
+            // check row length
+            if (distances[r].length != n) {
                 throw new IllegalArgumentException(
-                        String.format("Number of distances in row %d does not match number of items.", i)
+                        String.format("Number of distances in row %d does not match number of items.", r)
                 );
             }
-            System.arraycopy(distances[i], 0, this.distances[i], 0, distances[i].length);
+            // validate and copy row values
+            for(int c = 0; c < n; c++){
+                // check positive
+                if(distances[r][c] < 0.0){
+                    throw new IllegalArgumentException("All distances should be positive.");
+                }
+                // check symmetric
+                if(Math.abs(distances[r][c] - distances[c][r]) > DELTA){
+                    throw new IllegalArgumentException("Distance matrix should be symmetric.");
+                }
+                // check diagonal zero
+                if(r == c && distances[r][c] > DELTA){
+                    throw new IllegalArgumentException("Diagonal values should be zero.");
+                }
+                // copy
+                this.distances[r][c] = distances[r][c];
+            }
         }
         
     }
@@ -205,10 +253,6 @@ public class SimpleDistanceMatrixData extends SimpleNamedData implements Distanc
                 names = Arrays.stream(reader.getRowCellsAsStringArray())
                               .map(name -> StringUtils.unquote(name.trim()))
                               .toArray(n -> new String[n]);
-                // check uniqueness
-                if(Arrays.stream(names).distinct().count() < names.length){
-                    throw new IOException("Accession names should be unique");
-                }
                 // next row
                 r++;
             }
@@ -274,42 +318,25 @@ public class SimpleDistanceMatrixData extends SimpleNamedData implements Distanc
                 }
             }
             
-            // validate/complete matrix
-            double delta = 1e-10;
-            for(r = 0; r < n; r++){
-                
-                // validate lower triangular part
-                for(int c = 0; c < r; c++){
-                    if(dist[r][c] < 0.0){
-                        throw new IOException("Values should be positive.");
-                    }
-                }
-                
-                // validate diagonal
-                if(dist[r][r] > delta){
-                    throw new IOException("All diagonal values should equal zero.");
-                }
-                
-                // validate or complete upper triangular part
-                for(int c = r+1; c < n; c++){
-                    
-                    if(format == SymmetricMatrixFormat.FULL){
-                        // validate
-                        if(Math.abs(dist[r][c] - dist[c][r]) > delta){
-                            throw new IOException("Full matrix should be symmetric.");
-                        }
-                    } else {
-                        // complete
+            // complete upper triangular part of matrix
+            if(format != SymmetricMatrixFormat.FULL){
+                for(r = 0; r < n; r++){
+                    for(int c = r+1; c < n; c++){
                         dist[r][c] = dist[c][r];
                     }
-                    
                 }
             }
 
             if(names == null){
                 names = new String[n]; // all names null
             }
-            return new SimpleDistanceMatrixData(filePath.getFileName().toString(), names, dist);
+            try{
+                // create data
+                return new SimpleDistanceMatrixData(filePath.getFileName().toString(), names, dist);
+            } catch(IllegalArgumentException ex){
+                // wrap in IO exception
+                throw new IOException(ex.getMessage());
+            }
 
         }
     }
