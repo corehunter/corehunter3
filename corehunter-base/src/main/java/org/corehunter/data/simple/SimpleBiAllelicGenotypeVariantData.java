@@ -23,7 +23,7 @@ import static uno.informatics.common.Constants.UNKNOWN_INDEX;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -36,7 +36,7 @@ import uno.informatics.common.io.RowReader;
 /**
  * @author Guy Davenport, Herman De Beukelaer
  */
-public class SimpleBiAllelicGenotypeVariantData extends SimpleGenotypeVariantData
+public class SimpleBiAllelicGenotypeVariantData extends SimpleNamedData
                                                 implements BiAllelicGenotypeVariantData {
 
     private int[][] alleleScores;
@@ -82,69 +82,6 @@ public class SimpleBiAllelicGenotypeVariantData extends SimpleGenotypeVariantDat
                 for (int j = 0; j < numberOfMarkers; ++j) {
                     this.alleleScores[i][j] = alleleScores[i][j];
                 }
-            }
-        } else {
-            this.alleleScores = new int[0][0];
-        }
-    }
-
-    public SimpleBiAllelicGenotypeVariantData(String name, List<String> itemNames,
-            List<String> markerNames, List<List<Integer>> alleleScores) {
-        
-        super(name, itemNames);
-
-        if (markerNames == null) {
-            throw new IllegalArgumentException("Marker names not defined!");
-        }
-
-        if (alleleScores == null) {
-            throw new IllegalArgumentException("Alleles not deifned!");
-        }
-
-        if (getNames().length != alleleScores.size()) {
-            throw new IllegalArgumentException("Number of alleleScores don't match number of names!");
-        }
-
-        if (alleleScores.size() > 0) {
-            numberOfMarkers = markerNames.size();
-
-            this.markerNames = new String[numberOfMarkers];
-
-            this.alleleScores = new int[alleleScores.size()][numberOfMarkers];
-
-            Iterator<String> markerNameIterator = markerNames.iterator();
-
-            int i = 0;
-            int j = 0;
-
-            while (markerNameIterator.hasNext()) {
-                this.markerNames[j] = markerNameIterator.next();
-
-                ++j;
-            }
-
-            Iterator<List<Integer>> alleleScoresIterator = alleleScores.iterator();
-            List<Integer> markerAlleleScores;
-            Iterator<Integer> markerAlleleScoresIterator;
-
-            while (alleleScoresIterator.hasNext()) {
-                j = 0;
-
-                markerAlleleScores = alleleScoresIterator.next();
-
-                if (numberOfMarkers != markerAlleleScores.size()) {
-                    throw new IllegalArgumentException("Number of markers don't match for id : " + i);
-                }
-
-                markerAlleleScoresIterator = markerAlleleScores.iterator();
-
-                while (markerAlleleScoresIterator.hasNext()) {
-                    this.alleleScores[i][j] = markerAlleleScoresIterator.next();
-
-                    ++j;
-                }
-
-                ++i;
             }
         } else {
             this.alleleScores = new int[0][0];
@@ -305,5 +242,30 @@ public class SimpleBiAllelicGenotypeVariantData extends SimpleGenotypeVariantDat
         } catch (IOException e) {
             throw new IOException("Error reading file at row : " + row + " due to " + e.getMessage(), e);
         }
+    }
+
+    @Override
+    public int getNumberOfAlleles(int markerIndex) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public int getTotalNumberOfAlleles() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public String getAlleleName(int markerIndex, int alleleIndex) throws ArrayIndexOutOfBoundsException {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public double getAlelleFrequency(int id, int markerIndex, int alleleIndex) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public double getAverageAlelleFrequency(Collection<Integer> entryIds, int markerIndex, int alleleIndex) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }
