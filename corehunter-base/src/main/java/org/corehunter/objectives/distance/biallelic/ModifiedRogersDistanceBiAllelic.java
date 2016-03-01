@@ -55,11 +55,6 @@ public class ModifiedRogersDistanceBiAllelic implements GenotypeVariantDistanceM
     }
 
     @Override
-    public void setName(int id, String name) {
-        throw new UnsupportedOperationException("Not supported yet."); 
-    }
-
-    @Override
     public int getDatasetSize() {
         throw new UnsupportedOperationException("Not supported yet."); 
     }

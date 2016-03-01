@@ -19,6 +19,7 @@
 
 package org.corehunter.data.simple;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.NoSuchElementException;
 import java.util.Set;
@@ -48,47 +49,47 @@ public class SimpleNamedData implements NamedData {
      * @param n number of entries
      */
     public SimpleNamedData(int n) {
-        this(n, "Named data");
+        this("Named data", n);
     }
     
     /**
-     * Initialize data with given names. IDs are set to [0, n-1] where n is the number of names.
-     * Names are copied into an internal array.
-     * 
-     * @param names entry names
-     */
-    public SimpleNamedData(String[] names) {
-        this(names.length);
-        // copy names
-        System.arraycopy(names, 0, this.names, 0, names.length);
-    }
-    
-    /**
-     * Initialize data. IDs are set to [0, n-1].
+     * Initialize data with given dataset name. IDs are set to [0, n-1].
      * All names are set to <code>null</code>.
      * 
-     * @param n number of entries
      * @param datasetName name of the dataset
+     * @param n number of entries
      */
-    public SimpleNamedData(int n, String datasetName) {
-        names = new String[n];
+    public SimpleNamedData(String datasetName, int n) {
+        this(datasetName, n, null);
+    }
+    
+    /**
+     * Initialize data with given dataset and item names. IDs are set to [0, n-1].
+     * Missing item names should be encoded as <code>null</code> values in the array.
+     * Alternatively, if no names are assigned to any items, <code>names</code> itself
+     * may also be <code>null</code>.
+     * 
+     * @param datasetName name of the dataset
+     * @param n number of entries
+     * @param names item names, <code>null</code> if no names are assigned;
+     *              if not <code>null</code> its length should equal <code>n</code>
+     * @throws IllegalArgumentException if an incorrect number of names are specified
+     */
+    public SimpleNamedData(String datasetName, int n, String[] names){
         ids = Collections.unmodifiableSet(
                 IntStream.range(0, n).boxed().collect(Collectors.toSet())
         );
         this.datasetName = datasetName;
-    }
-    
-    /**
-     * Initialize data with given names. IDs are set to [0, n-1] where n is the number of names.
-     * Names are copied to an internal data structure.
-     * 
-     * @param names entry names
-     * @param datasetName dataset name
-     */
-    public SimpleNamedData(String[] names, String datasetName) {
-        this(names.length, datasetName);
-        // copy names
-        System.arraycopy(names, 0, this.names, 0, names.length);
+        if(names == null){
+            this.names = new String[n];
+        } else {
+            if(names.length != n){
+                throw new IllegalArgumentException(String.format(
+                        "Incorrect number of names. Expected: %d, actual: %d.", n, names.length
+                ));
+            }
+            this.names = Arrays.copyOf(names, n);
+        }
     }
     
     @Override
@@ -97,14 +98,13 @@ public class SimpleNamedData implements NamedData {
         return names[id];
     }
     
-    @Override
     public void setName(int id, String name){
         validateId(id);
         names[id] = name;
     }
     
     private void validateId(int id){
-        if(id < 0 || id >= names.length){
+        if(id < 0 || id >= getDatasetSize()){
             throw new NoSuchElementException(String.format("There is no entry with ID %d.", id));
         }
     }

@@ -52,7 +52,7 @@ public class SimpleDistanceMatrixDataTest {
     
     private static final String[] ERRONEOUS_FILES = {
         "/distances/err/empty.txt",        
-        "/distances/err/empty.txt",        
+        "/distances/err/empty-2.txt",        
         "/distances/err/excessive-names.txt",        
         "/distances/err/incorrect-row-length.csv",        
         "/distances/err/incorrect-row-length-2.csv",        
@@ -65,7 +65,8 @@ public class SimpleDistanceMatrixDataTest {
         "/distances/err/non-zero-diagonal-values.csv",        
         "/distances/err/non-zero-diagonal-values.txt",        
         "/distances/err/too-few-names.txt",        
-        "/distances/err/unexpected-names.txt"      
+        "/distances/err/unexpected-names.txt", 
+        "/distances/err/missing-rows.txt"
     };
     
     private static final SymmetricMatrixFormat[] ERRONEOUS_FILE_FORMATS = {
@@ -81,6 +82,7 @@ public class SimpleDistanceMatrixDataTest {
         SymmetricMatrixFormat.LOWER,
         SymmetricMatrixFormat.FULL,
         SymmetricMatrixFormat.LOWER_DIAG,
+        SymmetricMatrixFormat.FULL,
         SymmetricMatrixFormat.FULL,
         SymmetricMatrixFormat.FULL,
         SymmetricMatrixFormat.FULL
@@ -101,6 +103,7 @@ public class SimpleDistanceMatrixDataTest {
         true,
         false,
         true,
+        false,
         false
     };
     

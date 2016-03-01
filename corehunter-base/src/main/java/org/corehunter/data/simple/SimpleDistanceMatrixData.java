@@ -39,7 +39,7 @@ import uno.informatics.common.io.RowReader;
 
 /**
  * Simple implementation of a distance matrix that stores all values in a two-dimensional double array.
- * Row and column indices correspond to the assigned entry IDs.
+ * The assigned entry IDs correspond to the row/column indices in the matrix.
  * 
  * @author Guy Davenport, Herman De Beukelaer
  */
@@ -77,11 +77,16 @@ public class SimpleDistanceMatrixData extends SimpleNamedData implements Distanc
      * Violating any of these requirements will produce an exception.
      * <p>
      * Item names are optional, missing names should be encoded as <code>null</code>
-     * values in the name array.
+     * values in the name array. Alternatively, if no names are assigned to any items,
+     * <code>itemNames</code> itself may also be <code>null</code>.
      * 
-     * @param itemNames item names
-     * @param distances pairwise distances
+     * @param itemNames item names, <code>null</code> if no names are assigned; if not
+     *                  <code>null</code> its length should be the same as the dimension
+     *                  of the given distance matrix
+     * @param distances distance matrix (symmetric)
      * @throws IllegalArgumentException if an illegal distance matrix is given
+     *                                  or the number of names does not match
+     *                                  the dimension of the distance matrix
      */
     public SimpleDistanceMatrixData(String[] itemNames, double[][] distances) {
         this("Precomputed distance matrix", itemNames, distances);
@@ -97,32 +102,32 @@ public class SimpleDistanceMatrixData extends SimpleNamedData implements Distanc
      * Violating any of these requirements will produce an exception.
      * <p>
      * Item names are optional, missing names should be encoded as <code>null</code>
-     * values in the name array.
+     * values in the name array. Alternatively, if no names are assigned to any items,
+     * <code>itemNames</code> itself may also be <code>null</code>.
      * 
      * @param name dataset name
-     * @param itemNames item names
-     * @param distances pairwise distances
+     * @@param itemNames item names, <code>null</code> if no names are assigned; if not
+     *                  <code>null</code> its length should be the same as the dimension
+     *                  of the given distance matrix
+     * @param distances distance matrix (symmetric)
      * @throws IllegalArgumentException if an illegal distance matrix is given
+     *                                  or the number of names does not match
+     *                                  the dimension of the distance matrix
      */
     public SimpleDistanceMatrixData(String name, String[] itemNames, double[][] distances) {
         
-        // pass item and dataset names to parent
-        super(itemNames, name);
-
-        // check number of names/distances
-        if (itemNames.length != distances.length) {
-            throw new IllegalArgumentException("Number of names does not match number of distances.");
-        }
-        int n = itemNames.length;
+        // pass dataset name, size and item names to parent
+        super(name, distances.length, itemNames);
         
         // validate distances and copy to internal array
+        int n = distances.length;
         this.distances = new double[n][n];
 
         for (int r = 0; r < n; r++) {
             // check row length
             if (distances[r].length != n) {
                 throw new IllegalArgumentException(
-                        String.format("Number of distances in row %d does not match number of items.", r)
+                        String.format("Number of distances in row %d does not match number of rows.", r)
                 );
             }
             // validate and copy row values
@@ -146,31 +151,6 @@ public class SimpleDistanceMatrixData extends SimpleNamedData implements Distanc
         
     }
 
-    /**
-     * Create distance matrix data given the dataset name, item names (list)
-     * and distances (nested list, row wise). Item names and distances
-     * are copied to internal data structures.
-     * 
-     * @param name dataset name
-     * @param itemNames item names
-     * @param distances pairwise distances
-     */
-    public SimpleDistanceMatrixData(String name, List<String> itemNames, List<List<Double>> distances) {
-        this(name, itemNames.toArray(new String[0]), nestedListToArray(distances));
-    }
-    
-    private static double[][] nestedListToArray(List<List<Double>> distances){
-        double[][] distancesArray = new double[distances.size()][];
-        for(int i = 0; i < distances.size(); i++){
-            List<Double> row = distances.get(i);
-            distancesArray[i] = new double[row.size()];
-            for(int j = 0; j < row.size(); j++){
-                distancesArray[i][j] = row.get(j);
-            }
-        }
-        return distancesArray;
-    }
-
     @Override
     public double getDistance(int idX, int idY) {
         return distances[idX][idY];
@@ -178,19 +158,19 @@ public class SimpleDistanceMatrixData extends SimpleNamedData implements Distanc
 
     /**
      * Read distance matrix data. Only file types {@link FileType#TXT} and {@link FileType#CSV} are allowed.
-     * Values are separated with a single tab (txt) or comma (csv) and should all be positive. If the matrix is
-     * provided in a format that includes diagonal values ({@link SymmetricMatrixFormat#FULL} or
-     * {@link SymmetricMatrixFormat#LOWER_DIAG}) these should equal zero. If the full matrix is specified it
+     * Values are separated with a single tab (txt) or comma (csv) character and should all be positive.
+     * If the matrix is provided in a format that includes diagonal values ({@link SymmetricMatrixFormat#FULL}
+     * or {@link SymmetricMatrixFormat#LOWER_DIAG}) these should equal zero. If the full matrix is specified it
      * should be symmetric. Violating these requirements will produce an exception.
      * <p>
      * If <code>named</code> is <code>true</code> the first line of the file should contain the accession names.
      * Leading and trailing whitespace is removed from accession names and they are unquoted if wrapped in single
      * or double quotes after whitespace removal. If it is intended to start or end a name with whitespace this
-     * whitespace should be contained within quotes. When provided, names should be unique. If names are not provided
-     * they will all be set to <code>null</code>. The dataset name is set to the file name to which
-     * <code>filePath</code> points.
+     * whitespace should be contained within the quotes, as it will then not be removed. Missing item names are
+     * set to <code>null</code>. The dataset name is set to the name of the file to which <code>filePath</code>
+     * points.
      * 
-     * @param filePath file path
+     * @param filePath path to file that contains the data
      * @param type {@link FileType#TXT} or {@link FileType#CSV}
      * @param format specifies how the symmetric distance matrix is encoded in the file
      * @param named indicates whether a header row with accession names is included
@@ -318,15 +298,12 @@ public class SimpleDistanceMatrixData extends SimpleNamedData implements Distanc
                     }
                 }
             }
-
-            if(names == null){
-                names = new String[n]; // all names null
-            }
+            
             try{
                 // create data
                 return new SimpleDistanceMatrixData(filePath.getFileName().toString(), names, dist);
             } catch(IllegalArgumentException ex){
-                // wrap in IO exception
+                // convert to IO exception
                 throw new IOException(ex.getMessage());
             }
 
