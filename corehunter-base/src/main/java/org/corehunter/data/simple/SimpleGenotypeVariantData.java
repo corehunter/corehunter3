@@ -38,16 +38,32 @@ import org.corehunter.data.GenotypeVariantData;
  */
 public class SimpleGenotypeVariantData extends SimpleNamedData implements GenotypeVariantData {
 
-    private double[][][] alleleFrequencies;
-    private int numberOfMarkers;
-    private int[] numberOfAllelesForMarker;
-    private String[] markerNames;
-    private String[][] alleleNames;
-    private int totalNumberAlleles;
+    private final Double[][][] alleleFrequencies;   //  null means missing
+    private final int numberOfMarkers;
+    private final int[] numberOfAllelesForMarker;
+    private final int totalNumberAlleles;
+    private final String[] markerNames;             // all null if marker names are not provided
+    private final String[][] alleleNames;           // all null if allele names are not provided
 
-    public SimpleGenotypeVariantData(String name, String[] itemNames, String[] markerNames,
-            String[][] alleleNames, double[][][] alleleFrequencies) {
-        super(name, itemNames);
+    /**
+     * Create data with given dataset name, item names, marker/allele names and allele frequencies.
+     * All names (items, markers, alleles) are optional but the arrays lengths are important.
+     * The length of <code>itemNames</code> should match that of <code>alleleFrequencies</code>.
+     * The length of <code>markerNames</code> indicates the number of markers and should correspond
+     * to the length of <code>alleleNames</code>. Furthermore, the length of <code>alleleNames[m]</code>
+     * reflects the number of alleles of marker m. Missing names are encoded as <code>null</code> values
+     * in the respective array.
+     * 
+     * @param datasetName
+     * @param itemNames
+     * @param markerNames
+     * @param alleleNames
+     * @param alleleFrequencies 
+     */
+    public SimpleGenotypeVariantData(String datasetName, String[] itemNames, String[] markerNames,
+                                     String[][] alleleNames, double[][][] alleleFrequencies) {
+        
+        super(itemNames, datasetName);
 
         if (markerNames == null) {
             throw new IllegalArgumentException("Marker names not defined!");
@@ -127,142 +143,16 @@ public class SimpleGenotypeVariantData extends SimpleNamedData implements Genoty
         }
     }
 
-    public SimpleGenotypeVariantData(String name, List<String> itemNames,
-            List<String> markerNames, List<List<String>> alleleNames,
-            List<List<List<Double>>> frequencies) {
-        
-        super(name, itemNames);
-
-        if (markerNames == null) {
-            throw new IllegalArgumentException("Marker names not defined!");
-        }
-
-        if (alleleNames == null) {
-            throw new IllegalArgumentException("Allele names not defined!");
-        }
-
-        if (frequencies == null) {
-            throw new IllegalArgumentException("Allele Frequency entries not deifned!");
-        }
-
-        if (this.getNames().length != frequencies.size()) {
-            throw new IllegalArgumentException("Number of allele frequency entries does not match number of names!");
-        }
-
-        if (markerNames.size() != alleleNames.size()) {
-            throw new IllegalArgumentException("Number of marker names entries does not match "
-                                             + "number of marker/allele names!");
-        }
-
-        totalNumberAlleles = 0;
-
-        if (frequencies.size() > 0) {
-            numberOfMarkers = markerNames.size();
-
-            numberOfAllelesForMarker = new int[numberOfMarkers];
-
-            this.markerNames = new String[numberOfMarkers];
-            this.alleleNames = new String[numberOfMarkers][];
-
-            Iterator<String> markerNamesIterator = markerNames.iterator();
-            Iterator<List<String>> alleleNameIterator = alleleNames.iterator();
-
-            String markerName;
-            List<String> alleleNamesForMarker;
-
-            int markerIndex = 0;
-
-            while (markerNamesIterator.hasNext() && alleleNameIterator.hasNext()) {
-                markerName = markerNamesIterator.next();
-                alleleNamesForMarker = alleleNameIterator.next();
-
-                if (alleleNamesForMarker == null) {
-                    throw new IllegalArgumentException("Allele names not defined for marker : " + markerIndex + "!");
-                }
-
-                this.markerNames[markerIndex] = markerName;
-
-                numberOfAllelesForMarker[markerIndex] = alleleNamesForMarker.size();
-
-                totalNumberAlleles = totalNumberAlleles + numberOfAllelesForMarker[markerIndex];
-
-                this.alleleNames[markerIndex] = new String[numberOfAllelesForMarker[markerIndex]];
-
-                for (int k = 0; k < numberOfAllelesForMarker[markerIndex]; ++k) {
-                    this.alleleNames[markerIndex][k] = alleleNamesForMarker.get(k);
-                }
-
-                ++markerIndex;
-            }
-
-            this.alleleFrequencies = new double[frequencies.size()][numberOfMarkers][];
-
-            Iterator<List<List<Double>>> frequenciesIterator = frequencies.iterator();
-            Iterator<List<Double>> frequencyIterator;
-
-            int index = 0;
-
-            List<List<Double>> markerFrequencies;
-            List<Double> alleleFrequencies;
-
-            while (frequenciesIterator.hasNext()) {
-                markerFrequencies = frequenciesIterator.next();
-
-                if (numberOfMarkers != markerFrequencies.size()) {
-                    throw new IllegalArgumentException("Number of markers does not match "
-                                                     + "allele frequencies for id : " + index + "!");
-                }
-
-                frequencyIterator = markerFrequencies.iterator();
-
-                markerIndex = 0;
-
-                while (frequencyIterator.hasNext()) {
-                    alleleFrequencies = frequencyIterator.next();
-
-                    if (numberOfAllelesForMarker[markerIndex] != alleleFrequencies.size()) {
-                        throw new IllegalArgumentException("Number of alleles for marker " + markerIndex
-                                                + " is : " + alleleFrequencies.size()
-                                                + " but was expected to be " + numberOfAllelesForMarker[markerIndex]);
-                    }
-
-                    this.alleleFrequencies[index][markerIndex] = new double[numberOfAllelesForMarker[markerIndex]];
-
-                    for (int alleleIndex = 0; alleleIndex < numberOfAllelesForMarker[markerIndex]; ++alleleIndex) {
-                        this.alleleFrequencies[index][markerIndex][alleleIndex] = alleleFrequencies.get(alleleIndex);
-                    }
-
-                    ++markerIndex;
-                }
-                ++index;
-            }
-        } else {
-            this.markerNames = new String[0];
-            this.alleleNames = new String[0][0];
-            this.numberOfAllelesForMarker = new int[0];
-            this.alleleFrequencies = new double[0][0][0];
-        }
-    }
-
-    /* (non-Javadoc)
-     * @see org.corehunter.data.GenotypeVariantData#getNumberOfMarkers()
-     */
     @Override
     public int getNumberOfMarkers() {
         return numberOfMarkers;
     }
 
-    /* (non-Javadoc)
-     * @see org.corehunter.data.GenotypeVariantData#getAlelleFrequency(int, int, int)
-     */
     @Override
     public double getAlelleFrequency(int id, int markerIndex, int alleleIndex) {
         return alleleFrequencies[id][markerIndex][alleleIndex];
     }
-
-    /* (non-Javadoc)
-     * @see org.corehunter.data.GenotypeVariantData#getAverageAlelleFrequency(Collection<Integer>, int, int)
-     */
+    
     @Override
     public double getAverageAlelleFrequency(Collection<Integer> entityIds,
             int markerIndex, int alleleIndex) {
@@ -280,34 +170,22 @@ public class SimpleGenotypeVariantData extends SimpleNamedData implements Genoty
         return summedAlleleFrequency / entityIds.size();
     }
 
-    /* (non-Javadoc)
-     * @see org.corehunter.data.GenotypeVariantData#getNumberOfAllele(int)
-     */
     @Override
     public int getNumberOfAlleles(int markerIndex) {
         return numberOfAllelesForMarker[markerIndex];
     }
 
-    /* (non-Javadoc)
-     * @see org.corehunter.data.GenotypeVariantData#getTotalNumberOfAlleles()
-     */
     @Override
     public int getTotalNumberOfAlleles() {
         return totalNumberAlleles;
     }
 
-    /* (non-Javadoc)
-     * @see org.corehunter.data.NamedAllelicGenotypeVariantData#getMarkerName(int)
-     */
     @Override
     public String getMarkerName(int markerIndex)
             throws ArrayIndexOutOfBoundsException {
         return markerNames[markerIndex];
     }
 
-    /* (non-Javadoc)
-     * @see org.corehunter.data.NamedAllelicGenotypeVariantData#getAlleleName(int)
-     */
     @Override
     public String getAlleleName(int markerIndex, int alleleIndex)
             throws ArrayIndexOutOfBoundsException {
