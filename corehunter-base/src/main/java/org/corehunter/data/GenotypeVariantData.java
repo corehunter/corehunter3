@@ -89,6 +89,7 @@ public interface GenotypeVariantData extends NamedData {
 
     /**
      * Get the average frequency of an allele for the given entries (samples/accession).
+     * Missing values are treated as zero when computing the average.
      *
      * @param entryIds   the IDs of the entry, must be a subset of the IDs returned by {@link #getIDs()}
      * @param markerIndex the index of the marker within the range 0 to n-1, where n is the total number of markers as
@@ -96,7 +97,6 @@ public interface GenotypeVariantData extends NamedData {
      * @param alleleIndex allele index within the range 0 to a-1, where a is the number of alleles for the given marker
      *                    as returned by {@link #getNumberOfAlleles(int)}
      * @return average allele frequency across the given entries
-     * @throws NullPointerException if there is any missing data for this marker/allele pair in the given entries
      */
     public double getAverageAlelleFrequency(Collection<Integer> entryIds, int markerIndex, int alleleIndex);
 

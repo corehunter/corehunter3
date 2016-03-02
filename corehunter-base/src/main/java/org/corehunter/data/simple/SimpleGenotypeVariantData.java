@@ -245,9 +245,11 @@ public class SimpleGenotypeVariantData extends SimpleNamedData implements Genoty
     
     @Override
     public double getAverageAlelleFrequency(Collection<Integer> entityIds, int markerIndex, int alleleIndex) {
-        // TODO: check exception (null pointer) in case of missing data
         return entityIds.stream()
-                        .mapToDouble(id -> getAlelleFrequency(id, markerIndex, alleleIndex))
+                        .mapToDouble(id -> {
+                            Double f = getAlelleFrequency(id, markerIndex, alleleIndex);
+                            return f == null ? 0.0 : f;
+                        })
                         .average()
                         .getAsDouble();
     }
