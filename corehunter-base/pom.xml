@@ -10,7 +10,6 @@
     </parent>
     
     <artifactId>corehunter-base</artifactId>
-    <version>3.0.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>Core Hunter with base data structures</name>

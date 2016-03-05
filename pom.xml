@@ -1,5 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.corehunter</groupId>
@@ -47,15 +47,21 @@
         <module>corehunter-base</module>
         <module>corehunter-extended</module>
         <module>build-tools</module>
-    </modules>
+    <module>corehunter-services</module>
+  </modules>
 
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>org.corehunter</groupId>
-                <artifactId>corehunter-base</artifactId>
-                <version>3.0.0-SNAPSHOT</version>
+              <groupId>org.corehunter</groupId>
+              <artifactId>corehunter-base</artifactId>
+              <version>3.0.0-SNAPSHOT</version>
             </dependency>
+						<dependency>
+							<groupId>org.corehunter</groupId>
+						  <artifactId>corehunter-services-api</artifactId>
+							<version>3.0.0-SNAPSHOT</version>
+						</dependency>
             <dependency>
                 <groupId>org.jamesframework</groupId>
                 <artifactId>james-core</artifactId>
