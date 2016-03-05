@@ -23,16 +23,15 @@ import uno.informatics.data.Dataset;
 import uno.informatics.data.SimpleEntity;
 import uno.informatics.data.dataset.DatasetException;
 
-public interface DatasetServices
-{
-  public List<SimpleEntity> getDatasetDescriptions() ;
-  
-  public List<Dataset> getAllDatasets() throws DatasetException ;
+public interface DatasetServices {
+    public List<SimpleEntity> getDatasetDescriptions();
 
-  public Dataset getDataset(String datasetId) throws DatasetException;
+    public List<Dataset> getAllDatasets() throws DatasetException;
 
-  public void addDataset(Path path, FileType fileType, DatasetType datasetType) throws DatasetException ;
-  
-  public void removeDataset(String datasetId) throws DatasetException;
+    public Dataset getDataset(String datasetId) throws DatasetException;
+
+    public void addDataset(Path path, FileType fileType, DatasetType datasetType) throws DatasetException;
+
+    public void removeDataset(String datasetId) throws DatasetException;
 
 }

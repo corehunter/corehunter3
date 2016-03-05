@@ -17,13 +17,12 @@ package org.corehunter.services;
 
 import java.util.Date;
 
-public interface CorehunterRun
-{
-  public String getName();
+public interface CorehunterRun {
+    public String getName();
 
-  public Date getStartDate();
+    public Date getStartDate();
 
-  public Date getEndDate();
-  
-  public String getStatus();
+    public Date getEndDate();
+
+    public String getStatus();
 }

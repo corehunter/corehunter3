@@ -32,7 +32,7 @@ import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import org.corehunter.services.DatasetServices ;
+import org.corehunter.services.DatasetServices;
 import org.corehunter.services.DatasetType;
 
 import com.thoughtworks.xstream.XStream;
@@ -48,228 +48,195 @@ import uno.informatics.data.feature.array.ZipFeatureDatasetReader;
 import uno.informatics.data.feature.array.ZipFeatureDatasetWriter;
 import uno.informatics.data.pojo.SimpleEntityPojo;
 
-public class FileBasedDatasetServices implements DatasetServices
-{
-  private static final String DATASET_DESCRIPTIONS = "datasetDescriptions.xml";
+public class FileBasedDatasetServices implements DatasetServices {
+    private static final String DATASET_DESCRIPTIONS = "datasetDescriptions.xml";
 
-  private static List<SimpleEntity> datasetDescriptions ;
-  
-  private static Map<String, Dataset> datasetMap ;
-  
-  private static List<Dataset> datasetCache ;
-  
-  private Path path ;
-  
-  public FileBasedDatasetServices(Path path) throws DatasetException
-  {
-    setPath(path) ;
-    
-    initialise() ;
-  }
+    private static List<SimpleEntity> datasetDescriptions;
 
-  public synchronized final Path getPath()
-  {
-    return path;
-  }
+    private static Map<String, Dataset> datasetMap;
 
-  protected synchronized final void setPath(Path path)
-  {
-    if (path == null)
-      throw new IllegalArgumentException("Path must be defined!") ;
-    
-    this.path = path;
-  }
+    private static List<Dataset> datasetCache;
 
-  @Override
-  public List<Dataset> getAllDatasets() throws DatasetException
-  {
-    if (datasetCache == null)
-    {
-      datasetCache = new ArrayList<Dataset>(datasetDescriptions.size()) ;
-      
-      Iterator<SimpleEntity> iterator = datasetDescriptions.iterator() ;
-      
-      while (iterator.hasNext())
-        datasetCache.add(getDataset(iterator.next().getUniqueIdentifier())) ;
-    }
-    
-    return datasetCache;
-  }
-  
-  @Override
-  public List<SimpleEntity> getDatasetDescriptions()
-  {
-    return datasetDescriptions ;
-  }
-  
-  @Override
-  public Dataset getDataset(String datasetId) throws DatasetException
-  {
-    if (datasetMap.containsKey(datasetId))
-    {
-      return datasetMap.get(datasetId);
-    }
-    else
-    {
-      Dataset dataset = loadDataset(datasetId) ;
-      
-      datasetMap.put(datasetId, dataset) ;
-      
-      return dataset ;
-    }
-  }
-  
-  @Override
-  public void addDataset(Path path, FileType fileType, DatasetType datasetType) throws DatasetException
-  {
-    Dataset dataset = createDataset(path, fileType, datasetType) ;
-    
-    if (!datasetMap.containsKey(dataset.getUniqueIdentifier()))
-    {
-      datasetDescriptions.add(new SimpleEntityPojo(dataset)) ;
-      datasetMap.put(dataset.getUniqueIdentifier(), dataset) ;
-      
-      if (datasetCache != null)
-        datasetCache.add(dataset) ;
-      
-      XStream xstream = createXStream() ;
-      
-      OutputStream outputStream;
-      
-      try
-      {
-        outputStream = Files.newOutputStream(Paths.get(getPath().toString(), DATASET_DESCRIPTIONS));
-        
-        xstream.toXML(datasetDescriptions, outputStream) ;
-      }
-      catch (IOException e)
-      {
-        throw new DatasetException(e) ;
-      }
-    }
-    else
-    {
-      throw new DatasetException("Dataset already present : " + dataset.getUniqueIdentifier()) ;
-    }
-  }
-  
-  @Override
-  public void removeDataset(String datasetId) throws DatasetException
-  {
-    Dataset dataset = getDataset(datasetId) ;
-    
-    if (dataset != null)
-    {
-      ListIterator<SimpleEntity> listIterator = datasetDescriptions.listIterator() ;
-      
-      boolean found = false ;
-      
-      while (!found && listIterator.hasNext())
-      {
-        found = datasetId.equals(listIterator.next().getUniqueIdentifier()) ;
-        
-        if (found)
-          listIterator.remove(); 
-      }
-        
-      datasetDescriptions.remove(datasetId) ;
-      
-      Dataset removed = datasetMap.remove(datasetId) ;
-      
-      if (removed != null && datasetCache != null)
-        datasetCache.remove(dataset) ;
-    }
-  }
+    private Path path;
 
-  @SuppressWarnings("unchecked")
-  private void initialise() throws DatasetException
-  { 
-    try
-    {
-      Path datasetDescriptionsPath = Paths.get(getPath().toString(), DATASET_DESCRIPTIONS) ;
-      
-      if (Files.exists(datasetDescriptionsPath))
-      {
-        InputStream inputStream = Files.newInputStream(datasetDescriptionsPath) ;
-        
-        XStream xstream = createXStream() ;
-        
-        datasetDescriptions = (List<SimpleEntity>) xstream.fromXML(inputStream);
-        }
-      else
-      {
-        datasetDescriptions = new ArrayList<SimpleEntity>() ;
-      }
-      
-      datasetMap = new HashMap<String, Dataset>() ;
-      datasetCache = null ;
-    }
-    catch (IOException e)
-    {
-      throw new DatasetException(e) ;
-    }
-  }
-  
-  private Dataset loadDataset(String datasetId) throws DatasetException
-  {
-    Dataset dataset = null ;
-   
-    ZipFeatureDatasetReader reader = new ZipFeatureDatasetReader(Paths.get(getPath().toString(), datasetId).toFile()) ;
-    
-    dataset = reader.read();
-    
-    return dataset ;
-  }
-  
-  private Dataset createDataset(Path path, FileType fileType, DatasetType datasetType) throws DatasetException
-  {
-    Dataset dataset = null ;
-    
-    switch (datasetType)
-    {
-      case BI_ALLELIC_GENOTYPIC:
-        dataset = createBiAllelicGenotypicDataset(path, fileType) ;
-        break;
-      case MULTI_ALLELIC_GENOTYPIC:
-        dataset = createMultiAllelicGenotypicDataset(path, fileType) ;
-        break;
-      case PHENOTYPIC:
-        dataset = createPhenotypicDataset(path, fileType) ;
-        
-        ZipFeatureDatasetWriter writer = new ZipFeatureDatasetWriter(Paths.get(getPath().toString(), dataset.getUniqueIdentifier()).toFile()) ;
-        
-        writer.write(dataset);
-        break;
-      default:
-        throw new IllegalArgumentException("Unknown dataset type : " + datasetType) ;
-    }
-    
-    return dataset ;
-  }
+    public FileBasedDatasetServices(Path path) throws DatasetException {
+	setPath(path);
 
-  private Dataset createBiAllelicGenotypicDataset(Path path, FileType fileType) throws DatasetException
-  {
-    // TODO Auto-generated method stub
-    return null;
-  }
+	initialise();
+    }
 
-  private Dataset createMultiAllelicGenotypicDataset(Path path, FileType fileType) throws DatasetException
-  {
-    // TODO Auto-generated method stub
-    return null;
-  }
+    public synchronized final Path getPath() {
+	return path;
+    }
 
-  private Dataset createPhenotypicDataset(Path path, FileType fileType) throws DatasetException
-  {
-    return ArrayFeatureDataset.readFeatureDatasetFromTextFile(path.toFile(), fileType);
-  }
-  
-  private XStream createXStream()
-  {
-    XStream xstream = new XStream(new StaxDriver());
-    
-    xstream.setClassLoader(getClass().getClassLoader()) ;
-    
-    return xstream ;
-  }
+    protected synchronized final void setPath(Path path) {
+	if (path == null)
+	    throw new IllegalArgumentException("Path must be defined!");
+
+	this.path = path;
+    }
+
+    @Override
+    public List<Dataset> getAllDatasets() throws DatasetException {
+	if (datasetCache == null) {
+	    datasetCache = new ArrayList<Dataset>(datasetDescriptions.size());
+
+	    Iterator<SimpleEntity> iterator = datasetDescriptions.iterator();
+
+	    while (iterator.hasNext())
+		datasetCache.add(getDataset(iterator.next().getUniqueIdentifier()));
+	}
+
+	return datasetCache;
+    }
+
+    @Override
+    public List<SimpleEntity> getDatasetDescriptions() {
+	return datasetDescriptions;
+    }
+
+    @Override
+    public Dataset getDataset(String datasetId) throws DatasetException {
+	if (datasetMap.containsKey(datasetId)) {
+	    return datasetMap.get(datasetId);
+	} else {
+	    Dataset dataset = loadDataset(datasetId);
+
+	    datasetMap.put(datasetId, dataset);
+
+	    return dataset;
+	}
+    }
+
+    @Override
+    public void addDataset(Path path, FileType fileType, DatasetType datasetType) throws DatasetException {
+	Dataset dataset = createDataset(path, fileType, datasetType);
+
+	if (!datasetMap.containsKey(dataset.getUniqueIdentifier())) {
+	    datasetDescriptions.add(new SimpleEntityPojo(dataset));
+	    datasetMap.put(dataset.getUniqueIdentifier(), dataset);
+
+	    if (datasetCache != null)
+		datasetCache.add(dataset);
+
+	    XStream xstream = createXStream();
+
+	    OutputStream outputStream;
+
+	    try {
+		outputStream = Files.newOutputStream(Paths.get(getPath().toString(), DATASET_DESCRIPTIONS));
+
+		xstream.toXML(datasetDescriptions, outputStream);
+	    } catch (IOException e) {
+		throw new DatasetException(e);
+	    }
+	} else {
+	    throw new DatasetException("Dataset already present : " + dataset.getUniqueIdentifier());
+	}
+    }
+
+    @Override
+    public void removeDataset(String datasetId) throws DatasetException {
+	Dataset dataset = getDataset(datasetId);
+
+	if (dataset != null) {
+	    ListIterator<SimpleEntity> listIterator = datasetDescriptions.listIterator();
+
+	    boolean found = false;
+
+	    while (!found && listIterator.hasNext()) {
+		found = datasetId.equals(listIterator.next().getUniqueIdentifier());
+
+		if (found)
+		    listIterator.remove();
+	    }
+
+	    datasetDescriptions.remove(datasetId);
+
+	    Dataset removed = datasetMap.remove(datasetId);
+
+	    if (removed != null && datasetCache != null)
+		datasetCache.remove(dataset);
+	}
+    }
+
+    @SuppressWarnings("unchecked")
+    private void initialise() throws DatasetException {
+	try {
+	    Path datasetDescriptionsPath = Paths.get(getPath().toString(), DATASET_DESCRIPTIONS);
+
+	    if (Files.exists(datasetDescriptionsPath)) {
+		InputStream inputStream = Files.newInputStream(datasetDescriptionsPath);
+
+		XStream xstream = createXStream();
+
+		datasetDescriptions = (List<SimpleEntity>) xstream.fromXML(inputStream);
+	    } else {
+		datasetDescriptions = new ArrayList<SimpleEntity>();
+	    }
+
+	    datasetMap = new HashMap<String, Dataset>();
+	    datasetCache = null;
+	} catch (IOException e) {
+	    throw new DatasetException(e);
+	}
+    }
+
+    private Dataset loadDataset(String datasetId) throws DatasetException {
+	Dataset dataset = null;
+
+	ZipFeatureDatasetReader reader = new ZipFeatureDatasetReader(
+		Paths.get(getPath().toString(), datasetId).toFile());
+
+	dataset = reader.read();
+
+	return dataset;
+    }
+
+    private Dataset createDataset(Path path, FileType fileType, DatasetType datasetType) throws DatasetException {
+	Dataset dataset = null;
+
+	switch (datasetType) {
+	case BI_ALLELIC_GENOTYPIC:
+	    dataset = createBiAllelicGenotypicDataset(path, fileType);
+	    break;
+	case MULTI_ALLELIC_GENOTYPIC:
+	    dataset = createMultiAllelicGenotypicDataset(path, fileType);
+	    break;
+	case PHENOTYPIC:
+	    dataset = createPhenotypicDataset(path, fileType);
+
+	    ZipFeatureDatasetWriter writer = new ZipFeatureDatasetWriter(
+		    Paths.get(getPath().toString(), dataset.getUniqueIdentifier()).toFile());
+
+	    writer.write(dataset);
+	    break;
+	default:
+	    throw new IllegalArgumentException("Unknown dataset type : " + datasetType);
+	}
+
+	return dataset;
+    }
+
+    private Dataset createBiAllelicGenotypicDataset(Path path, FileType fileType) throws DatasetException {
+	// TODO Auto-generated method stub
+	return null;
+    }
+
+    private Dataset createMultiAllelicGenotypicDataset(Path path, FileType fileType) throws DatasetException {
+	// TODO Auto-generated method stub
+	return null;
+    }
+
+    private Dataset createPhenotypicDataset(Path path, FileType fileType) throws DatasetException {
+	return ArrayFeatureDataset.readFeatureDatasetFromTextFile(path.toFile(), fileType);
+    }
+
+    private XStream createXStream() {
+	XStream xstream = new XStream(new StaxDriver());
+
+	xstream.setClassLoader(getClass().getClassLoader());
+
+	return xstream;
+    }
 }

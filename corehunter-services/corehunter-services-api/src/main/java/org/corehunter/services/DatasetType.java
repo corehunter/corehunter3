@@ -15,21 +15,17 @@
  *******************************************************************************/
 package org.corehunter.services;
 
-public enum DatasetType
-{
-  PHENOTYPIC ("Phenotypic"),
-  BI_ALLELIC_GENOTYPIC ("Bi-allelic Genotypic"),
-  MULTI_ALLELIC_GENOTYPIC ("Multi-allelic Genotypic") ;
-  
-  private String name;
+public enum DatasetType {
+    PHENOTYPIC("Phenotypic"), BI_ALLELIC_GENOTYPIC("Bi-allelic Genotypic"), MULTI_ALLELIC_GENOTYPIC(
+	    "Multi-allelic Genotypic");
 
-  private DatasetType(String name)
-  {
-    this.name = name ;
-  }
+    private String name;
 
-  public synchronized final String getName()
-  {
-    return name;
-  }
+    private DatasetType(String name) {
+	this.name = name;
+    }
+
+    public synchronized final String getName() {
+	return name;
+    }
 }

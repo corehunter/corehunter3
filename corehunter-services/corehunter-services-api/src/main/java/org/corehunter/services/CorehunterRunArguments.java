@@ -15,7 +15,6 @@
  *******************************************************************************/
 package org.corehunter.services;
 
-public interface CorehunterRunArguments
-{
+public interface CorehunterRunArguments {
 
 }
