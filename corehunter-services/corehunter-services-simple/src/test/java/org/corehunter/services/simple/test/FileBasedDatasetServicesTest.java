@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
+
 package org.corehunter.services.simple.test;
 
 import static org.junit.Assert.assertEquals;
@@ -44,102 +45,102 @@ public class FileBasedDatasetServicesTest {
 
     @Test
     public void testSimpleAddAndRemove() {
-	try {
-	    FileBasedDatasetServices fileBasedDatasetServices = new FileBasedDatasetServices(
-		    Files.createTempDirectory(null));
+        try {
+            FileBasedDatasetServices fileBasedDatasetServices = new FileBasedDatasetServices(
+                    Files.createTempDirectory(null));
 
-	    Path phenotypicDataPath = Paths.get(ClassLoader.getSystemResource(PHENOTYPIC_FILE).toURI());
+            Path phenotypicDataPath = Paths.get(ClassLoader.getSystemResource(PHENOTYPIC_FILE).toURI());
 
-	    fileBasedDatasetServices.addDataset(phenotypicDataPath, FileType.CSV, DatasetType.PHENOTYPIC);
+            fileBasedDatasetServices.addDataset(phenotypicDataPath, FileType.CSV, DatasetType.PHENOTYPIC);
 
-	    List<SimpleEntity> datasetDescriptions = fileBasedDatasetServices.getDatasetDescriptions();
+            List<SimpleEntity> datasetDescriptions = fileBasedDatasetServices.getDatasetDescriptions();
 
-	    assertEquals("Number of dataset id is not 1", 1, datasetDescriptions.size());
+            assertEquals("Number of dataset id is not 1", 1, datasetDescriptions.size());
 
-	    SimpleEntity datasetId = datasetDescriptions.get(0);
+            SimpleEntity datasetId = datasetDescriptions.get(0);
 
-	    assertNotNull("Dataset 1 id is null", datasetId);
-	    assertNotNull("Dataset 1 name is null", datasetId.getName());
-	    assertNotNull("Dataset 1 UniqueIdentifier is null", datasetId.getUniqueIdentifier());
+            assertNotNull("Dataset 1 id is null", datasetId);
+            assertNotNull("Dataset 1 name is null", datasetId.getName());
+            assertNotNull("Dataset 1 UniqueIdentifier is null", datasetId.getUniqueIdentifier());
 
-	    Dataset dataset1 = fileBasedDatasetServices.getDataset(datasetId.getUniqueIdentifier());
+            Dataset dataset1 = fileBasedDatasetServices.getDataset(datasetId.getUniqueIdentifier());
 
-	    assertTrue("Dataset is not correct type", dataset1 instanceof FeatureDataset);
+            assertTrue("Dataset is not correct type", dataset1 instanceof FeatureDataset);
 
-	    assertEquals("Number of dataset 1 name is not correct", NAME1, dataset1.getName());
-	    assertEquals("Number of dataset 1 UniqueIdentifier is not correct", UNIQUE_IDENTIFIER1,
-		    dataset1.getUniqueIdentifier());
-	    assertEquals("Number of dataset 1 Description is not correct", DESCRIPTION1 + phenotypicDataPath.toString(),
-		    dataset1.getDescription());
-	    assertEquals("Number of dataset 1 Abbreviation is not correct", ABBREVIATION1, dataset1.getAbbreviation());
+            assertEquals("Number of dataset 1 name is not correct", NAME1, dataset1.getName());
+            assertEquals("Number of dataset 1 UniqueIdentifier is not correct", UNIQUE_IDENTIFIER1,
+                    dataset1.getUniqueIdentifier());
+            assertEquals("Number of dataset 1 Description is not correct", DESCRIPTION1 + phenotypicDataPath.toString(),
+                    dataset1.getDescription());
+            assertEquals("Number of dataset 1 Abbreviation is not correct", ABBREVIATION1, dataset1.getAbbreviation());
 
-	    List<Dataset> datasets = fileBasedDatasetServices.getAllDatasets();
+            List<Dataset> datasets = fileBasedDatasetServices.getAllDatasets();
 
-	    assertEquals("Number of dataset is not 1", 1, datasets.size());
+            assertEquals("Number of dataset is not 1", 1, datasets.size());
 
-	    assertTrue("dataset 1 not in list of Datasets", datasets.contains(dataset1));
+            assertTrue("dataset 1 not in list of Datasets", datasets.contains(dataset1));
 
-	    fileBasedDatasetServices.removeDataset(datasetId.getUniqueIdentifier());
+            fileBasedDatasetServices.removeDataset(datasetId.getUniqueIdentifier());
 
-	    datasetDescriptions = fileBasedDatasetServices.getDatasetDescriptions();
+            datasetDescriptions = fileBasedDatasetServices.getDatasetDescriptions();
 
-	    assertEquals("Number of dataset id is not 0", 0, datasetDescriptions.size());
+            assertEquals("Number of dataset id is not 0", 0, datasetDescriptions.size());
 
-	    datasets = fileBasedDatasetServices.getAllDatasets();
+            datasets = fileBasedDatasetServices.getAllDatasets();
 
-	    assertEquals("Number of dataset is not 0", 0, datasets.size());
+            assertEquals("Number of dataset is not 0", 0, datasets.size());
 
-	} catch (Exception e) {
-	    e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
 
-	    fail(e.getMessage());
-	}
+            fail(e.getMessage());
+        }
     }
 
     @Test
     public void testSimpleRestore() {
-	try {
-	    FileBasedDatasetServices fileBasedDatasetServices = new FileBasedDatasetServices(
-		    Files.createTempDirectory(null));
+        try {
+            FileBasedDatasetServices fileBasedDatasetServices = new FileBasedDatasetServices(
+                    Files.createTempDirectory(null));
 
-	    Path path = fileBasedDatasetServices.getPath();
+            Path path = fileBasedDatasetServices.getPath();
 
-	    Path phenotypicDataPath = Paths.get(ClassLoader.getSystemResource(PHENOTYPIC_FILE).toURI());
+            Path phenotypicDataPath = Paths.get(ClassLoader.getSystemResource(PHENOTYPIC_FILE).toURI());
 
-	    fileBasedDatasetServices.addDataset(phenotypicDataPath, FileType.CSV, DatasetType.PHENOTYPIC);
+            fileBasedDatasetServices.addDataset(phenotypicDataPath, FileType.CSV, DatasetType.PHENOTYPIC);
 
-	    fileBasedDatasetServices = new FileBasedDatasetServices(path);
+            fileBasedDatasetServices = new FileBasedDatasetServices(path);
 
-	    List<SimpleEntity> datasetDescriptions = fileBasedDatasetServices.getDatasetDescriptions();
+            List<SimpleEntity> datasetDescriptions = fileBasedDatasetServices.getDatasetDescriptions();
 
-	    assertEquals("Number of dataset id is not 1", 1, datasetDescriptions.size());
+            assertEquals("Number of dataset id is not 1", 1, datasetDescriptions.size());
 
-	    SimpleEntity datasetId = datasetDescriptions.get(0);
+            SimpleEntity datasetId = datasetDescriptions.get(0);
 
-	    assertNotNull("Dataset 1 id is null", datasetId);
-	    assertNotNull("Dataset 1 name is null", datasetId.getName());
-	    assertNotNull("Dataset 1 UniqueIdentifier is null", datasetId.getUniqueIdentifier());
+            assertNotNull("Dataset 1 id is null", datasetId);
+            assertNotNull("Dataset 1 name is null", datasetId.getName());
+            assertNotNull("Dataset 1 UniqueIdentifier is null", datasetId.getUniqueIdentifier());
 
-	    Dataset dataset1 = fileBasedDatasetServices.getDataset(datasetId.getUniqueIdentifier());
+            Dataset dataset1 = fileBasedDatasetServices.getDataset(datasetId.getUniqueIdentifier());
 
-	    assertTrue("Dataset is not correct type", dataset1 instanceof FeatureDataset);
+            assertTrue("Dataset is not correct type", dataset1 instanceof FeatureDataset);
 
-	    assertEquals("Number of dataset 1 name is not correct", NAME1, dataset1.getName());
-	    assertEquals("Number of dataset 1 UniqueIdentifier is not correct", UNIQUE_IDENTIFIER1,
-		    dataset1.getUniqueIdentifier());
-	    assertEquals("Number of dataset 1 Description is not correct", DESCRIPTION1 + phenotypicDataPath.toString(),
-		    dataset1.getDescription());
-	    assertEquals("Number of dataset 1 Abbreviation is not correct", ABBREVIATION1, dataset1.getAbbreviation());
+            assertEquals("Number of dataset 1 name is not correct", NAME1, dataset1.getName());
+            assertEquals("Number of dataset 1 UniqueIdentifier is not correct", UNIQUE_IDENTIFIER1,
+                    dataset1.getUniqueIdentifier());
+            assertEquals("Number of dataset 1 Description is not correct", DESCRIPTION1 + phenotypicDataPath.toString(),
+                    dataset1.getDescription());
+            assertEquals("Number of dataset 1 Abbreviation is not correct", ABBREVIATION1, dataset1.getAbbreviation());
 
-	    List<Dataset> datasets = fileBasedDatasetServices.getAllDatasets();
+            List<Dataset> datasets = fileBasedDatasetServices.getAllDatasets();
 
-	    assertEquals("Number of dataset is not 1", 1, datasets.size());
+            assertEquals("Number of dataset is not 1", 1, datasets.size());
 
-	    assertTrue("dataset 1 not in list of Datasets", datasets.contains(dataset1));
-	} catch (Exception e) {
-	    e.printStackTrace();
+            assertTrue("dataset 1 not in list of Datasets", datasets.contains(dataset1));
+        } catch (Exception e) {
+            e.printStackTrace();
 
-	    fail(e.getMessage());
-	}
+            fail(e.getMessage());
+        }
     }
 }
