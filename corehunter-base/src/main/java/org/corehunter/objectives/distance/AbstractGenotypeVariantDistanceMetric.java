@@ -22,6 +22,7 @@ package org.corehunter.objectives.distance;
 import java.util.Set;
 
 import org.corehunter.data.GenotypeVariantData;
+import org.corehunter.data.Header;
 
 /**
  * @author Guy Davenport
@@ -60,7 +61,7 @@ public abstract class AbstractGenotypeVariantDistanceMetric<GenotypeVariantDataT
     }
     
     @Override
-    public String getName(int id) {
+    public Header getHeader(int id) {
         throw new UnsupportedOperationException("Not supported yet."); 
     }
 

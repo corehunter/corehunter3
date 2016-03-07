@@ -27,8 +27,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 
 import org.corehunter.data.DistanceMatrixData;
+import org.corehunter.data.Header;
 import org.corehunter.data.matrix.SymmetricMatrixFormat;
 import org.corehunter.util.StringUtils;
 import uno.informatics.common.io.FileProperties;
@@ -46,12 +48,14 @@ import uno.informatics.common.io.RowReader;
 public class SimpleDistanceMatrixData extends SimpleNamedData implements DistanceMatrixData {
 
     private static final double DELTA = 1e-10;
+    private static final String NAMES_HEADER = "NAME";
+    private static final String IDENTIFIERS_HEADER = "ID";
     
     // distance matrix
     private final double[][] distances;
 
     /**
-     * Create distance matrix with given distances (two-dimensional array).
+     * Create distance matrix with given distances.
      * Distances are copied to an internal data structure. The dataset name
      * is set to "Precomputed distance matrix".
      * <p>
@@ -64,60 +68,59 @@ public class SimpleDistanceMatrixData extends SimpleNamedData implements Distanc
      */
     public SimpleDistanceMatrixData(double[][] distances) {
         // name of each item is set to null
-        this(new String[distances.length], distances);
+        this(new Header[distances.length], distances);
     }
     
     /**
-     * Create distance matrix data given the item names (array) and distances (two-dimensional array).
-     * Item names and distances are copied to internal data structures. The dataset name is set to
+     * Create distance matrix data given the item headers and distances.
+     * Item headers and distances are copied to internal data structures. The dataset name is set to
      * "Precomputed distance matrix".
      * <p>
      * All values should be positive and the diagonal values equal to zero.
      * The distance matrix should be symmetric with all rows of equal length.
      * Violating any of these requirements will produce an exception.
      * <p>
-     * Item names are optional, missing names should be encoded as <code>null</code>
-     * values in the name array. Alternatively, if no names are assigned to any items,
-     * <code>itemNames</code> itself may also be <code>null</code>.
+     * Item headers are optional, missing headers should be encoded as <code>null</code>
+     * values in the header array. Alternatively, if no headers are assigned to any items,
+     * <code>headers</code> itself may also be <code>null</code>.
      * 
-     * @param itemNames item names, <code>null</code> if no names are assigned; if not
+     * @param headers item headers, <code>null</code> if no headers are assigned; if not
      *                  <code>null</code> its length should be the same as the dimension
      *                  of the given distance matrix
      * @param distances distance matrix (symmetric)
      * @throws IllegalArgumentException if an illegal distance matrix is given
-     *                                  or the number of names does not match
+     *                                  or the number of headers does not match
      *                                  the dimension of the distance matrix
      */
-    public SimpleDistanceMatrixData(String[] itemNames, double[][] distances) {
-        this("Precomputed distance matrix", itemNames, distances);
+    public SimpleDistanceMatrixData(Header[] headers, double[][] distances) {
+        this("Precomputed distance matrix", headers, distances);
     }
     
     /**
-     * Create distance matrix data given the dataset name, item names (array)
-     * and distances (two-dimensional array). Item names and distances
-     * are copied to internal data structures.
+     * Create distance matrix data given the dataset name, item headers and distances.
+     * Item headers and distances are copied to internal data structures.
      * <p>
      * All values should be positive and the diagonal values equal to zero.
      * The distance matrix should be symmetric with all rows of equal length.
      * Violating any of these requirements will produce an exception.
      * <p>
-     * Item names are optional, missing names should be encoded as <code>null</code>
-     * values in the name array. Alternatively, if no names are assigned to any items,
-     * <code>itemNames</code> itself may also be <code>null</code>.
+     * Item headers are optional, missing headers should be encoded as <code>null</code>
+     * values in the header array. Alternatively, if no headers are assigned to any items,
+     * <code>headers</code> itself may also be <code>null</code>.
      * 
      * @param name dataset name
-     * @@param itemNames item names, <code>null</code> if no names are assigned; if not
+     * @param headers item headers, <code>null</code> if no headers are assigned; if not
      *                  <code>null</code> its length should be the same as the dimension
      *                  of the given distance matrix
      * @param distances distance matrix (symmetric)
      * @throws IllegalArgumentException if an illegal distance matrix is given
-     *                                  or the number of names does not match
+     *                                  or the number of headers does not match
      *                                  the dimension of the distance matrix
      */
-    public SimpleDistanceMatrixData(String name, String[] itemNames, double[][] distances) {
+    public SimpleDistanceMatrixData(String name, Header[] headers, double[][] distances) {
         
-        // pass dataset name, size and item names to parent
-        super(name, distances.length, itemNames);
+        // pass dataset name, size and item headers to parent
+        super(name, distances.length, headers);
         
         // validate distances and copy to internal array
         int n = distances.length;
@@ -163,23 +166,24 @@ public class SimpleDistanceMatrixData extends SimpleNamedData implements Distanc
      * or {@link SymmetricMatrixFormat#LOWER_DIAG}) these should equal zero. If the full matrix is specified it
      * should be symmetric. Violating these requirements will produce an exception.
      * <p>
-     * If <code>named</code> is <code>true</code> the first line of the file should contain the accession names.
-     * Leading and trailing whitespace is removed from accession names and they are unquoted if wrapped in single
-     * or double quotes after whitespace removal. If it is intended to start or end a name with whitespace this
-     * whitespace should be contained within the quotes, as it will then not be removed. Missing item names are
-     * set to <code>null</code>. The dataset name is set to the name of the file to which <code>filePath</code>
-     * points.
+     * Two optional header rows can be added at the beginning of the file to specify individual names and/or
+     * unique identifiers. The former is identified with row header "NAME", the latter with row header "ID".
+     * Assigned identifiers should be unique and are used to distinguish between individuals with the same
+     * name. Leading and trailing whitespace is removed from names and unique identifiers and they are
+     * unquoted if wrapped in single or double quotes after whitespace removal. If it is intended to start or end
+     * a name/identifier with whitespace this whitespace should be contained within the quotes, as it will then
+     * not be removed. It is allowed that names and/or identifiers are missing for some individuals.
+     * <p>
+     * The dataset name is set to the name of the file to which <code>filePath</code> points.
      * 
      * @param filePath path to file that contains the data
      * @param type {@link FileType#TXT} or {@link FileType#CSV}
      * @param format specifies how the symmetric distance matrix is encoded in the file
-     * @param named indicates whether a header row with accession names is included
      * @return distance matrix data
      * @throws IOException if the file can not be read or is not correctly formatted
      */
     public static final SimpleDistanceMatrixData readData(Path filePath, FileType type,
-                                                          SymmetricMatrixFormat format,
-                                                          boolean named) throws IOException {
+                                                          SymmetricMatrixFormat format) throws IOException {
         
         // validate arguments
         
@@ -201,8 +205,6 @@ public class SimpleDistanceMatrixData extends SimpleNamedData implements Distanc
             );
         }
 
-        // row counter
-        int r = 0;
         // read data from file
         try (RowReader reader = IOUtilities.createRowReader(
                 new FileProperties(filePath.toFile(), type)
@@ -216,46 +218,72 @@ public class SimpleDistanceMatrixData extends SimpleNamedData implements Distanc
                 throw new IOException("File is empty.");
             }
             
-            // read names if included
-            String[] names = null;
-            if(named){
-                // go to row with names
-                reader.nextRow();
-                // read, trim and unquote names
-                names = Arrays.stream(reader.getRowCellsAsStringArray())
-                              .map(name -> StringUtils.unquote(StringUtils.trim(name)))
-                              .toArray(n -> new String[n]);
-                // next row
-                r++;
-            }
-            
-            // read data rows
-            List<List<Double>> rows = new ArrayList<>();
+            // read row per row
+            List<List<Double>> datarows = new ArrayList<>();
+            List<Double> row;
+            String firstCell;
             int rowCount, prevRowCount = Constants.UNKNOWN_COUNT;
+            int r = 0; // row counter
+            String[] names = null;
+            String[] identifiers  = null;
             while(reader.nextRow()){
                                 
-                // read row
-                List<Double> row = reader.getRowCellsAsDouble();
-                rowCount = row.size();
+                // peek first cell
+                reader.nextColumn();
+                firstCell = reader.getCellAsString();
                 
-                // check number of values
-                checkNumValuesInRow(format, r, rowCount, prevRowCount);
-                
-                // store
-                rows.add(row);
+                switch (StringUtils.trimAndUnquote(firstCell)) {
+                    
+                    // names
+                    case NAMES_HEADER:
+                        
+                        // check: no data rows read yet
+                        if(!datarows.isEmpty()){
+                            throw new IOException("Row NAME should be at the top of the file.");
+                        }
+                        // read names
+                        reader.nextColumn();
+                        names = trimAndUnquote(reader.getRowCellsAsStringArray());
+                        break;
+                    
+                    // identifiers
+                    case IDENTIFIERS_HEADER:
+                        
+                        // check: no data rows read yet
+                        if(!datarows.isEmpty()){
+                            throw new IOException("Row ID should be at the top of the file.");
+                        }
+                        // read identifiers
+                        reader.nextColumn();
+                        identifiers = trimAndUnquote(reader.getRowCellsAsStringArray());
+                        break;
+                        
+                    // data row
+                    default:
+                        
+                        // read values
+                        row = reader.getRowCellsAsDouble();
+                        // check number of values
+                        rowCount = row.size();
+                        checkNumValuesInRow(format, r, rowCount, prevRowCount);
+                        // store
+                        datarows.add(row);
+                        prevRowCount = rowCount;
+                        break;
+                        
+                }
                 
                 // next row
-                prevRowCount = rowCount;
                 r++;
                 
             }
             
-            if(rows.isEmpty()){
+            if(datarows.isEmpty()){
                 throw new IOException("No data rows in file.");
             }
             
             // infer number of accessions
-            int n = rows.get(rows.size()-1).size();
+            int n = datarows.get(datarows.size()-1).size();
             if(format == SymmetricMatrixFormat.LOWER){
                 // diagonal not included
                 n++;
@@ -263,10 +291,10 @@ public class SimpleDistanceMatrixData extends SimpleNamedData implements Distanc
             
             // check number of rows
             int expectedRows = (format == SymmetricMatrixFormat.LOWER) ? n-1 : n;
-            if(rows.size() != expectedRows){
+            if(datarows.size() != expectedRows){
                 throw new IOException(String.format(
                         "Incorrect number of data rows. Expected: %d, actual: %d.",
-                        expectedRows, rows.size()
+                        expectedRows, datarows.size()
                 ));
             }
             
@@ -277,14 +305,35 @@ public class SimpleDistanceMatrixData extends SimpleNamedData implements Distanc
                 );
             }
             
+            // check number of identifiers
+            if(identifiers != null && identifiers.length != n){
+                throw new IOException(
+                        String.format(
+                                "Incorrect number of identifiers. Expected: %d, actual: %d.",
+                                n, identifiers.length
+                        )
+                );
+            }
+            
+            // combine names and identifiers in headers
+            Header[] headers = null;
+            if(names != null || identifiers != null){
+                headers = new Header[n];
+                for(int i = 0; i < n; i++){
+                    String name = names != null ? names[i] : null;
+                    String identifier = identifiers != null ? identifiers[i] : null;
+                    headers[i] = new Header(name, identifier);
+                }
+            }
+            
             // init distance matrix
             double[][] dist = new double[n][n];
             // skip first row if lower triangular encoding without diagonal
             int s = (format == SymmetricMatrixFormat.LOWER) ? 1 : 0;
             // fill matrix
-            Iterator<List<Double>> rowIterator = rows.iterator();
+            Iterator<List<Double>> rowIterator = datarows.iterator();
             for(r = s; r < n; r++){
-                List<Double> row = rowIterator.next();
+                row = rowIterator.next();
                 for(int c = 0; c < row.size(); c++){
                     dist[r][c] = row.get(c);
                 }
@@ -301,13 +350,20 @@ public class SimpleDistanceMatrixData extends SimpleNamedData implements Distanc
             
             try{
                 // create data
-                return new SimpleDistanceMatrixData(filePath.getFileName().toString(), names, dist);
+                return new SimpleDistanceMatrixData(filePath.getFileName().toString(), headers, dist);
             } catch(IllegalArgumentException ex){
                 // convert to IO exception
                 throw new IOException(ex.getMessage());
             }
 
         }
+    }
+    
+    private static String[] trimAndUnquote(String[] str){
+        return Arrays.stream(str)
+                     .map(name -> StringUtils.trimAndUnquote(name))         // trim and unquote
+                     .map(name -> Objects.equals(name, "") ? null : name)   // replace empty strings by null
+                     .toArray(n -> new String[n]);                          // dump in array
     }
     
     private static void checkNumValuesInRow(SymmetricMatrixFormat format, int row,

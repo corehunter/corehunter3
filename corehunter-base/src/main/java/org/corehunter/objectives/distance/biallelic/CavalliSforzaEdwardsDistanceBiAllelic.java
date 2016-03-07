@@ -24,6 +24,7 @@ import java.util.Set;
 import org.corehunter.data.BiAllelicGenotypeVariantData;
 import org.corehunter.objectives.distance.GenotypeVariantDistanceMetric;
 import org.corehunter.data.GenotypeVariantData;
+import org.corehunter.data.Header;
 
 public class CavalliSforzaEdwardsDistanceBiAllelic
         implements GenotypeVariantDistanceMetric<GenotypeVariantData> {
@@ -51,7 +52,7 @@ public class CavalliSforzaEdwardsDistanceBiAllelic
     }
 
     @Override
-    public String getName(int id) {
+    public Header getHeader(int id) {
         throw new UnsupportedOperationException("Not supported yet."); 
     }
 

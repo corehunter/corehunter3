@@ -21,21 +21,24 @@ package org.corehunter.data.simple;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import org.corehunter.data.Header;
 import org.corehunter.data.NamedData;
+import uno.informatics.data.SimpleEntity;
 
 /**
- * Stores names of n dataset entries which are assigned consecutive IDs from 0 to n-1.
+ * Stores headers of n dataset entries which are assigned consecutive IDs from 0 to n-1.
  * 
  * @author Guy Davenport, Herman De Beukelaer
  */
 public class SimpleNamedData implements NamedData {
 
-    // item names
-    private final String[] names;
+    // headers
+    private final Header[] headers;
     // item IDs (0..n-1)
     private final Set<Integer> ids;
     
@@ -64,43 +67,59 @@ public class SimpleNamedData implements NamedData {
     }
     
     /**
-     * Initialize data with given dataset and item names. IDs are set to [0, n-1].
-     * Missing item names should be encoded as <code>null</code> values in the array.
-     * Alternatively, if no names are assigned to any items, <code>names</code> itself
+     * Initialize data with given dataset name and item headers. IDs are set to [0, n-1].
+     * Missing item headers should be encoded as <code>null</code> values in the array.
+     * Alternatively, if no headers are assigned to any items, <code>headers</code> itself
      * may also be <code>null</code>.
      * 
      * @param datasetName name of the dataset
      * @param n number of entries
-     * @param names item names, <code>null</code> if no names are assigned;
-     *              if not <code>null</code> its length should equal <code>n</code>
+     * @param headers item headers, <code>null</code> if no headers are assigned;
+     *                if not <code>null</code> its length should equal <code>n</code>
      * @throws IllegalArgumentException if an incorrect number of names are specified
      */
-    public SimpleNamedData(String datasetName, int n, String[] names){
+    public SimpleNamedData(String datasetName, int n, Header[] headers){
         ids = Collections.unmodifiableSet(
                 IntStream.range(0, n).boxed().collect(Collectors.toSet())
         );
         this.datasetName = datasetName;
-        if(names == null){
-            this.names = new String[n];
+        if(headers == null){
+            this.headers = new Header[n];
         } else {
-            if(names.length != n){
+            if(headers.length != n){
                 throw new IllegalArgumentException(String.format(
-                        "Incorrect number of names. Expected: %d, actual: %d.", n, names.length
+                        "Incorrect number of headers. Expected: %d, actual: %d.", n, headers.length
                 ));
             }
-            this.names = Arrays.copyOf(names, n);
+            // check unique identifiers
+            Set<String> identifiers = new HashSet<>();
+            for(SimpleEntity header : headers){
+                if(header != null){
+                    String identifier = header.getUniqueIdentifier();
+                    if(identifier != null && !identifiers.add(identifier)){
+                        throw new IllegalArgumentException("Identifiers are not unique. "
+                                + "Duplicate identifier: " + identifier + ".");
+                    }
+                }
+            }
+            this.headers = Arrays.copyOf(headers, n);
         }
     }
     
     @Override
-    public String getName(int id) throws NoSuchElementException {
+    public Header getHeader(int id) throws NoSuchElementException {
         validateId(id);
-        return names[id];
+        return headers[id];
     }
     
-    public void setName(int id, String name){
+    public void setHeader(int id, Header header){
         validateId(id);
-        names[id] = name;
+        // check unique identifier
+        String identifier = header.getUniqueIdentifier();
+        if(identifier != null && Arrays.stream(headers).anyMatch(h -> h.getUniqueIdentifier().equals(identifier))){
+            throw new IllegalArgumentException("Identifier " + identifier + " already assigned");
+        }
+        headers[id] = header;
     }
     
     private void validateId(int id){
@@ -116,7 +135,7 @@ public class SimpleNamedData implements NamedData {
 
     @Override
     public int getDatasetSize() {
-        return names.length;
+        return headers.length;
     }
     
     /**

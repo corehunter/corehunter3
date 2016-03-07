@@ -21,6 +21,7 @@ package org.corehunter.tests;
 
 import java.util.Set;
 import java.util.TreeSet;
+import org.corehunter.data.Header;
 
 import org.corehunter.data.simple.SimpleDistanceMatrixData;
 import org.jamesframework.core.problems.objectives.evaluations.Evaluation;
@@ -43,8 +44,21 @@ public class TestData {
     public static final String NAME = "Test Dataset";
 
     public static final String[] NAMES = new String[]{
-        "Name 1", null, "Name 3", "Name 4", "Name 5"
+        "Alice", null, "Bob", "Carol", "Bob"
     };
+    
+    public static final String[] UNIQUE_IDENTIFIERS = new String[]{
+        "acc-1", "acc-2", "acc-3", "acc-4", "acc-5"
+    };
+    
+    public static final Header[] HEADERS;
+    
+    static{
+        HEADERS = new Header[NAMES.length];
+        for(int i = 0; i < HEADERS.length; i++){
+            HEADERS[i] = new Header(NAMES[i], UNIQUE_IDENTIFIERS[i]);
+        }
+    }
 
     public static final Set<Integer> SET = new TreeSet<>();
 
@@ -63,7 +77,7 @@ public class TestData {
         SUBSET1.add(3);
     }
 
-    public static final SimpleDistanceMatrixData DATA = new SimpleDistanceMatrixData(NAME, NAMES, DISTANCES);
+    public static final SimpleDistanceMatrixData DATA = new SimpleDistanceMatrixData(NAME, HEADERS, DISTANCES);
 
     public static final String[] MARKER_NAMES = new String[]{
         "mk1",

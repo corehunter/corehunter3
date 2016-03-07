@@ -22,20 +22,20 @@ package org.corehunter.data;
 import org.jamesframework.core.problems.datatypes.IntegerIdentifiedData;
 
 /**
- * Extends {@link IntegerIdentifiedData} by optionally assigning a name to each entry.
+ * Extends {@link IntegerIdentifiedData} by optionally assigning a header to each entry.
  *
  * @author Guy Davenport, Herman De Beukelaer
  */
 public interface NamedData extends IntegerIdentifiedData {
 
     /**
-     * Get the name of an entry by id.
+     * Get the header of an entry by id.
      *
      * @param id of an entry, should be within the range from 0 to n-1, where n is the number of
      *           entries as returned by {@link #getDatasetSize()}
-     * @return the name of an entry by id, <code>null</code> if no name is assigned to this entry
+     * @return the header of an entry by id, <code>null</code> if no header is assigned to this entry
      */
-    public String getName(int id);
+    public Header getHeader(int id);
     
     /**
      * Get the number of entries in the dataset.

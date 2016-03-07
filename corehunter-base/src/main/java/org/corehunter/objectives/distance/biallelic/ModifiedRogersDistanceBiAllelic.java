@@ -24,6 +24,7 @@ import java.util.Set;
 import org.corehunter.data.BiAllelicGenotypeVariantData;
 import org.corehunter.objectives.distance.GenotypeVariantDistanceMetric;
 import org.corehunter.data.GenotypeVariantData;
+import org.corehunter.data.Header;
 
 public class ModifiedRogersDistanceBiAllelic implements GenotypeVariantDistanceMetric<GenotypeVariantData> {
 
@@ -50,7 +51,7 @@ public class ModifiedRogersDistanceBiAllelic implements GenotypeVariantDistanceM
     }
 
     @Override
-    public String getName(int id) {
+    public Header getHeader(int id) {
         throw new UnsupportedOperationException("Not supported yet."); 
     }
 

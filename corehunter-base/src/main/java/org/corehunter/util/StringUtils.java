@@ -56,4 +56,14 @@ public class StringUtils {
         return str;
     }
     
+    /**
+     * First trim and then unquote the given string. 
+     * 
+     * @param str string to trim and unquote
+     * @return trimmed, unquoted string; <code>null</code> if input was <code>null</code>
+     */
+    public static String trimAndUnquote(String str){
+        return unquote(trim(str));
+    }
+    
 }
