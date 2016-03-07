@@ -22,6 +22,7 @@ package org.corehunter.data.simple;
 import static uno.informatics.common.Constants.UNKNOWN_INDEX;
 
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -30,10 +31,11 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 
-import uno.informatics.common.io.FileProperties;
 import uno.informatics.common.io.IOUtilities;
 import uno.informatics.common.io.RowReader;
 import org.corehunter.data.GenotypeVariantData;
+import org.corehunter.data.Header;
+import uno.informatics.common.io.FileType;
 
 /**
  * @author Guy Davenport, Herman De Beukelaer
@@ -54,44 +56,44 @@ public class SimpleGenotypeVariantData extends SimpleNamedData implements Genoty
      * For details of the arguments see 
      * {@link #SimpleGenotypeVariantData(String, String[], String[], String[][], Double[][][])}.
      * 
-     * @param itemNames item names
+     * @param itemHeaders item headers, specifying name and/or unique identifier
      * @param markerNames marker names
      * @param alleleNames allele names per marker
      * @param alleleFrequencies allele frequencies
      */
-    public SimpleGenotypeVariantData(String[] itemNames, String[] markerNames, String[][] alleleNames,
+    public SimpleGenotypeVariantData(Header[] itemHeaders, String[] markerNames, String[][] alleleNames,
                                      Double[][][] alleleFrequencies) {
-        this("Multi-allelic marker data", itemNames, markerNames, alleleNames, alleleFrequencies);
+        this("Multi-allelic marker data", itemHeaders, markerNames, alleleNames, alleleFrequencies);
     }
     
     /**
-     * Create data with given dataset name, item names, marker/allele names and allele frequencies.
+     * Create data with given dataset name, item headers, marker/allele names and allele frequencies.
      * The length of <code>alleleFrequencies</code> denotes the number of items in
      * the dataset. The length of <code>alleleFrequencies[i]</code> should be the same
      * for all <code>i</code> and denotes the number of markers. Finally, the length of
      * <code>alleleFrequencies[i][m]</code> should also be the same for all <code>i</code>
-     * and denotes the number of alleles of the m-th marker. Allele counts may differ for
-     * different markers.
+     * and denotes the number of alleles of the <code>m</code>-th marker. Allele counts may
+     * differ for different markers.
      * <p>
      * All frequencies should be positive and the values in <code>alleleFrequencies[i][m]</code> should
      * sum to one for all <code>i</code> and <code>m</code>. Missing values are encoded as <code>null</code>.
      * If one or more allele frequencies are missing at a certain marker for a certain individual, the
      * remaining frequencies should sum to a value less than or equal to one.
      * <p>
-     * Names (items, markers, alleles) are optional. Missing names are encoded as <code>null</code>.
-     * Alternatively, if no item, marker or allele names are assigned, the respective array argument
-     * itself may also be <code>null</code>. If not <code>null</code> the length of each name array
+     * Item headers and marker/allele names are optional. Missing names/headers are encoded as <code>null</code>.
+     * Alternatively, if no item headers or no marker or allele names are assigned, the respective array
+     * itself may also be <code>null</code>. If not <code>null</code> the length of each header/name array
      * should correspond to the dimensions of <code>alleleFrequencies</code> (number of individuals,
      * markers and alleles per marker).
      * <p>
      * Violating any of the requirements will produce an exception.
      * <p>
-     * Allele frequencies as well as any assigned names are copied into internal data structures,
+     * Allele frequencies as well as assigned headers and names are copied into internal data structures,
      * i.e. no references are retained to any of the arrays passed as arguments.
      * 
      * @param datasetName name of the dataset
-     * @param itemNames item names, <code>null</code> if no names are assigned; if not <code>null</code>
-     *                  its length should correspond to the number of individuals
+     * @param itemHeaders item headers, <code>null</code> if no headers are assigned; if not <code>null</code>
+     *                    its length should correspond to the number of individuals
      * @param markerNames marker names, <code>null</code> if no marker names are assigned; if not
      *                    <code>null</code> its length should correspond to the number of markers
      * @param alleleNames allele names per marker, <code>null</code> if no allele names are assigned;
@@ -101,11 +103,11 @@ public class SimpleGenotypeVariantData extends SimpleNamedData implements Genoty
      * @param alleleFrequencies allele frequencies, may not be <code>null</code>; dimensions indicate number of
      *                          individuals, markers and alleles per marker
      */
-    public SimpleGenotypeVariantData(String datasetName, String[] itemNames, String[] markerNames,
+    public SimpleGenotypeVariantData(String datasetName, Header[] itemHeaders, String[] markerNames,
                                      String[][] alleleNames, Double[][][] alleleFrequencies) {
         
-        // pass dataset name, size and item names to parent
-        super(datasetName, alleleFrequencies.length, itemNames);
+        // pass dataset name, size and item headers to parent
+        super(datasetName, alleleFrequencies.length, itemHeaders);
 
         // check allele frequencies and infer number of individuals, markers and alleles per marker
         if (alleleFrequencies == null) {
@@ -114,7 +116,7 @@ public class SimpleGenotypeVariantData extends SimpleNamedData implements Genoty
         int n = alleleFrequencies.length;
         int m = -1;
         int[] a = null;
-        // individuals
+        // loop over individuals
         for(int i = 0; i < n; i++){
             Double[][] indFreqs = alleleFrequencies[i];
             if(indFreqs == null){
@@ -127,7 +129,7 @@ public class SimpleGenotypeVariantData extends SimpleNamedData implements Genoty
             } else if (indFreqs.length != m) {
                 throw new IllegalArgumentException("All individuals should have same number of markers.");
             }
-            // markers
+            // loop over markers
             for(int j = 0; j < m; j++){
                 Double[] alleleFreqs = indFreqs[j];
                 if(alleleFreqs == null){
@@ -142,7 +144,7 @@ public class SimpleGenotypeVariantData extends SimpleNamedData implements Genoty
                             "Number of alleles per marker should be consistent across all individuals."
                     );
                 }
-                // alleles
+                // loop over alleles
                 if(Arrays.stream(alleleFreqs).filter(Objects::nonNull).anyMatch(f -> f < 0.0)){
                     throw new IllegalArgumentException("All frequencies should be positive.");
                 }
@@ -152,7 +154,7 @@ public class SimpleGenotypeVariantData extends SimpleNamedData implements Genoty
                                    .sum();
                 // sum should not exceed 1.0
                 if(sum > 1.0){
-                    throw new IllegalArgumentException("Allele frequency sum for marker should not exceed one.");
+                    throw new IllegalArgumentException("Allele frequency sum per marker should not exceed one.");
                 }
                 if(Arrays.stream(alleleFreqs).noneMatch(Objects::isNull)){
                     // no missing values: should sum to 1.0
@@ -183,7 +185,10 @@ public class SimpleGenotypeVariantData extends SimpleNamedData implements Genoty
             this.markerNames = new String[m];
         } else {
             if(markerNames.length != m){
-                throw new IllegalArgumentException("Incorrect number of marker names provided.");
+                throw new IllegalArgumentException(String.format(
+                        "Incorrect number of marker names provided. Expected: %d, actual: %d.",
+                        m, markerNames.length
+                ));
             }
             this.markerNames = Arrays.copyOf(markerNames, m);
         }
@@ -196,15 +201,19 @@ public class SimpleGenotypeVariantData extends SimpleNamedData implements Genoty
             }
         } else {
             if(alleleNames.length != m){
-                throw new IllegalArgumentException("Incorrect number of allele names provided.");
+                throw new IllegalArgumentException(String.format(
+                        "Incorrect number of marker-allele names provided. Expected: %d, actual: %d.",
+                        m, alleleNames.length
+                ));
             }
             for(int j = 0; j < m; j++){
                 if(alleleNames[j] == null){
                     this.alleleNames[j] = new String[numberOfAllelesForMarker[j]];
                 } else if (alleleNames[j].length != numberOfAllelesForMarker[j]) {
-                    throw new IllegalArgumentException(
-                            "Incorrect number of allele names provided for marker " + j
-                    );
+                    throw new IllegalArgumentException(String.format(
+                            "Incorrect number of allele names provided for marker %d. Expected: %d, actual: %d.",
+                            j, numberOfAllelesForMarker[j], alleleNames[j].length
+                    ));
                 } else {
                     this.alleleNames[j] = Arrays.copyOf(alleleNames[j], numberOfAllelesForMarker[j]);
                 }
@@ -254,153 +263,61 @@ public class SimpleGenotypeVariantData extends SimpleNamedData implements Genoty
                         .getAsDouble();
     }
 
-    public final static SimpleGenotypeVariantData readData(FileProperties fileProperties)
-            throws IOException {
+    /**
+     * Read genotype variant data from file. Only file types {@link FileType#TXT} and {@link FileType#CSV} are allowed.
+     * Values are separated with a single tab (txt) or comma (csv) character. Allele frequencies should follow the
+     * requirements as described in the constructor {@link #SimpleGenotypeVariantData(String, Header[], String[],
+     * String[][], Double[][][])}. Missing frequencies are encoding as empty cells.
+     * <p>
+     * The first row specifies the marker names. This header row is compulsory and the number of alleles (columns)
+     * per marker is inferred from the marker names. Each marker should be uniquely identified by its name.
+     * All columns corresponding to the same marker should occur consecutively in the file.
+     * A second optional header row can be included to specify allele names, which need not be unique.
+     * Depending on the number of header columns (if any, see below) some additional column header cells
+     * may have been prepended to the header rows.
+     * <p>
+     * Two optional (leftmost) header columns can be included to specify individual names and/or
+     * unique identifiers. The former is identified with column header "NAME", the latter with column header "ID".
+     * The column headers should be placed in the corresponding cell of the lowest header row (marker/allele names).
+     * Assigned identifiers should be unique and are used to distinguish between individuals with the same name.
+     * <p>
+     * Leading and trailing whitespace is removed from names and unique identifiers and they are unquoted if wrapped
+     * in single or double quotes after whitespace removal. If it is intended to start or end a name/identifier with
+     * whitespace this whitespace should be contained within the quotes, as it will then not be removed. It is allowed
+     * that names/identifiers are missing for some individuals/alleles but marker names are required.
+     * <p>
+     * The dataset name is set to the name of the file to which <code>filePath</code> points.
+     * 
+     * @param filePath path to file that contains the data
+     * @param type {@link FileType#TXT} or {@link FileType#CSV}
+     * @return genotype variant data
+     * @throws IOException if the file can not be read or is not correctly formatted
+     */
+    public final static SimpleGenotypeVariantData readData(Path filePath, FileType type) throws IOException {
         
-        RowReader reader;
-
-        if (fileProperties == null) {
-            throw new IOException("File properties not defined!");
+        // validate arguments
+        
+        if (filePath == null) {
+            throw new IllegalArgumentException("File path not defined.");
+        }
+        
+        if(!filePath.toFile().exists()){
+            throw new IOException("File does not exist : " + filePath + ".");
         }
 
-        if (fileProperties.getFile() == null) {
-            throw new IOException("File not defined!");
+        if(type == null){
+            throw new IllegalArgumentException("File type not defined.");
+        }
+        
+        if(type != FileType.TXT && type != FileType.CSV){
+            throw new IllegalArgumentException(
+                    String.format("Only file types TXT and CSV are supported. Got: %s.", type)
+            );
         }
 
-        if (fileProperties.getFileType() == null) {
-            throw new IOException("File type not defined!");
-        }
-
-        if (fileProperties.getRowHeaderPosition() > UNKNOWN_INDEX
-                && fileProperties.getDataRowPosition() > UNKNOWN_INDEX
-                && fileProperties.getDataRowPosition() <= fileProperties.getColumnHeaderPosition()) {
-            throw new IOException("Column header position : " + fileProperties.getDataRowPosition()
-                                + " must be before data position : " + fileProperties.getColumnHeaderPosition());
-        }
-
-        if (!fileProperties.getFile().exists()) {
-            throw new IOException("File does not exist : " + fileProperties.getFile());
-        }
-
-        List<String> itemNames = null;
-        List<String> markerNames = new LinkedList<>();
-        String markerName;
-        String lastMarkerName = null;
-        String alleleName;
-        List<String> markerAlleleNames = new LinkedList<>();
-        List<List<String>> alleleNames = new LinkedList<>();
-        List<Double> alleleFrequencies;
-        List<Double> markerFrequencies;
-        List<List<List<Double>>> frequencies;
-
-        int row = 0;
-
-        try {
-            reader = IOUtilities.createRowReader(fileProperties);
-
-            if (reader != null && reader.ready()) {
-                int columnCount = 0;
-
-                if (reader.nextRow()) {
-                    if (fileProperties.getRowHeaderPosition() > UNKNOWN_INDEX) {
-                        while (row < fileProperties.getRowHeaderPosition() && reader.nextRow()) {
-                            ++row;
-                        }
-                    }
-
-                    reader.nextColumn();
-                    reader.nextColumn();
-                    reader.nextColumn();
-
-                    itemNames = reader.getRowCellsAsString();
-
-                    columnCount = itemNames.size();
-
-                    frequencies = new ArrayList<>(columnCount);
-
-                    for (int i = 0; i < columnCount; ++i) {
-                        frequencies.add(new LinkedList<>());
-                    }
-
-                    if (fileProperties.getDataRowPosition() > UNKNOWN_INDEX) {
-                        while (row < fileProperties.getDataRowPosition() && reader.nextRow()) {
-                            ++row;
-                        }
-                    }
-
-                    Iterator<Double> frequencyIterator;
-                    int markerIndex = -1;
-                    int index = 0;
-
-                    while (reader.nextRow()) {
-                        reader.nextColumn();
-
-                        markerName = reader.getCellAsString();
-
-                        reader.nextColumn();
-
-                        alleleName = reader.getCellAsString();
-
-                        reader.nextColumn();
-
-                        alleleFrequencies = reader.getRowCellsAsDouble();
-
-                        if (frequencies.size() != columnCount) {
-                            throw new IOException("Rows are not all the same size!");
-                        }
-
-                        if (lastMarkerName == null || !lastMarkerName.equals(markerName)) {
-                            markerAlleleNames = new LinkedList<>();
-                            alleleNames.add(markerAlleleNames);
-                            markerNames.add(markerName);
-
-                            index = 0;
-
-                            frequencyIterator = alleleFrequencies.iterator();
-
-                            while (frequencyIterator.hasNext()) {
-                                markerFrequencies = new LinkedList<>();
-                                markerFrequencies.add(frequencyIterator.next());
-
-                                frequencies.get(index).add(markerFrequencies);
-
-                                ++index;
-                            }
-
-                            ++markerIndex;
-                        } else {
-                            frequencyIterator = alleleFrequencies.iterator();
-
-                            index = 0;
-
-                            while (frequencyIterator.hasNext()) {
-                                frequencies.get(index).get(markerIndex).add(frequencyIterator.next());
-                                ++index;
-                            }
-                        }
-
-                        markerAlleleNames.add(alleleName);
-
-                        lastMarkerName = markerName;
-
-                        ++row;
-                    }
-                } else {
-                    frequencies = new ArrayList<>(0);
-                }
-            } else {
-                frequencies = new ArrayList<>(0);
-            }
-
-            if (reader != null) {
-                reader.close();
-            }
-
-            return new SimpleGenotypeVariantData(fileProperties.getFile().getName(),
-                                                             itemNames, markerNames, alleleNames, frequencies);
-
-        } catch (IOException e) {
-            throw new IOException("Error reading file at row : " + row + " due to " + e.getMessage(), e);
-        }
+        // read data from file
+        // TODO
+        return null;
+        
     }
 }

@@ -160,7 +160,7 @@ public class SimpleDistanceMatrixData extends SimpleNamedData implements Distanc
     }
 
     /**
-     * Read distance matrix data. Only file types {@link FileType#TXT} and {@link FileType#CSV} are allowed.
+     * Read distance matrix data from file. Only file types {@link FileType#TXT} and {@link FileType#CSV} are allowed.
      * Values are separated with a single tab (txt) or comma (csv) character and should all be positive.
      * If the matrix is provided in a format that includes diagonal values ({@link SymmetricMatrixFormat#FULL}
      * or {@link SymmetricMatrixFormat#LOWER_DIAG}) these should equal zero. If the full matrix is specified it
