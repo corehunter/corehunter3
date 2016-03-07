@@ -140,14 +140,11 @@ public class GowersDistanceMatrixGeneratorTest {
             fileProperties.setRowHeaderPosition(0);
             
             List<Feature> features = dataset.getFeatures() ;
-            Feature rowHeaderFeature = dataset.getRowHeaderFeature() ;
-            
-            assertNotNull("Row headers need to be defined!", rowHeaderFeature) ;
-
+     
             MatrixDataset<Double> matrix
                     = DoubleArrayMatrixDataset.createMatrixDataset(
                             UID, NAME, DESCRIPTION, elementFeature,
-                            fileProperties, rowHeaderFeature, rowHeaderFeature);
+                            fileProperties);
 
             for (int x = 0; x < features.size(); ++x) {
                 for (int y = 0; y < features.size(); ++y) {
@@ -190,14 +187,11 @@ public class GowersDistanceMatrixGeneratorTest {
             fileProperties.setRowHeaderPosition(0);
             
             List<Feature> features = dataset.getFeatures() ;
-            Feature rowHeaderFeature = dataset.getRowHeaderFeature() ;
-            
-            assertNotNull("Row headers need to be defined!", rowHeaderFeature) ;
 
             MatrixDataset<Double> matrix
                     = DoubleArrayMatrixDataset.createMatrixDataset(
                             UID, NAME, DESCRIPTION, elementFeature,
-                            fileProperties, rowHeaderFeature, rowHeaderFeature);
+                            fileProperties);
 
             for (int x = 0; x < features.size(); ++x) {
                 for (int y = 0; y < features.size(); ++y) {
