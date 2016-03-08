@@ -16,8 +16,6 @@
 
 package org.corehunter.services.simple;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -30,9 +28,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
-
 import org.corehunter.services.DatasetServices;
 import org.corehunter.services.DatasetType;
 
@@ -41,7 +36,6 @@ import com.thoughtworks.xstream.io.xml.StaxDriver;
 
 import uno.informatics.common.io.FileType;
 import uno.informatics.data.Dataset;
-import uno.informatics.data.Entity;
 import uno.informatics.data.SimpleEntity;
 import uno.informatics.data.dataset.DatasetException;
 import uno.informatics.data.feature.array.ArrayFeatureDataset;

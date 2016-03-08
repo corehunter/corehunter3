@@ -16,14 +16,14 @@
 
 package org.corehunter.services;
 
-import java.util.Date;
+import org.joda.time.DateTime;
 
-public interface CorehunterRun {
-    public String getName();
+import uno.informatics.data.SimpleEntity;
 
-    public Date getStartDate();
+public interface CorehunterRun extends SimpleEntity {
+    public DateTime getStartDate();
 
-    public Date getEndDate();
+    public DateTime getEndDate();
 
-    public String getStatus();
+    public CorehunterRunStatus getStatus();
 }

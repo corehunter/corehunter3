@@ -18,9 +18,20 @@ package org.corehunter.services;
 
 import java.util.List;
 
+import org.jamesframework.core.subset.SubsetSolution;
+
 public interface CorehunterRunServices {
     public CorehunterRun executeCorehunter(CorehunterRunArguments arguments);
 
+    public CorehunterRun getCorehunterRun(String uniqueIdentifier);
+    
     public List<CorehunterRun> getAllCorehunterRuns();
 
+    public String getOutputStream(String uniqueIdentifier) ;
+
+    public String getErrorStream(String uniqueIdentifier) ;
+
+    public String getErrorMessage(String uniqueIdentifier) ;
+
+    public SubsetSolution getSubsetSolution(String uniqueIdentifier) ;
 }

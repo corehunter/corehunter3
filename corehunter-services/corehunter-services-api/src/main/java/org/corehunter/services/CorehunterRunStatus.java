@@ -16,10 +16,17 @@
 
 package org.corehunter.services;
 
-public interface CorehunterRunArguments {
-    public String getName() ;
-    
-    public int getSubsetSize() ;
+public enum CorehunterRunStatus {
 
-    public String getDatasetId();
+    RUNNING("Running"), FAILED("Failed"), FINISHED("Finished");
+
+    private String name;
+
+    private CorehunterRunStatus(String name) {
+        this.name = name;
+    }
+
+    public final String getName() {
+        return name;
+    }
 }
