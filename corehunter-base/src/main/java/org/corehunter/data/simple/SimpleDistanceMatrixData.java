@@ -33,7 +33,6 @@ import org.corehunter.data.DistanceMatrixData;
 import org.corehunter.data.Header;
 import org.corehunter.data.matrix.SymmetricMatrixFormat;
 import org.corehunter.util.StringUtils;
-import uno.informatics.common.io.FileProperties;
 
 import uno.informatics.common.io.FileType;
 import uno.informatics.common.io.IOUtilities;
@@ -206,9 +205,7 @@ public class SimpleDistanceMatrixData extends SimpleNamedData implements Distanc
         }
 
         // read data from file
-        try (RowReader reader = IOUtilities.createRowReader(
-                new FileProperties(filePath.toFile(), type)
-            )) {
+        try (RowReader reader = IOUtilities.createRowReader(filePath.toFile(), type)) {
             
             if (reader == null || !reader.ready()) {
                 throw new IOException("Can not create reader for file " + filePath + ". File may be empty.");
@@ -239,7 +236,15 @@ public class SimpleDistanceMatrixData extends SimpleNamedData implements Distanc
                         
                         // check: no data rows read yet
                         if(!datarows.isEmpty()){
-                            throw new IOException("Row NAME should be at the top of the file.");
+                            throw new IOException(String.format(
+                                    "Row %s should be at the top of the file.", NAMES_HEADER
+                            ));
+                        }
+                        // check: no names read yet
+                        if(names != null){
+                            throw new IOException(String.format(
+                                    "Duplicate %s column.", NAMES_HEADER
+                            ));
                         }
                         // read names
                         reader.nextColumn();
@@ -251,7 +256,15 @@ public class SimpleDistanceMatrixData extends SimpleNamedData implements Distanc
                         
                         // check: no data rows read yet
                         if(!datarows.isEmpty()){
-                            throw new IOException("Row ID should be at the top of the file.");
+                            throw new IOException(String.format(
+                                    "Row %s should be at the top of the file.", IDENTIFIERS_HEADER
+                            ));
+                        }
+                        // check: no identifiers read yet
+                        if(identifiers != null){
+                            throw new IOException(String.format(
+                                    "Duplicate %s column.", IDENTIFIERS_HEADER
+                            ));
                         }
                         // read identifiers
                         reader.nextColumn();
@@ -361,9 +374,16 @@ public class SimpleDistanceMatrixData extends SimpleNamedData implements Distanc
     
     private static String[] trimAndUnquote(String[] str){
         return Arrays.stream(str)
-                     .map(name -> StringUtils.trimAndUnquote(name))         // trim and unquote
-                     .map(name -> Objects.equals(name, "") ? null : name)   // replace empty strings by null
-                     .toArray(n -> new String[n]);                          // dump in array
+                     .map(name -> trimAndUnquote(name))        
+                     .toArray(n -> new String[n]);                          
+    }
+    
+    private static String trimAndUnquote(String str){
+        str = StringUtils.trimAndUnquote(str);
+        if(str != null && str.trim().equals("")){
+            str = null;
+        }
+        return str;
     }
     
     private static void checkNumValuesInRow(SymmetricMatrixFormat format, int row,

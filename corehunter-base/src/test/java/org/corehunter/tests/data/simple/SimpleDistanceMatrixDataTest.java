@@ -70,7 +70,9 @@ public class SimpleDistanceMatrixDataTest {
         "/distances/err/missing-rows.txt",
         "/distances/err/names-after-data.txt",
         "/distances/err/ids-after-data.txt",
-        "/distances/err/duplicate-ids.txt"
+        "/distances/err/duplicate-ids.txt",
+        "/distances/err/duplicate-id-row.txt",
+        "/distances/err/duplicate-name-row.txt"
     };
     
     private static final SymmetricMatrixFormat[] ERRONEOUS_FILE_FORMATS = {
@@ -84,6 +86,8 @@ public class SimpleDistanceMatrixDataTest {
         SymmetricMatrixFormat.LOWER,
         SymmetricMatrixFormat.FULL,
         SymmetricMatrixFormat.LOWER_DIAG,
+        SymmetricMatrixFormat.FULL,
+        SymmetricMatrixFormat.FULL,
         SymmetricMatrixFormat.FULL,
         SymmetricMatrixFormat.FULL,
         SymmetricMatrixFormat.FULL,
@@ -218,18 +222,18 @@ public class SimpleDistanceMatrixDataTest {
 
         for (int i = 0; i < size; i++) {
             
-            // check names, if assigned
+            // check name, if assigned
             if(withNames){
                 assertEquals("Name for " + i + " not correct.", NAMES[i], data.getHeader(i).getName());
             }
             
-            // check unique identifiers, if assigned
+            // check unique identifier, if assigned
             if(withUniqueIdentifiers){
                 assertEquals("Unique identifier for " + i + " not correct.",
                              UNIQUE_IDENTIFIERS[i], data.getHeader(i).getUniqueIdentifier());
             }
             
-            // check headers if both identifiers and names assigned
+            // check header if both identifiers and names assigned
             if(withNames && withUniqueIdentifiers){
                 assertEquals("Header for " + i + " not correct.", HEADERS[i], data.getHeader(i));
             }
