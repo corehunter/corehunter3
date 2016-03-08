@@ -19,31 +19,36 @@
 
 package org.corehunter.data.simple;
 
-import static uno.informatics.common.Constants.UNKNOWN_INDEX;
 
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 import uno.informatics.common.io.IOUtilities;
 import uno.informatics.common.io.RowReader;
 import org.corehunter.data.GenotypeVariantData;
 import org.corehunter.data.Header;
+import org.corehunter.util.StringUtils;
 import uno.informatics.common.io.FileType;
+
+import static uno.informatics.common.Constants.UNKNOWN_COUNT;
 
 /**
  * @author Guy Davenport, Herman De Beukelaer
  */
 public class SimpleGenotypeVariantData extends SimpleNamedData implements GenotypeVariantData {
 
-    private static final double DELTA = 1e-10;
-
+    private static final double SUM_TO_ONE_PRECISION = 0.01 + 1e-8;
+    private static final int UNDEFINED_COLUMN = -1;
+    private static final String NAMES_HEADER = "NAME";
+    private static final String IDENTIFIERS_HEADER = "ID";
+    
     private final Double[][][] alleleFrequencies;   // null element means missing value
     private final int numberOfMarkers;
     private final int[] numberOfAllelesForMarker;
@@ -76,9 +81,9 @@ public class SimpleGenotypeVariantData extends SimpleNamedData implements Genoty
      * differ for different markers.
      * <p>
      * All frequencies should be positive and the values in <code>alleleFrequencies[i][m]</code> should
-     * sum to one for all <code>i</code> and <code>m</code>. Missing values are encoded as <code>null</code>.
-     * If one or more allele frequencies are missing at a certain marker for a certain individual, the
-     * remaining frequencies should sum to a value less than or equal to one.
+     * sum to one for all <code>i</code> and <code>m</code>, with a precision of 0.01. Missing values are
+     * encoded as <code>null</code>. If one or more allele frequencies are missing at a certain marker for
+     * a certain individual, the remaining frequencies should sum to a value less than or equal to one.
      * <p>
      * Item headers and marker/allele names are optional. Missing names/headers are encoded as <code>null</code>.
      * Alternatively, if no item headers or no marker or allele names are assigned, the respective array
@@ -158,7 +163,7 @@ public class SimpleGenotypeVariantData extends SimpleNamedData implements Genoty
                 }
                 if(Arrays.stream(alleleFreqs).noneMatch(Objects::isNull)){
                     // no missing values: should sum to 1.0
-                    if(1.0 - sum > DELTA){
+                    if(1.0 - sum > SUM_TO_ONE_PRECISION){
                         throw new IllegalArgumentException("Allele frequencies for marker should sum to one.");
                     }
                 }
@@ -269,17 +274,20 @@ public class SimpleGenotypeVariantData extends SimpleNamedData implements Genoty
      * requirements as described in the constructor {@link #SimpleGenotypeVariantData(String, Header[], String[],
      * String[][], Double[][][])}. Missing frequencies are encoding as empty cells.
      * <p>
-     * The first row specifies the marker names. This header row is compulsory and the number of alleles (columns)
-     * per marker is inferred from the marker names. Each marker should be uniquely identified by its name.
-     * All columns corresponding to the same marker should occur consecutively in the file.
-     * A second optional header row can be included to specify allele names, which need not be unique.
-     * Depending on the number of header columns (if any, see below) some additional column header cells
-     * may have been prepended to the header rows.
+     * The file should start with two compulsory header rows specifying the marker and allele names, respectively.
+     * Each marker should be uniquely identified by its name, which can thus not be missing. The number of alleles
+     * per marker is inferred from these marker names. All columns corresponding to the same marker should occur
+     * consecutively in the file. The second header row specifies the allele names, which need not be unique and
+     * can be undefined for some or all alleles by leaving the corresponding cells blank. Still, this second header
+     * row should always be present, even if it consists of empty cells only. Depending on the number of header
+     * columns (if any, see below) some additional column header or empty cells may have been prepended to both
+     * header rows.
      * <p>
-     * Two optional (leftmost) header columns can be included to specify individual names and/or
-     * unique identifiers. The former is identified with column header "NAME", the latter with column header "ID".
-     * The column headers should be placed in the corresponding cell of the lowest header row (marker/allele names).
-     * Assigned identifiers should be unique and are used to distinguish between individuals with the same name.
+     * Two optional (leftmost) header columns can be included to specify individual names and/or unique identifiers.
+     * The former is identified with column header "NAME", the latter with column header "ID". The column headers should
+     * be placed in the corresponding cell of the second header row (allele names). The corresponding cells of the first
+     * header row (marker names) should be left blank. Assigned identifiers, if any, should be unique and are used to
+     * distinguish between individuals with the same name.
      * <p>
      * Leading and trailing whitespace is removed from names and unique identifiers and they are unquoted if wrapped
      * in single or double quotes after whitespace removal. If it is intended to start or end a name/identifier with
@@ -316,8 +324,219 @@ public class SimpleGenotypeVariantData extends SimpleNamedData implements Genoty
         }
 
         // read data from file
-        // TODO
-        return null;
+        try (RowReader reader = IOUtilities.createRowReader(filePath.toFile(), type)) {
+            
+            if (reader == null || !reader.ready()) {
+                throw new IOException("Can not create reader for file " + filePath + ". File may be empty.");
+            }
+            
+            if(!reader.hasNextRow()){
+                throw new IOException("File is empty.");
+            }
+            
+            // 1: read marker names
+            
+            reader.nextRow();
+            String[] markerNamesRow = reader.getRowCellsAsStringArray();
+            // skip empty cells corresponding to header columns (at most two)
+            int numHeaderCols = 0;
+            while(numHeaderCols < 2 && numHeaderCols < markerNamesRow.length
+                    && isEmpty(markerNamesRow[numHeaderCols])){
+                numHeaderCols++;
+            }
+            int numCols = markerNamesRow.length;
+            int numDataCols = numCols - numHeaderCols;
+            if(numDataCols == 0){
+                throw new IOException("No data columns.");
+            }
+            markerNamesRow = Arrays.stream(markerNamesRow)
+                                   .skip(numHeaderCols)
+                                   .map(StringUtils::trimAndUnquote)
+                                   .toArray(n -> new String[n]);
+            // extract/check names and infer number of alleles per marker
+            Set<String> markerNames = new LinkedHashSet<>(); // follows insertion order
+            List<Integer> allelesPerMarker = new ArrayList<>();
+            String prevName = null;
+            int curMarkerAlleleCount = UNKNOWN_COUNT;
+            for(String curName : markerNamesRow){
+                if(curName == null || curName.trim().equals("")){
+                    throw new IOException("Some marker names are missing or empty.");
+                }
+                if(!curName.equals(prevName)){
+                    // start of new marker (check uniqueness)
+                    if(!markerNames.add(curName)){
+                        throw new IOException(String.format(
+                                "Marker names should be unique. Duplicate name: %s. "
+                              + "Columns with allele frequencies for the same marker "
+                              + "should occur consecutively in the file.", curName
+                        ));
+                    }
+                    // store allele count of previous marker
+                    if(prevName != null){
+                        allelesPerMarker.add(curMarkerAlleleCount);
+                    }
+                    // reset allele count
+                    curMarkerAlleleCount = 1;
+                } else {
+                    // increase allele count
+                    curMarkerAlleleCount++;
+                }
+                // update previous marker name
+                prevName = curName;
+            }
+            // store allele count of last marker
+            allelesPerMarker.add(curMarkerAlleleCount);
+            // infer number of markers
+            int numMarkers = markerNames.size();
+            
+            // 2: read allele names
+            
+            reader.nextRow();
+            String[] alleleNamesRow = reader.getRowCellsAsStringArray();
+            // check row length
+            if(alleleNamesRow.length != numCols){
+                throw new IOException(String.format(
+                        "Unexpected number of columns at row 2. Expected: %d, actual: %d.",
+                        numCols, alleleNamesRow.length
+                ));
+            }
+            // infer item name and identifier column, if provided
+            int itemNameColumn = UNDEFINED_COLUMN;
+            int itemIdentifierColumn = UNDEFINED_COLUMN;
+            for(int c = 0; c < numHeaderCols; c++){
+                String str = StringUtils.trimAndUnquote(alleleNamesRow[c]);
+                switch(str){
+                    case NAMES_HEADER:
+                        if(itemNameColumn == UNDEFINED_COLUMN){
+                            itemNameColumn = c;
+                        } else {
+                            throw new IOException(String.format(
+                                    "Duplicate %s column.", NAMES_HEADER
+                            ));
+                        }
+                        break;
+                    case IDENTIFIERS_HEADER:
+                        if(itemIdentifierColumn == UNDEFINED_COLUMN){
+                            itemIdentifierColumn = c;
+                        } else {
+                            throw new IOException(String.format(
+                                    "Duplicate %s column.", IDENTIFIERS_HEADER
+                            ));
+                        }
+                        break;
+                    default: throw new IOException(String.format(
+                            "Unexpected column header. Row: 2, column: %d. Expected: %s or %s, actual: \"%s\".",
+                            c, NAMES_HEADER, IDENTIFIERS_HEADER, str
+                    ));
+                }
+            }
+            // group allele names by marker
+            int aglob = numHeaderCols;
+            String[][] alleleNames = new String[numMarkers][];
+            for(int m = 0; m < numMarkers; m++){
+                alleleNames[m] = new String[allelesPerMarker.get(m)];
+                for(int a = 0; a < alleleNames[m].length; a++){
+                    alleleNames[m][a] = trimAndUnquote(alleleNamesRow[aglob]);
+                    aglob++;
+                }
+            }
+            
+            // 3: read data rows
+            
+            if(!reader.hasNextRow()){
+                throw new IOException("No data rows.");
+            }
+            List<String> itemNames = new ArrayList<>();
+            List<String> itemIdentifiers = new ArrayList<>();
+            List<Double[][]> alleleFreqs = new ArrayList<>();
+            int r = 3;
+            while(reader.nextRow()){
+                
+                // read row headers, if any (name/identifier)
+                for(int c = 0; c < numHeaderCols; c++){
+                    if(!reader.hasNextColumn()){
+                        throw new IOException(String.format(
+                                "Too few columns at row %d. Expected: %d, actual: %d.",
+                                r, numCols, c
+                        ));
+                    }
+                    reader.nextColumn();
+                    String nameOrId = trimAndUnquote(reader.getCellAsString());
+                    if(itemNameColumn == c){
+                        itemNames.add(nameOrId);
+                    } else {
+                        itemIdentifiers.add(nameOrId);
+                    }
+                }
+                reader.nextColumn();
+                
+                // read allele frequencies as strings
+                String[] freqs = reader.getRowCellsAsStringArray();
+                // check length
+                if(freqs.length != numDataCols){
+                    throw new IOException(String.format(
+                            "Incorrect number of columns at row %d. Expected: %d, actual: %d.",
+                            r, numCols, freqs.length + numHeaderCols
+                    ));
+                }
+                // group per marker
+                Double[][] freqsPerMarker = new Double[numMarkers][];
+                int fglob = 0;
+                for(int m = 0; m < numMarkers; m++){
+                    freqsPerMarker[m] = new Double[allelesPerMarker.get(m)];
+                    for(int f = 0; f < freqsPerMarker[m].length; f++){
+                        Double freq = freqs[fglob] == null ? null : Double.parseDouble(freqs[fglob]);
+                        freqsPerMarker[m][f] = freq;
+                        fglob++;
+                    }
+                }
+                // store frequencies
+                alleleFreqs.add(freqsPerMarker);
+                
+                // next row
+                r++;
+                
+            }
+            int n = r-3;
+            
+            // combine names and identifiers in item headers
+            Header[] headers = null;
+            if(!itemNames.isEmpty() || !itemIdentifiers.isEmpty()){
+                headers = new Header[n];
+                for(int i = 0; i < n; i++){
+                    String name = !itemNames.isEmpty() ? itemNames.get(i) : null;
+                    String identifier = !itemIdentifiers.isEmpty() ? itemIdentifiers.get(i) : null;
+                    headers[i] = new Header(name, identifier);
+                }
+            }
+            
+            // convert collections to arrays
+            String[] markerNamesArray = markerNames.stream().toArray(k -> new String[k]);
+            Double[][][] alleleFreqsArray = alleleFreqs.stream().toArray(k -> new Double[k][][]);
+            
+            try{
+                // create data
+                return new SimpleGenotypeVariantData(filePath.getFileName().toString(),
+                                                     headers, markerNamesArray, alleleNames, alleleFreqsArray);
+            } catch(IllegalArgumentException ex){
+                // convert to IO exception
+                throw new IOException(ex.getMessage());
+            }
+            
+        }
         
     }
+
+    private static boolean isEmpty(String str) {
+        return str == null || StringUtils.trimAndUnquote(str).equals("");
+    }
+    
+    private static String trimAndUnquote(String str){
+        str = StringUtils.trimAndUnquote(str);
+        if(str != null && str.trim().equals("")){
+            str = null;
+        }
+        return str;
+    }
+    
 }
