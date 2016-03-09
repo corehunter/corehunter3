@@ -243,7 +243,7 @@ public class SimpleDistanceMatrixData extends SimpleNamedData implements Distanc
                         // check: no names read yet
                         if(names != null){
                             throw new IOException(String.format(
-                                    "Duplicate %s column.", NAMES_HEADER
+                                    "Duplicate %s row.", NAMES_HEADER
                             ));
                         }
                         // read names
@@ -263,7 +263,7 @@ public class SimpleDistanceMatrixData extends SimpleNamedData implements Distanc
                         // check: no identifiers read yet
                         if(identifiers != null){
                             throw new IOException(String.format(
-                                    "Duplicate %s column.", IDENTIFIERS_HEADER
+                                    "Duplicate %s row.", IDENTIFIERS_HEADER
                             ));
                         }
                         // read identifiers

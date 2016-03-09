@@ -397,7 +397,7 @@ public class SimpleGenotypeVariantData extends SimpleNamedData implements Genoty
             // check row length
             if(alleleNamesRow.length != numCols){
                 throw new IOException(String.format(
-                        "Unexpected number of columns at row 2. Expected: %d, actual: %d.",
+                        "Unexpected number of columns at row 1. Expected: %d, actual: %d.",
                         numCols, alleleNamesRow.length
                 ));
             }
@@ -426,7 +426,7 @@ public class SimpleGenotypeVariantData extends SimpleNamedData implements Genoty
                         }
                         break;
                     default: throw new IOException(String.format(
-                            "Unexpected column header. Row: 2, column: %d. Expected: %s or %s, actual: \"%s\".",
+                            "Unexpected column header. Row: 1, column: %d. Expected: %s or %s, actual: \"%s\".",
                             c, NAMES_HEADER, IDENTIFIERS_HEADER, str
                     ));
                 }
@@ -450,17 +450,11 @@ public class SimpleGenotypeVariantData extends SimpleNamedData implements Genoty
             List<String> itemNames = new ArrayList<>();
             List<String> itemIdentifiers = new ArrayList<>();
             List<Double[][]> alleleFreqs = new ArrayList<>();
-            int r = 3;
+            int r = 2;
             while(reader.nextRow()){
                 
                 // read row headers, if any (name/identifier)
                 for(int c = 0; c < numHeaderCols; c++){
-                    if(!reader.hasNextColumn()){
-                        throw new IOException(String.format(
-                                "Too few columns at row %d. Expected: %d, actual: %d.",
-                                r, numCols, c
-                        ));
-                    }
                     reader.nextColumn();
                     String nameOrId = trimAndUnquote(reader.getCellAsString());
                     if(itemNameColumn == c){
@@ -498,7 +492,7 @@ public class SimpleGenotypeVariantData extends SimpleNamedData implements Genoty
                 r++;
                 
             }
-            int n = r-3;
+            int n = r-2;
             
             // combine names and identifiers in item headers
             SimpleEntity[] headers = null;
