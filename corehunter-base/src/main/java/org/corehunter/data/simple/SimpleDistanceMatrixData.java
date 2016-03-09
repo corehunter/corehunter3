@@ -248,7 +248,7 @@ public class SimpleDistanceMatrixData extends SimpleNamedData implements Distanc
                         }
                         // read names
                         reader.nextColumn();
-                        names = trimAndUnquote(reader.getRowCellsAsStringArray());
+                        names = StringUtils.trimAndUnquote(reader.getRowCellsAsStringArray());
                         break;
                     
                     // identifiers
@@ -268,7 +268,7 @@ public class SimpleDistanceMatrixData extends SimpleNamedData implements Distanc
                         }
                         // read identifiers
                         reader.nextColumn();
-                        identifiers = trimAndUnquote(reader.getRowCellsAsStringArray());
+                        identifiers = StringUtils.trimAndUnquote(reader.getRowCellsAsStringArray());
                         break;
                         
                     // data row
@@ -370,20 +370,6 @@ public class SimpleDistanceMatrixData extends SimpleNamedData implements Distanc
             }
 
         }
-    }
-    
-    private static String[] trimAndUnquote(String[] str){
-        return Arrays.stream(str)
-                     .map(name -> trimAndUnquote(name))        
-                     .toArray(n -> new String[n]);                          
-    }
-    
-    private static String trimAndUnquote(String str){
-        str = StringUtils.trimAndUnquote(str);
-        if(str != null && str.trim().equals("")){
-            str = null;
-        }
-        return str;
     }
     
     private static void checkNumValuesInRow(SymmetricMatrixFormat format, int row,

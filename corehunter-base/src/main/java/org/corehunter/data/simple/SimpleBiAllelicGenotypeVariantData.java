@@ -32,6 +32,7 @@ import org.corehunter.data.BiAllelicGenotypeVariantData;
 import uno.informatics.common.io.FileProperties;
 import uno.informatics.common.io.IOUtilities;
 import uno.informatics.common.io.RowReader;
+import uno.informatics.data.SimpleEntity;
 
 /**
  * @author Guy Davenport, Herman De Beukelaer
@@ -43,9 +44,9 @@ public class SimpleBiAllelicGenotypeVariantData extends SimpleNamedData
     private int numberOfMarkers;
     private String[] markerNames;
 
-    public SimpleBiAllelicGenotypeVariantData(String name, String[] itemNames,
+    public SimpleBiAllelicGenotypeVariantData(String name, SimpleEntity[] itemNames,
                                               String[] markerNames, int[][] alleleScores) {
-        super(name, itemNames);
+        super(name, alleleScores.length, itemNames);
 
         if (markerNames == null) {
             throw new IllegalArgumentException("Marker names not defined!");
@@ -242,6 +243,7 @@ public class SimpleBiAllelicGenotypeVariantData extends SimpleNamedData
         } catch (IOException e) {
             throw new IOException("Error reading file at row : " + row + " due to " + e.getMessage(), e);
         }
+
     }
 
     @Override
@@ -260,7 +262,7 @@ public class SimpleBiAllelicGenotypeVariantData extends SimpleNamedData
     }
 
     @Override
-    public double getAlelleFrequency(int id, int markerIndex, int alleleIndex) {
+    public Double getAlelleFrequency(int id, int markerIndex, int alleleIndex) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 

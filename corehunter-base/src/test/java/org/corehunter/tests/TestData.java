@@ -89,6 +89,13 @@ public class TestData {
         "mk6",
         "mk7"
     };
+    
+    public static final String[] MARKER_NAMES_DIPLOID = {
+        "mk1",
+        "mk2",
+        "mk3",
+        "mk4"
+    };
 
     public static final int[][] ALLELE_SCORES = {
         {1, 0, 2, 1, 1, 0, 0},
@@ -145,6 +152,39 @@ public class TestData {
             {null, null}
         }
     };
+    
+    public static final Double[][][] ALLELES_DIPLOID = {
+        {
+            {0.5, 0.0, 0.5},
+            {0.0, 1.0, 0.0, 0.0},
+            {1.0, 0.0},
+            {null, null}
+        },
+        {
+            {0.0, 1.0, 0.0},
+            {0.5, 0.0, 0.5, 0.0},
+            {0.5, 0.5},
+            {0.5, 0.5}
+        },
+        {
+            {0.5, 0.5, 0.0},
+            {0.0, 0.0, 0.0, 1.0},
+            {0.0, 1.0},
+            {1.0, 0.0}
+        },
+        {
+            {0.0, 0.5, 0.5},
+            {0.0, 1.0, 0.0, 0.0},
+            {0.5, 0.5},
+            {0.5, 0.5}
+        },
+        {
+            {1.0, 0.0, 0.0},
+            {null, null, null, null},
+            {1.0, 0.0},
+            {0.0, 1.0}
+        }
+    };
 
     public static final String[][] ALLELE_NAMES = {
         {"mk1-1", "mk1-2", "mk1-3"},
@@ -154,6 +194,13 @@ public class TestData {
         {null, "mk5-2", "mk5-3"},
         {"mk6-1", "mk6-2"},
         {"mk7-1", "mk7-2"}
+    };
+    
+    public static final String[][] ALLELE_NAMES_DIPLOID = {
+        {"1", "2", "3"},
+        {"A", "B", "C", "D"},
+        {"a1", "a2"},
+        {"+", "-"}
     };
 
     public static final double[][] CAVALLI_SFORZA_EDWARDS_DISTANCES = {

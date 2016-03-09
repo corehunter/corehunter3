@@ -19,6 +19,8 @@
 
 package org.corehunter.util;
 
+import java.util.Arrays;
+
 /**
  * @author Herman De Beukelaer
  */
@@ -57,13 +59,43 @@ public class StringUtils {
     }
     
     /**
-     * First trim and then unquote the given string. 
+     * First trim and then unquote the given string.
+     * If the input is <code>null</code> or the unquoted, trimmed
+     * string consists of space only, <code>null</code> is returned.
      * 
      * @param str string to trim and unquote
      * @return trimmed, unquoted string; <code>null</code> if input was <code>null</code>
+     *         or resulting string consists of spaces only
      */
     public static String trimAndUnquote(String str){
-        return unquote(trim(str));
+        str = unquote(trim(str));
+        if(str != null && trim(str).equals("")){
+            return null;
+        }
+        return str;
+    }
+    
+    /**
+     * Trim and unquote all string in the given array.
+     * 
+     * @param str string array
+     * @return array with unquoted, trimmed strings
+     */
+    public static String[] trimAndUnquote(String[] str){
+        return Arrays.stream(str)
+                     .map(StringUtils::trimAndUnquote)        
+                     .toArray(n -> new String[n]);
+    }
+    
+    /**
+     * Checks whether the given string is blank. A string is defined to be blank if it is
+     * <code>null</code> or if it consists of spaces only after being trimmed and unquoted.
+     * 
+     * @param str string to check
+     * @return <code>true</code> if the string is blank
+     */
+    public static boolean isBlank(String str){
+        return trimAndUnquote(str) == null;
     }
     
 }
