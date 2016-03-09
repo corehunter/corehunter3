@@ -232,11 +232,6 @@ public class SimpleDistanceMatrixDataTest {
                 assertEquals("Unique identifier for " + i + " not correct.",
                              UNIQUE_IDENTIFIERS[i], data.getHeader(i).getUniqueIdentifier());
             }
-            
-            // check header if both identifiers and names assigned
-            if(withNames && withUniqueIdentifiers){
-                assertEquals("Header for " + i + " not correct.", HEADERS[i], data.getHeader(i));
-            }
 
             // check distances
             for (int j = 0; j < size; j++) {

@@ -20,9 +20,11 @@
 package org.corehunter.data;
 
 import org.jamesframework.core.problems.datatypes.IntegerIdentifiedData;
+import uno.informatics.data.SimpleEntity;
 
 /**
  * Extends {@link IntegerIdentifiedData} by optionally assigning a header to each entry.
+ * A header consists of a name and/or unique identifier.
  *
  * @author Guy Davenport, Herman De Beukelaer
  */
@@ -35,7 +37,7 @@ public interface NamedData extends IntegerIdentifiedData {
      *           entries as returned by {@link #getDatasetSize()}
      * @return the header of an entry by id, <code>null</code> if no header is assigned to this entry
      */
-    public Header getHeader(int id);
+    public SimpleEntity getHeader(int id);
     
     /**
      * Get the number of entries in the dataset.

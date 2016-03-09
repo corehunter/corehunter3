@@ -21,11 +21,12 @@ package org.corehunter.tests;
 
 import java.util.Set;
 import java.util.TreeSet;
-import org.corehunter.data.Header;
 
 import org.corehunter.data.simple.SimpleDistanceMatrixData;
 import org.jamesframework.core.problems.objectives.evaluations.Evaluation;
 import org.jamesframework.core.problems.objectives.evaluations.SimpleEvaluation;
+import uno.informatics.data.SimpleEntity;
+import uno.informatics.data.pojo.SimpleEntityPojo;
 
 /**
  * @author Guy Davenport
@@ -51,12 +52,12 @@ public class TestData {
         "acc-1", "acc-2", "acc-3", null, "acc-5"
     };
     
-    public static final Header[] HEADERS;
+    public static final SimpleEntity[] HEADERS;
     
     static{
-        HEADERS = new Header[NAMES.length];
+        HEADERS = new SimpleEntity[NAMES.length];
         for(int i = 0; i < HEADERS.length; i++){
-            HEADERS[i] = new Header(NAMES[i], UNIQUE_IDENTIFIERS[i]);
+            HEADERS[i] = new SimpleEntityPojo(UNIQUE_IDENTIFIERS[i], NAMES[i]);
         }
     }
 

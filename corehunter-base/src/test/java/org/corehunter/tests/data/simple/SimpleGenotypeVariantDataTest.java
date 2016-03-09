@@ -33,7 +33,6 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
-import org.corehunter.data.simple.SimpleDistanceMatrixData;
 
 import org.corehunter.data.simple.SimpleGenotypeVariantData;
 
@@ -217,11 +216,6 @@ public class SimpleGenotypeVariantDataTest {
             if(withUniqueIdentifiers){
                 assertEquals("Unique identifier for " + i + " not correct.",
                              UNIQUE_IDENTIFIERS[i], data.getHeader(i).getUniqueIdentifier());
-            }
-            
-            // check header if both identifiers and names assigned
-            if(withNames && withUniqueIdentifiers){
-                assertEquals("Header for " + i + " not correct.", HEADERS[i], data.getHeader(i));
             }
 
             // check frequencies

@@ -23,10 +23,10 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import org.corehunter.data.Header;
 import org.corehunter.data.NamedData;
 import uno.informatics.data.SimpleEntity;
 
@@ -38,7 +38,7 @@ import uno.informatics.data.SimpleEntity;
 public class SimpleNamedData implements NamedData {
 
     // headers
-    private final Header[] headers;
+    private final SimpleEntity[] headers;
     // item IDs (0..n-1)
     private final Set<Integer> ids;
     
@@ -78,13 +78,13 @@ public class SimpleNamedData implements NamedData {
      *                if not <code>null</code> its length should equal <code>n</code>
      * @throws IllegalArgumentException if an incorrect number of names are specified
      */
-    public SimpleNamedData(String datasetName, int n, Header[] headers){
+    public SimpleNamedData(String datasetName, int n, SimpleEntity[] headers){
         ids = Collections.unmodifiableSet(
                 IntStream.range(0, n).boxed().collect(Collectors.toSet())
         );
         this.datasetName = datasetName;
         if(headers == null){
-            this.headers = new Header[n];
+            this.headers = new SimpleEntity[n];
         } else {
             if(headers.length != n){
                 throw new IllegalArgumentException(String.format(
@@ -107,12 +107,12 @@ public class SimpleNamedData implements NamedData {
     }
     
     @Override
-    public Header getHeader(int id) throws NoSuchElementException {
+    public SimpleEntity getHeader(int id) throws NoSuchElementException {
         validateId(id);
         return headers[id];
     }
     
-    public void setHeader(int id, Header header){
+    public void setHeader(int id, SimpleEntity header){
         validateId(id);
         // check unique identifier
         String identifier = header.getUniqueIdentifier();

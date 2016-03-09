@@ -33,11 +33,12 @@ import java.util.Set;
 import uno.informatics.common.io.IOUtilities;
 import uno.informatics.common.io.RowReader;
 import org.corehunter.data.GenotypeVariantData;
-import org.corehunter.data.Header;
 import org.corehunter.util.StringUtils;
 import uno.informatics.common.io.FileType;
 
 import static uno.informatics.common.Constants.UNKNOWN_COUNT;
+import uno.informatics.data.SimpleEntity;
+import uno.informatics.data.pojo.SimpleEntityPojo;
 
 /**
  * @author Guy Davenport, Herman De Beukelaer
@@ -66,7 +67,7 @@ public class SimpleGenotypeVariantData extends SimpleNamedData implements Genoty
      * @param alleleNames allele names per marker
      * @param alleleFrequencies allele frequencies
      */
-    public SimpleGenotypeVariantData(Header[] itemHeaders, String[] markerNames, String[][] alleleNames,
+    public SimpleGenotypeVariantData(SimpleEntity[] itemHeaders, String[] markerNames, String[][] alleleNames,
                                      Double[][][] alleleFrequencies) {
         this("Multi-allelic marker data", itemHeaders, markerNames, alleleNames, alleleFrequencies);
     }
@@ -108,7 +109,7 @@ public class SimpleGenotypeVariantData extends SimpleNamedData implements Genoty
      * @param alleleFrequencies allele frequencies, may not be <code>null</code>; dimensions indicate number of
      *                          individuals, markers and alleles per marker
      */
-    public SimpleGenotypeVariantData(String datasetName, Header[] itemHeaders, String[] markerNames,
+    public SimpleGenotypeVariantData(String datasetName, SimpleEntity[] itemHeaders, String[] markerNames,
                                      String[][] alleleNames, Double[][][] alleleFrequencies) {
         
         // pass dataset name, size and item headers to parent
@@ -271,7 +272,7 @@ public class SimpleGenotypeVariantData extends SimpleNamedData implements Genoty
     /**
      * Read genotype variant data from file. Only file types {@link FileType#TXT} and {@link FileType#CSV} are allowed.
      * Values are separated with a single tab (txt) or comma (csv) character. Allele frequencies should follow the
-     * requirements as described in the constructor {@link #SimpleGenotypeVariantData(String, Header[], String[],
+     * requirements as described in the constructor {@link #SimpleGenotypeVariantData(String, SimpleEntity[], String[],
      * String[][], Double[][][])}. Missing frequencies are encoding as empty cells.
      * <p>
      * The file should start with two compulsory header rows specifying the marker and allele names, respectively.
@@ -500,13 +501,13 @@ public class SimpleGenotypeVariantData extends SimpleNamedData implements Genoty
             int n = r-3;
             
             // combine names and identifiers in item headers
-            Header[] headers = null;
+            SimpleEntity[] headers = null;
             if(!itemNames.isEmpty() || !itemIdentifiers.isEmpty()){
-                headers = new Header[n];
+                headers = new SimpleEntity[n];
                 for(int i = 0; i < n; i++){
                     String name = !itemNames.isEmpty() ? itemNames.get(i) : null;
                     String identifier = !itemIdentifiers.isEmpty() ? itemIdentifiers.get(i) : null;
-                    headers[i] = new Header(name, identifier);
+                    headers[i] = new SimpleEntityPojo(identifier, name);
                 }
             }
             

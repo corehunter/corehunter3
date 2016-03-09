@@ -23,7 +23,7 @@ import static org.corehunter.tests.TestData.ALLELES;
 import static org.corehunter.tests.TestData.ALLELE_NAMES;
 import static org.corehunter.tests.TestData.MARKER_NAMES;
 import static org.corehunter.tests.TestData.NAME;
-import static org.corehunter.tests.TestData.NAMES;
+import static org.corehunter.tests.TestData.HEADERS;
 import static org.corehunter.tests.TestData.NUMBER_EFFECTIVE_ALLELES_SUBSET1;
 import static org.corehunter.tests.TestData.PRECISION;
 import static org.corehunter.tests.TestData.SUBSET1;
@@ -47,7 +47,7 @@ public class NumberEffectiveAllelesMultiAllelicTest extends EvaluationTest {
     @Test
     public void test() {
         SimpleGenotypeVariantData data
-                = new SimpleGenotypeVariantData(NAME, NAMES, MARKER_NAMES, ALLELE_NAMES, ALLELES);
+                = new SimpleGenotypeVariantData(NAME, HEADERS, MARKER_NAMES, ALLELE_NAMES, ALLELES);
 
         NumberEffectiveAllelesMultiAllelic objective
                 = new NumberEffectiveAllelesMultiAllelic();

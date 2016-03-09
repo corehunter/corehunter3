@@ -27,16 +27,16 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Objects;
 
 import org.corehunter.data.DistanceMatrixData;
-import org.corehunter.data.Header;
 import org.corehunter.data.matrix.SymmetricMatrixFormat;
 import org.corehunter.util.StringUtils;
 
 import uno.informatics.common.io.FileType;
 import uno.informatics.common.io.IOUtilities;
 import uno.informatics.common.io.RowReader;
+import uno.informatics.data.SimpleEntity;
+import uno.informatics.data.pojo.SimpleEntityPojo;
 
 /**
  * Simple implementation of a distance matrix that stores all values in a two-dimensional double array.
@@ -67,7 +67,7 @@ public class SimpleDistanceMatrixData extends SimpleNamedData implements Distanc
      */
     public SimpleDistanceMatrixData(double[][] distances) {
         // name of each item is set to null
-        this(new Header[distances.length], distances);
+        this(new SimpleEntity[distances.length], distances);
     }
     
     /**
@@ -91,7 +91,7 @@ public class SimpleDistanceMatrixData extends SimpleNamedData implements Distanc
      *                                  or the number of headers does not match
      *                                  the dimension of the distance matrix
      */
-    public SimpleDistanceMatrixData(Header[] headers, double[][] distances) {
+    public SimpleDistanceMatrixData(SimpleEntity[] headers, double[][] distances) {
         this("Precomputed distance matrix", headers, distances);
     }
     
@@ -116,7 +116,7 @@ public class SimpleDistanceMatrixData extends SimpleNamedData implements Distanc
      *                                  or the number of headers does not match
      *                                  the dimension of the distance matrix
      */
-    public SimpleDistanceMatrixData(String name, Header[] headers, double[][] distances) {
+    public SimpleDistanceMatrixData(String name, SimpleEntity[] headers, double[][] distances) {
         
         // pass dataset name, size and item headers to parent
         super(name, distances.length, headers);
@@ -329,13 +329,13 @@ public class SimpleDistanceMatrixData extends SimpleNamedData implements Distanc
             }
             
             // combine names and identifiers in headers
-            Header[] headers = null;
+            SimpleEntity[] headers = null;
             if(names != null || identifiers != null){
-                headers = new Header[n];
+                headers = new SimpleEntity[n];
                 for(int i = 0; i < n; i++){
                     String name = names != null ? names[i] : null;
                     String identifier = identifiers != null ? identifiers[i] : null;
-                    headers[i] = new Header(name, identifier);
+                    headers[i] = new SimpleEntityPojo(identifier, name);
                 }
             }
             
