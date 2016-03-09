@@ -30,6 +30,7 @@ import java.util.concurrent.Executors;
 
 import org.corehunter.Corehunter;
 import org.corehunter.CorehunterArguments;
+import org.corehunter.CorehunterObjective;
 import org.corehunter.listener.SimpleCorehunterListener;
 import org.corehunter.services.CorehunterRun;
 import org.corehunter.services.CorehunterRunArguments;
@@ -164,10 +165,13 @@ public class SimpleCorehunterRunServices implements CorehunterRunServices {
         private SubsetSolution subsetSolution;
         private DateTime startDate;
         private DateTime endDate;
+        private CorehunterRunStatus status;
 
         public CorehunterRunnable(CorehunterRunArguments corehunterRunArguments) {
             super(createUniqueIdentifier(), corehunterRunArguments.getName());
             this.corehunterRunArguments = corehunterRunArguments;
+
+            status = CorehunterRunStatus.NOT_STARTED;
         }
 
         public final String getOutputStream() {
@@ -202,6 +206,10 @@ public class SimpleCorehunterRunServices implements CorehunterRunServices {
             return endDate;
         }
 
+        public CorehunterRunStatus getStatus() {
+            return status;
+        }
+
         @Override
         public void run() {
 
@@ -210,6 +218,9 @@ public class SimpleCorehunterRunServices implements CorehunterRunServices {
 
                 CorehunterArguments arguments = new CorehunterArguments(corehunterRunArguments.getSubsetSize());
 
+                // TODO get from arugments
+                arguments.setObjective(CorehunterObjective.GD);
+
                 arguments.setDataset(datasetServices.getDataset(corehunterRunArguments.getDatasetId()));
 
                 corehunter = new Corehunter(arguments);
@@ -217,10 +228,15 @@ public class SimpleCorehunterRunServices implements CorehunterRunServices {
                 outputStream = new ByteArrayOutputStream();
                 PrintStream printStream = new PrintStream(outputStream);
 
+                status = CorehunterRunStatus.RUNNING;
+
                 subsetSolution = corehunter.execute(new SimpleCorehunterListener(printStream));
 
                 printStream.close();
+
+                status = CorehunterRunStatus.FINISHED;
             } catch (Exception e) {
+                status = CorehunterRunStatus.FAILED;
                 errorMessage = e.getMessage();
                 errorStream = new ByteArrayOutputStream();
                 PrintStream printStream = new PrintStream(errorStream);
@@ -231,7 +247,7 @@ public class SimpleCorehunterRunServices implements CorehunterRunServices {
 
             endDate = new DateTime();
 
-        } // String content = baos.toString(charsetName); // e.g. ISO-8859-1
+        }
 
     }
 
@@ -242,7 +258,7 @@ public class SimpleCorehunterRunServices implements CorehunterRunServices {
 
             setStartDate(corehunterRunnable.getStartDate());
             setEndDate(corehunterRunnable.getEndDate());
-            setStatus(CorehunterRunStatus.FAILED);
+            setStatus(corehunterRunnable.getStatus());
         }
 
     }

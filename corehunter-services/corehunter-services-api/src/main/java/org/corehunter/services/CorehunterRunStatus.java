@@ -18,7 +18,7 @@ package org.corehunter.services;
 
 public enum CorehunterRunStatus {
 
-    RUNNING("Running"), FAILED("Failed"), FINISHED("Finished");
+    NOT_STARTED("Not Started"), RUNNING("Running"), FAILED("Failed"), FINISHED("Finished");
 
     private String name;
 

@@ -16,8 +16,6 @@
 
 package org.corehunter.services.simple;
 
-import java.util.Date;
-
 import org.corehunter.services.CorehunterRun;
 import org.corehunter.services.CorehunterRunStatus;
 import org.joda.time.DateTime;

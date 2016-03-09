@@ -22,12 +22,15 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.rmi.server.UID;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
+import java.util.UUID;
+
 import org.corehunter.services.DatasetServices;
 import org.corehunter.services.DatasetType;
 
@@ -36,6 +39,7 @@ import com.thoughtworks.xstream.io.xml.StaxDriver;
 
 import uno.informatics.common.io.FileType;
 import uno.informatics.data.Dataset;
+import uno.informatics.data.FeatureDataset;
 import uno.informatics.data.SimpleEntity;
 import uno.informatics.data.dataset.DatasetException;
 import uno.informatics.data.feature.array.ArrayFeatureDataset;
@@ -106,7 +110,7 @@ public class FileBasedDatasetServices implements DatasetServices {
     }
 
     @Override
-    public void addDataset(Path path, FileType fileType, DatasetType datasetType) throws DatasetException {
+    public String addDataset(Path path, FileType fileType, DatasetType datasetType) throws DatasetException {
         Dataset dataset = createDataset(path, fileType, datasetType);
 
         if (!datasetMap.containsKey(dataset.getUniqueIdentifier())) {
@@ -131,6 +135,8 @@ public class FileBasedDatasetServices implements DatasetServices {
         } else {
             throw new DatasetException("Dataset already present : " + dataset.getUniqueIdentifier());
         }
+
+        return dataset.getUniqueIdentifier();
     }
 
     @Override
@@ -229,7 +235,13 @@ public class FileBasedDatasetServices implements DatasetServices {
     }
 
     private Dataset createPhenotypicDataset(Path path, FileType fileType) throws DatasetException {
-        return ArrayFeatureDataset.readFeatureDatasetFromTextFile(path.toFile(), fileType);
+        ArrayFeatureDataset dataset = (ArrayFeatureDataset) ArrayFeatureDataset
+                .readFeatureDatasetFromTextFile(path.toFile(), fileType);
+
+        // TODO remove cast
+        dataset.setUniqueIdentifier(UUID.randomUUID().toString());
+
+        return dataset;
     }
 
     private XStream createXStream() {

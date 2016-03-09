@@ -14,25 +14,36 @@
  * limitations under the License.
  *******************************************************************************/
 
-package org.corehunter.services;
+package org.corehunter.services.simple;
 
-import java.nio.file.Path;
-import java.util.List;
+import org.corehunter.services.CorehunterRunArguments;
 
-import uno.informatics.common.io.FileType;
-import uno.informatics.data.Dataset;
-import uno.informatics.data.SimpleEntity;
-import uno.informatics.data.dataset.DatasetException;
+public class CorehunterRunArgumentsPojo implements CorehunterRunArguments {
 
-public interface DatasetServices {
-    public List<SimpleEntity> getDatasetDescriptions();
+    private String name ;
+    private int subsetSize ;
+    private String datasetId ;
+    
+    public CorehunterRunArgumentsPojo(String name, int subsetSize, String datasetId) {
+        super();
+        this.name = name;
+        this.subsetSize = subsetSize;
+        this.datasetId = datasetId;
+    }
 
-    public List<Dataset> getAllDatasets() throws DatasetException;
+    @Override
+    public String getName() {
+        return name ;
+    }
 
-    public Dataset getDataset(String datasetId) throws DatasetException;
+    @Override
+    public int getSubsetSize() {
+        return subsetSize;
+    }
 
-    public String addDataset(Path path, FileType fileType, DatasetType datasetType) throws DatasetException;
-
-    public void removeDataset(String datasetId) throws DatasetException;
+    @Override
+    public String getDatasetId() {
+        return datasetId;
+    }
 
 }
