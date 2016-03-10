@@ -97,15 +97,7 @@ public class TestData {
         "mk4"
     };
 
-    public static final int[][] ALLELE_SCORES = {
-        {1, 0, 2, 1, 1, 0, 0},
-        {2, 0, 2, 0, 1, 2, 1},
-        {1, 0, 1, 0, 1, 1, 0},
-        {1, 0, 1, 1, 1, 2, 2},
-        {1, 0, 2, 0, 1, 2, 0}
-    };
-
-    public static final Double[][][] ALLELES = {
+    public static final Double[][][] ALLELE_FREQUENCIES = {
         {
             {null, null, null},
             {0.5, 0.5},
@@ -153,7 +145,7 @@ public class TestData {
         }
     };
     
-    public static final Double[][][] ALLELES_DIPLOID = {
+    public static final Double[][][] ALLELE_FREQUENCIES_DIPLOID = {
         {
             {0.5, 0.0, 0.5},
             {0.0, 1.0, 0.0, 0.0},
@@ -201,6 +193,62 @@ public class TestData {
         {"A", "B", "C", "D"},
         {"a1", "a2"},
         {"+", "-"}
+    };
+    
+    public static final int[][] ALLELE_SCORES_BIALLELIC = {
+        {1, 0, 2, 1, 1, 0, 0},
+        {2, 0, 2, 0, 1, 2, 1},
+        {1, 0, 1, 0, 1, 1, 0},
+        {1, 0, 1, 1, 1, 2, 2},
+        {1, 0, 2, 0, 1, 2, 0}
+    };
+    
+    public static final Double[][][] ALLELE_FREQUENCIES_BIALLELIC = {
+        {
+            {0.5, 0.5},
+            {1.0, 0.0},
+            {0.0, 1.0},
+            {0.5, 0.5},
+            {0.5, 0.5},
+            {1.0, 0.0},
+            {1.0, 0.0}
+        },
+        {
+            {0.0, 1.0},
+            {1.0, 0.0},
+            {0.0, 1.0},
+            {1.0, 0.0},
+            {0.5, 0.5},
+            {0.0, 1.0},
+            {0.5, 0.5}
+        },
+        {
+            {0.5, 0.5},
+            {1.0, 0.0},
+            {0.5, 0.5},
+            {1.0, 0.0},
+            {0.5, 0.5},
+            {0.5, 0.5},
+            {1.0, 0.0}
+        },
+        {
+            {0.5, 0.5},
+            {1.0, 0.0},
+            {0.5, 0.5},
+            {0.5, 0.5},
+            {0.5, 0.5},
+            {0.0, 1.0},
+            {0.0, 1.0}
+        },
+        {
+            {0.5, 0.5},
+            {1.0, 0.0},
+            {0.0, 1.0},
+            {0.1, 1.0},
+            {0.5, 0.5},
+            {0.0, 1.0},
+            {1.0, 0.0}
+        },
     };
 
     public static final double[][] CAVALLI_SFORZA_EDWARDS_DISTANCES = {

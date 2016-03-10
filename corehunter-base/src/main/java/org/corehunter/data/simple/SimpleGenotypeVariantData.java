@@ -24,7 +24,6 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -261,7 +260,8 @@ public class SimpleGenotypeVariantData extends SimpleNamedData implements Genoty
      * Read genotype variant data from file. Only file types {@link FileType#TXT} and {@link FileType#CSV} are allowed.
      * Values are separated with a single tab (txt) or comma (csv) character. Allele frequencies should follow the
      * requirements as described in the constructor {@link #SimpleGenotypeVariantData(String, SimpleEntity[], String[],
-     * String[][], Double[][][])}. Missing frequencies are encoding as empty cells.
+     * String[][], Double[][][])}. Missing frequencies are encoding as empty cells. Trailing empty cells can be
+     * omitted from any data row.
      * <p>
      * The file should start with two compulsory header rows specifying the marker and allele names, respectively.
      * Each marker should be uniquely identified by its name, which can thus not be missing. The number of alleles
@@ -280,7 +280,9 @@ public class SimpleGenotypeVariantData extends SimpleNamedData implements Genoty
      * Leading and trailing whitespace is removed from names and unique identifiers and they are unquoted if wrapped
      * in single or double quotes after whitespace removal. If it is intended to start or end a name/identifier with
      * whitespace this whitespace should be contained within the quotes, as it will then not be removed. It is allowed
-     * that names/identifiers are missing for some individuals/alleles but marker names are required.
+     * that names/identifiers are missing for some individuals/alleles but marker names are required. In this
+     * case the corresponding cells should be left blank. Trailing blank cells at the end of the allele name
+     * header row can be omitted.
      * <p>
      * The dataset name is set to the name of the file to which <code>filePath</code> points.
      * 
@@ -381,6 +383,10 @@ public class SimpleGenotypeVariantData extends SimpleNamedData implements Genoty
             
             reader.nextRow();
             String[] alleleNamesRow = reader.getRowCellsAsStringArray();
+            // extend with null values if needed
+            if(alleleNamesRow.length < numCols){
+                alleleNamesRow = Arrays.copyOf(alleleNamesRow, numCols);
+            }
             // check row length
             if(alleleNamesRow.length != numCols){
                 throw new IOException(String.format(
@@ -393,6 +399,12 @@ public class SimpleGenotypeVariantData extends SimpleNamedData implements Genoty
             int itemIdentifierColumn = UNDEFINED_COLUMN;
             for(int c = 0; c < numHeaderCols; c++){
                 String str = StringUtils.trimAndUnquote(alleleNamesRow[c]);
+                if(str == null){
+                    throw new IOException(String.format(
+                            "Missing column header. Row: 1, column: %d. Expected: %s or %s, but found blank cell.",
+                            c, NAMES_HEADER, IDENTIFIERS_HEADER
+                    ));
+                }
                 switch(str){
                     case NAMES_HEADER:
                         if(itemNameColumn == UNDEFINED_COLUMN){
@@ -440,34 +452,37 @@ public class SimpleGenotypeVariantData extends SimpleNamedData implements Genoty
             int r = 2;
             while(reader.nextRow()){
                 
-                // read row headers, if any (name/identifier)
+                // read row as strings
+                String[] dataRow = reader.getRowCellsAsStringArray();
+                // extend with null values if needed
+                if(dataRow.length < numCols){
+                    dataRow = Arrays.copyOf(dataRow, numCols);
+                }
+                // check length
+                if(dataRow.length != numCols){
+                    throw new IOException(String.format(
+                            "Incorrect number of columns at row %d. Expected: %d, actual: %d.",
+                            r, numCols, dataRow.length
+                    ));
+                }
+                
+                // extract row headers, if any (name/identifier)
                 for(int c = 0; c < numHeaderCols; c++){
-                    reader.nextColumn();
-                    String nameOrId = StringUtils.trimAndUnquote(reader.getCellAsString());
+                    String nameOrId = StringUtils.trimAndUnquote(dataRow[c]);
                     if(itemNameColumn == c){
                         itemNames.add(nameOrId);
                     } else {
                         itemIdentifiers.add(nameOrId);
                     }
                 }
-                reader.nextColumn();
                 
-                // read allele frequencies as strings (to support missing values)
-                String[] freqs = reader.getRowCellsAsStringArray();
-                // check length
-                if(freqs.length != numDataCols){
-                    throw new IOException(String.format(
-                            "Incorrect number of columns at row %d. Expected: %d, actual: %d.",
-                            r, numCols, freqs.length + numHeaderCols
-                    ));
-                }
                 // group per marker
                 Double[][] freqsPerMarker = new Double[numMarkers][];
-                int fglob = 0;
+                int fglob = numHeaderCols;
                 for(int m = 0; m < numMarkers; m++){
                     freqsPerMarker[m] = new Double[allelesPerMarker.get(m)];
                     for(int f = 0; f < freqsPerMarker[m].length; f++){
-                        Double freq = freqs[fglob] == null ? null : Double.parseDouble(freqs[fglob]);
+                        Double freq = dataRow[fglob] == null ? null : Double.parseDouble(dataRow[fglob]);
                         freqsPerMarker[m][f] = freq;
                         fglob++;
                     }
@@ -516,7 +531,8 @@ public class SimpleGenotypeVariantData extends SimpleNamedData implements Genoty
      * the two observed alleles are specified (by number/name/id) for each individual. The number of alleles may
      * be larger than two and different per marker, but each diploid genotype contains only one (homozygous) or
      * two (heterozygous) of all possible alleles of a certain marker. This means that all inferred frequencies
-     * are either 0.0, 0.5 or 1.0. Missing values are encoding as empty cells.
+     * are either 0.0, 0.5 or 1.0. Missing values are encoding as empty cells. Trailing empty cells can be
+     * omitted from any data row.
      * <p>
      * The file starts with a compulsory header row specifying the marker names. Although this row is required
      * some or all names may be undefined by leaving the corresponding cells blank. Each pair of two consecutive
@@ -536,9 +552,10 @@ public class SimpleGenotypeVariantData extends SimpleNamedData implements Genoty
      * Leading and trailing whitespace is removed from names and unique identifiers and they are unquoted if wrapped
      * in single or double quotes after whitespace removal. If it is intended to start or end a name/identifier with
      * whitespace this whitespace should be contained within the quotes, as it will then not be removed. It is allowed
-     * that names/identifiers are missing for some individuals/markers. The name and identifier columns can be omitted
-     * if no names/identifiers are assigned, but the header row with marker names should always be present, even if no
-     * marker names are assigned in which case it consists of empty cells only.
+     * that names/identifiers are missing for some individuals/markers. In this case the corresponding cells should be
+     * left blank. The name and identifier columns can be omitted if no names/identifiers are assigned, but the header
+     * row with marker names should always be present, even if no marker names are assigned.  Yet, trailing blank
+     * cells at the end of the header row can be omitted.
      * <p>
      * The dataset name is set to the name of the file to which <code>filePath</code> points.
      * 
@@ -581,11 +598,35 @@ public class SimpleGenotypeVariantData extends SimpleNamedData implements Genoty
                 throw new IOException("File is empty.");
             }
             
-            // 1: read marker names
+            // read all data
+            List<String[]> rows = new ArrayList<>();
+            while(reader.nextRow()){
+                rows.add(reader.getRowCellsAsStringArray());
+            }
+            int n = rows.size()-1;
             
-            reader.nextRow();
-            // read and trim/unquote
-            String[] headerRow = StringUtils.trimAndUnquote(reader.getRowCellsAsStringArray());
+            if(n < 0){
+                throw new IOException("File is empty.");
+            }
+            if(n == 0){
+                throw new IOException("No data rows.");
+            }
+            
+            // infer number of columns
+            int numCols = rows.stream().mapToInt(row -> row.length).max().getAsInt();
+            // extend rows with null values where needed + trim and unquote
+            for(int r = 0; r <= n; r++){
+                String[] row = rows.get(r);
+                row = StringUtils.trimAndUnquote(row);
+                if(row.length < numCols){
+                    row = Arrays.copyOf(row, numCols);
+                }
+                rows.set(r, row);
+            }
+            
+            // 1: extract marker names
+            
+            String[] headerRow = rows.get(0);
             // check for presence of header columns
             int itemNameColumn = UNDEFINED_COLUMN;
             int itemIdentifierColumn = UNDEFINED_COLUMN;
@@ -612,7 +653,6 @@ public class SimpleGenotypeVariantData extends SimpleNamedData implements Genoty
                 }
                 numHeaderCols++;
             }
-            int numCols = headerRow.length;
             int numDataCols = numCols - numHeaderCols;
             if(numDataCols == 0){
                 throw new IOException("No data columns.");
@@ -652,68 +692,46 @@ public class SimpleGenotypeVariantData extends SimpleNamedData implements Genoty
                 }
                 markerNames[m] = markerName;
             }
-            // set array to null if no marker names provided
-            if(Arrays.stream(markerNames).allMatch(Objects::isNull)){
-                markerNames = null;
-            }
-            if(markerNames != null){
-                // check uniqueness
-                uniqueNames(markerNames, true);
-                // remove trailing dots, underscores and dashes from
-                // inferred marker names if this does not compromise uniqueness
-                String[] trimmedMarkerNames = Arrays.stream(markerNames)
-                                                    .map(str -> 
-                                                         str != null
-                                                           && (str.endsWith(".")
-                                                               || str.endsWith("-")
-                                                               || str.endsWith("_"))
-                                                         ? str.substring(0, str.length()-1)
-                                                         : str
-                                                    )
-                                                    .toArray(n -> new String[n]);
-                markerNames = uniqueNames(trimmedMarkerNames, false) ? trimmedMarkerNames : markerNames;
-            }
+            // check uniqueness
+            uniqueNames(markerNames, true);
+            // remove trailing dots, underscores and dashes from
+            // inferred marker names if this does not compromise uniqueness
+            String[] trimmedMarkerNames = Arrays.stream(markerNames)
+                                                .map(str -> 
+                                                     str != null
+                                                       && (str.endsWith(".")
+                                                           || str.endsWith("-")
+                                                           || str.endsWith("_"))
+                                                     ? str.substring(0, str.length()-1)
+                                                     : str
+                                                )
+                                                .toArray(k -> new String[k]);
+            markerNames = uniqueNames(trimmedMarkerNames, false) ? trimmedMarkerNames : markerNames;
             
-            // 2: read data rows
-            
-            if(!reader.hasNextRow()){
-                throw new IOException("No data rows.");
-            }
-            List<String> itemNames = new ArrayList<>();
-            List<String> itemIdentifiers = new ArrayList<>();
-            List<String[]> alleleRefs = new ArrayList<>();
-            int r = 1;
-            while(reader.nextRow()){
+            // 2: extract item names/identifiers
+
+            String[] itemNames = null;
+            String[] itemIdentifiers = null;
+            if(numHeaderCols > 0){
+                itemNames = new String[n];
+                itemIdentifiers = new String[n];
+                for(int i = 0; i < n; i++){
                 
-                // read row headers, if any (name/identifier)
-                for(int c = 0; c < numHeaderCols; c++){
-                    reader.nextColumn();
-                    String nameOrId = StringUtils.trimAndUnquote(reader.getCellAsString());
-                    if(itemNameColumn == c){
-                        itemNames.add(nameOrId);
-                    } else {
-                        itemIdentifiers.add(nameOrId);
+                    String[] row = rows.get(i+1);
+
+                    // extract row headers, if any (name/identifier)
+                    for(int c = 0; c < numHeaderCols; c++){
+                        if(itemNameColumn == c){
+                            itemNames[i] = row[c];
+                        } else {
+                            itemIdentifiers[i] = row[c];
+                        }
                     }
+
                 }
-                reader.nextColumn();
-                
-                // read allele references (strings, missing values allowed)
-                String[] refs = StringUtils.trimAndUnquote(reader.getRowCellsAsStringArray());
-                // check length
-                if(refs.length != numDataCols){
-                    throw new IOException(String.format(
-                            "Incorrect number of columns at row %d. Expected: %d, actual: %d.",
-                            r, numCols, refs.length + numHeaderCols
-                    ));
-                }
-                // store
-                alleleRefs.add(refs);
-                
-                // next row
-                r++;
-                
             }
-            int n = alleleRefs.size();
+            
+            // 3: extract alleles
             
             // infer allele names per marker
             String[][] alleleNames = new String[numMarkers][];
@@ -721,9 +739,9 @@ public class SimpleGenotypeVariantData extends SimpleNamedData implements Genoty
                 // infer set of observed alleles (sort lexicographically)
                 Set<String> alleles = new TreeSet<>();
                 for(int i = 0; i < n; i++){
-                    String[] geno = alleleRefs.get(i);
+                    String[] row = rows.get(i+1);
                     for(int a = 0; a < 2; a++){
-                        String allele = geno[2*m + a];
+                        String allele = row[numHeaderCols + 2*m + a];
                         if(allele != null){
                             alleles.add(allele);
                         }
@@ -746,9 +764,9 @@ public class SimpleGenotypeVariantData extends SimpleNamedData implements Genoty
                 for(int m = 0; m < numMarkers; m++){
                     int numAlleles = alleleNames[m].length;
                     Double[] freqs = new Double[numAlleles];
-                    String[] geno = alleleRefs.get(i);
-                    String allele1 = geno[2*m];
-                    String allele2 = geno[2*m+1];
+                    String[] row = rows.get(i+1);
+                    String allele1 = row[numHeaderCols + 2*m];
+                    String allele2 = row[numHeaderCols + 2*m+1];
                     if(allele1 != null && allele2 != null){
                         // no missing values
                         Arrays.fill(freqs, 0.0);
@@ -770,11 +788,11 @@ public class SimpleGenotypeVariantData extends SimpleNamedData implements Genoty
             
             // combine names and identifiers in item headers
             SimpleEntity[] headers = null;
-            if(!itemNames.isEmpty() || !itemIdentifiers.isEmpty()){
+            if(itemNames != null){
                 headers = new SimpleEntity[n];
                 for(int i = 0; i < n; i++){
-                    String name = !itemNames.isEmpty() ? itemNames.get(i) : null;
-                    String identifier = !itemIdentifiers.isEmpty() ? itemIdentifiers.get(i) : null;
+                    String name = itemNames[i];
+                    String identifier = itemIdentifiers[i];
                     headers[i] = new SimpleEntityPojo(identifier, name);
                 }
             }

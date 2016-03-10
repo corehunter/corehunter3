@@ -19,7 +19,6 @@
 
 package org.corehunter.tests.objectives.multiallelic;
 
-import static org.corehunter.tests.TestData.ALLELES;
 import static org.corehunter.tests.TestData.ALLELE_NAMES;
 import static org.corehunter.tests.TestData.MARKER_NAMES;
 import static org.corehunter.tests.TestData.NAME;
@@ -32,6 +31,7 @@ import org.corehunter.data.simple.SimpleGenotypeVariantData;
 import org.corehunter.objectives.multiallelic.ShannonsDiversityMultiAllelic;
 import org.jamesframework.core.subset.SubsetSolution;
 import org.junit.Test;
+import static org.corehunter.tests.TestData.ALLELE_FREQUENCIES;
 
 /**
  * @author Guy Davenport
@@ -46,7 +46,7 @@ public class ShannonsDiversityMultiAllelicTest extends EvaluationTest {
     @Test
     public void test() {
         SimpleGenotypeVariantData data
-                = new SimpleGenotypeVariantData(NAME, HEADERS, MARKER_NAMES, ALLELE_NAMES, ALLELES);
+                = new SimpleGenotypeVariantData(NAME, HEADERS, MARKER_NAMES, ALLELE_NAMES, ALLELE_FREQUENCIES);
 
         ShannonsDiversityMultiAllelic objective
                 = new ShannonsDiversityMultiAllelic();

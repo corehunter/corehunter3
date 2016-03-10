@@ -19,7 +19,6 @@
 
 package org.corehunter.tests.objectives.multiallelic;
 
-import static org.corehunter.tests.TestData.ALLELES;
 import static org.corehunter.tests.TestData.ALLELE_NAMES;
 import static org.corehunter.tests.TestData.MARKER_NAMES;
 import static org.corehunter.tests.TestData.NAME;
@@ -33,6 +32,10 @@ import org.corehunter.data.simple.SimpleGenotypeVariantData;
 import org.corehunter.objectives.multiallelic.NumberEffectiveAllelesMultiAllelic;
 import org.jamesframework.core.subset.SubsetSolution;
 import org.junit.Test;
+import static org.junit.Assert.assertFalse;
+import static org.corehunter.tests.TestData.ALLELE_FREQUENCIES;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertFalse;
 
 /**
  * @author Guy Davenport
@@ -47,7 +50,7 @@ public class NumberEffectiveAllelesMultiAllelicTest extends EvaluationTest {
     @Test
     public void test() {
         SimpleGenotypeVariantData data
-                = new SimpleGenotypeVariantData(NAME, HEADERS, MARKER_NAMES, ALLELE_NAMES, ALLELES);
+                = new SimpleGenotypeVariantData(NAME, HEADERS, MARKER_NAMES, ALLELE_NAMES, ALLELE_FREQUENCIES);
 
         NumberEffectiveAllelesMultiAllelic objective
                 = new NumberEffectiveAllelesMultiAllelic();

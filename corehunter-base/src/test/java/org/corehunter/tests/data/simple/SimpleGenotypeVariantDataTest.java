@@ -19,10 +19,8 @@
 
 package org.corehunter.tests.data.simple;
 
-import static org.corehunter.tests.TestData.ALLELES;
 import static org.corehunter.tests.TestData.ALLELE_NAMES;
 import static org.corehunter.tests.TestData.MARKER_NAMES;
-import static org.corehunter.tests.TestData.ALLELES_DIPLOID;
 import static org.corehunter.tests.TestData.ALLELE_NAMES_DIPLOID;
 import static org.corehunter.tests.TestData.MARKER_NAMES_DIPLOID;
 import static org.corehunter.tests.TestData.NAME;
@@ -31,6 +29,8 @@ import static org.corehunter.tests.TestData.NAMES;
 import static org.corehunter.tests.TestData.PRECISION;
 import static org.corehunter.tests.TestData.SET;
 import static org.corehunter.tests.TestData.UNIQUE_IDENTIFIERS;
+import static org.corehunter.tests.TestData.ALLELE_FREQUENCIES_DIPLOID;
+import static org.corehunter.tests.TestData.ALLELE_FREQUENCIES;
 
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
@@ -45,12 +45,13 @@ import org.junit.BeforeClass;
 import org.junit.AfterClass;
 import org.junit.Test;
 
+
+import uno.informatics.common.io.FileType;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-
-import uno.informatics.common.io.FileType;
 
 /**
  * @author Guy Davenport, Herman De Beukelaer
@@ -67,6 +68,8 @@ public class SimpleGenotypeVariantDataTest {
     private static final String DIPLOID_CSV_NAMES_IDS = "/multiallelic/diploid/names-and-ids.csv";
     private static final String DIPLOID_TXT_NO_NAMES = "/multiallelic/diploid/no-names.txt";
     private static final String DIPLOID_TXT_NO_MARKER_NAMES = "/multiallelic/diploid/no-marker-names.txt";
+    private static final String DIPLOID_TXT_NO_NAMES_NO_MARKER_NAMES
+                                                            = "/multiallelic/diploid/no-names-no-marker-names.txt";
 
     private static final String ERRONEOUS_FILES_DIR = "/multiallelic/err/";
     private static final String DIPLOID_ERRONEOUS_FILES_DIR = "/multiallelic/diploid/err/";
@@ -95,7 +98,7 @@ public class SimpleGenotypeVariantDataTest {
         datasetName = NAME;
         withNames = true;
         withUniqueIdentifiers = true;
-        testDataGeneral(new SimpleGenotypeVariantData(NAME, HEADERS, MARKER_NAMES, ALLELE_NAMES, ALLELES));
+        testDataGeneral(new SimpleGenotypeVariantData(NAME, HEADERS, MARKER_NAMES, ALLELE_NAMES, ALLELE_FREQUENCIES));
     }
 
     @Test
@@ -179,7 +182,7 @@ public class SimpleGenotypeVariantDataTest {
         withNames = true;
         withUniqueIdentifiers = true;
         testDataDiploid(new SimpleGenotypeVariantData(NAME, HEADERS, MARKER_NAMES_DIPLOID,
-                                                      ALLELE_NAMES_DIPLOID, ALLELES_DIPLOID));
+                                                      ALLELE_NAMES_DIPLOID, ALLELE_FREQUENCIES_DIPLOID));
     }
     
     @Test
@@ -242,6 +245,24 @@ public class SimpleGenotypeVariantDataTest {
         Arrays.fill(MARKER_NAMES_DIPLOID, null);
         testDataDiploid(SimpleGenotypeVariantData.readDiploidData(
             Paths.get(SimpleGenotypeVariantDataTest.class.getResource(DIPLOID_TXT_NO_MARKER_NAMES).getPath()),
+            FileType.TXT
+        ));
+        // restore
+        System.arraycopy(markerNamesBackup, 0, MARKER_NAMES_DIPLOID, 0, MARKER_NAMES_DIPLOID.length);
+    }
+    
+    @Test
+    public void diploidFromTxtFileWithoutNamesOrMarkerNames() throws IOException {
+        datasetName = "no-names-no-marker-names.txt";
+        withNames = false;
+        withUniqueIdentifiers = false;
+        System.out.println(" |- File diploid/" + datasetName);
+        // store copy of all marker names
+        String[] markerNamesBackup = Arrays.copyOf(MARKER_NAMES_DIPLOID, MARKER_NAMES_DIPLOID.length);
+        // erase marker names
+        Arrays.fill(MARKER_NAMES_DIPLOID, null);
+        testDataDiploid(SimpleGenotypeVariantData.readDiploidData(
+            Paths.get(SimpleGenotypeVariantDataTest.class.getResource(DIPLOID_TXT_NO_NAMES_NO_MARKER_NAMES).getPath()),
             FileType.TXT
         ));
         // restore
@@ -355,11 +376,11 @@ public class SimpleGenotypeVariantDataTest {
     }
     
     private void testDataGeneral(SimpleGenotypeVariantData data) {
-        testData(data, MARKER_NAMES, ALLELE_NAMES, ALLELES);
+        testData(data, MARKER_NAMES, ALLELE_NAMES, ALLELE_FREQUENCIES);
     }
     
     private void testDataDiploid(SimpleGenotypeVariantData data) {
-        testData(data, MARKER_NAMES_DIPLOID, ALLELE_NAMES_DIPLOID, ALLELES_DIPLOID);
+        testData(data, MARKER_NAMES_DIPLOID, ALLELE_NAMES_DIPLOID, ALLELE_FREQUENCIES_DIPLOID);
     }
     
 }

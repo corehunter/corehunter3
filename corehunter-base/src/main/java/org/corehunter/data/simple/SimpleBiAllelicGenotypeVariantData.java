@@ -220,6 +220,14 @@ public class SimpleBiAllelicGenotypeVariantData extends SimpleNamedData
         }
     }
 
+    /**
+     * ... TODO
+     * 
+     * @param filePath path to file that contains the data
+     * @param type {@link FileType#TXT} or {@link FileType#CSV}
+     * @return biallelic genotype variant data
+     * @throws IOException if the file can not be read or is not correctly formatted
+     */
     public static final SimpleBiAllelicGenotypeVariantData readData(Path filePath, FileType type) throws IOException {
         
         return null;

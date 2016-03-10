@@ -25,6 +25,9 @@ import org.corehunter.Corehunter;
 import org.corehunter.CorehunterArguments;
 import org.jamesframework.core.subset.SubsetSolution;
 import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Guy Davenport

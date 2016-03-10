@@ -19,7 +19,6 @@
 
 package org.corehunter.tests.objectives.distance.multiallelic;
 
-import static org.corehunter.tests.TestData.ALLELES;
 import static org.corehunter.tests.TestData.ALLELE_NAMES;
 import static org.corehunter.tests.TestData.MARKER_NAMES;
 import static org.corehunter.tests.TestData.MODIFIED_ROGERS_DISTANCES;
@@ -35,6 +34,10 @@ import org.corehunter.data.simple.SimpleGenotypeVariantData;
 import org.corehunter.objectives.distance.multiallelic.ModifiedRogersDistanceMultiAllelic;
 import org.junit.Assert;
 import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.corehunter.tests.TestData.ALLELE_FREQUENCIES;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Guy Davenport
@@ -49,7 +52,7 @@ public class ModifiedRogersDistanceMultiAllelicTest {
     @Test
     public void test() {
         SimpleGenotypeVariantData data = new SimpleGenotypeVariantData(
-                NAME, HEADERS, MARKER_NAMES, ALLELE_NAMES, ALLELES
+                NAME, HEADERS, MARKER_NAMES, ALLELE_NAMES, ALLELE_FREQUENCIES
         );
 
         ModifiedRogersDistanceMultiAllelic distanceMetric

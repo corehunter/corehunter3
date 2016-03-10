@@ -37,11 +37,11 @@ import org.junit.AfterClass;
 import org.junit.Test;
 
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 import org.junit.BeforeClass;
 import uno.informatics.common.io.FileType;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Guy Davenport, Herman De Beukelaer
@@ -66,8 +66,6 @@ public class SimpleDistanceMatrixDataTest {
         "/distances/err/non-symmetric.txt",        
         "/distances/err/non-zero-diagonal-values.csv",        
         "/distances/err/non-zero-diagonal-values.txt",        
-        "/distances/err/too-few-names.txt",        
-        "/distances/err/too-few-ids.txt",        
         "/distances/err/missing-rows.txt",
         "/distances/err/names-after-data.txt",
         "/distances/err/ids-after-data.txt",
@@ -87,8 +85,6 @@ public class SimpleDistanceMatrixDataTest {
         SymmetricMatrixFormat.LOWER,
         SymmetricMatrixFormat.FULL,
         SymmetricMatrixFormat.LOWER_DIAG,
-        SymmetricMatrixFormat.FULL,
-        SymmetricMatrixFormat.FULL,
         SymmetricMatrixFormat.FULL,
         SymmetricMatrixFormat.FULL,
         SymmetricMatrixFormat.FULL,

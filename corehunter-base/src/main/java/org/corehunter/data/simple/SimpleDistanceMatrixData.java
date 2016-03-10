@@ -24,6 +24,7 @@ import uno.informatics.common.Constants;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
@@ -170,7 +171,8 @@ public class SimpleDistanceMatrixData extends SimpleNamedData implements Distanc
      * name. Leading and trailing whitespace is removed from names and unique identifiers and they are
      * unquoted if wrapped in single or double quotes after whitespace removal. If it is intended to start or end
      * a name/identifier with whitespace this whitespace should be contained within the quotes, as it will then
-     * not be removed. It is allowed that names and/or identifiers are missing for some individuals.
+     * not be removed. It is allowed that names and/or identifiers are missing for some individuals. In this
+     * case the corresponding cells should be left blank. Trailing blank cells can be omitted for any header row.
      * <p>
      * The dataset name is set to the name of the file to which <code>filePath</code> points.
      * 
@@ -308,6 +310,14 @@ public class SimpleDistanceMatrixData extends SimpleNamedData implements Distanc
                         "Incorrect number of data rows. Expected: %d, actual: %d.",
                         expectedRows, datarows.size()
                 ));
+            }
+            
+            // extend names/identifiers with null values if necessary
+            if(names != null && names.length < n){
+                names = Arrays.copyOf(names, n);
+            }
+            if(identifiers != null && identifiers.length < n){
+                identifiers = Arrays.copyOf(identifiers, n);
             }
             
             // check number of names

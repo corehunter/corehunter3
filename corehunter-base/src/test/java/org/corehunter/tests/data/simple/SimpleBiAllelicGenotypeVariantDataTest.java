@@ -34,6 +34,12 @@ import org.corehunter.data.simple.SimpleBiAllelicGenotypeVariantData;
 import org.junit.Test;
 
 import uno.informatics.common.io.FileProperties;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 /**
  * @author Guy Davenport
