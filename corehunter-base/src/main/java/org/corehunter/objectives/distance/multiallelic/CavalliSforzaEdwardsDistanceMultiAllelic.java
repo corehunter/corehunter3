@@ -55,8 +55,8 @@ public class CavalliSforzaEdwardsDistanceMultiAllelic extends
             numberOfAlleles = getData().getNumberOfAlleles(markerIndex);
 
             for (int alleleIndex = 0; alleleIndex < numberOfAlleles; ++alleleIndex) {
-                pxla = getData().getAlelleFrequency(idX, markerIndex, alleleIndex);
-                pyla = getData().getAlelleFrequency(idY, markerIndex, alleleIndex);
+                pxla = getData().getAlleleFrequency(idX, markerIndex, alleleIndex);
+                pyla = getData().getAlleleFrequency(idY, markerIndex, alleleIndex);
 
                 if (pxla >= 0 && pyla >= 0) {
                     sqrtDiff = Math.sqrt(pxla) - Math.sqrt(pyla);

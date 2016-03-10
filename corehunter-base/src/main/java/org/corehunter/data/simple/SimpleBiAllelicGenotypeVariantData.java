@@ -19,19 +19,14 @@
 
 package org.corehunter.data.simple;
 
-import static uno.informatics.common.Constants.UNKNOWN_INDEX;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
+import java.nio.file.Path;
+import java.util.Arrays;
 
 import org.corehunter.data.BiAllelicGenotypeVariantData;
 
-import uno.informatics.common.io.FileProperties;
-import uno.informatics.common.io.IOUtilities;
-import uno.informatics.common.io.RowReader;
+import uno.informatics.common.io.FileType;
 import uno.informatics.data.SimpleEntity;
 
 /**
@@ -43,230 +38,192 @@ public class SimpleBiAllelicGenotypeVariantData extends SimpleNamedData
     private final Integer[][] alleleScores; // null element means missing value
     private final String[] markerNames;     // null element means no marker name assigned
 
-    public SimpleBiAllelicGenotypeVariantData(String name, SimpleEntity[] itemNames,
-                                              String[] markerNames, int[][] alleleScores) {
-        super(name, alleleScores.length, itemNames);
-
-        if (markerNames == null) {
-            throw new IllegalArgumentException("Marker names not defined!");
-        }
-
-        if (alleleScores == null) {
-            throw new IllegalArgumentException("Alleles not deifned!");
-        }
-
-        if (getNames().length != alleleScores.length) {
-            throw new IllegalArgumentException("Number of alleleScores don't match number of names!");
-        }
-
-        if (alleleScores.length > 0) {
-            numberOfMarkers = alleleScores[0].length;
-
-            if (numberOfMarkers != markerNames.length) {
-                throw new IllegalArgumentException("Number of marker names don't match number of markers!");
-            }
-
-            this.markerNames = new String[numberOfMarkers];
-
-            this.alleleScores = new int[alleleScores.length][numberOfMarkers];
-
-            for (int j = 0; j < numberOfMarkers; ++j) {
-                this.markerNames[j] = markerNames[j];
-            }
-
-            for (int i = 0; i < alleleScores.length; ++i) {
-                if (numberOfMarkers != alleleScores[i].length) {
-                    throw new IllegalArgumentException("Number of markers don't match for id : " + i);
-                }
-
-                for (int j = 0; j < numberOfMarkers; ++j) {
-                    this.alleleScores[i][j] = alleleScores[i][j];
-                }
-            }
-        } else {
-            this.alleleScores = new int[0][0];
-        }
-    }
-
-    /* 
-     * (non-Javadoc)
-     * @see org.corehunter.data.GenotypeVariantData#getNumberOfMarkers()
+    /**
+     * Create data with given dataset name, item headers, marker names and allele scores.
+     * The number of rows and columns of <code>alleleScores</code> indicates the number of
+     * items and markers, respectively. All entries in this matrix should be 0, 1 or 2
+     * (or <code>null</code> for missing values).
+     * <p>
+     * Item headers and marker names are optional. Missing names/headers are encoded as <code>null</code>.
+     * Alternatively, if no item headers or no marker names are assigned, the respective array itself may
+     * also be <code>null</code>. If not <code>null</code> the length of <code>itemHeaders</code> and
+     * <code>markerNames</code> should be equal to the number of items and markers, respectively, as inferred
+     * from the dimensions of <code>alleleScores</code>.
+     * <p>
+     * Violating any of the requirements will produce an exception.
+     * <p>
+     * Allele scores as well as assigned headers and names are copied into internal data structures,
+     * i.e. no references are retained to any of the arrays passed as arguments.
+     * 
+     * @param datasetName name of the dataset
+     * @param itemHeaders item headers, <code>null</code> if no headers are assigned; if not <code>null</code>
+     *                    its length should equal the number of rows in <code>alleleScores</code>
+     * @param markerNames marker names, <code>null</code> if no marker names are assigned; if not
+     *                    <code>null</code> its length should equal the number of columns in <code>alleleScores</code>
+     * @param alleleScores allele scores, may not be <code>null</code> but can contain <code>null</code>
+     *                     values (missing); dimensions indicate number of items (rows) and markers (columns)
      */
+    public SimpleBiAllelicGenotypeVariantData(String datasetName, SimpleEntity[] itemHeaders,
+                                              String[] markerNames, Integer[][] alleleScores) {
+        
+        // pass dataset name, size and item headers to parent
+        super(datasetName, alleleScores.length, itemHeaders);
+        
+        // check allele scores and infer number of items/markers
+        int n = alleleScores.length;
+        int m = -1;
+        if(n == 0){
+            throw new IllegalArgumentException("No data (zero rows).");
+        }
+        for(int i = 0; i < n; i++){
+            Integer[] geno = alleleScores[i];
+            // check: genotype defined
+            if(geno == null){
+                throw new IllegalArgumentException(String.format(
+                        "Allele scores not defined for item %d.", i
+                ));
+            }
+            // set/check number of markers
+            if(m == -1){
+                m = geno.length;
+                if(m == 0){
+                    throw new IllegalArgumentException("No markers (zero columns)");
+                }
+            } else if (geno.length != m){
+                throw new IllegalArgumentException(String.format(
+                        "Incorrect number of markers for item %d. Expected: %d, actual: %d.",
+                        i, m, geno.length
+                ));
+            }
+            // check values
+            for(int j = 0; j < m; j++){
+                if(geno[j] != null && (geno[j] < 0 || geno[j] > 2)){
+                    throw new IllegalArgumentException(String.format(
+                            "Unexpected value at row %d and column %d. Got: %d (allowed: 0, 1, 2, null).",
+                            i, j, geno[j]
+                    ));
+                }
+            }
+        }
+        // copy allele scores
+        this.alleleScores = new Integer[n][m];
+        for(int i = 0; i < n; i++){
+            this.alleleScores[i] = Arrays.copyOf(alleleScores[i], m);
+        }
+        
+        // check and copy marker names
+        if(markerNames == null){
+            this.markerNames = new String[m];
+        } else {
+            if(markerNames.length != m){
+                throw new IllegalArgumentException(String.format(
+                        "Incorrect number of marker names provided. Expected: %d, actual: %d.",
+                        m, markerNames.length
+                ));
+            }
+            this.markerNames = Arrays.copyOf(markerNames, m);
+        }
+        
+    }
+    
     @Override
     public int getNumberOfMarkers() {
-        return numberOfMarkers;
+        return alleleScores[0].length;
     }
-
-    /* 
-     * (non-Javadoc)
-     * @see org.corehunter.data.BiAllelicGenotypeVariantData#getAlleleScore(int, int)
-     */
+    
+    @Override
+    public String getMarkerName(int markerIndex) {
+        return markerNames[markerIndex];
+    }
+    
     @Override
     public int getAlleleScore(int id, int markerIndex) {
         return alleleScores[id][markerIndex];
     }
-
-    /*
-     * (non-Javadoc)
-     * @see org.corehunter.data.NamedGenotypeVariantData#getMarkerName(int)
+    
+    /**
+     * Returns 2 for each marker.
+     * 
+     * @param markerIndex marker index; ignored unless it falls outside the valid range
+     * @return 2
+     * @throws ArrayIndexOutOfBoundsException if <code>markerIndex</code> falls outsize the valid
+     *                                        range 0..m-1 with m the number of markers
      */
     @Override
-    public String getMarkerName(int markerIndex)
-            throws ArrayIndexOutOfBoundsException {
-        return markerNames[markerIndex];
-    }
-
-    public static final SimpleBiAllelicGenotypeVariantData readData(
-            FileProperties fileProperties) throws IOException {
-        
-        RowReader reader;
-
-        if (fileProperties == null) {
-            throw new IOException("File properties not defined!");
-        }
-
-        if (fileProperties.getFile() == null) {
-            throw new IOException("File not defined!");
-        }
-
-        if (fileProperties.getFileType() == null) {
-            throw new IOException("File type not defined!");
-        }
-
-        if (!fileProperties.hasColumnHeader()) {
-            throw new IOException("Column headers must be defined!");
-        }
-
-        if (!fileProperties.hasRowHeader()) {
-            throw new IOException("Row headers must be defined!");
-        }
-
-        if (fileProperties.getDataRowPosition() <= fileProperties.getColumnHeaderPosition()) {
-            throw new IOException("Column header position : " + fileProperties.getDataRowPosition()
-                                + " must be before data position : " + fileProperties.getColumnHeaderPosition());
-        }
-
-        if (!fileProperties.getFile().exists()) {
-            throw new IOException("File does not exist : " + fileProperties.getFile());
-        }
-
-        List<String> itemsNames = new LinkedList<>();
-        List<String> markerNames = new LinkedList<>();
-
-        String name;
-
-        List<Integer> alleleScoresRow;
-        List<List<Integer>> alleleScores;
-
-        int row = 0;
-
-        try {
-            reader = IOUtilities.createRowReader(fileProperties);
-
-            if (reader != null && reader.ready()) {
-                int columnCount = 0;
-
-                if (reader.nextRow()) {
-                    if (fileProperties.getRowHeaderPosition() > UNKNOWN_INDEX) {
-                        while (row < fileProperties.getRowHeaderPosition() && reader.nextRow()) {
-                            ++row;
-                        }
-                    }
-
-                    reader.nextColumn();
-                    reader.nextColumn();
-
-                    markerNames = reader.getRowCellsAsString();
-
-                    columnCount = markerNames.size();
-
-                    alleleScores = new LinkedList<>();
-
-                    if (fileProperties.getDataRowPosition() > UNKNOWN_INDEX) {
-                        while (row < fileProperties.getDataRowPosition() && reader.nextRow()) {
-                            ++row;
-                        }
-                    }
-
-                    reader.nextColumn();
-
-                    name = reader.getCellAsString();
-
-                    itemsNames.add(name);
-
-                    reader.nextColumn();
-
-                    alleleScoresRow = reader.getRowCellsAsInt();
-
-                    if (alleleScoresRow.size() != columnCount) {
-                        throw new IOException("Rows are not all the same size!");
-                    }
-
-                    alleleScores.add(alleleScoresRow);
-
-                    ++row;
-
-                    while (reader.nextRow()) {
-                        reader.nextColumn();
-
-                        name = reader.getCellAsString();
-
-                        itemsNames.add(name);
-
-                        reader.nextColumn();
-
-                        alleleScoresRow = reader.getRowCellsAsInt();
-
-                        if (alleleScoresRow.size() != columnCount) {
-                            throw new IOException("Rows are not all the same size!");
-                        }
-
-                        alleleScores.add(alleleScoresRow);
-
-                        ++row;
-                    }
-                } else {
-                    alleleScores = new ArrayList<>(0);
-                }
-            } else {
-                alleleScores = new ArrayList<>(0);
-            }
-
-            if (reader != null) {
-                reader.close();
-            }
-
-            return new SimpleBiAllelicGenotypeVariantData(fileProperties.getFile().getName(),
-                                                          itemsNames, markerNames, alleleScores);
-
-        } catch (IOException e) {
-            throw new IOException("Error reading file at row : " + row + " due to " + e.getMessage(), e);
-        }
-
-    }
-
-    @Override
     public int getNumberOfAlleles(int markerIndex) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        validateMarkerIndex(markerIndex);
+        return 2;
     }
 
+    /**
+     * Since each marker has two alleles this method returns twice the number of markers.
+     * 
+     * @return twice the number of markers
+     */
     @Override
     public int getTotalNumberOfAlleles() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return 2 * getNumberOfMarkers();
     }
 
+    /**
+     * The name of each allele is simply a string version of the allele index (0/1). 
+     * 
+     * @param markerIndex marker index; ignored unless it falls outside the valid range
+     * @param alleleIndex allele index; 0 or 1
+     * @return "0" or "1" depending on the allele index
+     * @throws ArrayIndexOutOfBoundsException if <code>markerIndex</code> falls outsize the valid
+     *                                        range 0..m-1 with m the number of markers, or if
+     *                                        <code>alleleIndex</code> is not 0 or 1
+     */
     @Override
-    public String getAlleleName(int markerIndex, int alleleIndex) throws ArrayIndexOutOfBoundsException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public String getAlleleName(int markerIndex, int alleleIndex) {
+        validateMarkerIndex(markerIndex);
+        validateAlleleIndex(alleleIndex);
+        return "" + alleleIndex;
     }
 
+    /**
+     * Computes the the allele frequency at a certain marker in a certain individual.
+     * For allele 1, the frequency <code>f</code> is defined as the allele score divided by two.
+     * The frequency of allele 0 equals <code>1.0 - f</code>.
+     * 
+     * @param id item id within 0..n-1 with n the number of items
+     * @param markerIndex marker index within 0..m-1 with m the number of markers
+     * @param alleleIndex allele index; 0 or 1
+     * @return allele frequency; 0.0, 0.5 or 1.0 (or <code>null</code> if allele score is missing)
+     * @throws ArrayIndexOutOfBoundsException if the id or marker/allele index is out of range
+     */
     @Override
-    public Double getAlelleFrequency(int id, int markerIndex, int alleleIndex) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public Double getAlleleFrequency(int id, int markerIndex, int alleleIndex) {
+        
+        validateAlleleIndex(alleleIndex);
+        Integer a = alleleScores[id][markerIndex];
+        
+        if(a == null){
+            return null;
+        }
+        
+        double f = ((double) a) / 2.0;
+        return alleleIndex == 1 ? f : 1.0 - f;
+        
+    }
+    
+    private void validateMarkerIndex(int markerIndex){
+        if(markerIndex < 0 || markerIndex >= getNumberOfMarkers()){
+            throw new ArrayIndexOutOfBoundsException("Invalid marker index: " + markerIndex + ".");
+        }
+    }
+    
+    private void validateAlleleIndex(int alleleIndex){
+        if(alleleIndex < 0 || alleleIndex >= 2){
+            throw new ArrayIndexOutOfBoundsException("Invalid allele index: " + alleleIndex + ".");
+        }
     }
 
-    @Override
-    public double getAverageAlelleFrequency(Collection<Integer> entryIds, int markerIndex, int alleleIndex) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public static final SimpleBiAllelicGenotypeVariantData readData(Path filePath, FileType type) throws IOException {
+        
+        return null;
+
     }
+    
 }

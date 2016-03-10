@@ -51,8 +51,8 @@ public class ModifiedRogersDistanceMultiAllelic extends
             numberOfAlleles = getData().getNumberOfAlleles(markerIndex);
 
             for (int alleleIndex = 0; alleleIndex < numberOfAlleles; ++alleleIndex) {
-                double pxla = getData().getAlelleFrequency(idX, markerIndex, alleleIndex);
-                double pyla = getData().getAlelleFrequency(idY, markerIndex, alleleIndex);
+                double pxla = getData().getAlleleFrequency(idX, markerIndex, alleleIndex);
+                double pyla = getData().getAlleleFrequency(idY, markerIndex, alleleIndex);
 
                 if (pxla >= 0 && pyla >= 0) {
                     markerSqDiff += (pxla - pyla) * (pxla - pyla);

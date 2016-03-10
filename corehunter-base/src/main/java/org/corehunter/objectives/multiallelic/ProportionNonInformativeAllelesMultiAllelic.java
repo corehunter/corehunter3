@@ -58,7 +58,7 @@ public class ProportionNonInformativeAllelesMultiAllelic
 
                 found = false;
                 while (!found && iterator.hasNext()) {
-                    alleleFrequency = data.getAlelleFrequency(iterator.next(), markerIndex, alleleIndex);
+                    alleleFrequency = data.getAlleleFrequency(iterator.next(), markerIndex, alleleIndex);
                     found = alleleFrequency > 0;
                 }
 

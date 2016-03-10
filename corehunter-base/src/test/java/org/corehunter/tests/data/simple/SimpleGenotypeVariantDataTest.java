@@ -335,15 +335,15 @@ public class SimpleGenotypeVariantDataTest {
                     if(alleles[i][m][a] == null){
                         assertNull("Frequency should be missing for allele " + a
                                  + " of marker " + m + " in individual " + i + ".",
-                                data.getAlelleFrequency(i, m, a));
+                                data.getAlleleFrequency(i, m, a));
                     } else {
                         assertNotNull("Frequency should not be missing for allele " + a
                                  + " of marker " + m + " in individual " + i + ".",
-                                data.getAlelleFrequency(i, m, a));
+                                data.getAlleleFrequency(i, m, a));
                         assertEquals("Incorrect frequency for allele " + a
                                + " of marker " + m + " in individual " + i + ".",
                                alleles[i][m][a],
-                               data.getAlelleFrequency(i, m, a),
+                               data.getAlleleFrequency(i, m, a),
                                PRECISION);
                     }
                 }

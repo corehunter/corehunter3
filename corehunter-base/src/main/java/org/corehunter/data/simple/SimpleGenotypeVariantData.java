@@ -107,8 +107,9 @@ public class SimpleGenotypeVariantData extends SimpleNamedData implements Genoty
      *                    if not <code>null</code> the length of <code>alleleNames</code> should correspond
      *                    to the number of markers and the length of <code>alleleNames[m]</code> to the number
      *                    of alleles of the m-th marker
-     * @param alleleFrequencies allele frequencies, may not be <code>null</code>; dimensions indicate number of
-     *                          individuals, markers and alleles per marker
+     * @param alleleFrequencies allele frequencies, may not be <code>null</code> but can contain <code>null</code>
+     *                          values (missing); dimensions indicate number of individuals, markers and alleles
+     *                          per marker
      */
     public SimpleGenotypeVariantData(String datasetName, SimpleEntity[] itemHeaders, String[] markerNames,
                                      String[][] alleleNames, Double[][][] alleleFrequencies) {
@@ -117,9 +118,6 @@ public class SimpleGenotypeVariantData extends SimpleNamedData implements Genoty
         super(datasetName, alleleFrequencies.length, itemHeaders);
 
         // check allele frequencies and infer number of individuals, markers and alleles per marker
-        if (alleleFrequencies == null) {
-            throw new IllegalArgumentException("Allele frequency entries not defined.");
-        }
         int n = alleleFrequencies.length;
         int m = -1;
         int[] a = null;
@@ -255,19 +253,8 @@ public class SimpleGenotypeVariantData extends SimpleNamedData implements Genoty
     }
 
     @Override
-    public Double getAlelleFrequency(int id, int markerIndex, int alleleIndex) {
+    public Double getAlleleFrequency(int id, int markerIndex, int alleleIndex) {
         return alleleFrequencies[id][markerIndex][alleleIndex];
-    }
-    
-    @Override
-    public double getAverageAlelleFrequency(Collection<Integer> entityIds, int markerIndex, int alleleIndex) {
-        return entityIds.stream()
-                        .mapToDouble(id -> {
-                            Double f = getAlelleFrequency(id, markerIndex, alleleIndex);
-                            return f == null ? 0.0 : f;
-                        })
-                        .average()
-                        .getAsDouble();
     }
 
     /**
