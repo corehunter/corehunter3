@@ -40,9 +40,8 @@ import uno.informatics.data.SimpleEntity;
 public class SimpleBiAllelicGenotypeVariantData extends SimpleNamedData
                                                 implements BiAllelicGenotypeVariantData {
 
-    private int[][] alleleScores;
-    private int numberOfMarkers;
-    private String[] markerNames;
+    private final Integer[][] alleleScores; // null element means missing value
+    private final String[] markerNames;     // null element means no marker name assigned
 
     public SimpleBiAllelicGenotypeVariantData(String name, SimpleEntity[] itemNames,
                                               String[] markerNames, int[][] alleleScores) {

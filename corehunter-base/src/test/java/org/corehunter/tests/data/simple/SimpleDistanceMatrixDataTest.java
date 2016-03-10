@@ -38,6 +38,7 @@ import org.junit.Test;
 
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import org.junit.BeforeClass;
 import uno.informatics.common.io.FileType;
@@ -225,12 +226,18 @@ public class SimpleDistanceMatrixDataTest {
             // check name, if assigned
             if(withNames){
                 assertEquals("Name for " + i + " not correct.", NAMES[i], data.getHeader(i).getName());
+            } else {
+                assertTrue("No name should have been set for individual " + i, 
+                            data.getHeader(i) == null || data.getHeader(i).getName() == null);
             }
             
             // check unique identifier, if assigned
             if(withUniqueIdentifiers){
                 assertEquals("Unique identifier for " + i + " not correct.",
                              UNIQUE_IDENTIFIERS[i], data.getHeader(i).getUniqueIdentifier());
+            } else {
+                assertTrue("No unique identifier should have been set for individual " + i, 
+                            data.getHeader(i) == null || data.getHeader(i).getUniqueIdentifier() == null);
             }
 
             // check distances

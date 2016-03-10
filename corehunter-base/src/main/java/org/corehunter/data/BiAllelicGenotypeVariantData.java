@@ -22,7 +22,7 @@ package org.corehunter.data;
 /**
  * Biallelic data contains the allele score for markers that have two and only two alleles. If any of the markers have
  * three or more alleles, such as classic SSR data, then the generic {@link GenotypeVariantData} must be used.
- * Biallelic datasets can be treated separately when desired to optimize computations.
+ * Biallelic datasets may be treated separately to reduce computation time, for example in the objectives.
  *
  * @author Guy Davenport, Herman De Beukelaer
  */

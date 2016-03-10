@@ -60,8 +60,7 @@ public class SimpleGenotypeVariantData extends SimpleNamedData implements Genoty
     private final String[][] alleleNames;           // null element means no allele name assigned
 
     /**
-     * Create data with name "Multi-allelic marker data".
-     * For details of the arguments see 
+     * Create data with name "Multi-allelic marker data". For details of the arguments see 
      * {@link #SimpleGenotypeVariantData(String, String[], String[], String[][], Double[][][])}.
      * 
      * @param itemHeaders item headers, specifying name and/or unique identifier
@@ -666,21 +665,27 @@ public class SimpleGenotypeVariantData extends SimpleNamedData implements Genoty
                 }
                 markerNames[m] = markerName;
             }
-            // check uniqueness
-            uniqueNames(markerNames, true);
-            // remove trailing dots, underscores and dashes from
-            // inferred marker names if this does not compromise uniqueness
-            String[] trimmedMarkerNames = Arrays.stream(markerNames)
-                                                .map(str -> 
-                                                     str != null
-                                                       && (str.endsWith(".")
-                                                           || str.endsWith("-")
-                                                           || str.endsWith("_"))
-                                                     ? str.substring(0, str.length()-1)
-                                                     : str
-                                                )
-                                                .toArray(n -> new String[n]);
-            markerNames = uniqueNames(trimmedMarkerNames, false) ? trimmedMarkerNames : markerNames;
+            // set array to null if no marker names provided
+            if(Arrays.stream(markerNames).allMatch(Objects::isNull)){
+                markerNames = null;
+            }
+            if(markerNames != null){
+                // check uniqueness
+                uniqueNames(markerNames, true);
+                // remove trailing dots, underscores and dashes from
+                // inferred marker names if this does not compromise uniqueness
+                String[] trimmedMarkerNames = Arrays.stream(markerNames)
+                                                    .map(str -> 
+                                                         str != null
+                                                           && (str.endsWith(".")
+                                                               || str.endsWith("-")
+                                                               || str.endsWith("_"))
+                                                         ? str.substring(0, str.length()-1)
+                                                         : str
+                                                    )
+                                                    .toArray(n -> new String[n]);
+                markerNames = uniqueNames(trimmedMarkerNames, false) ? trimmedMarkerNames : markerNames;
+            }
             
             // 2: read data rows
             
@@ -740,8 +745,8 @@ public class SimpleGenotypeVariantData extends SimpleNamedData implements Genoty
                 // check: at least one allele
                 if(alleles.isEmpty()){
                     throw new IOException(String.format(
-                            "No data for marker %s (columns %d and %d).",
-                            markerNames[m], numHeaderCols + 2*m, numHeaderCols + 2*m+1
+                            "No data for marker %d (columns %d and %d).",
+                            m, numHeaderCols + 2*m, numHeaderCols + 2*m+1
                     ));
                 }
                 // convert to array and store
@@ -810,6 +815,9 @@ public class SimpleGenotypeVariantData extends SimpleNamedData implements Genoty
     }
     
     private static boolean uniqueNames(String[] names, boolean throwException) throws IOException{
+        if(names == null){
+            return true;
+        }
         Set<String> checked = new HashSet<>();
         for(String name : names){
             if(name != null && !checked.add(name)){

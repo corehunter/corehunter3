@@ -66,7 +66,7 @@ public class SimpleGenotypeVariantDataTest {
     private static final String DIPLOID_CSV_NAMES = "/multiallelic/diploid/names.csv";
     private static final String DIPLOID_CSV_NAMES_IDS = "/multiallelic/diploid/names-and-ids.csv";
     private static final String DIPLOID_TXT_NO_NAMES = "/multiallelic/diploid/no-names.txt";
-    private static final String DIPLOID_TXT_UNDEFINED_MARKER_NAMES = "/multiallelic/diploid/undefined-marker-names.txt";
+    private static final String DIPLOID_TXT_NO_MARKER_NAMES = "/multiallelic/diploid/no-marker-names.txt";
 
     private static final String ERRONEOUS_FILES_DIR = "/multiallelic/err/";
     private static final String DIPLOID_ERRONEOUS_FILES_DIR = "/multiallelic/diploid/err/";
@@ -231,23 +231,21 @@ public class SimpleGenotypeVariantDataTest {
     }
     
     @Test
-    public void diploidFromTxtFileWithUndefinedMarkerNames() throws IOException {
-        datasetName = "undefined-marker-names.txt";
-        withNames = false;
+    public void diploidFromTxtFileWithoutMarkerNames() throws IOException {
+        datasetName = "no-marker-names.txt";
+        withNames = true;
         withUniqueIdentifiers = false;
         System.out.println(" |- File diploid/" + datasetName);
         // store copy of all marker names
-        String[] allMarkerNames = Arrays.copyOf(MARKER_NAMES_DIPLOID, MARKER_NAMES_DIPLOID.length);
-        // erase name of 2nd and 3rd marker
-        MARKER_NAMES_DIPLOID[1] = null;
-        MARKER_NAMES_DIPLOID[2] = null;
+        String[] markerNamesBackup = Arrays.copyOf(MARKER_NAMES_DIPLOID, MARKER_NAMES_DIPLOID.length);
+        // erase marker names
+        Arrays.fill(MARKER_NAMES_DIPLOID, null);
         testDataDiploid(SimpleGenotypeVariantData.readDiploidData(
-            Paths.get(SimpleGenotypeVariantDataTest.class.getResource(DIPLOID_TXT_UNDEFINED_MARKER_NAMES).getPath()),
+            Paths.get(SimpleGenotypeVariantDataTest.class.getResource(DIPLOID_TXT_NO_MARKER_NAMES).getPath()),
             FileType.TXT
         ));
         // restore
-        MARKER_NAMES_DIPLOID[1] = allMarkerNames[1];
-        MARKER_NAMES_DIPLOID[2] = allMarkerNames[2];
+        System.arraycopy(markerNamesBackup, 0, MARKER_NAMES_DIPLOID, 0, MARKER_NAMES_DIPLOID.length);
     }
     
     @Test
@@ -317,12 +315,18 @@ public class SimpleGenotypeVariantDataTest {
             // check name, if assigned
             if(withNames){
                 assertEquals("Name for " + i + " not correct.", NAMES[i], data.getHeader(i).getName());
+            } else {
+                assertTrue("No name should have been set for individual " + i, 
+                            data.getHeader(i) == null || data.getHeader(i).getName() == null);
             }
             
             // check unique identifier, if assigned
             if(withUniqueIdentifiers){
                 assertEquals("Unique identifier for " + i + " not correct.",
                              UNIQUE_IDENTIFIERS[i], data.getHeader(i).getUniqueIdentifier());
+            } else {
+                assertTrue("No unique identifier should have been set for individual " + i, 
+                            data.getHeader(i) == null || data.getHeader(i).getUniqueIdentifier() == null);
             }
 
             // check frequencies
