@@ -20,28 +20,26 @@
 package org.corehunter.tests.distance;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.Iterator;
-import java.util.List;
 
 import org.corehunter.data.DistanceMatrixData;
+import org.corehunter.data.matrix.SymmetricMatrixFormat;
+import org.corehunter.data.simple.SimpleDistanceMatrixData;
 import org.corehunter.distance.GowersDistanceMatrixGenerator;
 import org.junit.Test;
 
-import uno.informatics.common.io.FileProperties;
 import uno.informatics.common.io.FileType;
 import uno.informatics.data.DataType;
 import uno.informatics.data.Feature;
 import uno.informatics.data.FeatureDataset;
-import uno.informatics.data.MatrixDataset;
 import uno.informatics.data.ScaleType;
 import uno.informatics.data.dataset.DatasetException;
 import uno.informatics.data.feature.array.ArrayFeatureDataset;
-import uno.informatics.data.matrix.array.DoubleArrayMatrixDataset;
 import uno.informatics.data.pojo.SimpleFeaturePojo;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
 
 /**
  * @author Guy Davenport
@@ -49,12 +47,7 @@ import static org.junit.Assert.fail;
 public class GowersDistanceMatrixGeneratorTest {
 
     private static final String DATA_FILE = "/phenotypic_data.csv";
-    private static final String DATA_FILE_WITH_TYPE = "/phenotypic_data_type.csv";
     private static final String MATRIX_FILE = "/matrix.csv";
-
-    private static final String UID = "test";
-    private static final String NAME = "test";
-    private static final String DESCRIPTION = "test";
 
     private static final Object[][] DATA = new Object[][]{
         new Object[]{1, 1.0, "1", true},
@@ -66,32 +59,21 @@ public class GowersDistanceMatrixGeneratorTest {
 
     private static final Feature[] FEATURES = new Feature[]{
         new SimpleFeaturePojo("feature1", DataType.INTEGER, ScaleType.INTERVAL, 0, 5),
-        new SimpleFeaturePojo("feature1", DataType.DOUBLE, ScaleType.RATIO, 0.0, 5.0),
-        new SimpleFeaturePojo("feature1", DataType.STRING, ScaleType.NOMINAL),
-        new SimpleFeaturePojo("feature1", DataType.BOOLEAN, ScaleType.NOMINAL)
+        new SimpleFeaturePojo("feature2", DataType.DOUBLE, ScaleType.RATIO, 0.0, 5.0),
+        new SimpleFeaturePojo("feature3", DataType.STRING, ScaleType.NOMINAL),
+        new SimpleFeaturePojo("feature4", DataType.BOOLEAN, ScaleType.NOMINAL)
     };
 
     private static final double[][] MATRIX = new double[][]{
-        new double[]{1.0, 0.6, 0.55, 0.15, 0.65},
-        new double[]{0.6, 1.0, 0.45, 0.55, 0.55},
-        new double[]{0.55, 0.45, 1.0, 0.35, 0.6},
-        new double[]{0.15, 0.55, 0.35, 1.0, 0.4},
-        new double[]{0.65, 0.55, 0.6, 0.4, 1.0}
+        new double[]{0.00, 0.40, 0.45, 0.85, 0.35},
+        new double[]{0.40, 0.00, 0.55, 0.45, 0.45},
+        new double[]{0.45, 0.55, 0.00, 0.65, 0.40},
+        new double[]{0.85, 0.45, 0.65, 0.00, 0.60},
+        new double[]{0.35, 0.45, 0.40, 0.60, 0.00}
     };
 
-    private static final double DELTA = 0.0000001;
+    private static final double DELTA = 1e-8;
 
-    /**
-     * Test method for {@link GowersDistanceMatrixGenerator#GowersDistanceMatrixGenerator(Object[][], Feature[])}.
-     */
-    @Test
-    public void testGowersDistanceMatrixGenerator() {
-        new GowersDistanceMatrixGenerator(DATA, FEATURES);
-    }
-
-    /**
-     * Test method for {@link GowersDistanceMatrixGenerator#generateDistanceMatrix()}.
-     */
     @Test
     public void testGenerateDistanceMatrix() {
         GowersDistanceMatrixGenerator generator = new GowersDistanceMatrixGenerator(DATA, FEATURES);
@@ -114,103 +96,34 @@ public class GowersDistanceMatrixGeneratorTest {
             }
         }
     }
-
-    //@Test TODO to fix this test we need a new expected matrix calculated in R
-    //      where all values are treated as factors (Nominal)
-    public void testGenerateDistanceMatrixFromFile() {
-        try {
-
-            FeatureDataset dataset = ArrayFeatureDataset.readFeatureDatasetFromTextFile(
-                new File(GowersDistanceMatrixGeneratorTest.class.getResource(DATA_FILE).getPath()), FileType.CSV) ;
-
-            GowersDistanceMatrixGenerator generator = new GowersDistanceMatrixGenerator(dataset);
-
-            DistanceMatrixData data = generator.generateDistanceMatrix();
-
-            Feature elementFeature = null;
-
-            FileProperties fileProperties = new FileProperties(
-                    GowersDistanceMatrixGeneratorTest.class.getResource(MATRIX_FILE).getPath(), FileType.CSV
-            );
-
-            fileProperties.setColumnHeaderPosition(0);
-            fileProperties.setDataRowPosition(1);
-            fileProperties.setRowHeaderPosition(0);
-            
-            List<Feature> features = dataset.getFeatures() ;
-            Feature rowHeaderFeature = dataset.getRowHeaderFeature() ;
-            
-            assertNotNull("Row headers need to be defined!", rowHeaderFeature) ;
-
-            MatrixDataset<Double> matrix
-                    = DoubleArrayMatrixDataset.createMatrixDataset(
-                            UID, NAME, DESCRIPTION, elementFeature,
-                            fileProperties, rowHeaderFeature, rowHeaderFeature);
-
-            for (int x = 0; x < features.size(); ++x) {
-                for (int y = 0; y < features.size(); ++y) {
-                    assertEquals(
-                            "x=" + x + " y=" + y,
-                            (double) matrix.getValue(x, y),
-                            1 - data.getDistance(x, y),
-                            DELTA
-                    );
-                }
-            }
-
-        } catch (DatasetException e) {
-            e.printStackTrace();
-            fail(e.getMessage());
-        }
-    }
     
     @Test
-    public void testGenerateDistanceMatrixFromFileWithType() {
-        try {
+    public void testGenerateDistanceMatrixFromFile() throws IOException, DatasetException {
 
-            FeatureDataset dataset = ArrayFeatureDataset.readFeatureDatasetFromTextFile(
-                    new File(GowersDistanceMatrixGeneratorTest.class.getResource(DATA_FILE_WITH_TYPE).getPath()),
-                    FileType.CSV
-            );
+        FeatureDataset dataset = ArrayFeatureDataset.readFeatureDatasetFromTextFile(
+                new File(GowersDistanceMatrixGeneratorTest.class.getResource(DATA_FILE).getPath()),
+                FileType.CSV
+        );
 
-            GowersDistanceMatrixGenerator generator = new GowersDistanceMatrixGenerator(dataset);
+        GowersDistanceMatrixGenerator generator = new GowersDistanceMatrixGenerator(dataset);
 
-            DistanceMatrixData data = generator.generateDistanceMatrix();
+        DistanceMatrixData distances = generator.generateDistanceMatrix();
+        DistanceMatrixData expected = SimpleDistanceMatrixData.readData(
+                Paths.get(GowersDistanceMatrixGeneratorTest.class.getResource(MATRIX_FILE).getPath()),
+                FileType.CSV, SymmetricMatrixFormat.FULL
+        );
 
-            Feature elementFeature = null;
-
-            FileProperties fileProperties = new FileProperties(
-                    GowersDistanceMatrixGeneratorTest.class.getResource(MATRIX_FILE).getPath(), FileType.CSV
-            );
-
-            fileProperties.setColumnHeaderPosition(0);
-            fileProperties.setDataRowPosition(1);
-            fileProperties.setRowHeaderPosition(0);
-            
-            List<Feature> features = dataset.getFeatures() ;
-            Feature rowHeaderFeature = dataset.getRowHeaderFeature() ;
-            
-            assertNotNull("Row headers need to be defined!", rowHeaderFeature) ;
-
-            MatrixDataset<Double> matrix
-                    = DoubleArrayMatrixDataset.createMatrixDataset(
-                            UID, NAME, DESCRIPTION, elementFeature,
-                            fileProperties, rowHeaderFeature, rowHeaderFeature);
-
-            for (int x = 0; x < features.size(); ++x) {
-                for (int y = 0; y < features.size(); ++y) {
-                    assertEquals(
-                            "x=" + x + " y=" + y,
-                            (double) matrix.getValue(x, y),
-                            1 - data.getDistance(x, y),
-                            DELTA
-                    );
-                }
+        int n = dataset.getRowCount();
+        for (int x = 0; x < n; x++) {
+            for (int y = 0; y < n; y++) {
+                assertEquals(
+                        "x=" + x + " y=" + y,
+                        expected.getDistance(x, y),
+                        distances.getDistance(x, y),
+                        DELTA
+                );
             }
-
-        } catch (DatasetException e) {
-            e.printStackTrace();
-            fail(e.getMessage());
         }
+        
     }
 }
