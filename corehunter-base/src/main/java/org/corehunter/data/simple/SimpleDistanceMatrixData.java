@@ -217,8 +217,8 @@ public class SimpleDistanceMatrixData extends SimpleNamedData implements Distanc
             }
             
             // read row per row
-            List<List<Double>> datarows = new ArrayList<>();
-            List<Double> row;
+            List<double[]> datarows = new ArrayList<>();
+            double[] row;
             String firstCell;
             int rowCount, prevRowCount = Constants.UNKNOWN_COUNT;
             int r = 0; // row counter
@@ -276,9 +276,9 @@ public class SimpleDistanceMatrixData extends SimpleNamedData implements Distanc
                     default:
                         
                         // read values
-                        row = reader.getRowCellsAsDouble();
+                        row = reader.getRowCellsAsDoubleArray();
                         // check number of values
-                        rowCount = row.size();
+                        rowCount = row.length;
                         checkNumValuesInRow(format, r, rowCount, prevRowCount);
                         // store
                         datarows.add(row);
@@ -297,7 +297,7 @@ public class SimpleDistanceMatrixData extends SimpleNamedData implements Distanc
             }
             
             // infer number of accessions
-            int n = datarows.get(datarows.size()-1).size();
+            int n = datarows.get(datarows.size()-1).length;
             if(format == SymmetricMatrixFormat.LOWER){
                 // diagonal not included
                 n++;
@@ -353,11 +353,11 @@ public class SimpleDistanceMatrixData extends SimpleNamedData implements Distanc
             // skip first row if lower triangular encoding without diagonal
             int s = (format == SymmetricMatrixFormat.LOWER) ? 1 : 0;
             // fill matrix
-            Iterator<List<Double>> rowIterator = datarows.iterator();
+            Iterator<double[]> rowIterator = datarows.iterator();
             for(r = s; r < n; r++){
                 row = rowIterator.next();
-                for(int c = 0; c < row.size(); c++){
-                    dist[r][c] = row.get(c);
+                for(int c = 0; c < row.length; c++){
+                    dist[r][c] = row[c];
                 }
             }
             
