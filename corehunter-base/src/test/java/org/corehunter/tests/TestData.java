@@ -195,12 +195,12 @@ public class TestData {
         {"+", "-"}
     };
     
-    public static final int[][] ALLELE_SCORES_BIALLELIC = {
+    public static final Integer[][] ALLELE_SCORES_BIALLELIC = {
         {1, 0, 2, 1, 1, 0, 0},
         {2, 0, 2, 0, 1, 2, 1},
-        {1, 0, 1, 0, 1, 1, 0},
-        {1, 0, 1, 1, 1, 2, 2},
-        {1, 0, 2, 0, 1, 2, 0}
+        {1, 0, null, 0, 1, 1, 0},
+        {1, 0, 1, 1, 1, 2, null},
+        {1, 0, null, 0, null, 2, 0}
     };
     
     public static final Double[][][] ALLELE_FREQUENCIES_BIALLELIC = {
@@ -225,7 +225,7 @@ public class TestData {
         {
             {0.5, 0.5},
             {1.0, 0.0},
-            {0.5, 0.5},
+            {null, null},
             {1.0, 0.0},
             {0.5, 0.5},
             {0.5, 0.5},
@@ -238,14 +238,14 @@ public class TestData {
             {0.5, 0.5},
             {0.5, 0.5},
             {0.0, 1.0},
-            {0.0, 1.0}
+            {null, null}
         },
         {
             {0.5, 0.5},
             {1.0, 0.0},
-            {0.0, 1.0},
-            {0.1, 1.0},
-            {0.5, 0.5},
+            {null, null},
+            {1.0, 0.0},
+            {null, null},
             {0.0, 1.0},
             {1.0, 0.0}
         },

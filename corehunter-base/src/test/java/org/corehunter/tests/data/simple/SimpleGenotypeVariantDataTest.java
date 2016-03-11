@@ -95,6 +95,15 @@ public class SimpleGenotypeVariantDataTest {
     @Test
     public void inMemory() {
         System.out.println(" |- In memory test");
+        datasetName = null;
+        withNames = true;
+        withUniqueIdentifiers = true;
+        testDataGeneral(new SimpleGenotypeVariantData(HEADERS, MARKER_NAMES, ALLELE_NAMES, ALLELE_FREQUENCIES));
+    }
+    
+    @Test
+    public void inMemoryWithName() {
+        System.out.println(" |- In memory test with dataset name");
         datasetName = NAME;
         withNames = true;
         withUniqueIdentifiers = true;
@@ -299,14 +308,14 @@ public class SimpleGenotypeVariantDataTest {
                           String[][] alleleNames, Double[][][] alleles) {
         
         // check dataset name, if set
-        String expectedDatasetName = datasetName != null ? datasetName : "Multi-allelic marker data";
+        String expectedDatasetName = datasetName != null ? datasetName : "Multiallelic marker data";
         assertEquals("Incorrect dataset name.", expectedDatasetName, data.getDatasetName());
         
         // check IDs
         assertEquals("Ids not correct.", SET, data.getIDs());
         
         // check number of markers
-        assertEquals("Number of marker is not correct.", markerNames.length, data.getNumberOfMarkers());
+        assertEquals("Number of markers is not correct.", markerNames.length, data.getNumberOfMarkers());
         // check total number of alleles
         assertEquals("Incorrect total number of alleles.", Arrays.stream(alleleNames)
                                                                  .mapToInt(names -> names.length)
@@ -359,8 +368,8 @@ public class SimpleGenotypeVariantDataTest {
                                 data.getAlleleFrequency(i, m, a));
                     } else {
                         assertNotNull("Frequency should not be missing for allele " + a
-                                 + " of marker " + m + " in individual " + i + ".",
-                                data.getAlleleFrequency(i, m, a));
+                                    + " of marker " + m + " in individual " + i + ".",
+                                   data.getAlleleFrequency(i, m, a));
                         assertEquals("Incorrect frequency for allele " + a
                                + " of marker " + m + " in individual " + i + ".",
                                alleles[i][m][a],

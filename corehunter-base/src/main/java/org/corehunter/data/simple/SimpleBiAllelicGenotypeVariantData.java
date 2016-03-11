@@ -22,12 +22,19 @@ package org.corehunter.data.simple;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
 
 import org.corehunter.data.BiAllelicGenotypeVariantData;
+import org.corehunter.util.StringUtils;
 
 import uno.informatics.common.io.FileType;
+import uno.informatics.common.io.IOUtilities;
+import uno.informatics.common.io.RowReader;
 import uno.informatics.data.SimpleEntity;
+import uno.informatics.data.pojo.SimpleEntityPojo;
 
 /**
  * @author Guy Davenport, Herman De Beukelaer
@@ -35,9 +42,26 @@ import uno.informatics.data.SimpleEntity;
 public class SimpleBiAllelicGenotypeVariantData extends SimpleNamedData
                                                 implements BiAllelicGenotypeVariantData {
 
+    private static final int UNDEFINED_COLUMN = -1;
+    private static final String NAMES_HEADER = "NAME";
+    private static final String IDENTIFIERS_HEADER = "ID";
+    
     private final Integer[][] alleleScores; // null element means missing value
     private final String[] markerNames;     // null element means no marker name assigned
 
+    /**
+     * Create data with name "Biallelic marker data". For details of the arguments see 
+     * {@link #SimpleBiAllelicGenotypeVariantData(String, SimpleEntity[], String[], Integer[][])}.
+     * 
+     * @param itemHeaders item headers (include name and/or unique identifier)
+     * @param markerNames marker names
+     * @param alleleScores 0/1/2 allele score matrix
+     */
+    public SimpleBiAllelicGenotypeVariantData(SimpleEntity[] itemHeaders, String[] markerNames,
+                                              Integer[][] alleleScores) {
+        this("Biallelic marker data", itemHeaders, markerNames, alleleScores);
+    }
+    
     /**
      * Create data with given dataset name, item headers, marker names and allele scores.
      * The number of rows and columns of <code>alleleScores</code> indicates the number of
@@ -99,7 +123,7 @@ public class SimpleBiAllelicGenotypeVariantData extends SimpleNamedData
             for(int j = 0; j < m; j++){
                 if(geno[j] != null && (geno[j] < 0 || geno[j] > 2)){
                     throw new IllegalArgumentException(String.format(
-                            "Unexpected value at row %d and column %d. Got: %d (allowed: 0, 1, 2, null).",
+                            "Unexpected value at data row %d and data column %d. Got: %d (allowed: 0, 1, 2).",
                             i, j, geno[j]
                     ));
                 }
@@ -137,7 +161,7 @@ public class SimpleBiAllelicGenotypeVariantData extends SimpleNamedData
     }
     
     @Override
-    public int getAlleleScore(int id, int markerIndex) {
+    public Integer getAlleleScore(int id, int markerIndex) {
         return alleleScores[id][markerIndex];
     }
     
@@ -221,7 +245,29 @@ public class SimpleBiAllelicGenotypeVariantData extends SimpleNamedData
     }
 
     /**
-     * ... TODO
+     * Read biallelic genotype variant data from file. Only file types {@link FileType#TXT} and {@link FileType#CSV}
+     * are allowed. Values are separated with a single tab (txt) or comma (csv) character. The file contains an
+     * allele score matrix with one row per individual and one column per marker. Only values 0, 1 and 2 are valid.
+     * Empty cells are also allowed which means that data is missing. Trailing empty cells can be omitted at any row.
+     * <p>
+     * The file starts with a compulsory header row specifying the marker names. Although this row is required
+     * some or all names may be undefined by leaving the corresponding cells blank. Depending on the number of
+     * header columns (if any, see below) some additional column header cells may be prepended to the header row.
+     * <p>
+     * Two optional (leftmost) header columns can be included to specify individual names and/or unique identifiers.
+     * The former is identified with column header "NAME", the latter with column header "ID". The column headers should
+     * be placed in the corresponding cell of the header row. Assigned identifiers, if any, should be unique and are
+     * used to distinguish between individuals with the same name.
+     * <p>
+     * Leading and trailing whitespace is removed from names and unique identifiers and they are unquoted if wrapped
+     * in single or double quotes after whitespace removal. If it is intended to start or end a name/identifier with
+     * whitespace this whitespace should be contained within the quotes, as it will then not be removed. It is allowed
+     * that names/identifiers are missing for some individuals/markers. In this case the corresponding cells should be
+     * left blank. The name and identifier columns can be omitted if no names/identifiers are assigned, but the header
+     * row with marker names should always be present, even if no marker names are assigned. Yet, trailing blank cells
+     * at the end of the header row can be omitted.
+     * <p>
+     * The dataset name is set to the name of the file to which <code>filePath</code> points.
      * 
      * @param filePath path to file that contains the data
      * @param type {@link FileType#TXT} or {@link FileType#CSV}
@@ -230,7 +276,152 @@ public class SimpleBiAllelicGenotypeVariantData extends SimpleNamedData
      */
     public static final SimpleBiAllelicGenotypeVariantData readData(Path filePath, FileType type) throws IOException {
         
-        return null;
+        // validate arguments
+        
+        if (filePath == null) {
+            throw new IllegalArgumentException("File path not defined.");
+        }
+        
+        if(!filePath.toFile().exists()){
+            throw new IOException("File does not exist : " + filePath + ".");
+        }
+
+        if(type == null){
+            throw new IllegalArgumentException("File type not defined.");
+        }
+        
+        if(type != FileType.TXT && type != FileType.CSV){
+            throw new IllegalArgumentException(
+                    String.format("Only file types TXT and CSV are supported. Got: %s.", type)
+            );
+        }
+        
+        // read data from file
+        try(RowReader reader = IOUtilities.createRowReader(filePath.toFile(), type)){
+            
+            if (reader == null || !reader.ready()) {
+                throw new IOException("Can not create reader for file " + filePath + ". File may be empty.");
+            }
+            
+            if(!reader.hasNextRow()){
+                throw new IOException("File is empty.");
+            }
+            
+            // read all data
+            List<String[]> rows = new ArrayList<>();
+            while(reader.nextRow()){
+                rows.add(reader.getRowCellsAsStringArray());
+            }
+            int n = rows.size()-1;
+            
+            if(n < 0){
+                throw new IOException("File is empty.");
+            }
+            if(n == 0){
+                throw new IOException("No data rows.");
+            }
+            
+            // infer number of columns
+            int numCols = rows.stream().mapToInt(row -> row.length).max().getAsInt();
+            // extend rows with null values where needed
+            for(int r = 0; r <= n; r++){
+                String[] row = rows.get(r);
+                if(row.length < numCols){
+                    row = Arrays.copyOf(row, numCols);
+                }
+                rows.set(r, row);
+            }
+            
+            // 1: extract marker names
+            
+            // trim and unquote header row
+            String[] headerRow = StringUtils.trimAndUnquote(rows.get(0));
+            // check for presence of header columns
+            int itemNameColumn = UNDEFINED_COLUMN;
+            int itemIdentifierColumn = UNDEFINED_COLUMN;
+            int numHeaderCols = 0;
+            while(numHeaderCols < 2 && numHeaderCols < headerRow.length
+                    && (Objects.equals(headerRow[numHeaderCols], NAMES_HEADER)
+                        || Objects.equals(headerRow[numHeaderCols], IDENTIFIERS_HEADER))){
+                if(headerRow[numHeaderCols].equals(NAMES_HEADER)){
+                    if(itemNameColumn == UNDEFINED_COLUMN){
+                        itemNameColumn = numHeaderCols;
+                    } else {
+                        throw new IOException(String.format(
+                                "Duplicate %s column.", NAMES_HEADER
+                        ));
+                    }
+                } else {
+                    if(itemIdentifierColumn == UNDEFINED_COLUMN){
+                        itemIdentifierColumn = numHeaderCols;
+                    } else {
+                        throw new IOException(String.format(
+                                "Duplicate %s column.", IDENTIFIERS_HEADER
+                        ));
+                    }
+                }
+                numHeaderCols++;
+            }
+            int m = numCols - numHeaderCols;
+            if(m == 0){
+                throw new IOException("No data columns.");
+            }
+            // store marker names
+            String[] markerNames = Arrays.copyOfRange(headerRow, numHeaderCols, headerRow.length);
+            
+            // 2: extract item names, identifiers and alelle scores
+            
+            String[] itemNames = new String[n];
+            String[] itemIdentifiers = new String[n];
+            Integer[][] alleleScores = new Integer[n][m];
+            for(int i = 0; i < n; i++){
+                
+                String[] row = rows.get(i+1);
+                
+                // extract item name and/or identifier
+                for(int c = 0; c < numHeaderCols; c++){
+                    String nameOrId = StringUtils.trimAndUnquote(row[c]);
+                    if(itemNameColumn == c){
+                        itemNames[i] = nameOrId;
+                    } else {
+                        itemIdentifiers[i] = nameOrId;
+                    }
+                }
+                
+                // extract allele scores
+                for(int j = 0; j < m; j++){
+                    String s = row[numHeaderCols + j];
+                    try {
+                        alleleScores[i][j] = (s == null ? null : Integer.parseInt(s.trim()));
+                    } catch (NumberFormatException ex){
+                        // wrap in IO exception
+                        throw new IOException(String.format(
+                                "Invalid allele score at row %d, column %d. Expected integer value 0/1/2, got: \"%s\".",
+                                i+1, numHeaderCols + j, s
+                        ), ex);
+                    }
+                }
+                
+            }
+            
+            // combine names and identifiers in item headers
+            SimpleEntity[] headers = new SimpleEntity[n];
+            for(int i = 0; i < n; i++){
+                String name = itemNames[i];
+                String identifier = itemIdentifiers[i];
+                headers[i] = new SimpleEntityPojo(identifier, name);
+            }
+            
+            try{
+                // create data
+                return new SimpleBiAllelicGenotypeVariantData(filePath.getFileName().toString(),
+                                                              headers, markerNames, alleleScores);
+            } catch(IllegalArgumentException ex){
+                // convert to IO exception
+                throw new IOException(ex.getMessage());
+            }
+            
+        }
 
     }
     

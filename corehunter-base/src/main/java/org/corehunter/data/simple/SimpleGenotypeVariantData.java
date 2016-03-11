@@ -59,8 +59,8 @@ public class SimpleGenotypeVariantData extends SimpleNamedData implements Genoty
     private final String[][] alleleNames;           // null element means no allele name assigned
 
     /**
-     * Create data with name "Multi-allelic marker data". For details of the arguments see 
-     * {@link #SimpleGenotypeVariantData(String, String[], String[], String[][], Double[][][])}.
+     * Create data with name "Multiallelic marker data". For details of the arguments see 
+     * {@link #SimpleGenotypeVariantData(String, SimpleEntity[], String[], String[][], Double[][][])}.
      * 
      * @param itemHeaders item headers, specifying name and/or unique identifier
      * @param markerNames marker names
@@ -69,7 +69,7 @@ public class SimpleGenotypeVariantData extends SimpleNamedData implements Genoty
      */
     public SimpleGenotypeVariantData(SimpleEntity[] itemHeaders, String[] markerNames, String[][] alleleNames,
                                      Double[][][] alleleFrequencies) {
-        this("Multi-allelic marker data", itemHeaders, markerNames, alleleNames, alleleFrequencies);
+        this("Multiallelic marker data", itemHeaders, markerNames, alleleNames, alleleFrequencies);
     }
     
     /**
@@ -261,15 +261,15 @@ public class SimpleGenotypeVariantData extends SimpleNamedData implements Genoty
      * Values are separated with a single tab (txt) or comma (csv) character. Allele frequencies should follow the
      * requirements as described in the constructor {@link #SimpleGenotypeVariantData(String, SimpleEntity[], String[],
      * String[][], Double[][][])}. Missing frequencies are encoding as empty cells. Trailing empty cells can be
-     * omitted from any data row.
+     * omitted from any row.
      * <p>
      * The file should start with two compulsory header rows specifying the marker and allele names, respectively.
-     * Each marker should be uniquely identified by its name, which can thus not be missing. The number of alleles
-     * per marker is inferred from these marker names. All columns corresponding to the same marker should occur
-     * consecutively in the file. The second header row specifies the allele names, which need not be unique and
-     * can be undefined for some or all alleles by leaving the corresponding cells blank. Still, this second header
-     * row should always be present, even if it consists of empty cells only. Depending on the number of header
-     * columns (if any, see below) some additional column header or empty cells may be prepended to both header rows.
+     * Marker names should be unique and specified for each data column. All columns corresponding to the same marker
+     * should occur consecutively in the file and are marked with the name of this marker. The second header row
+     * specifies the allele names, which need not be unique and can be undefined for some or all alleles by leaving
+     * the corresponding cells blank. This second header row should always be present, even if it consists of empty
+     * cells only, but trailing empty cells can be omitted. Depending on the number of header columns (if any, see
+     * below) some additional column header or empty cells may be prepended to both header rows.
      * <p>
      * Two optional (leftmost) header columns can be included to specify individual names and/or unique identifiers.
      * The former is identified with column header "NAME", the latter with column header "ID". The column headers should
@@ -280,9 +280,8 @@ public class SimpleGenotypeVariantData extends SimpleNamedData implements Genoty
      * Leading and trailing whitespace is removed from names and unique identifiers and they are unquoted if wrapped
      * in single or double quotes after whitespace removal. If it is intended to start or end a name/identifier with
      * whitespace this whitespace should be contained within the quotes, as it will then not be removed. It is allowed
-     * that names/identifiers are missing for some individuals/alleles but marker names are required. In this
-     * case the corresponding cells should be left blank. Trailing blank cells at the end of the allele name
-     * header row can be omitted.
+     * that names/identifiers are missing for some individuals/alleles but marker names are required. If a name/id is
+     * missing the corresponding cell should be left blank. Trailing blank cells at the end of a row can be omitted.
      * <p>
      * The dataset name is set to the name of the file to which <code>filePath</code> points.
      * 
@@ -482,7 +481,16 @@ public class SimpleGenotypeVariantData extends SimpleNamedData implements Genoty
                 for(int m = 0; m < numMarkers; m++){
                     freqsPerMarker[m] = new Double[allelesPerMarker.get(m)];
                     for(int f = 0; f < freqsPerMarker[m].length; f++){
-                        Double freq = dataRow[fglob] == null ? null : Double.parseDouble(dataRow[fglob]);
+                        Double freq;
+                        try {
+                            freq = (dataRow[fglob] == null ? null : Double.parseDouble(dataRow[fglob]));
+                        } catch (NumberFormatException ex){
+                            // wrap in IO exception
+                            throw new IOException(String.format(
+                                    "Invalid frequency at row %d, column %d. Expected double value, got: \"%s\".",
+                                    r, fglob, dataRow[fglob]
+                            ), ex);
+                        }
                         freqsPerMarker[m][f] = freq;
                         fglob++;
                     }
@@ -532,7 +540,7 @@ public class SimpleGenotypeVariantData extends SimpleNamedData implements Genoty
      * be larger than two and different per marker, but each diploid genotype contains only one (homozygous) or
      * two (heterozygous) of all possible alleles of a certain marker. This means that all inferred frequencies
      * are either 0.0, 0.5 or 1.0. Missing values are encoding as empty cells. Trailing empty cells can be
-     * omitted from any data row.
+     * omitted at any row.
      * <p>
      * The file starts with a compulsory header row specifying the marker names. Although this row is required
      * some or all names may be undefined by leaving the corresponding cells blank. Each pair of two consecutive
@@ -554,8 +562,8 @@ public class SimpleGenotypeVariantData extends SimpleNamedData implements Genoty
      * whitespace this whitespace should be contained within the quotes, as it will then not be removed. It is allowed
      * that names/identifiers are missing for some individuals/markers. In this case the corresponding cells should be
      * left blank. The name and identifier columns can be omitted if no names/identifiers are assigned, but the header
-     * row with marker names should always be present, even if no marker names are assigned.  Yet, trailing blank
-     * cells at the end of the header row can be omitted.
+     * row with marker names should always be present, even if no marker names are assigned. Yet, trailing blank cells
+     * at the end of the header row can be omitted.
      * <p>
      * The dataset name is set to the name of the file to which <code>filePath</code> points.
      * 
