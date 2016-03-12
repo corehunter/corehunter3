@@ -47,7 +47,7 @@ public class SimpleCorehunterRunServicesTest {
         }
     }
 
-    @Test
+    //@Test
     public void testExecuteCorehunter() {
 
         try {

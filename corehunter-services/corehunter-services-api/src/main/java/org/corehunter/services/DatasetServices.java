@@ -33,6 +33,6 @@ public interface DatasetServices {
 
     public String addDataset(Path path, FileType fileType, DatasetType datasetType) throws DatasetException;
 
-    public void removeDataset(String datasetId) throws DatasetException;
+    public boolean removeDataset(String datasetId) throws DatasetException;
 
 }

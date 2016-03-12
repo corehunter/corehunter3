@@ -25,6 +25,8 @@ public interface CorehunterRunServices {
 
     public CorehunterRun getCorehunterRun(String uniqueIdentifier);
     
+    public boolean removeCorehunterRun(String uniqueIdentifier);
+    
     public List<CorehunterRun> getAllCorehunterRuns();
 
     public String getOutputStream(String uniqueIdentifier) ;

@@ -140,7 +140,7 @@ public class FileBasedDatasetServices implements DatasetServices {
     }
 
     @Override
-    public void removeDataset(String datasetId) throws DatasetException {
+    public boolean removeDataset(String datasetId) throws DatasetException {
         Dataset dataset = getDataset(datasetId);
 
         if (dataset != null) {
@@ -163,6 +163,10 @@ public class FileBasedDatasetServices implements DatasetServices {
             if (removed != null && datasetCache != null) {
                 datasetCache.remove(dataset);
             }
+
+            return true;
+        } else {
+            return false;
         }
     }
 

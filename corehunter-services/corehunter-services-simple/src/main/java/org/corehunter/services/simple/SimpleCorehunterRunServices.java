@@ -72,13 +72,20 @@ public class SimpleCorehunterRunServices implements CorehunterRunServices {
 
     @Override
     public CorehunterRun getCorehunterRun(String uniqueIdentifier) {
-        CorehunterRunnable corehunterRunnable = corehunterRunnableMap.get(uniqueIdentifier);
+        CorehunterRunnable corehunterRunnable = corehunterRunnableMap.remove(uniqueIdentifier);
 
         if (corehunterRunnable != null) {
             return createCorehunterRunFromRunnable(corehunterRunnable);
         } else {
             return null;
         }
+    }
+    
+    @Override
+    public boolean removeCorehunterRun(String uniqueIdentifier) {
+        CorehunterRunnable corehunterRunnable = corehunterRunnableMap.get(uniqueIdentifier);
+
+        return corehunterRunnable != null;
     }
 
     @Override
