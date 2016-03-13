@@ -22,7 +22,6 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.rmi.server.UID;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -39,7 +38,6 @@ import com.thoughtworks.xstream.io.xml.StaxDriver;
 
 import uno.informatics.common.io.FileType;
 import uno.informatics.data.Dataset;
-import uno.informatics.data.FeatureDataset;
 import uno.informatics.data.SimpleEntity;
 import uno.informatics.data.dataset.DatasetException;
 import uno.informatics.data.feature.array.ArrayFeatureDataset;
@@ -58,6 +56,12 @@ public class FileBasedDatasetServices implements DatasetServices {
 
     private Path path;
 
+    public FileBasedDatasetServices() throws DatasetException {
+        setPath(Paths.get(""));
+
+        initialise();
+    }
+
     public FileBasedDatasetServices(Path path) throws DatasetException {
         setPath(path);
 
@@ -68,12 +72,14 @@ public class FileBasedDatasetServices implements DatasetServices {
         return path;
     }
 
-    protected synchronized final void setPath(Path path) {
+    public synchronized final void setPath(Path path) throws DatasetException {
         if (path == null) {
             throw new IllegalArgumentException("Path must be defined!");
         }
 
         this.path = path;
+
+        initialise();
     }
 
     @Override
@@ -173,6 +179,10 @@ public class FileBasedDatasetServices implements DatasetServices {
     @SuppressWarnings("unchecked")
     private void initialise() throws DatasetException {
         try {
+            if (!Files.exists(getPath())) {
+                Files.createDirectories(getPath());
+            }
+
             Path datasetDescriptionsPath = Paths.get(getPath().toString(), DATASET_DESCRIPTIONS);
 
             if (Files.exists(datasetDescriptionsPath)) {
@@ -195,10 +205,12 @@ public class FileBasedDatasetServices implements DatasetServices {
     private Dataset loadDataset(String datasetId) throws DatasetException {
         Dataset dataset = null;
 
-        ZipFeatureDatasetReader reader = new ZipFeatureDatasetReader(
-                Paths.get(getPath().toString(), datasetId).toFile());
+        if (datasetId != null) {
+            ZipFeatureDatasetReader reader = new ZipFeatureDatasetReader(
+                    Paths.get(getPath().toString(), datasetId).toFile());
 
-        dataset = reader.read();
+            dataset = reader.read();
+        }
 
         return dataset;
     }
