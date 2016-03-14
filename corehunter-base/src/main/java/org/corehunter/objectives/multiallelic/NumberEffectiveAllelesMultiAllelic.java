@@ -26,15 +26,11 @@ import org.jamesframework.core.subset.SubsetSolution;
 import org.corehunter.data.GenotypeVariantData;
 
 /**
- * @author Guy Davenport
+ * @author Guy Davenport, Herman De Beukelaer
  */
 public class NumberEffectiveAllelesMultiAllelic implements Objective<SubsetSolution, GenotypeVariantData> {
 
-    /*
-     * (non-Javadoc)
-     * @see org.jamesframework.core.problems.objectives.Objective#evaluate(org.
-     * jamesframework.core.problems.solutions.Solution, java.lang.Object)
-     */
+    // TODO: handle missing data
     @Override
     public Evaluation evaluate(SubsetSolution solution,
             GenotypeVariantData data) {
@@ -64,12 +60,9 @@ public class NumberEffectiveAllelesMultiAllelic implements Objective<SubsetSolut
         return SimpleEvaluation.WITH_VALUE(total / (double) numberOfMarkers);
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.jamesframework.core.problems.objectives.Objective#isMinimizing()
-     */
     @Override
     public boolean isMinimizing() {
         return false;
     }
+    
 }

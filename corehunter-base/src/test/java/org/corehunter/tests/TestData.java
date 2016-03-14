@@ -29,7 +29,7 @@ import uno.informatics.data.SimpleEntity;
 import uno.informatics.data.pojo.SimpleEntityPojo;
 
 /**
- * @author Guy Davenport
+ * @author Guy Davenport, Herman De Beukelaer
  */
 public class TestData {
 
@@ -69,13 +69,6 @@ public class TestData {
         SET.add(2);
         SET.add(3);
         SET.add(4);
-    }
-
-    public static final Set<Integer> SUBSET1 = new TreeSet<>();
-
-    static {
-        SUBSET1.add(2);
-        SUBSET1.add(3);
     }
 
     public static final SimpleDistanceMatrixData DATA = new SimpleDistanceMatrixData(NAME, HEADERS, DISTANCES);
@@ -267,17 +260,35 @@ public class TestData {
         {0.422577127364258, 0.288679258495851, 0.431227483884252, 0.462910049886276, 0}
     };
 
+    // subset with missing data
+    public static final Set<Integer> SUBSET1 = new TreeSet<>();
+
+    static {
+        SUBSET1.add(2);
+        SUBSET1.add(3);
+    }
+    
+    // subset without missing data
+    public static final Set<Integer> SUBSET2 = new TreeSet<>();
+
+    static {
+        SUBSET2.add(1);
+        SUBSET2.add(2);
+    }
+    
     public static final Evaluation COVERAGE_SUBSET1 = SimpleEvaluation.WITH_VALUE(0.7894736842105263);
     public static final Evaluation PROPORTION_NON_INFORMATIVE_ALLELES_SUBSET1 = SimpleEvaluation.WITH_VALUE(
             1.0 - COVERAGE_SUBSET1.getValue()
     );
 
-    public static final Evaluation HETROZYGOUS_LOCI_DIVERSITY_SUBSET1
-            = SimpleEvaluation.WITH_VALUE(0.40830714285714287);
+    // TODO: determine value for subset 1 (with missing data)
+    public static final Evaluation SHANNONS_DIVERSITY_SUBSET1 = SimpleEvaluation.WITH_VALUE(-1.0);
+    public static final Evaluation SHANNONS_DIVERSITY_SUBSET2 = SimpleEvaluation.WITH_VALUE(2.71220568749008);
+    
+    public static final Evaluation HETROZYGOUS_LOCI_DIVERSITY_SUBSET1 = SimpleEvaluation.WITH_VALUE(0.4083071428571428);
 
     public static final Evaluation NUMBER_EFFECTIVE_ALLELES_SUBSET1 = SimpleEvaluation.WITH_VALUE(2.0355486159192213);
 
 
-    public static final Evaluation SHANNONS_DIVERSITY_SUBSET1 = SimpleEvaluation.WITH_VALUE(2.605375591343493);
 
 }

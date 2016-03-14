@@ -31,6 +31,21 @@ proportion.non.informative.alleles <- function(freqs){
   1.0 - coverage(freqs)
 }
 
+# TODO: handle missing data
+shannon <- function(freqs, num.markers){
+  p <- colMeans(freqs)
+  p <- p/num.markers
+  if(!isTRUE(all.equal(sum(p), 1.0, tol = 0.001))){
+    stop(sprintf(
+      "Something is wrong: normalized frequencies should sum to one. Got: %.5f.",
+      sum(p)
+    ))
+  }
+  p <- p[p > 0.0]
+  sh <- -sum(p*log(p))
+  return(sh)
+}
+
 ###########
 # GENERAL #
 ###########
