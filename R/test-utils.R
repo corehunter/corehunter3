@@ -8,7 +8,7 @@ load.multiallelic.data <- function(){
   freqs <- read.csv(paste(data.dir, "multiallelic/names-and-ids.csv", sep="/"), header = F, skip = 2)
   freqs <- freqs[,3:ncol(freqs)]
   colnames(freqs) <- 1:ncol(freqs)
-  list(freqs = freqs, m = 7)
+  list(freqs = freqs, markers = 7, allele.counts = c(3,2,3,4,3,2,2))
 }
 
 ################
@@ -44,6 +44,36 @@ shannon <- function(freqs, num.markers){
   p <- p[p > 0.0]
   sh <- -sum(p*log(p))
   return(sh)
+}
+
+# TODO: handle missing data
+heterozygous.loci <- function(freqs, allele.counts){
+  num.markers <- length(allele.counts)
+  p <- colMeans(freqs)
+  p.square <- p*p
+  cum.allele.counts <- c(0, cumsum(allele.counts))
+  p.square.sums <- sapply(1:num.markers, function(m){
+    start <- cum.allele.counts[m]+1
+    stop <- cum.allele.counts[m+1]
+    sum(p.square[start:stop])
+  })
+  he <- mean(1 - p.square.sums)
+  return(he)
+}
+
+# TODO: handle missing data
+number.effective.alleles <- function(freqs, allele.counts){
+  num.markers <- length(allele.counts)
+  p <- colMeans(freqs)
+  p.square <- p*p
+  cum.allele.counts <- c(0, cumsum(allele.counts))
+  p.square.sums <- sapply(1:num.markers, function(m){
+    start <- cum.allele.counts[m]+1
+    stop <- cum.allele.counts[m+1]
+    sum(p.square[start:stop])
+  })
+  ne <- mean(1/p.square.sums)
+  return(ne)
 }
 
 ###########
