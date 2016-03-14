@@ -23,7 +23,7 @@ import org.corehunter.objectives.distance.AbstractGenotypeVariantDistanceMetric;
 import org.corehunter.data.GenotypeVariantData;
 
 /**
- * @author Guy Davenport
+ * @author Guy Davenport, Herman De Beukelaer
  */
 public class ModifiedRogersDistanceMultiAllelic extends
         AbstractGenotypeVariantDistanceMetric<GenotypeVariantData> {
@@ -31,40 +31,31 @@ public class ModifiedRogersDistanceMultiAllelic extends
     public ModifiedRogersDistanceMultiAllelic(GenotypeVariantData data) {
         super(data);
     }
-
-    /*
-     * (non-Javadoc)
-     * @see org.corehunter.DistanceMatrixData#getDistance(int, int)
-     */
+    
     @Override
     public double getDistance(int idX, int idY) {
         
-        double distance;
-
         int numberOfMarkers = getData().getNumberOfMarkers();
-        int numberOfAlleles;
-
-        double markerSqDiff = 0;
-        double sumMarkerSqDiff = 0;
-
+        double sumSquareDiff = 0.0;
+        
         for (int markerIndex = 0; markerIndex < numberOfMarkers; ++markerIndex) {
-            numberOfAlleles = getData().getNumberOfAlleles(markerIndex);
-
+            
+            int numberOfAlleles = getData().getNumberOfAlleles(markerIndex);
             for (int alleleIndex = 0; alleleIndex < numberOfAlleles; ++alleleIndex) {
-                double pxla = getData().getAlleleFrequency(idX, markerIndex, alleleIndex);
-                double pyla = getData().getAlleleFrequency(idY, markerIndex, alleleIndex);
-
-                if (pxla >= 0 && pyla >= 0) {
-                    markerSqDiff += (pxla - pyla) * (pxla - pyla);
+                
+                Double pxla = getData().getAlleleFrequency(idX, markerIndex, alleleIndex);
+                Double pyla = getData().getAlleleFrequency(idY, markerIndex, alleleIndex);
+                if (pxla != null && pyla != null) {
+                    sumSquareDiff += (pxla - pyla) * (pxla - pyla);
                 }
+                
             }
-
-            sumMarkerSqDiff += markerSqDiff;
+            
         }
 
-        distance = 1.0 / (Math.sqrt(2.0 * numberOfMarkers))
-                * Math.sqrt(sumMarkerSqDiff);
+        double distance = Math.sqrt(sumSquareDiff / (2*numberOfMarkers));
 
         return distance;
+        
     }
 }

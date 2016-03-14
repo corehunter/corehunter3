@@ -26,7 +26,7 @@ import static org.corehunter.tests.TestData.NAME;
 import static org.corehunter.tests.TestData.HEADERS;
 import static org.corehunter.tests.TestData.PRECISION;
 import static org.corehunter.tests.TestData.SET;
-import static org.junit.Assert.assertEquals;
+import static org.corehunter.tests.TestData.ALLELE_FREQUENCIES;
 
 import java.util.Iterator;
 
@@ -34,21 +34,14 @@ import org.corehunter.data.simple.SimpleGenotypeVariantData;
 import org.corehunter.objectives.distance.multiallelic.ModifiedRogersDistanceMultiAllelic;
 import org.junit.Assert;
 import org.junit.Test;
-import static org.junit.Assert.assertEquals;
-import static org.corehunter.tests.TestData.ALLELE_FREQUENCIES;
-import static org.junit.Assert.assertEquals;
+
 import static org.junit.Assert.assertEquals;
 
 /**
- * @author Guy Davenport
+ * @author Guy Davenport, Herman De Beukelaer
  */
 public class ModifiedRogersDistanceMultiAllelicTest {
 
-    /**
-     * Test method for
-     * {@link org.corehunter.objectives.distance.multiallelic
-     * .CavalliSforzaEdwardsDistanceMultiAllelic#getDistance(int, int)}.
-     */
     @Test
     public void test() {
         SimpleGenotypeVariantData data = new SimpleGenotypeVariantData(
@@ -90,4 +83,5 @@ public class ModifiedRogersDistanceMultiAllelicTest {
             ++i;
         }
     }
+    
 }
