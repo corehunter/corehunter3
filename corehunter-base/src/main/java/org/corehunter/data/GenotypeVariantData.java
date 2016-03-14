@@ -92,7 +92,7 @@ public interface GenotypeVariantData extends NamedData {
      * The default implementation relies on {@link #getAlleleFrequency(int, int, int)} to access
      * individual frequencies and treats missing values as zero when computing the average.
      *
-     * @param entryIds   the IDs of the entry, must be a subset of the IDs returned by {@link #getIDs()}
+     * @param itemIds   the IDs of the entry, must be a subset of the IDs returned by {@link #getIDs()}
      * @param markerIndex the index of the marker within the range 0 to n-1, where n is the total number of markers as
      *                    returned by {@link #getNumberOfMarkers()}
      * @param alleleIndex allele index within the range 0 to a-1, where a is the number of alleles for the given marker
