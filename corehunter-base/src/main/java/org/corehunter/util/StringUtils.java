@@ -31,10 +31,13 @@ public class StringUtils {
     /**
      * Removes single or double quote characters from a string.
      * Only removes quotes at the beginning and end of a string
-     * and only if both are single or double quotes.
+     * and only if both are single or double quotes. If an empty
+     * string or empty quotes are given as input, the result
+     * is <code>null</code>.
      * 
      * @param str string to unquote
-     * @return unquoted string, or <code>null</code> if input was <code>null</code>
+     * @return unquoted string, or <code>null</code> if input was
+     *         empty quotes or <code>null</code>
      */
     public static String unquote(String str){
         if(str != null
@@ -42,60 +45,33 @@ public class StringUtils {
              || (str.startsWith("\"") && str.endsWith("\"")))){
             str = str.substring(1, str.length()-1);
         }
-        return str;
-    }
-    
-    /**
-     * Trim leading and trailing whitespace from the given string.
-     * 
-     * @param str string to trim
-     * @return trimmed string, or <code>null</code> if input was <code>null</code>
-     */
-    public static String trim(String str){
-        if(str != null){
-            str = str.trim();
+        if(str != null && str.equals("")){
+            str = null;
         }
         return str;
     }
     
     /**
-     * First trim and then unquote the given string.
-     * If the input is <code>null</code> or the unquoted, trimmed
-     * string consists of space only, <code>null</code> is returned.
-     * 
-     * @param str string to trim and unquote
-     * @return trimmed, unquoted string; <code>null</code> if input was <code>null</code>
-     *         or resulting string consists of spaces only
-     */
-    public static String trimAndUnquote(String str){
-        str = unquote(trim(str));
-        if(str != null && trim(str).equals("")){
-            return null;
-        }
-        return str;
-    }
-    
-    /**
-     * Trim and unquote all string in the given array.
+     * Unquote all strings in the given array.
      * 
      * @param str string array
-     * @return array with unquoted, trimmed strings
+     * @return array with unquoted strings
      */
-    public static String[] trimAndUnquote(String[] str){
+    public static String[] unquote(String[] str){
         return Arrays.stream(str)
-                     .map(StringUtils::trimAndUnquote)        
+                     .map(StringUtils::unquote)        
                      .toArray(n -> new String[n]);
     }
     
     /**
-     * Checks whether the given string is blank. A string is defined to be blank if it is
-     * <code>null</code> or if it consists of spaces only after being trimmed and unquoted.
+     * Checks whether the given string is blank. A string is considered blank if it is
+     * <code>null</code>, empty or consists of empty quotes (single or double).
      * 
      * @param str string to check
      * @return <code>true</code> if the string is blank
      */
     public static boolean isBlank(String str){
-        return trimAndUnquote(str) == null;
+        return unquote(str) == null;
     }
     
 }

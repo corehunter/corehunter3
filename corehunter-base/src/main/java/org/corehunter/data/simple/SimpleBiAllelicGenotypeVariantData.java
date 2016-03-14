@@ -33,6 +33,7 @@ import org.corehunter.util.StringUtils;
 import uno.informatics.common.io.FileType;
 import uno.informatics.common.io.IOUtilities;
 import uno.informatics.common.io.RowReader;
+import uno.informatics.common.io.text.TextFileRowReader;
 import uno.informatics.data.SimpleEntity;
 import uno.informatics.data.pojo.SimpleEntityPojo;
 
@@ -297,7 +298,9 @@ public class SimpleBiAllelicGenotypeVariantData extends SimpleNamedData
         }
         
         // read data from file
-        try(RowReader reader = IOUtilities.createRowReader(filePath.toFile(), type)){
+        try(RowReader reader = IOUtilities.createRowReader(
+                filePath.toFile(), type, TextFileRowReader.REMOVE_WHITE_SPACE
+        )){
             
             if (reader == null || !reader.ready()) {
                 throw new IOException("Can not create reader for file " + filePath + ". File may be empty.");
@@ -334,8 +337,8 @@ public class SimpleBiAllelicGenotypeVariantData extends SimpleNamedData
             
             // 1: extract marker names
             
-            // trim and unquote header row
-            String[] headerRow = StringUtils.trimAndUnquote(rows.get(0));
+            // unquote header row
+            String[] headerRow = StringUtils.unquote(rows.get(0));
             // check for presence of header columns
             int itemNameColumn = UNDEFINED_COLUMN;
             int itemIdentifierColumn = UNDEFINED_COLUMN;
@@ -380,7 +383,7 @@ public class SimpleBiAllelicGenotypeVariantData extends SimpleNamedData
                 
                 // extract item name and/or identifier
                 for(int c = 0; c < numHeaderCols; c++){
-                    String nameOrId = StringUtils.trimAndUnquote(row[c]);
+                    String nameOrId = StringUtils.unquote(row[c]);
                     if(itemNameColumn == c){
                         itemNames[i] = nameOrId;
                     } else {

@@ -35,6 +35,7 @@ import org.corehunter.util.StringUtils;
 import uno.informatics.common.io.FileType;
 import uno.informatics.common.io.IOUtilities;
 import uno.informatics.common.io.RowReader;
+import uno.informatics.common.io.text.TextFileRowReader;
 import uno.informatics.data.SimpleEntity;
 import uno.informatics.data.pojo.SimpleEntityPojo;
 
@@ -206,7 +207,9 @@ public class SimpleDistanceMatrixData extends SimpleNamedData implements Distanc
         }
 
         // read data from file
-        try (RowReader reader = IOUtilities.createRowReader(filePath.toFile(), type)) {
+        try (RowReader reader = IOUtilities.createRowReader(
+                filePath.toFile(), type, TextFileRowReader.REMOVE_WHITE_SPACE
+        )) {
             
             if (reader == null || !reader.ready()) {
                 throw new IOException("Can not create reader for file " + filePath + ". File may be empty.");
@@ -229,8 +232,10 @@ public class SimpleDistanceMatrixData extends SimpleNamedData implements Distanc
                 // peek first cell
                 reader.nextColumn();
                 firstCell = reader.getCellAsString();
+                // TODO: remove manual trim when library is fixed
+                firstCell = (firstCell == null ? null : firstCell.trim());
                 
-                switch (StringUtils.trimAndUnquote(firstCell)) {
+                switch (StringUtils.unquote(firstCell)) {
                     
                     // names
                     case NAMES_HEADER:
@@ -249,7 +254,7 @@ public class SimpleDistanceMatrixData extends SimpleNamedData implements Distanc
                         }
                         // read names
                         reader.nextColumn();
-                        names = StringUtils.trimAndUnquote(reader.getRowCellsAsStringArray());
+                        names = StringUtils.unquote(reader.getRowCellsAsStringArray());
                         break;
                     
                     // identifiers
@@ -269,7 +274,7 @@ public class SimpleDistanceMatrixData extends SimpleNamedData implements Distanc
                         }
                         // read identifiers
                         reader.nextColumn();
-                        identifiers = StringUtils.trimAndUnquote(reader.getRowCellsAsStringArray());
+                        identifiers = StringUtils.unquote(reader.getRowCellsAsStringArray());
                         break;
                         
                     // data row

@@ -38,6 +38,7 @@ import org.corehunter.util.StringUtils;
 import uno.informatics.common.io.FileType;
 
 import static uno.informatics.common.Constants.UNKNOWN_COUNT;
+import uno.informatics.common.io.text.TextFileRowReader;
 import uno.informatics.data.SimpleEntity;
 import uno.informatics.data.pojo.SimpleEntityPojo;
 
@@ -313,7 +314,9 @@ public class SimpleGenotypeVariantData extends SimpleNamedData implements Genoty
         }
 
         // read data from file
-        try (RowReader reader = IOUtilities.createRowReader(filePath.toFile(), type)) {
+        try (RowReader reader = IOUtilities.createRowReader(
+                filePath.toFile(), type, TextFileRowReader.REMOVE_WHITE_SPACE
+        )) {
             
             if (reader == null || !reader.ready()) {
                 throw new IOException("Can not create reader for file " + filePath + ". File may be empty.");
@@ -340,7 +343,7 @@ public class SimpleGenotypeVariantData extends SimpleNamedData implements Genoty
             }
             markerNamesRow = Arrays.stream(markerNamesRow)
                                    .skip(numHeaderCols)
-                                   .map(StringUtils::trimAndUnquote)
+                                   .map(StringUtils::unquote)
                                    .toArray(n -> new String[n]);
             // extract/check names and infer number of alleles per marker
             Set<String> markerNames = new LinkedHashSet<>(); // follows insertion order
@@ -397,7 +400,7 @@ public class SimpleGenotypeVariantData extends SimpleNamedData implements Genoty
             int itemNameColumn = UNDEFINED_COLUMN;
             int itemIdentifierColumn = UNDEFINED_COLUMN;
             for(int c = 0; c < numHeaderCols; c++){
-                String str = StringUtils.trimAndUnquote(alleleNamesRow[c]);
+                String str = StringUtils.unquote(alleleNamesRow[c]);
                 if(str == null){
                     throw new IOException(String.format(
                             "Missing column header. Row: 1, column: %d. Expected: %s or %s, but found blank cell.",
@@ -435,7 +438,7 @@ public class SimpleGenotypeVariantData extends SimpleNamedData implements Genoty
             for(int m = 0; m < numMarkers; m++){
                 alleleNames[m] = new String[allelesPerMarker.get(m)];
                 for(int a = 0; a < alleleNames[m].length; a++){
-                    alleleNames[m][a] = StringUtils.trimAndUnquote(alleleNamesRow[aglob]);
+                    alleleNames[m][a] = StringUtils.unquote(alleleNamesRow[aglob]);
                     aglob++;
                 }
             }
@@ -467,7 +470,7 @@ public class SimpleGenotypeVariantData extends SimpleNamedData implements Genoty
                 
                 // extract row headers, if any (name/identifier)
                 for(int c = 0; c < numHeaderCols; c++){
-                    String nameOrId = StringUtils.trimAndUnquote(dataRow[c]);
+                    String nameOrId = StringUtils.unquote(dataRow[c]);
                     if(itemNameColumn == c){
                         itemNames.add(nameOrId);
                     } else {
@@ -596,7 +599,9 @@ public class SimpleGenotypeVariantData extends SimpleNamedData implements Genoty
         }
         
         // read data from file
-        try(RowReader reader = IOUtilities.createRowReader(filePath.toFile(), type)){
+        try(RowReader reader = IOUtilities.createRowReader(
+                filePath.toFile(), type, TextFileRowReader.REMOVE_WHITE_SPACE
+        )){
             
             if (reader == null || !reader.ready()) {
                 throw new IOException("Can not create reader for file " + filePath + ". File may be empty.");
@@ -622,10 +627,10 @@ public class SimpleGenotypeVariantData extends SimpleNamedData implements Genoty
             
             // infer number of columns
             int numCols = rows.stream().mapToInt(row -> row.length).max().getAsInt();
-            // extend rows with null values where needed + trim and unquote
+            // extend rows with null values where needed + unquote
             for(int r = 0; r <= n; r++){
                 String[] row = rows.get(r);
-                row = StringUtils.trimAndUnquote(row);
+                row = StringUtils.unquote(row);
                 if(row.length < numCols){
                     row = Arrays.copyOf(row, numCols);
                 }
