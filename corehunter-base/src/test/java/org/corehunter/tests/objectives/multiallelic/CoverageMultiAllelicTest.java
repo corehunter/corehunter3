@@ -26,23 +26,18 @@ import static org.corehunter.tests.TestData.NAME;
 import static org.corehunter.tests.TestData.HEADERS;
 import static org.corehunter.tests.TestData.PRECISION;
 import static org.corehunter.tests.TestData.SUBSET1;
+import static org.corehunter.tests.TestData.ALLELE_FREQUENCIES;
 
 import org.corehunter.data.simple.SimpleGenotypeVariantData;
 import org.corehunter.objectives.multiallelic.CoverageMultiAllelic;
 import org.jamesframework.core.subset.SubsetSolution;
 import org.junit.Test;
-import static org.corehunter.tests.TestData.ALLELE_FREQUENCIES;
 
 /**
- * @author Guy Davenport
+ * @author Guy Davenport, Herman De Beukelaer
  */
 public class CoverageMultiAllelicTest extends EvaluationTest {
 
-    /**
-     * Test method for
-     * {@link org.corehunter.objectives.distance.multiallelic
-     * .CavalliSforzaEdwardsDistanceMultiAllelic#getDistance(int, int)}.
-     */
     @Test
     public void test() {
         SimpleGenotypeVariantData data

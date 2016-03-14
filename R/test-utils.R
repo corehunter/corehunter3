@@ -23,6 +23,14 @@ cavalli.sforza.edwards <- function(freqs.1, freqs.2, num.markers){
   modified.rogers(sqrt(freqs.1), sqrt(freqs.2), num.markers)
 }
 
+coverage <- function(freqs){
+  sum(colSums(freqs, na.rm = TRUE) > 0.0) / ncol(freqs)
+}
+
+proportion.non.informative.alleles <- function(freqs){
+  1.0 - coverage(freqs)
+}
+
 ###########
 # GENERAL #
 ###########

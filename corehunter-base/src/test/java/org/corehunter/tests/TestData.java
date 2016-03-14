@@ -267,15 +267,16 @@ public class TestData {
         {0.422577127364258, 0.288679258495851, 0.431227483884252, 0.462910049886276, 0}
     };
 
-    public static final Evaluation COVERAGE_SUBSET1 = SimpleEvaluation.WITH_VALUE(1.0 - 0.10526315789473684);
+    public static final Evaluation COVERAGE_SUBSET1 = SimpleEvaluation.WITH_VALUE(0.7894736842105263);
+    public static final Evaluation PROPORTION_NON_INFORMATIVE_ALLELES_SUBSET1 = SimpleEvaluation.WITH_VALUE(
+            1.0 - COVERAGE_SUBSET1.getValue()
+    );
 
     public static final Evaluation HETROZYGOUS_LOCI_DIVERSITY_SUBSET1
             = SimpleEvaluation.WITH_VALUE(0.40830714285714287);
 
     public static final Evaluation NUMBER_EFFECTIVE_ALLELES_SUBSET1 = SimpleEvaluation.WITH_VALUE(2.0355486159192213);
 
-    public static final Evaluation PROPORTION_NON_INFORMATIVE_ALLELES_SUBSET1
-            = SimpleEvaluation.WITH_VALUE(0.10526315789473684);
 
     public static final Evaluation SHANNONS_DIVERSITY_SUBSET1 = SimpleEvaluation.WITH_VALUE(2.605375591343493);
 

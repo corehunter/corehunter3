@@ -28,25 +28,19 @@ import org.jamesframework.core.subset.SubsetSolution;
 import org.corehunter.data.GenotypeVariantData;
 
 /**
- * @author Guy Davenport
+ * @author Guy Davenport, Herman De Beukelaer
  */
-public class ProportionNonInformativeAllelesMultiAllelic
-        implements Objective<SubsetSolution, GenotypeVariantData> {
+public class ProportionNonInformativeAllelesMultiAllelic implements Objective<SubsetSolution, GenotypeVariantData> {
 
-    /*
-     * (non-Javadoc)
-     * @see org.jamesframework.core.problems.objectives.Objective#evaluate(org.
-     * jamesframework.core.problems.solutions.Solution, java.lang.Object)
-     */
     @Override
-    public Evaluation evaluate(SubsetSolution solution,
-            GenotypeVariantData data) {
+    public Evaluation evaluate(SubsetSolution solution, GenotypeVariantData data) {
+        
         int numberOfMarkers = data.getNumberOfMarkers();
 
         int numberOfAlleles;
 
         double alleleCount = 0;
-        double alleleFrequency;
+        Double alleleFrequency;
         boolean found;
 
         for (int markerIndex = 0; markerIndex < numberOfMarkers; ++markerIndex) {
@@ -59,7 +53,7 @@ public class ProportionNonInformativeAllelesMultiAllelic
                 found = false;
                 while (!found && iterator.hasNext()) {
                     alleleFrequency = data.getAlleleFrequency(iterator.next(), markerIndex, alleleIndex);
-                    found = alleleFrequency > 0;
+                    found = (alleleFrequency != null && alleleFrequency > 0);
                 }
 
                 if (found) {
@@ -71,12 +65,9 @@ public class ProportionNonInformativeAllelesMultiAllelic
         return SimpleEvaluation.WITH_VALUE(1 - (alleleCount / (double) data.getTotalNumberOfAlleles()));
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.jamesframework.core.problems.objectives.Objective#isMinimizing()
-     */
     @Override
     public boolean isMinimizing() {
         return false;
     }
+    
 }
