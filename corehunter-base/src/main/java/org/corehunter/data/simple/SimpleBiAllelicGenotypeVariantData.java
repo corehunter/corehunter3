@@ -69,11 +69,12 @@ public class SimpleBiAllelicGenotypeVariantData extends SimpleNamedData
      * items and markers, respectively. All entries in this matrix should be 0, 1 or 2
      * (or <code>null</code> for missing values).
      * <p>
-     * Item headers and marker names are optional. Missing names/headers are encoded as <code>null</code>.
-     * Alternatively, if no item headers or no marker names are assigned, the respective array itself may
-     * also be <code>null</code>. If not <code>null</code> the length of <code>itemHeaders</code> and
-     * <code>markerNames</code> should be equal to the number of items and markers, respectively, as inferred
-     * from the dimensions of <code>alleleScores</code>.
+     * Item headers and marker names are optional. Both arguments can be <code>null</code>.
+     * If marker names are given they need not be defined for all markers nor unique.
+     * If item headers are specified each item should at least have a unique identifier
+     * (names are optional). If not <code>null</code> the length of <code>itemHeaders</code> and
+     * <code>markerNames</code> should be equal to the number of items and markers, respectively,
+     * as inferred from the dimensions of <code>alleleScores</code>.
      * <p>
      * Violating any of the requirements will produce an exception.
      * <p>
@@ -82,9 +83,12 @@ public class SimpleBiAllelicGenotypeVariantData extends SimpleNamedData
      * 
      * @param datasetName name of the dataset
      * @param itemHeaders item headers, <code>null</code> if no headers are assigned; if not <code>null</code>
-     *                    its length should equal the number of rows in <code>alleleScores</code>
+     *                    its length should equal the number of rows in <code>alleleScores</code> and each item
+     *                    should at least have a unique identifier
      * @param markerNames marker names, <code>null</code> if no marker names are assigned; if not
-     *                    <code>null</code> its length should equal the number of columns in <code>alleleScores</code>
+     *                    <code>null</code> its length should equal the number of columns in
+     *                    <code>alleleScores</code>; can contain <code>null</code> values for
+     *                    markers whose name is undefined
      * @param alleleScores allele scores, may not be <code>null</code> but can contain <code>null</code>
      *                     values (missing); dimensions indicate number of items (rows) and markers (columns)
      */
@@ -249,7 +253,7 @@ public class SimpleBiAllelicGenotypeVariantData extends SimpleNamedData
      * Read biallelic genotype variant data from file. Only file types {@link FileType#TXT} and {@link FileType#CSV}
      * are allowed. Values are separated with a single tab (txt) or comma (csv) character. The file contains an
      * allele score matrix with one row per individual and one column per marker. Only values 0, 1 and 2 are valid.
-     * Empty cells are also allowed which means that data is missing. Trailing empty cells can be omitted at any row.
+     * Empty cells are also allowed in case of missing data.
      * <p>
      * The file starts with a compulsory header row specifying the marker names. Although this row is required
      * some or all names may be undefined by leaving the corresponding cells blank. Depending on the number of
@@ -257,16 +261,14 @@ public class SimpleBiAllelicGenotypeVariantData extends SimpleNamedData
      * <p>
      * Two optional (leftmost) header columns can be included to specify individual names and/or unique identifiers.
      * The former is identified with column header "NAME", the latter with column header "ID". The column headers should
-     * be placed in the corresponding cell of the header row. Assigned identifiers, if any, should be unique and are
-     * used to distinguish between individuals with the same name.
+     * be placed in the corresponding cell of the header row. If only names are specified they should be defined for
+     * all individuals and unique. Else, additional unique identifiers are required.
      * <p>
      * Leading and trailing whitespace is removed from names and unique identifiers and they are unquoted if wrapped
      * in single or double quotes after whitespace removal. If it is intended to start or end a name/identifier with
-     * whitespace this whitespace should be contained within the quotes, as it will then not be removed. It is allowed
-     * that names/identifiers are missing for some individuals/markers. In this case the corresponding cells should be
-     * left blank. The name and identifier columns can be omitted if no names/identifiers are assigned, but the header
-     * row with marker names should always be present, even if no marker names are assigned. Yet, trailing blank cells
-     * at the end of the header row can be omitted.
+     * whitespace this whitespace should be contained within the quotes, as it will then not be removed.
+     * <p>
+     * Trailing empty cells can be omitted at any row in the file.
      * <p>
      * The dataset name is set to the name of the file to which <code>filePath</code> points.
      * 
@@ -374,8 +376,8 @@ public class SimpleBiAllelicGenotypeVariantData extends SimpleNamedData
             
             // 2: extract item names, identifiers and alelle scores
             
-            String[] itemNames = new String[n];
-            String[] itemIdentifiers = new String[n];
+            String[] itemNames = (itemNameColumn == UNDEFINED_COLUMN ? null : new String[n]);
+            String[] itemIdentifiers = (itemIdentifierColumn == UNDEFINED_COLUMN ? null : new String[n]);
             Integer[][] alleleScores = new Integer[n][m];
             for(int i = 0; i < n; i++){
                 
@@ -408,11 +410,17 @@ public class SimpleBiAllelicGenotypeVariantData extends SimpleNamedData
             }
             
             // combine names and identifiers in item headers
-            SimpleEntity[] headers = new SimpleEntity[n];
-            for(int i = 0; i < n; i++){
-                String name = itemNames[i];
-                String identifier = itemIdentifiers[i];
-                headers[i] = new SimpleEntityPojo(identifier, name);
+            SimpleEntity[] headers = null;
+            if(itemIdentifiers == null){
+                itemIdentifiers = itemNames;
+            }
+            if(itemIdentifiers != null){
+                headers = new SimpleEntity[n];
+                for(int i = 0; i < n; i++){
+                    String name = (itemNames == null ? null : itemNames[i]);
+                    String identifier = itemIdentifiers[i];
+                    headers[i] = new SimpleEntityPojo(identifier, name);
+                }
             }
             
             try{

@@ -30,6 +30,9 @@ import static org.corehunter.tests.TestData.SET;
 import static org.corehunter.tests.TestData.UNIQUE_IDENTIFIERS;
 import static org.corehunter.tests.TestData.ALLELE_FREQUENCIES_DIPLOID;
 import static org.corehunter.tests.TestData.ALLELE_FREQUENCIES;
+import static org.corehunter.tests.TestData.HEADERS_NAMES_AND_IDS;
+import static org.corehunter.tests.TestData.HEADERS_UNIQUE_NAMES;
+import static org.corehunter.tests.TestData.BLANK_HEADERS;
 
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
@@ -51,11 +54,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.corehunter.tests.TestData.HEADERS_WITHOUT_IDS;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import uno.informatics.data.SimpleEntity;
 
 /**
  * @author Guy Davenport, Herman De Beukelaer
@@ -78,8 +77,7 @@ public class SimpleGenotypeVariantDataTest {
     private static final String ERRONEOUS_FILES_DIR = "/multiallelic/err/";
     private static final String DIPLOID_ERRONEOUS_FILES_DIR = "/multiallelic/diploid/err/";
     
-    private boolean withNames;
-    private boolean withUniqueIdentifiers;
+    private SimpleEntity[] expectedHeaders;
     private String datasetName;
     
     @BeforeClass
@@ -100,25 +98,22 @@ public class SimpleGenotypeVariantDataTest {
     public void inMemory() {
         System.out.println(" |- In memory test");
         datasetName = null;
-        withNames = true;
-        withUniqueIdentifiers = true;
-        testDataGeneral(new SimpleGenotypeVariantData(HEADERS_WITHOUT_IDS, MARKER_NAMES, ALLELE_NAMES, ALLELE_FREQUENCIES));
+        expectedHeaders = HEADERS_NAMES_AND_IDS;
+        testDataGeneral(new SimpleGenotypeVariantData(HEADERS_NAMES_AND_IDS, MARKER_NAMES, ALLELE_NAMES, ALLELE_FREQUENCIES));
     }
     
     @Test
     public void inMemoryWithName() {
         System.out.println(" |- In memory test with dataset name");
         datasetName = NAME;
-        withNames = true;
-        withUniqueIdentifiers = true;
-        testDataGeneral(new SimpleGenotypeVariantData(NAME, HEADERS_WITHOUT_IDS, MARKER_NAMES, ALLELE_NAMES, ALLELE_FREQUENCIES));
+        expectedHeaders = HEADERS_NAMES_AND_IDS;
+        testDataGeneral(new SimpleGenotypeVariantData(NAME, HEADERS_NAMES_AND_IDS, MARKER_NAMES, ALLELE_NAMES, ALLELE_FREQUENCIES));
     }
 
     @Test
     public void fromTxtFileWithNames() throws IOException {
         datasetName = "names.txt";
-        withNames = true;
-        withUniqueIdentifiers = false;
+        expectedHeaders = HEADERS_UNIQUE_NAMES;
         System.out.println(" |- File " + datasetName);
         testDataGeneral(SimpleGenotypeVariantData.readData(
             Paths.get(SimpleGenotypeVariantDataTest.class.getResource(TXT_NAMES).getPath()),
@@ -129,8 +124,7 @@ public class SimpleGenotypeVariantDataTest {
     @Test
     public void fromCsvFileWithNames() throws IOException {
         datasetName = "names.csv";
-        withNames = true;
-        withUniqueIdentifiers = false;
+        expectedHeaders = HEADERS_UNIQUE_NAMES;
         System.out.println(" |- File " + datasetName);
         testDataGeneral(SimpleGenotypeVariantData.readData(
             Paths.get(SimpleGenotypeVariantDataTest.class.getResource(CSV_NAMES).getPath()),
@@ -141,8 +135,7 @@ public class SimpleGenotypeVariantDataTest {
     @Test
     public void fromCsvFileWithNamesAndIDs() throws IOException {
         datasetName = "names-and-ids.csv";
-        withNames = true;
-        withUniqueIdentifiers = true;
+        expectedHeaders = HEADERS_NAMES_AND_IDS;
         System.out.println(" |- File " + datasetName);
         testDataGeneral(SimpleGenotypeVariantData.readData(
             Paths.get(SimpleGenotypeVariantDataTest.class.getResource(CSV_NAMES_IDS).getPath()),
@@ -153,8 +146,7 @@ public class SimpleGenotypeVariantDataTest {
     @Test
     public void fromCsvFileWithoutNames() throws IOException {
         datasetName = "no-names.csv";
-        withNames = false;
-        withUniqueIdentifiers = false;
+        expectedHeaders = BLANK_HEADERS;
         System.out.println(" |- File " + datasetName);
         testDataGeneral(SimpleGenotypeVariantData.readData(
             Paths.get(SimpleGenotypeVariantDataTest.class.getResource(CSV_NO_NAMES).getPath()),
@@ -192,17 +184,15 @@ public class SimpleGenotypeVariantDataTest {
     public void diploidInMemory() {
         System.out.println(" |- In memory test (diploid)");
         datasetName = NAME;
-        withNames = true;
-        withUniqueIdentifiers = true;
-        testDataDiploid(new SimpleGenotypeVariantData(NAME, HEADERS_WITHOUT_IDS, MARKER_NAMES_DIPLOID,
+        expectedHeaders = HEADERS_NAMES_AND_IDS;
+        testDataDiploid(new SimpleGenotypeVariantData(NAME, HEADERS_NAMES_AND_IDS, MARKER_NAMES_DIPLOID,
                                                       ALLELE_NAMES_DIPLOID, ALLELE_FREQUENCIES_DIPLOID));
     }
     
     @Test
     public void diploidFromTxtFileWithNames() throws IOException {
         datasetName = "names.txt";
-        withNames = true;
-        withUniqueIdentifiers = false;
+        expectedHeaders = HEADERS_UNIQUE_NAMES;
         System.out.println(" |- File diploid/" + datasetName);
         testDataDiploid(SimpleGenotypeVariantData.readDiploidData(
             Paths.get(SimpleGenotypeVariantDataTest.class.getResource(DIPLOID_TXT_NAMES).getPath()),
@@ -213,8 +203,7 @@ public class SimpleGenotypeVariantDataTest {
     @Test
     public void diploidFromCsvFileWithNames() throws IOException {
         datasetName = "names.csv";
-        withNames = true;
-        withUniqueIdentifiers = false;
+        expectedHeaders = HEADERS_UNIQUE_NAMES;
         System.out.println(" |- File diploid/" + datasetName);
         testDataDiploid(SimpleGenotypeVariantData.readDiploidData(
             Paths.get(SimpleGenotypeVariantDataTest.class.getResource(DIPLOID_CSV_NAMES).getPath()),
@@ -225,8 +214,7 @@ public class SimpleGenotypeVariantDataTest {
     @Test
     public void diploidFromCsvFileWithNamesAndIDs() throws IOException {
         datasetName = "names-and-ids.csv";
-        withNames = true;
-        withUniqueIdentifiers = true;
+        expectedHeaders = HEADERS_NAMES_AND_IDS;
         System.out.println(" |- File diploid/" + datasetName);
         testDataDiploid(SimpleGenotypeVariantData.readDiploidData(
             Paths.get(SimpleGenotypeVariantDataTest.class.getResource(DIPLOID_CSV_NAMES_IDS).getPath()),
@@ -237,8 +225,7 @@ public class SimpleGenotypeVariantDataTest {
     @Test
     public void diploidFromTxtFileWithoutNames() throws IOException {
         datasetName = "no-names.txt";
-        withNames = false;
-        withUniqueIdentifiers = false;
+        expectedHeaders = BLANK_HEADERS;
         System.out.println(" |- File diploid/" + datasetName);
         testDataDiploid(SimpleGenotypeVariantData.readDiploidData(
             Paths.get(SimpleGenotypeVariantDataTest.class.getResource(DIPLOID_TXT_NO_NAMES).getPath()),
@@ -249,8 +236,7 @@ public class SimpleGenotypeVariantDataTest {
     @Test
     public void diploidFromTxtFileWithoutMarkerNames() throws IOException {
         datasetName = "no-marker-names.txt";
-        withNames = true;
-        withUniqueIdentifiers = false;
+        expectedHeaders = HEADERS_UNIQUE_NAMES;
         System.out.println(" |- File diploid/" + datasetName);
         // store copy of all marker names
         String[] markerNamesBackup = Arrays.copyOf(MARKER_NAMES_DIPLOID, MARKER_NAMES_DIPLOID.length);
@@ -267,8 +253,7 @@ public class SimpleGenotypeVariantDataTest {
     @Test
     public void diploidFromTxtFileWithoutNamesOrMarkerNames() throws IOException {
         datasetName = "no-names-no-marker-names.txt";
-        withNames = false;
-        withUniqueIdentifiers = false;
+        expectedHeaders = BLANK_HEADERS;
         System.out.println(" |- File diploid/" + datasetName);
         // store copy of all marker names
         String[] markerNamesBackup = Arrays.copyOf(MARKER_NAMES_DIPLOID, MARKER_NAMES_DIPLOID.length);
@@ -346,22 +331,8 @@ public class SimpleGenotypeVariantDataTest {
 
         for (int i = 0; i < size; i++) {
             
-            // check name, if assigned
-            if(withNames){
-                assertEquals("Name for " + i + " not correct.", NAMES[i], data.getHeader(i).getName());
-            } else {
-                assertTrue("No name should have been set for individual " + i, 
-                            data.getHeader(i) == null || data.getHeader(i).getName() == null);
-            }
-            
-            // check unique identifier, if assigned
-            if(withUniqueIdentifiers){
-                assertEquals("Unique identifier for " + i + " not correct.",
-                             UNIQUE_IDENTIFIERS[i], data.getHeader(i).getUniqueIdentifier());
-            } else {
-                assertTrue("No unique identifier should have been set for individual " + i, 
-                            data.getHeader(i) == null || data.getHeader(i).getUniqueIdentifier() == null);
-            }
+            // check header
+            assertEquals("Header for individual " + i + " is not correct.", expectedHeaders[i], data.getHeader(i));
 
             // check frequencies
             for (int m = 0; m < data.getNumberOfMarkers(); m++) {

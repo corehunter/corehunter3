@@ -169,8 +169,8 @@ public class SimpleDistanceMatrixData extends SimpleNamedData implements Distanc
      * <p>
      * Two optional header rows can be added at the beginning of the file to specify individual names and/or
      * unique identifiers. The former is identified with row header "NAME", the latter with row header "ID".
-     * If only names are specified they should be unique. Else unique identifiers are also required to distinguish
-     * between items with the same name. Leading and trailing whitespace is removed from names and unique identifiers
+     * If only names are specified they should be defined for each item and unique. Else, additional unique
+     * identifiers are also required. Leading and trailing whitespace is removed from names and unique identifiers
      * and they are unquoted if wrapped in single or double quotes after whitespace removal. If it is intended to
      * start or end a name/identifier with whitespace this whitespace should be contained within the quotes, as it
      * will then not be removed.
@@ -313,6 +313,11 @@ public class SimpleDistanceMatrixData extends SimpleNamedData implements Distanc
                         "Incorrect number of data rows. Expected: %d, actual: %d.",
                         expectedRows, datarows.size()
                 ));
+            }
+            
+            // pad names with extra null values if needed when identifiers are also specified
+            if(names != null && identifiers != null && names.length < n){
+                names = Arrays.copyOf(names, n);
             }
             
             // check number of names

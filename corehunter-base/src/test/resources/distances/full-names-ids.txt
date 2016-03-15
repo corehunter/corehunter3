@@ -1,4 +1,4 @@
-NAME	Alice	"Dave"	'Bob'	"Carol"	"Bob"
+NAME	Alice	    	'Bob'	"Bob"
 ID  	acc-1	acc-2	acc-3	 acc-4	acc-5
 0.0	0.2	0.4	0.6	0.8
 0.2	0.0	0.2	0.4	0.6

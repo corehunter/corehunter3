@@ -45,7 +45,7 @@ public class TestData {
     public static final String NAME = "Test Dataset";
 
     public static final String[] NAMES = new String[]{
-        "Alice", "Dave", "Bob", "Carol", "Bob"
+        "Alice", null, "Bob", "Bob", null
     };
     public static final String[] UNIQUE_IDENTIFIERS = new String[]{
         "acc-1", "acc-2", "acc-3", "acc-4", "acc-5"

@@ -29,27 +29,24 @@ import org.corehunter.data.simple.SimpleBiAllelicGenotypeVariantData;
 
 import static org.corehunter.tests.TestData.ALLELE_FREQUENCIES_BIALLELIC;
 import static org.corehunter.tests.TestData.ALLELE_SCORES_BIALLELIC;
+import static org.corehunter.tests.TestData.HEADERS_NAMES_AND_IDS;
+import static org.corehunter.tests.TestData.HEADERS_UNIQUE_NAMES;
+import static org.corehunter.tests.TestData.BLANK_HEADERS;
 import static org.corehunter.tests.TestData.MARKER_NAMES;
 import static org.corehunter.tests.TestData.NAME;
-import static org.corehunter.tests.TestData.NAMES;
 import static org.corehunter.tests.TestData.PRECISION;
 import static org.corehunter.tests.TestData.SET;
-import static org.corehunter.tests.TestData.UNIQUE_IDENTIFIERS;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 import uno.informatics.common.io.FileType;
-import static org.corehunter.tests.TestData.HEADERS_WITHOUT_IDS;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import uno.informatics.data.SimpleEntity;
 
 /**
  * @author Guy Davenport, Herman De Beukelaer
@@ -65,8 +62,7 @@ public class SimpleBiAllelicGenotypeVariantDataTest {
 
     private static final String ERRONEOUS_FILES_DIR = "/biallelic/err/";
     
-    private boolean withNames = false;
-    private boolean withUniqueIdentifiers = false;
+    private SimpleEntity[] expectedHeaders;
     private boolean withMarkerNames = true;
     private String datasetName;
     
@@ -84,23 +80,22 @@ public class SimpleBiAllelicGenotypeVariantDataTest {
     public void inMemoryTest() {
         System.out.println(" |- In memory test");
         datasetName = null;
-        withNames = true;
-        withUniqueIdentifiers = true;
-        testData(new SimpleBiAllelicGenotypeVariantData(HEADERS_WITHOUT_IDS, MARKER_NAMES, ALLELE_SCORES_BIALLELIC));
+        expectedHeaders = HEADERS_NAMES_AND_IDS;
+        testData(new SimpleBiAllelicGenotypeVariantData(HEADERS_NAMES_AND_IDS, MARKER_NAMES, ALLELE_SCORES_BIALLELIC));
     }
     
     @Test
     public void inMemoryTestWithName() {
         System.out.println(" |- In memory test with dataset name");
         datasetName = NAME;
-        withNames = true;
-        withUniqueIdentifiers = true;
-        testData(new SimpleBiAllelicGenotypeVariantData(NAME, HEADERS_WITHOUT_IDS, MARKER_NAMES, ALLELE_SCORES_BIALLELIC));
+        expectedHeaders = HEADERS_NAMES_AND_IDS;
+        testData(new SimpleBiAllelicGenotypeVariantData(NAME, HEADERS_NAMES_AND_IDS, MARKER_NAMES, ALLELE_SCORES_BIALLELIC));
     }
     
     @Test
     public void fromTxtFileWithoutNames() throws IOException {
         datasetName = "no-names.txt";
+        expectedHeaders = BLANK_HEADERS;
         System.out.println(" |- File " + datasetName);
         testData(SimpleBiAllelicGenotypeVariantData.readData(
             Paths.get(SimpleBiAllelicGenotypeVariantDataTest.class.getResource(TXT_NO_NAMES).getPath()),
@@ -111,7 +106,7 @@ public class SimpleBiAllelicGenotypeVariantDataTest {
     @Test
     public void fromTxtFileWithNames() throws IOException {
         datasetName = "names.txt";
-        withNames = true;
+        expectedHeaders = HEADERS_UNIQUE_NAMES;
         System.out.println(" |- File " + datasetName);
         testData(SimpleBiAllelicGenotypeVariantData.readData(
             Paths.get(SimpleBiAllelicGenotypeVariantDataTest.class.getResource(TXT_NAMES).getPath()),
@@ -122,7 +117,7 @@ public class SimpleBiAllelicGenotypeVariantDataTest {
     @Test
     public void fromCsvFileWithNames() throws IOException {
         datasetName = "names.csv";
-        withNames = true;
+        expectedHeaders = HEADERS_UNIQUE_NAMES;
         System.out.println(" |- File " + datasetName);
         testData(SimpleBiAllelicGenotypeVariantData.readData(
             Paths.get(SimpleBiAllelicGenotypeVariantDataTest.class.getResource(CSV_NAMES).getPath()),
@@ -133,8 +128,7 @@ public class SimpleBiAllelicGenotypeVariantDataTest {
     @Test
     public void fromCsvFileWithNamesAndIds() throws IOException {
         datasetName = "names-and-ids.csv";
-        withNames = true;
-        withUniqueIdentifiers = true;
+        expectedHeaders = HEADERS_NAMES_AND_IDS;
         System.out.println(" |- File " + datasetName);
         testData(SimpleBiAllelicGenotypeVariantData.readData(
             Paths.get(SimpleBiAllelicGenotypeVariantDataTest.class.getResource(CSV_NAMES_IDS).getPath()),
@@ -145,7 +139,7 @@ public class SimpleBiAllelicGenotypeVariantDataTest {
     @Test
     public void fromCsvFileWithoutMarkerNames() throws IOException {
         datasetName = "no-marker-names.csv";
-        withNames = true;
+        expectedHeaders = HEADERS_UNIQUE_NAMES;
         withMarkerNames = false;
         System.out.println(" |- File " + datasetName);
         testData(SimpleBiAllelicGenotypeVariantData.readData(
@@ -157,6 +151,7 @@ public class SimpleBiAllelicGenotypeVariantDataTest {
     @Test
     public void fromCsvFileWithoutNamesOrMarkerNames() throws IOException {
         datasetName = "no-names-no-marker-names.csv";
+        expectedHeaders = BLANK_HEADERS;
         withMarkerNames = false;
         System.out.println(" |- File " + datasetName);
         testData(SimpleBiAllelicGenotypeVariantData.readData(
@@ -224,22 +219,8 @@ public class SimpleBiAllelicGenotypeVariantDataTest {
 
         for (int i = 0; i < size; i++) {
             
-            // check name, if assigned
-            if(withNames){
-                assertEquals("Name for " + i + " not correct.", NAMES[i], data.getHeader(i).getName());
-            } else {
-                assertTrue("No name should have been set for individual " + i, 
-                            data.getHeader(i) == null || data.getHeader(i).getName() == null);
-            }
-            
-            // check unique identifier, if assigned
-            if(withUniqueIdentifiers){
-                assertEquals("Unique identifier for " + i + " not correct.",
-                             UNIQUE_IDENTIFIERS[i], data.getHeader(i).getUniqueIdentifier());
-            } else {
-                assertTrue("No unique identifier should have been set for individual " + i, 
-                            data.getHeader(i) == null || data.getHeader(i).getUniqueIdentifier() == null);
-            }
+            // check header
+            assertEquals("Header for individual " + i + " is not correct.", expectedHeaders[i], data.getHeader(i));
 
             // check scores and frequencies
             for (int m = 0; m < data.getNumberOfMarkers(); m++) {

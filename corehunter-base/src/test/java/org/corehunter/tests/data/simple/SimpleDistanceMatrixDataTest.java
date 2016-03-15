@@ -21,8 +21,6 @@ package org.corehunter.tests.data.simple;
 
 import static org.corehunter.tests.TestData.DISTANCES;
 import static org.corehunter.tests.TestData.NAME;
-import static org.corehunter.tests.TestData.NAMES;
-import static org.corehunter.tests.TestData.UNIQUE_IDENTIFIERS;
 import static org.corehunter.tests.TestData.PRECISION;
 import static org.corehunter.tests.TestData.SET;
 
@@ -61,6 +59,7 @@ public class SimpleDistanceMatrixDataTest {
         "/distances/err/empty.txt",        
         "/distances/err/excessive-names.txt",        
         "/distances/err/excessive-ids.txt",        
+        "/distances/err/too-few-ids.txt",        
         "/distances/err/incorrect-row-length.csv",        
         "/distances/err/incorrect-row-length-2.csv",        
         "/distances/err/incorrect-row-length.txt",        
@@ -75,13 +74,15 @@ public class SimpleDistanceMatrixDataTest {
         "/distances/err/duplicate-ids.txt",
         "/distances/err/duplicate-id-row.txt",
         "/distances/err/duplicate-name-row.txt",
-        "/distances/err/duplicate-names-without-ids.txt"
+        "/distances/err/duplicate-names-without-ids.txt",
+        "/distances/err/missing-names-without-ids.txt"
     };
     
     private static final SymmetricMatrixFormat[] ERRONEOUS_FILE_FORMATS = {
         SymmetricMatrixFormat.FULL,
         SymmetricMatrixFormat.FULL,
         SymmetricMatrixFormat.FULL,
+        SymmetricMatrixFormat.FULL,
         SymmetricMatrixFormat.LOWER,
         SymmetricMatrixFormat.LOWER,
         SymmetricMatrixFormat.FULL,
@@ -89,6 +90,7 @@ public class SimpleDistanceMatrixDataTest {
         SymmetricMatrixFormat.LOWER,
         SymmetricMatrixFormat.FULL,
         SymmetricMatrixFormat.LOWER_DIAG,
+        SymmetricMatrixFormat.FULL,
         SymmetricMatrixFormat.FULL,
         SymmetricMatrixFormat.FULL,
         SymmetricMatrixFormat.FULL,
@@ -214,6 +216,7 @@ public class SimpleDistanceMatrixDataTest {
 
         int size = data.getDatasetSize();
 
+        // check items (headers and distances)
         for (int i = 0; i < size; i++) {
             
             // check header

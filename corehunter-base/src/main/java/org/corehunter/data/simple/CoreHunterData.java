@@ -48,10 +48,10 @@ public class CoreHunterData extends SimpleNamedData {
      * @param distances precomputed distance matrix
      */
     public CoreHunterData(GenotypeVariantData markers, FeatureDataset phenotypes, DistanceMatrixData distances) {
-        // TODO ...
+        super(inferDatasetSize(markers, phenotypes, distances));
     }
     
-    private int inferDatasetSize(GenotypeVariantData markers, FeatureDataset phenotypes, DistanceMatrixData distances){
+    private static int inferDatasetSize(GenotypeVariantData markers, FeatureDataset phenotypes, DistanceMatrixData distances){
         // check not all undefined
         if(markers == null && phenotypes == null && distances == null){
             throw new IllegalArgumentException(
@@ -59,10 +59,8 @@ public class CoreHunterData extends SimpleNamedData {
             );
         }
         // check same size
-        List<Integer> sizes = new ArrayList<>();
-        if(markers != null){
-            sizes.add(markers.getDatasetSize());
-        }
+        // TODO ...
+        return 0;
     }
 
 }

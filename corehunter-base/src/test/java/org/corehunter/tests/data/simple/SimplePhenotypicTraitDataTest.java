@@ -28,6 +28,9 @@ import java.nio.file.Paths;
 import org.corehunter.data.simple.SimpleBiAllelicGenotypeVariantData;
 import org.corehunter.data.simple.SimplePhenotypicTraitData;
 
+import static org.corehunter.tests.TestData.BLANK_HEADERS;
+import static org.corehunter.tests.TestData.HEADERS_UNIQUE_NAMES;
+import static org.corehunter.tests.TestData.HEADERS_NAMES_AND_IDS;
 import static org.corehunter.tests.TestData.NAMES;
 import static org.corehunter.tests.TestData.PHENOTYPIC_TRAIT_NAMES;
 import static org.corehunter.tests.TestData.PHENOTYPIC_TRAIT_VALUES;
@@ -38,13 +41,12 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import uno.informatics.common.io.FileType;
 import uno.informatics.data.FeatureDataset;
 import uno.informatics.data.FeatureDatasetRow;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import uno.informatics.data.SimpleEntity;
 
 /**
  * @author Herman De Beukelaer
@@ -55,8 +57,7 @@ public class SimplePhenotypicTraitDataTest {
 
     private static final String ERRONEOUS_FILES_DIR = "/phenotypes/err/";
     
-    private boolean withNames = false;
-    private boolean withUniqueIdentifiers = false;
+    private SimpleEntity[] expectedHeaders;
     private String datasetName;
     
     @BeforeClass
@@ -72,7 +73,7 @@ public class SimplePhenotypicTraitDataTest {
     @Test
     public void fromCsvFileWithNames() throws IOException {
         datasetName = "names.csv";
-        withNames = true;
+        expectedHeaders = HEADERS_UNIQUE_NAMES;
         System.out.println(" |- File " + datasetName);
         testData(SimplePhenotypicTraitData.readData(
             Paths.get(SimplePhenotypicTraitDataTest.class.getResource(CSV_NAMES).getPath()),
@@ -127,22 +128,8 @@ public class SimplePhenotypicTraitDataTest {
 
         for (int i = 0; i < size; i++) {
             
-            // check name, if assigned
-            if(withNames){
-                assertEquals("Name for " + i + " not correct.", NAMES[i], data.getHeader(i).getName());
-            } else {
-                assertTrue("No name should have been set for individual " + i, 
-                            data.getHeader(i) == null || data.getHeader(i).getName() == null);
-            }
-            
-            // check unique identifier, if assigned
-            if(withUniqueIdentifiers){
-                assertEquals("Unique identifier for " + i + " not correct.",
-                             UNIQUE_IDENTIFIERS[i], data.getHeader(i).getUniqueIdentifier());
-            } else {
-                assertTrue("No unique identifier should have been set for individual " + i, 
-                            data.getHeader(i) == null || data.getHeader(i).getUniqueIdentifier() == null);
-            }
+            // check header
+            assertEquals("Header for individual " + i + " is not correct.", expectedHeaders[i], data.getHeader(i));
 
             // check trait values
             FeatureDatasetRow row = fData.getRow(i);

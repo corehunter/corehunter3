@@ -1,6 +1,6 @@
 NAME	mk1_1	mk1_2	mk2_1	mk2_2	mk3_1	mk3_2	mk4_1	mk4_2
 Alice	1   	3   	B   	B   	a1  	a1  	    	
-    	2   	2   	C   	A   	a1  	a2  	+   	-
+Dave	2   	2   	C   	A   	a1  	a2  	+   	-
 Bob 	1   	2   	D   	D   	a2  	a2  	+   	+
 Carol	2   	3   	B   	B   	a2  	a1  	+   	-
-Bob 	1   	1   	    	    	a1  	a1  	-   	-
+Eve 	1   	1   	    	    	a1  	a1  	-   	-
