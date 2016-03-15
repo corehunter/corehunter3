@@ -232,8 +232,6 @@ public class SimpleDistanceMatrixData extends SimpleNamedData implements Distanc
                 // peek first cell
                 reader.nextColumn();
                 firstCell = reader.getCellAsString();
-                // TODO: remove manual trim when library is fixed
-                firstCell = (firstCell == null ? null : firstCell.trim());
                 
                 switch (StringUtils.unquote(firstCell)) {
                     
