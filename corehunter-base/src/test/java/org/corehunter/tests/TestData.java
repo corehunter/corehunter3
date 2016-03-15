@@ -45,20 +45,30 @@ public class TestData {
     public static final String NAME = "Test Dataset";
 
     public static final String[] NAMES = new String[]{
-        "Alice", null, "Bob", "Carol", "Bob"
+        "Alice", "Dave", "Bob", "Carol", "Bob"
     };
-    
     public static final String[] UNIQUE_IDENTIFIERS = new String[]{
-        "acc-1", "acc-2", "acc-3", null, "acc-5"
+        "acc-1", "acc-2", "acc-3", "acc-4", "acc-5"
     };
     
-    public static final SimpleEntity[] HEADERS;
+    public static final String[] UNIQUE_NAMES = new String[]{
+        "Alice", "Dave", "Bob", "Carol", "Eve"
+    };
+    
+    public static final SimpleEntity[] HEADERS_UNIQUE_NAMES;
+    public static final SimpleEntity[] HEADERS_NAMES_AND_IDS;
+    public static final SimpleEntity[] BLANK_HEADERS;
     
     static{
-        HEADERS = new SimpleEntity[NAMES.length];
-        for(int i = 0; i < HEADERS.length; i++){
-            HEADERS[i] = new SimpleEntityPojo(UNIQUE_IDENTIFIERS[i], NAMES[i]);
+        HEADERS_UNIQUE_NAMES = new SimpleEntity[NAMES.length];
+        for(int i = 0; i < HEADERS_UNIQUE_NAMES.length; i++){
+            HEADERS_UNIQUE_NAMES[i] = new SimpleEntityPojo(UNIQUE_NAMES[i]);
         }
+        HEADERS_NAMES_AND_IDS = new SimpleEntity[NAMES.length];
+        for(int i = 0; i < HEADERS_NAMES_AND_IDS.length; i++){
+            HEADERS_NAMES_AND_IDS[i] = new SimpleEntityPojo(UNIQUE_IDENTIFIERS[i], NAMES[i]);
+        }
+        BLANK_HEADERS = new SimpleEntity[NAMES.length];
     }
 
     public static final Set<Integer> SET = new TreeSet<>();
@@ -71,7 +81,9 @@ public class TestData {
         SET.add(4);
     }
 
-    public static final SimpleDistanceMatrixData DATA = new SimpleDistanceMatrixData(NAME, HEADERS, DISTANCES);
+    public static final SimpleDistanceMatrixData DATA = new SimpleDistanceMatrixData(
+            NAME, HEADERS_NAMES_AND_IDS, DISTANCES
+    );
 
     public static final String[] MARKER_NAMES = {
         "mk1",
@@ -242,6 +254,23 @@ public class TestData {
             {0.0, 1.0},
             {1.0, 0.0}
         },
+    };
+    
+    
+    public static final String[] PHENOTYPIC_TRAIT_NAMES  = {
+        "trait 1",
+        "trait 2",
+        "trait 3",
+        "trait 4",
+        "trait 5"
+    };
+    
+    public static final Object[][] PHENOTYPIC_TRAIT_VALUES  = {
+        {"A", 3, 4, 1.4, false},
+        {"B", 1, 5, 0.5, true},
+        {"A", 0, 6, 0.5, true},
+        {"C", 2, 9, 0.5, false},
+        {"B", 2, 1, 1.3, true}
     };
 
     public static final double[][] CAVALLI_SFORZA_EDWARDS_DISTANCES = {

@@ -24,11 +24,11 @@ import static org.corehunter.tests.TestData.HETROZYGOUS_LOCI_DIVERSITY_SUBSET1;
 import static org.corehunter.tests.TestData.HETROZYGOUS_LOCI_DIVERSITY_SUBSET2;
 import static org.corehunter.tests.TestData.MARKER_NAMES;
 import static org.corehunter.tests.TestData.NAME;
-import static org.corehunter.tests.TestData.HEADERS;
 import static org.corehunter.tests.TestData.PRECISION;
 import static org.corehunter.tests.TestData.SUBSET1;
 import static org.corehunter.tests.TestData.SUBSET2;
 import static org.corehunter.tests.TestData.ALLELE_FREQUENCIES;
+import static org.corehunter.tests.TestData.HEADERS_NAMES_AND_IDS;
 
 import org.corehunter.data.simple.SimpleGenotypeVariantData;
 import org.corehunter.objectives.multiallelic.HetrozygousLociDiversityMultiAllelic;
@@ -43,11 +43,11 @@ public class HetrozygousLociDiversityMultiAllelicTest extends EvaluationTest {
     // TODO: for this test we need to agree how to handle missing data
     //@Test
     public void test() {
-        SimpleGenotypeVariantData data
-                = new SimpleGenotypeVariantData(NAME, HEADERS, MARKER_NAMES, ALLELE_NAMES, ALLELE_FREQUENCIES);
+        SimpleGenotypeVariantData data = new SimpleGenotypeVariantData(
+                NAME, HEADERS_NAMES_AND_IDS, MARKER_NAMES, ALLELE_NAMES, ALLELE_FREQUENCIES
+        );
 
-        HetrozygousLociDiversityMultiAllelic objective
-                = new HetrozygousLociDiversityMultiAllelic();
+        HetrozygousLociDiversityMultiAllelic objective = new HetrozygousLociDiversityMultiAllelic();
 
         assertEquals("Evaluation for subset 1 is not correct!", HETROZYGOUS_LOCI_DIVERSITY_SUBSET1,
                 objective.evaluate(new SubsetSolution(data.getIDs(), SUBSET1), data), PRECISION);
@@ -55,11 +55,11 @@ public class HetrozygousLociDiversityMultiAllelicTest extends EvaluationTest {
     
     @Test
     public void testNoMissingData() {
-        SimpleGenotypeVariantData data
-                = new SimpleGenotypeVariantData(NAME, HEADERS, MARKER_NAMES, ALLELE_NAMES, ALLELE_FREQUENCIES);
+        SimpleGenotypeVariantData data = new SimpleGenotypeVariantData(
+                NAME, HEADERS_NAMES_AND_IDS, MARKER_NAMES, ALLELE_NAMES, ALLELE_FREQUENCIES
+        );
 
-        HetrozygousLociDiversityMultiAllelic objective
-                = new HetrozygousLociDiversityMultiAllelic();
+        HetrozygousLociDiversityMultiAllelic objective = new HetrozygousLociDiversityMultiAllelic();
 
         assertEquals("Evaluation for subset 2 is not correct!", HETROZYGOUS_LOCI_DIVERSITY_SUBSET2,
                 objective.evaluate(new SubsetSolution(data.getIDs(), SUBSET2), data), PRECISION);

@@ -19,6 +19,13 @@
 
 package org.corehunter.data.simple;
 
+import java.util.ArrayList;
+import java.util.List;
+import org.corehunter.data.DistanceMatrixData;
+import org.corehunter.data.GenotypeVariantData;
+import org.jamesframework.core.problems.datatypes.IntegerIdentifiedData;
+import uno.informatics.data.FeatureDataset;
+
 /**
  * Combines all data used in Core Hunter.
  * Includes marker data, phenotypic traits and/or a precomputed distance matrix.
@@ -28,13 +35,34 @@ package org.corehunter.data.simple;
 public class CoreHunterData extends SimpleNamedData {
 
     /**
-     * Initialize Core Hunter data set with n entries. IDs are set to [0, n-1].
-     * Names are set to <code>null</code> and updated if named data is added.
+     * Initialize Core Hunter data consisting of marker data, phenotypic traits and/or a precomputed distance matrix.
+     * At least one of these should be defined (i.e. non <code>null</code>). Items should be ordered in the same way
+     * across all datasets, which should all be of the same size n. If headers are specified (item names and/or unique
+     * identifiers) in some or all datasets these should also be consistent across datasets. If this is not the case,
+     * an exception will be thrown.
+     * <p>
+     * Integer IDs as required by {@link IntegerIdentifiedData} are set to [0, n-1].
      * 
-     * @param n dataset size
+     * @param markers marker data (bi- or multiallelic)
+     * @param phenotypes phenotypic traits
+     * @param distances precomputed distance matrix
      */
-    public CoreHunterData(int n) {
-        super(n);
+    public CoreHunterData(GenotypeVariantData markers, FeatureDataset phenotypes, DistanceMatrixData distances) {
+        // TODO ...
+    }
+    
+    private int inferDatasetSize(GenotypeVariantData markers, FeatureDataset phenotypes, DistanceMatrixData distances){
+        // check not all undefined
+        if(markers == null && phenotypes == null && distances == null){
+            throw new IllegalArgumentException(
+                    "At least one type of data (markers, phenotypes, distances) should be defined."
+            );
+        }
+        // check same size
+        List<Integer> sizes = new ArrayList<>();
+        if(markers != null){
+            sizes.add(markers.getDatasetSize());
+        }
     }
 
 }

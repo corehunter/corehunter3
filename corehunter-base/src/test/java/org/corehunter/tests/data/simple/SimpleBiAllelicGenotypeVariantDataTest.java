@@ -29,7 +29,6 @@ import org.corehunter.data.simple.SimpleBiAllelicGenotypeVariantData;
 
 import static org.corehunter.tests.TestData.ALLELE_FREQUENCIES_BIALLELIC;
 import static org.corehunter.tests.TestData.ALLELE_SCORES_BIALLELIC;
-import static org.corehunter.tests.TestData.HEADERS;
 import static org.corehunter.tests.TestData.MARKER_NAMES;
 import static org.corehunter.tests.TestData.NAME;
 import static org.corehunter.tests.TestData.NAMES;
@@ -46,9 +45,14 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import uno.informatics.common.io.FileType;
+import static org.corehunter.tests.TestData.HEADERS_WITHOUT_IDS;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 /**
- * @author Guy Davenport
+ * @author Guy Davenport, Herman De Beukelaer
  */
 public class SimpleBiAllelicGenotypeVariantDataTest {
 
@@ -82,7 +86,7 @@ public class SimpleBiAllelicGenotypeVariantDataTest {
         datasetName = null;
         withNames = true;
         withUniqueIdentifiers = true;
-        testData(new SimpleBiAllelicGenotypeVariantData(HEADERS, MARKER_NAMES, ALLELE_SCORES_BIALLELIC));
+        testData(new SimpleBiAllelicGenotypeVariantData(HEADERS_WITHOUT_IDS, MARKER_NAMES, ALLELE_SCORES_BIALLELIC));
     }
     
     @Test
@@ -91,7 +95,7 @@ public class SimpleBiAllelicGenotypeVariantDataTest {
         datasetName = NAME;
         withNames = true;
         withUniqueIdentifiers = true;
-        testData(new SimpleBiAllelicGenotypeVariantData(NAME, HEADERS, MARKER_NAMES, ALLELE_SCORES_BIALLELIC));
+        testData(new SimpleBiAllelicGenotypeVariantData(NAME, HEADERS_WITHOUT_IDS, MARKER_NAMES, ALLELE_SCORES_BIALLELIC));
     }
     
     @Test

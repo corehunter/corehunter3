@@ -22,7 +22,6 @@ package org.corehunter.data.simple;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -67,15 +66,15 @@ public class SimpleNamedData implements NamedData {
     
     /**
      * Initialize data with given dataset name and item headers. IDs are set to [0, n-1].
-     * Missing item headers should be encoded as <code>null</code> values in the array.
-     * Alternatively, if no headers are assigned to any items, <code>headers</code> itself
-     * may also be <code>null</code>.
      * 
      * @param datasetName name of the dataset
      * @param n number of entries
      * @param headers item headers, <code>null</code> if no headers are assigned;
      *                if not <code>null</code> its length should equal <code>n</code>
-     * @throws IllegalArgumentException if an incorrect number of names are specified
+     *                and each item should at least have a unique identifier (name is optional)
+     * @throws IllegalArgumentException if an incorrect number of headers are specified
+     *                                  or if unique identifiers are missing in one or
+     *                                  more headers
      */
     public SimpleNamedData(String datasetName, int n, SimpleEntity[] headers){
         ids = Collections.unmodifiableSet(
@@ -83,7 +82,7 @@ public class SimpleNamedData implements NamedData {
         );
         this.datasetName = datasetName;
         if(headers == null){
-            this.headers = new SimpleEntity[n];
+            this.headers = null;
         } else {
             if(headers.length != n){
                 throw new IllegalArgumentException(String.format(
@@ -92,13 +91,18 @@ public class SimpleNamedData implements NamedData {
             }
             // check unique identifiers
             Set<String> identifiers = new HashSet<>();
-            for(SimpleEntity header : headers){
-                if(header != null){
-                    String identifier = header.getUniqueIdentifier();
-                    if(identifier != null && !identifiers.add(identifier)){
-                        throw new IllegalArgumentException("Identifiers are not unique. "
-                                + "Duplicate identifier: " + identifier + ".");
-                    }
+            for(int i = 0 ; i < n; i++){
+                SimpleEntity header = headers[i];
+                if(header == null || header.getUniqueIdentifier() == null){
+                    throw new IllegalArgumentException(String.format(
+                            "No identifier defined for item %d.", i
+                    ));
+                }
+                if(!identifiers.add(header.getUniqueIdentifier())){
+                    throw new IllegalArgumentException(String.format(
+                            "Identifiers are not unique. Duplicate identifier %s for item %d.",
+                            header.getUniqueIdentifier(), i
+                    ));
                 }
             }
             this.headers = Arrays.copyOf(headers, n);
@@ -106,25 +110,8 @@ public class SimpleNamedData implements NamedData {
     }
     
     @Override
-    public SimpleEntity getHeader(int id) throws NoSuchElementException {
-        validateId(id);
-        return headers[id];
-    }
-    
-    public void setHeader(int id, SimpleEntity header){
-        validateId(id);
-        // check unique identifier
-        String identifier = header.getUniqueIdentifier();
-        if(identifier != null && Arrays.stream(headers).anyMatch(h -> h.getUniqueIdentifier().equals(identifier))){
-            throw new IllegalArgumentException("Identifier " + identifier + " already assigned");
-        }
-        headers[id] = header;
-    }
-    
-    private void validateId(int id){
-        if(id < 0 || id >= getDatasetSize()){
-            throw new NoSuchElementException(String.format("There is no entry with ID %d.", id));
-        }
+    public SimpleEntity getHeader(int id) {
+        return headers == null ? null : headers[id];
     }
 
     @Override
@@ -134,7 +121,7 @@ public class SimpleNamedData implements NamedData {
 
     @Override
     public int getDatasetSize() {
-        return headers.length;
+        return ids.size();
     }
     
     /**

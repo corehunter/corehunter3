@@ -24,7 +24,6 @@ import static org.corehunter.tests.TestData.MARKER_NAMES;
 import static org.corehunter.tests.TestData.ALLELE_NAMES_DIPLOID;
 import static org.corehunter.tests.TestData.MARKER_NAMES_DIPLOID;
 import static org.corehunter.tests.TestData.NAME;
-import static org.corehunter.tests.TestData.HEADERS;
 import static org.corehunter.tests.TestData.NAMES;
 import static org.corehunter.tests.TestData.PRECISION;
 import static org.corehunter.tests.TestData.SET;
@@ -48,6 +47,11 @@ import org.junit.Test;
 
 import uno.informatics.common.io.FileType;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.corehunter.tests.TestData.HEADERS_WITHOUT_IDS;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -98,7 +102,7 @@ public class SimpleGenotypeVariantDataTest {
         datasetName = null;
         withNames = true;
         withUniqueIdentifiers = true;
-        testDataGeneral(new SimpleGenotypeVariantData(HEADERS, MARKER_NAMES, ALLELE_NAMES, ALLELE_FREQUENCIES));
+        testDataGeneral(new SimpleGenotypeVariantData(HEADERS_WITHOUT_IDS, MARKER_NAMES, ALLELE_NAMES, ALLELE_FREQUENCIES));
     }
     
     @Test
@@ -107,7 +111,7 @@ public class SimpleGenotypeVariantDataTest {
         datasetName = NAME;
         withNames = true;
         withUniqueIdentifiers = true;
-        testDataGeneral(new SimpleGenotypeVariantData(NAME, HEADERS, MARKER_NAMES, ALLELE_NAMES, ALLELE_FREQUENCIES));
+        testDataGeneral(new SimpleGenotypeVariantData(NAME, HEADERS_WITHOUT_IDS, MARKER_NAMES, ALLELE_NAMES, ALLELE_FREQUENCIES));
     }
 
     @Test
@@ -190,7 +194,7 @@ public class SimpleGenotypeVariantDataTest {
         datasetName = NAME;
         withNames = true;
         withUniqueIdentifiers = true;
-        testDataDiploid(new SimpleGenotypeVariantData(NAME, HEADERS, MARKER_NAMES_DIPLOID,
+        testDataDiploid(new SimpleGenotypeVariantData(NAME, HEADERS_WITHOUT_IDS, MARKER_NAMES_DIPLOID,
                                                       ALLELE_NAMES_DIPLOID, ALLELE_FREQUENCIES_DIPLOID));
     }
     

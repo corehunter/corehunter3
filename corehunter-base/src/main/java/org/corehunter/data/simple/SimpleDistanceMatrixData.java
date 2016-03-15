@@ -73,8 +73,8 @@ public class SimpleDistanceMatrixData extends SimpleNamedData implements Distanc
     
     /**
      * Create distance matrix data given the item headers and distances.
-     * Item headers and distances are copied to internal data structures. The dataset name is set to
-     * "Precomputed distance matrix".
+     * Item headers and distances are copied to internal data structures.
+     * The dataset name is set to "Precomputed distance matrix".
      * <p>
      * All values should be positive and the diagonal values equal to zero.
      * The distance matrix should be symmetric with all rows of equal length.
@@ -104,18 +104,19 @@ public class SimpleDistanceMatrixData extends SimpleNamedData implements Distanc
      * The distance matrix should be symmetric with all rows of equal length.
      * Violating any of these requirements will produce an exception.
      * <p>
-     * Item headers are optional, missing headers should be encoded as <code>null</code>
-     * values in the header array. Alternatively, if no headers are assigned to any items,
-     * <code>headers</code> itself may also be <code>null</code>.
+     * Item headers are optional.
      * 
      * @param name dataset name
      * @param headers item headers, <code>null</code> if no headers are assigned; if not
-     *                  <code>null</code> its length should be the same as the dimension
-     *                  of the given distance matrix
+     *                <code>null</code> its length should be the same as the dimension
+     *                of the given distance matrix and each item should at least have a
+     *                unique identifier (names are optional)
      * @param distances distance matrix (symmetric)
-     * @throws IllegalArgumentException if an illegal distance matrix is given
-     *                                  or the number of headers does not match
-     *                                  the dimension of the distance matrix
+     * @throws IllegalArgumentException if an illegal distance matrix is given,
+     *                                  if the number of headers does not match
+     *                                  the dimension of the distance matrix, or
+     *                                  if unique identifiers are missing in one
+     *                                  or more headers
      */
     public SimpleDistanceMatrixData(String name, SimpleEntity[] headers, double[][] distances) {
         
@@ -168,12 +169,11 @@ public class SimpleDistanceMatrixData extends SimpleNamedData implements Distanc
      * <p>
      * Two optional header rows can be added at the beginning of the file to specify individual names and/or
      * unique identifiers. The former is identified with row header "NAME", the latter with row header "ID".
-     * Assigned identifiers should be unique and are used to distinguish between individuals with the same
-     * name. Leading and trailing whitespace is removed from names and unique identifiers and they are
-     * unquoted if wrapped in single or double quotes after whitespace removal. If it is intended to start or end
-     * a name/identifier with whitespace this whitespace should be contained within the quotes, as it will then
-     * not be removed. It is allowed that names and/or identifiers are missing for some individuals. In this
-     * case the corresponding cells should be left blank. Trailing blank cells can be omitted for any header row.
+     * If only names are specified they should be unique. Else unique identifiers are also required to distinguish
+     * between items with the same name. Leading and trailing whitespace is removed from names and unique identifiers
+     * and they are unquoted if wrapped in single or double quotes after whitespace removal. If it is intended to
+     * start or end a name/identifier with whitespace this whitespace should be contained within the quotes, as it
+     * will then not be removed.
      * <p>
      * The dataset name is set to the name of the file to which <code>filePath</code> points.
      * 
@@ -315,14 +315,6 @@ public class SimpleDistanceMatrixData extends SimpleNamedData implements Distanc
                 ));
             }
             
-            // extend names/identifiers with null values if necessary
-            if(names != null && names.length < n){
-                names = Arrays.copyOf(names, n);
-            }
-            if(identifiers != null && identifiers.length < n){
-                identifiers = Arrays.copyOf(identifiers, n);
-            }
-            
             // check number of names
             if(names != null && names.length != n){
                 throw new IOException(
@@ -342,11 +334,14 @@ public class SimpleDistanceMatrixData extends SimpleNamedData implements Distanc
             
             // combine names and identifiers in headers
             SimpleEntity[] headers = null;
-            if(names != null || identifiers != null){
+            if(identifiers == null){
+                identifiers = names;
+            }
+            if(identifiers != null){
                 headers = new SimpleEntity[n];
                 for(int i = 0; i < n; i++){
                     String name = names != null ? names[i] : null;
-                    String identifier = identifiers != null ? identifiers[i] : null;
+                    String identifier = identifiers[i];
                     headers[i] = new SimpleEntityPojo(identifier, name);
                 }
             }

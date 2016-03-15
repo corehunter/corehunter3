@@ -23,7 +23,6 @@ import static org.corehunter.tests.TestData.ALLELE_NAMES;
 import static org.corehunter.tests.TestData.MARKER_NAMES;
 import static org.corehunter.tests.TestData.MODIFIED_ROGERS_DISTANCES;
 import static org.corehunter.tests.TestData.NAME;
-import static org.corehunter.tests.TestData.HEADERS;
 import static org.corehunter.tests.TestData.PRECISION;
 import static org.corehunter.tests.TestData.SET;
 import static org.corehunter.tests.TestData.ALLELE_FREQUENCIES;
@@ -35,6 +34,7 @@ import org.corehunter.objectives.distance.multiallelic.ModifiedRogersDistanceMul
 import org.junit.Assert;
 import org.junit.Test;
 
+import static org.corehunter.tests.TestData.HEADERS_NAMES_AND_IDS;
 import static org.junit.Assert.assertEquals;
 
 /**
@@ -45,7 +45,7 @@ public class ModifiedRogersDistanceMultiAllelicTest {
     @Test
     public void test() {
         SimpleGenotypeVariantData data = new SimpleGenotypeVariantData(
-                NAME, HEADERS, MARKER_NAMES, ALLELE_NAMES, ALLELE_FREQUENCIES
+                NAME, HEADERS_NAMES_AND_IDS, MARKER_NAMES, ALLELE_NAMES, ALLELE_FREQUENCIES
         );
 
         ModifiedRogersDistanceMultiAllelic distanceMetric

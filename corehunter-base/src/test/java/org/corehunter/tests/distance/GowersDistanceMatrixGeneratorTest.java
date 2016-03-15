@@ -46,15 +46,15 @@ import static org.junit.Assert.assertEquals;
  */
 public class GowersDistanceMatrixGeneratorTest {
 
-    private static final String DATA_FILE = "/phenotypic_data.csv";
-    private static final String MATRIX_FILE = "/matrix.csv";
+    private static final String DATA_FILE = "/phenotypes/phenotypic_data.csv";
+    private static final String MATRIX_FILE = "/phenotypes/matrix.csv";
 
-    private static final Object[][] DATA = new Object[][]{
-        new Object[]{1, 1.0, "1", true},
-        new Object[]{2, 3.0, "2", true},
-        new Object[]{3, 3.0, "1", false},
-        new Object[]{4, 5.0, "2", false},
-        new Object[]{5, 4.0, "1", true}
+    private static final Object[][] DATA = {
+        {1, 1.0, "1", true},
+        {2, 3.0, "2", true},
+        {3, 3.0, "1", false},
+        {4, 5.0, "2", false},
+        {5, 4.0, "1", true}
     };
 
     private static final Feature[] FEATURES = new Feature[]{
