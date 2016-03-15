@@ -31,11 +31,9 @@ import org.corehunter.data.simple.SimplePhenotypicTraitData;
 import static org.corehunter.tests.TestData.BLANK_HEADERS;
 import static org.corehunter.tests.TestData.HEADERS_UNIQUE_NAMES;
 import static org.corehunter.tests.TestData.HEADERS_NAMES_AND_IDS;
-import static org.corehunter.tests.TestData.NAMES;
 import static org.corehunter.tests.TestData.PHENOTYPIC_TRAIT_NAMES;
 import static org.corehunter.tests.TestData.PHENOTYPIC_TRAIT_VALUES;
 import static org.corehunter.tests.TestData.SET;
-import static org.corehunter.tests.TestData.UNIQUE_IDENTIFIERS;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -53,7 +51,9 @@ import uno.informatics.data.SimpleEntity;
  */
 public class SimplePhenotypicTraitDataTest {
 
-    private static final String CSV_NAMES = "/phenotypes/names.csv";
+    private static final String CSV_NAMES = "/phenotypes/names-no-whitespace.csv";
+    private static final String CSV_NAMES_IDS = "/phenotypes/names-and-ids.csv";
+    private static final String TXT_NO_NAMES = "/phenotypes/no-names-no-whitespace.txt";
 
     private static final String ERRONEOUS_FILES_DIR = "/phenotypes/err/";
     
@@ -72,12 +72,34 @@ public class SimplePhenotypicTraitDataTest {
     
     @Test
     public void fromCsvFileWithNames() throws IOException {
-        datasetName = "names.csv";
+        datasetName = "names-no-whitespace.csv";
         expectedHeaders = HEADERS_UNIQUE_NAMES;
         System.out.println(" |- File " + datasetName);
         testData(SimplePhenotypicTraitData.readData(
             Paths.get(SimplePhenotypicTraitDataTest.class.getResource(CSV_NAMES).getPath()),
             FileType.CSV
+        ));
+    }
+    
+    @Test
+    public void fromCsvFileWithNamesAndIds() throws IOException {
+        datasetName = "names-and-ids.csv";
+        expectedHeaders = HEADERS_NAMES_AND_IDS;
+        System.out.println(" |- File " + datasetName);
+        testData(SimplePhenotypicTraitData.readData(
+            Paths.get(SimplePhenotypicTraitDataTest.class.getResource(CSV_NAMES_IDS).getPath()),
+            FileType.CSV
+        ));
+    }
+    
+    @Test
+    public void fromTxtFileWithoutNames() throws IOException {
+        datasetName = "no-names-no-whitespace.txt";
+        expectedHeaders = BLANK_HEADERS;
+        System.out.println(" |- File " + datasetName);
+        testData(SimplePhenotypicTraitData.readData(
+            Paths.get(SimplePhenotypicTraitDataTest.class.getResource(TXT_NO_NAMES).getPath()),
+            FileType.TXT
         ));
     }
     
