@@ -68,7 +68,7 @@ public class SimpleDistanceMatrixData extends SimpleNamedData implements Distanc
      */
     public SimpleDistanceMatrixData(double[][] distances) {
         // name of each item is set to null
-        this(new SimpleEntity[distances.length], distances);
+        this(null, distances);
     }
     
     /**
