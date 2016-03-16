@@ -22,7 +22,6 @@ package org.corehunter.tests.data.simple;
 import static org.corehunter.tests.TestData.ALLELE_NAMES;
 import static org.corehunter.tests.TestData.UNDEFINED_ALLELE_NAMES;
 import static org.corehunter.tests.TestData.MARKER_NAMES;
-import static org.corehunter.tests.TestData.UNDEFINED_MARKER_NAMES;
 import static org.corehunter.tests.TestData.ALLELE_NAMES_DIPLOID;
 import static org.corehunter.tests.TestData.MARKER_NAMES_DIPLOID;
 import static org.corehunter.tests.TestData.UNDEFINED_MARKER_NAMES_DIPLOID;

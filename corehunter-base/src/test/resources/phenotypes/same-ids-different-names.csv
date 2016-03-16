@@ -1,0 +1,7 @@
+NAME    , ID     , trait 1, trait 2, trait 3, trait 4, trait 5
+TYPE    ,        , N      , O      , I      , R      , NB
+Alice   ,        , A      , 3      , 4      , 1.4    , false
+        , Unknown, B      , 1      , 5      , 0.5    , true
+Fake Bob, Bob-1  , A      , 0      , 6      , 0.5    , true
+Bob     , Bob-2  , C      , 2      , 9      , 0.5    , false
+Carol   ,        , B      , 2      , 1      , 1.3    , true
