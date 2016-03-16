@@ -255,15 +255,11 @@ public class SimpleBiAllelicGenotypeVariantData extends SimpleNamedData
      * allele score matrix with one row per individual and one column per marker. Only values 0, 1 and 2 are valid.
      * Empty cells are also allowed in case of missing data.
      * <p>
-     * The file starts with a compulsory header row specifying the marker names. Although this row is required
-     * some or all names may be undefined by leaving the corresponding cells blank. Depending on the number of
-     * header columns (if any, see below) some additional column header cells may be prepended to the header row.
-     * <p>
-     * Two optional (leftmost) header columns can be included to specify individual names and/or unique identifiers.
-     * The former is identified with column header "NAME", the latter with column header "ID". The column headers should
-     * be placed in the corresponding cell of the header row. If only names are specified they should be defined for
-     * all individuals and unique. Else, additional unique identifiers are required at least for those individuals
-     * whose name is undefined or not unique.
+     * An optional first header row and column may be included to specify individual and marker names, identified
+     * with column/row header "NAME". Some or all marker names may be undefined by leaving the corresponding cells
+     * blank and marker names need not be unique. If item names are not unique or defined for some but not all items,
+     * a second header column "ID" should be included to provide unique identifiers for at least those items whose name
+     * is undefined or not unique.
      * <p>
      * Leading and trailing whitespace is removed from names and unique identifiers and they are unquoted if wrapped
      * in single or double quotes after whitespace removal. If it is intended to start or end a name/identifier with
@@ -313,24 +309,19 @@ public class SimpleBiAllelicGenotypeVariantData extends SimpleNamedData
                 throw new IOException("File is empty.");
             }
             
-            // read all data
+            // read and unquote all data
             List<String[]> rows = new ArrayList<>();
             while(reader.nextRow()){
-                rows.add(reader.getRowCellsAsStringArray());
+                rows.add(StringUtils.unquote(reader.getRowCellsAsStringArray()));
             }
-            int n = rows.size()-1;
-            
-            if(n < 0){
+            if(rows.isEmpty()){
                 throw new IOException("File is empty.");
-            }
-            if(n == 0){
-                throw new IOException("No data rows.");
             }
             
             // infer number of columns
             int numCols = rows.stream().mapToInt(row -> row.length).max().getAsInt();
             // extend rows with null values where needed
-            for(int r = 0; r <= n; r++){
+            for(int r = 0; r < rows.size(); r++){
                 String[] row = rows.get(r);
                 if(row.length < numCols){
                     row = Arrays.copyOf(row, numCols);
@@ -338,60 +329,49 @@ public class SimpleBiAllelicGenotypeVariantData extends SimpleNamedData
                 rows.set(r, row);
             }
             
-            // 1: extract marker names
-            
-            // unquote header row
-            String[] headerRow = StringUtils.unquote(rows.get(0));
-            // check for presence of header columns
-            int itemNameColumn = UNDEFINED_COLUMN;
-            int itemIdentifierColumn = UNDEFINED_COLUMN;
+            // check for presence of names and ids
+            boolean withNames = numCols >= 1 && Objects.equals(rows.get(0)[0], NAMES_HEADER);
+            boolean withIds = numCols >= 2 && Objects.equals(rows.get(0)[1], IDENTIFIERS_HEADER);
             int numHeaderCols = 0;
-            while(numHeaderCols < 2 && numHeaderCols < headerRow.length
-                    && (Objects.equals(headerRow[numHeaderCols], NAMES_HEADER)
-                        || Objects.equals(headerRow[numHeaderCols], IDENTIFIERS_HEADER))){
-                if(headerRow[numHeaderCols].equals(NAMES_HEADER)){
-                    if(itemNameColumn == UNDEFINED_COLUMN){
-                        itemNameColumn = numHeaderCols;
-                    } else {
-                        throw new IOException(String.format(
-                                "Duplicate %s column.", NAMES_HEADER
-                        ));
-                    }
-                } else {
-                    if(itemIdentifierColumn == UNDEFINED_COLUMN){
-                        itemIdentifierColumn = numHeaderCols;
-                    } else {
-                        throw new IOException(String.format(
-                                "Duplicate %s column.", IDENTIFIERS_HEADER
-                        ));
-                    }
-                }
+            if(withNames){
                 numHeaderCols++;
             }
+            if(withIds){
+                numHeaderCols++;
+            }
+            int numHeaderRows = (withNames ? 1 : 0);
+            
+            // infer number of individuals
+            int n = rows.size() - numHeaderRows;
+            if(n == 0){
+                throw new IOException("No data rows.");
+            }
+            
+            // infer number of markers
             int m = numCols - numHeaderCols;
             if(m == 0){
                 throw new IOException("No data columns.");
             }
-            // store marker names
-            String[] markerNames = Arrays.copyOfRange(headerRow, numHeaderCols, headerRow.length);
+            
+            // 1: extract marker names (if provided)
+            
+            String[] markerNames = (withNames ? Arrays.copyOfRange(rows.get(0), numHeaderCols, numCols) : null);
             
             // 2: extract item names, identifiers and alelle scores
             
-            String[] itemNames = (itemNameColumn == UNDEFINED_COLUMN ? null : new String[n]);
-            String[] itemIdentifiers = (itemIdentifierColumn == UNDEFINED_COLUMN ? null : new String[n]);
+            String[] itemNames = new String[n];
+            String[] itemIdentifiers = new String[n];
             Integer[][] alleleScores = new Integer[n][m];
             for(int i = 0; i < n; i++){
                 
-                String[] row = rows.get(i+1);
+                String[] row = rows.get(numHeaderRows + i);
                 
-                // extract item name and/or identifier
-                for(int c = 0; c < numHeaderCols; c++){
-                    String nameOrId = StringUtils.unquote(row[c]);
-                    if(itemNameColumn == c){
-                        itemNames[i] = nameOrId;
-                    } else {
-                        itemIdentifiers[i] = nameOrId;
-                    }
+                // extract item name and identifier
+                if(withNames){
+                    itemNames[i] = row[0];
+                }
+                if(withIds){
+                    itemIdentifiers[i] = row[1];
                 }
                 
                 // extract allele scores
@@ -403,7 +383,7 @@ public class SimpleBiAllelicGenotypeVariantData extends SimpleNamedData
                         // wrap in IO exception
                         throw new IOException(String.format(
                                 "Invalid allele score at row %d, column %d. Expected integer value 0/1/2, got: \"%s\".",
-                                i+1, numHeaderCols + j, s
+                                numHeaderRows + i, numHeaderCols + j, s
                         ), ex);
                     }
                 }
@@ -411,18 +391,20 @@ public class SimpleBiAllelicGenotypeVariantData extends SimpleNamedData
             }
             
             // combine names and identifiers in headers
-            SimpleEntity[] headers = null;
-            if(itemIdentifiers != null || itemNames != null){
-                headers = new SimpleEntity[n];
-                for(int i = 0; i < n; i++){
-                    String name = itemNames != null ? itemNames[i] : null;
-                    String identifier = itemIdentifiers != null ? itemIdentifiers[i] : null;
+            SimpleEntity[] headers = new SimpleEntity[n];
+            for(int i = 0; i < n; i++){
+                String name = itemNames[i];
+                String identifier = itemIdentifiers[i];
+                if(name != null || identifier != null){
                     if(identifier == null){
                         headers[i] = new SimpleEntityPojo(name);
                     } else {
                         headers[i] = new SimpleEntityPojo(identifier, name);
                     }
                 }
+            }
+            if(Arrays.stream(headers).allMatch(Objects::isNull)){
+                headers = null;
             }
             
             try{

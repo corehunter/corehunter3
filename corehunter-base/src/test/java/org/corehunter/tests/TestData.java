@@ -95,12 +95,27 @@ public class TestData {
         "mk6",
         "mk7"
     };
+    public static final String[] UNDEFINED_MARKER_NAMES = {
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+    };
     
     public static final String[] MARKER_NAMES_DIPLOID = {
         "mk1",
         "mk2",
         "mk3",
         "mk4"
+    };
+    public static final String[] UNDEFINED_MARKER_NAMES_DIPLOID = {
+        null,
+        null,
+        null,
+        null
     };
 
     public static final Double[][][] ALLELE_FREQUENCIES = {
@@ -192,6 +207,15 @@ public class TestData {
         {null, "mk5-2", "mk5-3"},
         {"mk6-1", "mk6-2"},
         {"mk7-1", "mk7-2"}
+    };
+    public static final String[][] UNDEFINED_ALLELE_NAMES = {
+        {null, null, null},
+        {null, null},
+        {null, null, null},
+        {null, null, null, null},
+        {null, null, null},
+        {null, null},
+        {null, null}
     };
     
     public static final String[][] ALLELE_NAMES_DIPLOID = {
