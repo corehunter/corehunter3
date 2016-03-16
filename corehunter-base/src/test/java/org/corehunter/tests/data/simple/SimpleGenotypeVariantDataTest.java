@@ -45,13 +45,12 @@ import org.junit.BeforeClass;
 import org.junit.AfterClass;
 import org.junit.Test;
 
-
-import uno.informatics.common.io.FileType;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+
+import uno.informatics.common.io.FileType;
 import uno.informatics.data.SimpleEntity;
 
 /**
@@ -97,7 +96,9 @@ public class SimpleGenotypeVariantDataTest {
         System.out.println(" |- In memory test");
         datasetName = null;
         expectedHeaders = HEADERS_NAMES_AND_IDS;
-        testDataGeneral(new SimpleGenotypeVariantData(HEADERS_NAMES_AND_IDS, MARKER_NAMES, ALLELE_NAMES, ALLELE_FREQUENCIES));
+        testDataGeneral(new SimpleGenotypeVariantData(
+                HEADERS_NAMES_AND_IDS, MARKER_NAMES, ALLELE_NAMES, ALLELE_FREQUENCIES
+        ));
     }
     
     @Test
@@ -105,7 +106,9 @@ public class SimpleGenotypeVariantDataTest {
         System.out.println(" |- In memory test with dataset name");
         datasetName = NAME;
         expectedHeaders = HEADERS_NAMES_AND_IDS;
-        testDataGeneral(new SimpleGenotypeVariantData(NAME, HEADERS_NAMES_AND_IDS, MARKER_NAMES, ALLELE_NAMES, ALLELE_FREQUENCIES));
+        testDataGeneral(new SimpleGenotypeVariantData(
+                NAME, HEADERS_NAMES_AND_IDS, MARKER_NAMES, ALLELE_NAMES, ALLELE_FREQUENCIES
+        ));
     }
 
     @Test

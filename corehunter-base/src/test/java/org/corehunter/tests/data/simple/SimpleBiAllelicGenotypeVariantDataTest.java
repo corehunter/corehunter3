@@ -41,11 +41,12 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import uno.informatics.common.io.FileType;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+
+import uno.informatics.common.io.FileType;
 import uno.informatics.data.SimpleEntity;
 
 /**
@@ -89,7 +90,9 @@ public class SimpleBiAllelicGenotypeVariantDataTest {
         System.out.println(" |- In memory test with dataset name");
         datasetName = NAME;
         expectedHeaders = HEADERS_NAMES_AND_IDS;
-        testData(new SimpleBiAllelicGenotypeVariantData(NAME, HEADERS_NAMES_AND_IDS, MARKER_NAMES, ALLELE_SCORES_BIALLELIC));
+        testData(new SimpleBiAllelicGenotypeVariantData(
+                NAME, HEADERS_NAMES_AND_IDS, MARKER_NAMES, ALLELE_SCORES_BIALLELIC
+        ));
     }
     
     @Test

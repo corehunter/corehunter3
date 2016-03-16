@@ -23,26 +23,26 @@ import static org.corehunter.tests.TestData.DISTANCES;
 import static org.corehunter.tests.TestData.NAME;
 import static org.corehunter.tests.TestData.PRECISION;
 import static org.corehunter.tests.TestData.SET;
+import static org.corehunter.tests.TestData.BLANK_HEADERS;
+import static org.corehunter.tests.TestData.HEADERS_UNIQUE_NAMES;
+import static org.corehunter.tests.TestData.HEADERS_NAMES_AND_IDS;
+
+import org.corehunter.data.matrix.SymmetricMatrixFormat;
+import org.corehunter.data.simple.SimpleDistanceMatrixData;
 
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import org.corehunter.data.matrix.SymmetricMatrixFormat;
 
-import org.corehunter.data.simple.SimpleDistanceMatrixData;
 import org.junit.AfterClass;
 import org.junit.Test;
-
-
 import org.junit.BeforeClass;
-import uno.informatics.common.io.FileType;
 
-import static org.corehunter.tests.TestData.BLANK_HEADERS;
-import static org.corehunter.tests.TestData.HEADERS_UNIQUE_NAMES;
-import static org.corehunter.tests.TestData.HEADERS_NAMES_AND_IDS;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+
+import uno.informatics.common.io.FileType;
 import uno.informatics.data.SimpleEntity;
 
 /**

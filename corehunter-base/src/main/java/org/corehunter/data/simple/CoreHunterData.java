@@ -51,7 +51,9 @@ public class CoreHunterData extends SimpleNamedData {
         super(inferDatasetSize(markers, phenotypes, distances));
     }
     
-    private static int inferDatasetSize(GenotypeVariantData markers, FeatureDataset phenotypes, DistanceMatrixData distances){
+    private static int inferDatasetSize(GenotypeVariantData markers,
+                                        FeatureDataset phenotypes,
+                                        DistanceMatrixData distances){
         // check not all undefined
         if(markers == null && phenotypes == null && distances == null){
             throw new IllegalArgumentException(

@@ -107,18 +107,19 @@ public class SimplePhenotypicTraitData extends SimpleNamedData implements Phenot
             // check unique identifiers
             Set<String> uniqueIds = new HashSet<>();
             for(int i = 0; i < data.getRowCount(); i++){
-                SimpleEntity header = data.getRow(i).getHeader();
-                if(header == null){
-                    throw new IOException(String.format(
-                            "Missing name/id for item %d. Unique identifier is required when name is not defined.", i
-                    ));
-                } else if(!uniqueIds.add(header.getUniqueIdentifier())){
+                SimpleEntity header = data.getRow(i).getHeader();                    
+                if(header != null && !uniqueIds.add(header.getUniqueIdentifier())){
                     throw new IOException(String.format(
                             "Duplicate name/id %s for item %d. "
                           + "Names should either be unique or complemented with unique identifiers.",
                             header.getUniqueIdentifier(), i
                     ));
                 }
+            }
+            // check for missing identifiers
+            if(!uniqueIds.isEmpty() && uniqueIds.size() < data.getRowCount()){
+                throw new IOException("Missing names/ids. Unique identifier is "
+                                    + "required for items whose name is not defined.");
             }
 
             return new SimplePhenotypicTraitData(data);
