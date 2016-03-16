@@ -19,8 +19,11 @@
 
 package org.corehunter.data.simple;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.HashSet;
+import java.util.Set;
 import org.corehunter.data.PhenotypicTraitData;
 import uno.informatics.common.io.FileType;
 import uno.informatics.data.FeatureDataset;
@@ -93,10 +96,31 @@ public class SimplePhenotypicTraitData extends SimpleNamedData implements Phenot
         }
         
         // read data from file
-        FeatureDataset data;
         try {
             
-            data = ArrayFeatureDataset.readFeatureDatasetFromTextFile(filePath.toFile(), type);
+            FeatureDataset data = ArrayFeatureDataset.readFeatureDatasetFromTextFile(filePath.toFile(), type);
+            
+            if(data == null){
+                throw new IOException("Cannot read file. File may be empty.");
+            }
+            
+            // check unique identifiers
+            Set<String> uniqueIds = new HashSet<>();
+            for(int i = 0; i < data.getRowCount(); i++){
+                SimpleEntity header = data.getRow(i).getHeader();
+                if(header == null){
+                    throw new IOException(String.format(
+                            "Missing name/id for item %d. Unique identifier is required when name is not defined.", i
+                    ));
+                } else if(!uniqueIds.add(header.getUniqueIdentifier())){
+                    throw new IOException(String.format(
+                            "Duplicate name/id %s for item %d. "
+                          + "Names should either be unique or complemented with unique identifiers.",
+                            header.getUniqueIdentifier(), i
+                    ));
+                }
+            }
+
             return new SimplePhenotypicTraitData(data);
             
         } catch (DatasetException | IllegalArgumentException ex ){

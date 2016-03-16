@@ -273,6 +273,21 @@ public class TestData {
         {"B", 2, 1, 1.3, true}
     };
     
+    public static final Object[][] PHENOTYPIC_TRAIT_INFERRED_BOUNDS = {
+        {null, null},
+        {0, 3},
+        {1, 9},
+        {0.5, 1.4},
+        {null, null}
+    };
+    public static final Object[][] PHENOTYPIC_TRAIT_EXPLICIT_BOUNDS = {
+        {null, null},
+        {0, 5},
+        {0, 10},
+        {0.0, 2.0},
+        {null, null}
+    };
+    
     public static final double[][] CAVALLI_SFORZA_EDWARDS_DISTANCES = {
         {0, 0.654653670707977, 0.204552898786406, 0.289281483686467, 0.462910049886276},
         {0.654653670707977, 0, 0.644537429955437, 0.685866836181303, 0.319248437552872},
