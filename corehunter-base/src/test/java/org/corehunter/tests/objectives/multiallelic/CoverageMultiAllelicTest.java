@@ -26,7 +26,7 @@ import static org.corehunter.tests.TestData.NAME;
 import static org.corehunter.tests.TestData.PRECISION;
 import static org.corehunter.tests.TestData.SUBSET1;
 import static org.corehunter.tests.TestData.ALLELE_FREQUENCIES;
-import static org.corehunter.tests.TestData.HEADERS_NAMES_AND_IDS;
+import static org.corehunter.tests.TestData.HEADERS_NON_UNIQUE_NAMES;
 
 import org.corehunter.data.simple.SimpleGenotypeVariantData;
 import org.corehunter.objectives.multiallelic.CoverageMultiAllelic;
@@ -41,7 +41,7 @@ public class CoverageMultiAllelicTest extends EvaluationTest {
     @Test
     public void test() {
         SimpleGenotypeVariantData data = new SimpleGenotypeVariantData(
-                NAME, HEADERS_NAMES_AND_IDS, MARKER_NAMES, ALLELE_NAMES, ALLELE_FREQUENCIES
+                NAME, HEADERS_NON_UNIQUE_NAMES, MARKER_NAMES, ALLELE_NAMES, ALLELE_FREQUENCIES
         );
 
         CoverageMultiAllelic distanceMetric = new CoverageMultiAllelic();

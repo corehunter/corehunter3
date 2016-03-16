@@ -19,14 +19,6 @@
 
 package org.corehunter.tests.data.simple;
 
-import static org.corehunter.tests.TestData.DISTANCES;
-import static org.corehunter.tests.TestData.NAME;
-import static org.corehunter.tests.TestData.PRECISION;
-import static org.corehunter.tests.TestData.SET;
-import static org.corehunter.tests.TestData.BLANK_HEADERS;
-import static org.corehunter.tests.TestData.HEADERS_UNIQUE_NAMES;
-import static org.corehunter.tests.TestData.HEADERS_NAMES_AND_IDS;
-
 import org.corehunter.data.matrix.SymmetricMatrixFormat;
 import org.corehunter.data.simple.SimpleDistanceMatrixData;
 
@@ -38,12 +30,21 @@ import org.junit.AfterClass;
 import org.junit.Test;
 import org.junit.BeforeClass;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 import uno.informatics.common.io.FileType;
 import uno.informatics.data.SimpleEntity;
+
+import static org.corehunter.tests.TestData.DISTANCES;
+import static org.corehunter.tests.TestData.NAME;
+import static org.corehunter.tests.TestData.PRECISION;
+import static org.corehunter.tests.TestData.SET;
+import static org.corehunter.tests.TestData.BLANK_HEADERS;
+import static org.corehunter.tests.TestData.HEADERS_UNIQUE_NAMES;
+
+import static org.corehunter.tests.TestData.HEADERS_NON_UNIQUE_NAMES;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Guy Davenport, Herman De Beukelaer
@@ -76,7 +77,9 @@ public class SimpleDistanceMatrixDataTest {
         "/distances/err/duplicate-id-row.txt",
         "/distances/err/duplicate-name-row.txt",
         "/distances/err/duplicate-names-without-ids.txt",
-        "/distances/err/missing-names-without-ids.txt"
+        "/distances/err/missing-names-without-ids.txt",
+        "/distances/err/missing-ids.txt",
+        "/distances/err/missing-ids-2.txt"
     };
     
     private static final SymmetricMatrixFormat[] ERRONEOUS_FILE_FORMATS = {
@@ -91,6 +94,8 @@ public class SimpleDistanceMatrixDataTest {
         SymmetricMatrixFormat.LOWER,
         SymmetricMatrixFormat.FULL,
         SymmetricMatrixFormat.LOWER_DIAG,
+        SymmetricMatrixFormat.FULL,
+        SymmetricMatrixFormat.FULL,
         SymmetricMatrixFormat.FULL,
         SymmetricMatrixFormat.FULL,
         SymmetricMatrixFormat.FULL,
@@ -119,8 +124,8 @@ public class SimpleDistanceMatrixDataTest {
     public void inMemoryWithHeaders() {
         System.out.println(" |- In memory test with headers");
         datasetName = NAME;
-        expectedHeaders = HEADERS_NAMES_AND_IDS;
-        testData(new SimpleDistanceMatrixData(NAME, HEADERS_NAMES_AND_IDS, DISTANCES));
+        expectedHeaders = HEADERS_NON_UNIQUE_NAMES;
+        testData(new SimpleDistanceMatrixData(NAME, HEADERS_NON_UNIQUE_NAMES, DISTANCES));
     }
     
     @Test
@@ -156,7 +161,7 @@ public class SimpleDistanceMatrixDataTest {
     @Test
     public void fromFileWithNamesAndIdentifiers() throws IOException {
         datasetName = "full-names-ids.txt";
-        expectedHeaders = HEADERS_NAMES_AND_IDS;
+        expectedHeaders = HEADERS_NON_UNIQUE_NAMES;
         System.out.println(" |- File " + datasetName);
         testData(SimpleDistanceMatrixData.readData(
                 Paths.get(SimpleDistanceMatrixDataTest.class.getResource(TXT_FULL_NAMES_IDS).getPath()),

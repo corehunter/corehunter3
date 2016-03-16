@@ -44,31 +44,32 @@ public class TestData {
 
     public static final String NAME = "Test Dataset";
 
-    public static final String[] NAMES = new String[]{
-        "Alice", null, "Bob", "Bob", null
-    };
-    public static final String[] UNIQUE_IDENTIFIERS = new String[]{
-        "acc-1", "acc-2", "acc-3", "acc-4", "acc-5"
-    };
-    
     public static final String[] UNIQUE_NAMES = new String[]{
         "Alice", "Dave", "Bob", "Carol", "Eve"
     };
     
+    public static final String[] NON_UNIQUE_NAMES = new String[]{
+        "Alice", null, "Bob", "Bob", "Carol"
+    };
+    
+    public static final String[] UNIQUE_IDENTIFIERS = new String[]{
+        "Alice", "Unknown", "Bob-1", "Bob-2", "Carol"
+    };
+    
     public static final SimpleEntity[] HEADERS_UNIQUE_NAMES;
-    public static final SimpleEntity[] HEADERS_NAMES_AND_IDS;
+    public static final SimpleEntity[] HEADERS_NON_UNIQUE_NAMES;
     public static final SimpleEntity[] BLANK_HEADERS;
     
     static{
-        HEADERS_UNIQUE_NAMES = new SimpleEntity[NAMES.length];
+        HEADERS_UNIQUE_NAMES = new SimpleEntity[NON_UNIQUE_NAMES.length];
         for(int i = 0; i < HEADERS_UNIQUE_NAMES.length; i++){
             HEADERS_UNIQUE_NAMES[i] = new SimpleEntityPojo(UNIQUE_NAMES[i]);
         }
-        HEADERS_NAMES_AND_IDS = new SimpleEntity[NAMES.length];
-        for(int i = 0; i < HEADERS_NAMES_AND_IDS.length; i++){
-            HEADERS_NAMES_AND_IDS[i] = new SimpleEntityPojo(UNIQUE_IDENTIFIERS[i], NAMES[i]);
+        HEADERS_NON_UNIQUE_NAMES = new SimpleEntity[NON_UNIQUE_NAMES.length];
+        for(int i = 0; i < HEADERS_NON_UNIQUE_NAMES.length; i++){
+            HEADERS_NON_UNIQUE_NAMES[i] = new SimpleEntityPojo(UNIQUE_IDENTIFIERS[i], NON_UNIQUE_NAMES[i]);
         }
-        BLANK_HEADERS = new SimpleEntity[NAMES.length];
+        BLANK_HEADERS = new SimpleEntity[NON_UNIQUE_NAMES.length];
     }
 
     public static final Set<Integer> SET = new TreeSet<>();
@@ -82,7 +83,7 @@ public class TestData {
     }
 
     public static final SimpleDistanceMatrixData DATA = new SimpleDistanceMatrixData(
-            NAME, HEADERS_NAMES_AND_IDS, DISTANCES
+            NAME, HEADERS_NON_UNIQUE_NAMES, DISTANCES
     );
 
     public static final String[] MARKER_NAMES = {

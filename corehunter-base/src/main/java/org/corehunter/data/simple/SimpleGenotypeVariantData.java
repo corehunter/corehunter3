@@ -278,7 +278,8 @@ public class SimpleGenotypeVariantData extends SimpleNamedData implements Genoty
      * The former is identified with column header "NAME", the latter with column header "ID". The column headers should
      * be placed in the corresponding cell of the second header row (allele names). The corresponding cells of the first
      * header row (marker names) should be left blank. If only names are specified they should be defined for
-     * all individuals and unique. Else, additional unique identifiers are required.
+     * all individuals and unique. Else, additional unique identifiers are required at least for those individuals
+     * whose name is not defined or not unique.
      * <p>
      * Leading and trailing whitespace is removed from names and unique identifiers and they are unquoted if wrapped
      * in single or double quotes after whitespace removal. If it is intended to start or end a name/identifier with
@@ -503,17 +504,18 @@ public class SimpleGenotypeVariantData extends SimpleNamedData implements Genoty
             }
             int n = alleleFreqs.size();
             
-            // combine names and identifiers in item headers
+            // combine names and identifiers in headers
             SimpleEntity[] headers = null;
-            if(itemIdentifiers == null){
-                itemIdentifiers = itemNames;
-            }
-            if(itemIdentifiers != null){
+            if(itemIdentifiers != null || itemNames != null){
                 headers = new SimpleEntity[n];
                 for(int i = 0; i < n; i++){
                     String name = itemNames != null ? itemNames.get(i) : null;
-                    String identifier = itemIdentifiers.get(i);
-                    headers[i] = new SimpleEntityPojo(identifier, name);
+                    String identifier = itemIdentifiers != null ? itemIdentifiers.get(i) : null;
+                    if(identifier == null){
+                        headers[i] = new SimpleEntityPojo(name);
+                    } else {
+                        headers[i] = new SimpleEntityPojo(identifier, name);
+                    }
                 }
             }
             
@@ -556,7 +558,8 @@ public class SimpleGenotypeVariantData extends SimpleNamedData implements Genoty
      * Two optional (leftmost) header columns can be included to specify individual names and/or unique identifiers.
      * The former is identified with column header "NAME", the latter with column header "ID". The column headers should
      * be placed in the corresponding cell of the header row. If only names are specified they should be defined for
-     * all individuals and unique. Else, additional unique identifiers are required.
+     * all individuals and unique. Else, additional unique identifiers are required at least for those individuals
+     * whose name is undefined or not unique.
      * <p>
      * Leading and trailing whitespace is removed from names and unique identifiers and they are unquoted if wrapped
      * in single or double quotes after whitespace removal. If it is intended to start or end a name/identifier with
@@ -790,17 +793,18 @@ public class SimpleGenotypeVariantData extends SimpleNamedData implements Genoty
                 }
             }
             
-            // combine names and identifiers in item headers
+            // combine names and identifiers in headers
             SimpleEntity[] headers = null;
-            if(itemIdentifiers == null){
-                itemIdentifiers = itemNames;
-            }
-            if(itemIdentifiers != null){
+            if(itemIdentifiers != null || itemNames != null){
                 headers = new SimpleEntity[n];
                 for(int i = 0; i < n; i++){
-                    String name = (itemNames == null ? null : itemNames[i]);
-                    String identifier = itemIdentifiers[i];
-                    headers[i] = new SimpleEntityPojo(identifier, name);
+                    String name = itemNames != null ? itemNames[i] : null;
+                    String identifier = itemIdentifiers != null ? itemIdentifiers[i] : null;
+                    if(identifier == null){
+                        headers[i] = new SimpleEntityPojo(name);
+                    } else {
+                        headers[i] = new SimpleEntityPojo(identifier, name);
+                    }
                 }
             }
             

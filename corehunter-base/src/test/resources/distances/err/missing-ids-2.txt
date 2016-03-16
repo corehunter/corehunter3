@@ -1,5 +1,5 @@
-NAME	Alice	        	'Bob'	"Bob"	Carol
-ID  	    	Unknown 	Bob-1	 Bob-2	
+NAME	Alice	    	Bob 	Bob
+ID  	acc-1	acc-2	     	    	acc-5
 0.0	0.2	0.4	0.6	0.8
 0.2	0.0	0.2	0.4	0.6
 0.4	0.2	0.0	0.1	0.4

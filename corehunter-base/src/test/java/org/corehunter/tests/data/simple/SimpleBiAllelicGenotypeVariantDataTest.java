@@ -29,13 +29,16 @@ import org.corehunter.data.simple.SimpleBiAllelicGenotypeVariantData;
 
 import static org.corehunter.tests.TestData.ALLELE_FREQUENCIES_BIALLELIC;
 import static org.corehunter.tests.TestData.ALLELE_SCORES_BIALLELIC;
-import static org.corehunter.tests.TestData.HEADERS_NAMES_AND_IDS;
 import static org.corehunter.tests.TestData.HEADERS_UNIQUE_NAMES;
+import static org.corehunter.tests.TestData.HEADERS_NON_UNIQUE_NAMES;
 import static org.corehunter.tests.TestData.BLANK_HEADERS;
 import static org.corehunter.tests.TestData.MARKER_NAMES;
 import static org.corehunter.tests.TestData.NAME;
 import static org.corehunter.tests.TestData.PRECISION;
 import static org.corehunter.tests.TestData.SET;
+
+import uno.informatics.common.io.FileType;
+import uno.informatics.data.SimpleEntity;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -45,9 +48,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-
-import uno.informatics.common.io.FileType;
-import uno.informatics.data.SimpleEntity;
 
 /**
  * @author Guy Davenport, Herman De Beukelaer
@@ -81,17 +81,19 @@ public class SimpleBiAllelicGenotypeVariantDataTest {
     public void inMemoryTest() {
         System.out.println(" |- In memory test");
         datasetName = null;
-        expectedHeaders = HEADERS_NAMES_AND_IDS;
-        testData(new SimpleBiAllelicGenotypeVariantData(HEADERS_NAMES_AND_IDS, MARKER_NAMES, ALLELE_SCORES_BIALLELIC));
+        expectedHeaders = HEADERS_NON_UNIQUE_NAMES;
+        testData(new SimpleBiAllelicGenotypeVariantData(
+                HEADERS_NON_UNIQUE_NAMES, MARKER_NAMES, ALLELE_SCORES_BIALLELIC
+        ));
     }
     
     @Test
     public void inMemoryTestWithName() {
         System.out.println(" |- In memory test with dataset name");
         datasetName = NAME;
-        expectedHeaders = HEADERS_NAMES_AND_IDS;
+        expectedHeaders = HEADERS_NON_UNIQUE_NAMES;
         testData(new SimpleBiAllelicGenotypeVariantData(
-                NAME, HEADERS_NAMES_AND_IDS, MARKER_NAMES, ALLELE_SCORES_BIALLELIC
+                NAME, HEADERS_NON_UNIQUE_NAMES, MARKER_NAMES, ALLELE_SCORES_BIALLELIC
         ));
     }
     
@@ -131,7 +133,7 @@ public class SimpleBiAllelicGenotypeVariantDataTest {
     @Test
     public void fromCsvFileWithNamesAndIds() throws IOException {
         datasetName = "names-and-ids.csv";
-        expectedHeaders = HEADERS_NAMES_AND_IDS;
+        expectedHeaders = HEADERS_NON_UNIQUE_NAMES;
         System.out.println(" |- File " + datasetName);
         testData(SimpleBiAllelicGenotypeVariantData.readData(
             Paths.get(SimpleBiAllelicGenotypeVariantDataTest.class.getResource(CSV_NAMES_IDS).getPath()),

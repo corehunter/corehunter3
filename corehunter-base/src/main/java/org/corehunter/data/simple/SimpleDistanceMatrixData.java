@@ -170,9 +170,10 @@ public class SimpleDistanceMatrixData extends SimpleNamedData implements Distanc
      * Two optional header rows can be added at the beginning of the file to specify individual names and/or
      * unique identifiers. The former is identified with row header "NAME", the latter with row header "ID".
      * If only names are specified they should be defined for each item and unique. Else, additional unique
-     * identifiers are also required. Leading and trailing whitespace is removed from names and unique identifiers
-     * and they are unquoted if wrapped in single or double quotes after whitespace removal. If it is intended to
-     * start or end a name/identifier with whitespace this whitespace should be contained within the quotes, as it
+     * identifiers are also required for at least those items whose name is undefined or not unique.
+     * Leading and trailing whitespace is removed from names and unique identifiers and they are unquoted if
+     * wrapped in single or double quotes after whitespace removal. If it is intended to start or end a
+     * name/identifier with whitespace this whitespace should be contained within the quotes, as it
      * will then not be removed.
      * <p>
      * The dataset name is set to the name of the file to which <code>filePath</code> points.
@@ -339,15 +340,16 @@ public class SimpleDistanceMatrixData extends SimpleNamedData implements Distanc
             
             // combine names and identifiers in headers
             SimpleEntity[] headers = null;
-            if(identifiers == null){
-                identifiers = names;
-            }
-            if(identifiers != null){
+            if(identifiers != null || names != null){
                 headers = new SimpleEntity[n];
                 for(int i = 0; i < n; i++){
                     String name = names != null ? names[i] : null;
-                    String identifier = identifiers[i];
-                    headers[i] = new SimpleEntityPojo(identifier, name);
+                    String identifier = identifiers != null ? identifiers[i] : null;
+                    if(identifier == null){
+                        headers[i] = new SimpleEntityPojo(name);
+                    } else {
+                        headers[i] = new SimpleEntityPojo(identifier, name);
+                    }
                 }
             }
             

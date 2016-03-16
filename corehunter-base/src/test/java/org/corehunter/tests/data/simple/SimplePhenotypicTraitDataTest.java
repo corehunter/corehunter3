@@ -29,7 +29,6 @@ import org.corehunter.data.simple.SimplePhenotypicTraitData;
 
 import static org.corehunter.tests.TestData.BLANK_HEADERS;
 import static org.corehunter.tests.TestData.HEADERS_UNIQUE_NAMES;
-import static org.corehunter.tests.TestData.HEADERS_NAMES_AND_IDS;
 import static org.corehunter.tests.TestData.PHENOTYPIC_TRAIT_INFERRED_BOUNDS;
 import static org.corehunter.tests.TestData.PHENOTYPIC_TRAIT_EXPLICIT_BOUNDS;
 import static org.corehunter.tests.TestData.PHENOTYPIC_TRAIT_NAMES;
@@ -45,6 +44,16 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.corehunter.tests.TestData.HEADERS_NON_UNIQUE_NAMES;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -91,7 +100,7 @@ public class SimplePhenotypicTraitDataTest {
     @Test
     public void fromCsvFileWithNamesAndIds() throws IOException {
         datasetName = "names-and-ids.csv";
-        expectedHeaders = HEADERS_NAMES_AND_IDS;
+        expectedHeaders = HEADERS_NON_UNIQUE_NAMES;
         expectedBounds = PHENOTYPIC_TRAIT_INFERRED_BOUNDS;
         System.out.println(" |- File " + datasetName);
         testData(SimplePhenotypicTraitData.readData(

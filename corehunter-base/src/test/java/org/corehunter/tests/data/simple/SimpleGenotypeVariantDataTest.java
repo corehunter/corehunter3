@@ -28,8 +28,8 @@ import static org.corehunter.tests.TestData.PRECISION;
 import static org.corehunter.tests.TestData.SET;
 import static org.corehunter.tests.TestData.ALLELE_FREQUENCIES_DIPLOID;
 import static org.corehunter.tests.TestData.ALLELE_FREQUENCIES;
-import static org.corehunter.tests.TestData.HEADERS_NAMES_AND_IDS;
 import static org.corehunter.tests.TestData.HEADERS_UNIQUE_NAMES;
+import static org.corehunter.tests.TestData.HEADERS_NON_UNIQUE_NAMES;
 import static org.corehunter.tests.TestData.BLANK_HEADERS;
 
 import java.io.IOException;
@@ -95,9 +95,9 @@ public class SimpleGenotypeVariantDataTest {
     public void inMemory() {
         System.out.println(" |- In memory test");
         datasetName = null;
-        expectedHeaders = HEADERS_NAMES_AND_IDS;
+        expectedHeaders = HEADERS_NON_UNIQUE_NAMES;
         testDataGeneral(new SimpleGenotypeVariantData(
-                HEADERS_NAMES_AND_IDS, MARKER_NAMES, ALLELE_NAMES, ALLELE_FREQUENCIES
+                HEADERS_NON_UNIQUE_NAMES, MARKER_NAMES, ALLELE_NAMES, ALLELE_FREQUENCIES
         ));
     }
     
@@ -105,9 +105,9 @@ public class SimpleGenotypeVariantDataTest {
     public void inMemoryWithName() {
         System.out.println(" |- In memory test with dataset name");
         datasetName = NAME;
-        expectedHeaders = HEADERS_NAMES_AND_IDS;
+        expectedHeaders = HEADERS_NON_UNIQUE_NAMES;
         testDataGeneral(new SimpleGenotypeVariantData(
-                NAME, HEADERS_NAMES_AND_IDS, MARKER_NAMES, ALLELE_NAMES, ALLELE_FREQUENCIES
+                NAME, HEADERS_NON_UNIQUE_NAMES, MARKER_NAMES, ALLELE_NAMES, ALLELE_FREQUENCIES
         ));
     }
 
@@ -136,7 +136,7 @@ public class SimpleGenotypeVariantDataTest {
     @Test
     public void fromCsvFileWithNamesAndIDs() throws IOException {
         datasetName = "names-and-ids.csv";
-        expectedHeaders = HEADERS_NAMES_AND_IDS;
+        expectedHeaders = HEADERS_NON_UNIQUE_NAMES;
         System.out.println(" |- File " + datasetName);
         testDataGeneral(SimpleGenotypeVariantData.readData(
             Paths.get(SimpleGenotypeVariantDataTest.class.getResource(CSV_NAMES_IDS).getPath()),
@@ -185,8 +185,8 @@ public class SimpleGenotypeVariantDataTest {
     public void diploidInMemory() {
         System.out.println(" |- In memory test (diploid)");
         datasetName = NAME;
-        expectedHeaders = HEADERS_NAMES_AND_IDS;
-        testDataDiploid(new SimpleGenotypeVariantData(NAME, HEADERS_NAMES_AND_IDS, MARKER_NAMES_DIPLOID,
+        expectedHeaders = HEADERS_NON_UNIQUE_NAMES;
+        testDataDiploid(new SimpleGenotypeVariantData(NAME, HEADERS_NON_UNIQUE_NAMES, MARKER_NAMES_DIPLOID,
                                                       ALLELE_NAMES_DIPLOID, ALLELE_FREQUENCIES_DIPLOID));
     }
     
@@ -215,7 +215,7 @@ public class SimpleGenotypeVariantDataTest {
     @Test
     public void diploidFromCsvFileWithNamesAndIDs() throws IOException {
         datasetName = "names-and-ids.csv";
-        expectedHeaders = HEADERS_NAMES_AND_IDS;
+        expectedHeaders = HEADERS_NON_UNIQUE_NAMES;
         System.out.println(" |- File diploid/" + datasetName);
         testDataDiploid(SimpleGenotypeVariantData.readDiploidData(
             Paths.get(SimpleGenotypeVariantDataTest.class.getResource(DIPLOID_CSV_NAMES_IDS).getPath()),

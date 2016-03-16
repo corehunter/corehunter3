@@ -26,6 +26,7 @@ import static org.corehunter.tests.TestData.NAME;
 import static org.corehunter.tests.TestData.PRECISION;
 import static org.corehunter.tests.TestData.SET;
 import static org.corehunter.tests.TestData.ALLELE_FREQUENCIES;
+import static org.corehunter.tests.TestData.HEADERS_NON_UNIQUE_NAMES;
 
 import java.util.Iterator;
 
@@ -33,7 +34,6 @@ import org.corehunter.data.simple.SimpleGenotypeVariantData;
 import org.corehunter.objectives.distance.multiallelic.CavalliSforzaEdwardsDistanceMultiAllelic;
 import org.junit.Test;
 
-import static org.corehunter.tests.TestData.HEADERS_NAMES_AND_IDS;
 import static org.junit.Assert.assertEquals;
 
 /**
@@ -44,7 +44,7 @@ public class CavalliSforzaEdwardsDistanceMultiAllelicTest {
     @Test
     public void test() {
         SimpleGenotypeVariantData data = new SimpleGenotypeVariantData(
-                NAME, HEADERS_NAMES_AND_IDS, MARKER_NAMES, ALLELE_NAMES, ALLELE_FREQUENCIES
+                NAME, HEADERS_NON_UNIQUE_NAMES, MARKER_NAMES, ALLELE_NAMES, ALLELE_FREQUENCIES
         );
 
         CavalliSforzaEdwardsDistanceMultiAllelic distanceMetric
