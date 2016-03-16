@@ -41,6 +41,7 @@ import static org.corehunter.tests.TestData.BLANK_HEADERS;
 import static org.corehunter.tests.TestData.HEADERS_UNIQUE_NAMES;
 import static org.corehunter.tests.TestData.HEADERS_NAMES_AND_IDS;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import uno.informatics.data.SimpleEntity;
 
@@ -221,6 +222,14 @@ public class SimpleDistanceMatrixDataTest {
             
             // check header
             assertEquals("Header for individual " + i + " is not correct.", expectedHeaders[i], data.getHeader(i));
+            // check name and id separately
+            if(expectedHeaders[i] != null){
+                assertNotNull("Header not defined for individual " + i + ".", data.getHeader(i));
+                assertEquals("Name for individual " + i + " is not correct.",
+                             expectedHeaders[i].getName(), data.getHeader(i).getName());
+                assertEquals("Id for individual " + i + " is not correct.",
+                             expectedHeaders[i].getUniqueIdentifier(), data.getHeader(i).getUniqueIdentifier());
+            }
 
             // check distances
             for (int j = 0; j < size; j++) {

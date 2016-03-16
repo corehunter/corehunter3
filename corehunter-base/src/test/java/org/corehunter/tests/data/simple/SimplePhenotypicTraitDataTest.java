@@ -35,25 +35,28 @@ import static org.corehunter.tests.TestData.PHENOTYPIC_TRAIT_NAMES;
 import static org.corehunter.tests.TestData.PHENOTYPIC_TRAIT_VALUES;
 import static org.corehunter.tests.TestData.SET;
 
+import uno.informatics.common.io.FileType;
+import uno.informatics.data.FeatureDataset;
+import uno.informatics.data.FeatureDatasetRow;
+import uno.informatics.data.SimpleEntity;
+
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import uno.informatics.common.io.FileType;
-import uno.informatics.data.FeatureDataset;
-import uno.informatics.data.FeatureDatasetRow;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import uno.informatics.data.SimpleEntity;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 
 /**
  * @author Herman De Beukelaer
  */
 public class SimplePhenotypicTraitDataTest {
 
-    private static final String CSV_NAMES = "/phenotypes/names-no-whitespace.csv";
+    private static final String CSV_NAMES = "/phenotypes/names.csv";
     private static final String CSV_NAMES_IDS = "/phenotypes/names-and-ids.csv";
-    private static final String TXT_NO_NAMES = "/phenotypes/no-names-no-whitespace.txt";
+    private static final String TXT_NO_NAMES = "/phenotypes/no-names.txt";
 
     private static final String ERRONEOUS_FILES_DIR = "/phenotypes/err/";
     
@@ -72,7 +75,7 @@ public class SimplePhenotypicTraitDataTest {
     
     @Test
     public void fromCsvFileWithNames() throws IOException {
-        datasetName = "names-no-whitespace.csv";
+        datasetName = "names.csv";
         expectedHeaders = HEADERS_UNIQUE_NAMES;
         System.out.println(" |- File " + datasetName);
         testData(SimplePhenotypicTraitData.readData(
@@ -94,7 +97,7 @@ public class SimplePhenotypicTraitDataTest {
     
     @Test
     public void fromTxtFileWithoutNames() throws IOException {
-        datasetName = "no-names-no-whitespace.txt";
+        datasetName = "no-names.txt";
         expectedHeaders = BLANK_HEADERS;
         System.out.println(" |- File " + datasetName);
         testData(SimplePhenotypicTraitData.readData(
@@ -152,6 +155,14 @@ public class SimplePhenotypicTraitDataTest {
             
             // check header
             assertEquals("Header for individual " + i + " is not correct.", expectedHeaders[i], data.getHeader(i));
+            // check name and id separately
+            if(expectedHeaders[i] != null){
+                assertNotNull("Header not defined for individual " + i + ".", data.getHeader(i));
+                assertEquals("Name for individual " + i + " is not correct.",
+                             expectedHeaders[i].getName(), data.getHeader(i).getName());
+                assertEquals("Id for individual " + i + " is not correct.",
+                             expectedHeaders[i].getUniqueIdentifier(), data.getHeader(i).getUniqueIdentifier());
+            }
 
             // check trait values
             FeatureDatasetRow row = fData.getRow(i);

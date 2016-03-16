@@ -24,10 +24,8 @@ import static org.corehunter.tests.TestData.MARKER_NAMES;
 import static org.corehunter.tests.TestData.ALLELE_NAMES_DIPLOID;
 import static org.corehunter.tests.TestData.MARKER_NAMES_DIPLOID;
 import static org.corehunter.tests.TestData.NAME;
-import static org.corehunter.tests.TestData.NAMES;
 import static org.corehunter.tests.TestData.PRECISION;
 import static org.corehunter.tests.TestData.SET;
-import static org.corehunter.tests.TestData.UNIQUE_IDENTIFIERS;
 import static org.corehunter.tests.TestData.ALLELE_FREQUENCIES_DIPLOID;
 import static org.corehunter.tests.TestData.ALLELE_FREQUENCIES;
 import static org.corehunter.tests.TestData.HEADERS_NAMES_AND_IDS;
@@ -333,6 +331,14 @@ public class SimpleGenotypeVariantDataTest {
             
             // check header
             assertEquals("Header for individual " + i + " is not correct.", expectedHeaders[i], data.getHeader(i));
+            // check name and id separately
+            if(expectedHeaders[i] != null){
+                assertNotNull("Header not defined for individual " + i + ".", data.getHeader(i));
+                assertEquals("Name for individual " + i + " is not correct.",
+                             expectedHeaders[i].getName(), data.getHeader(i).getName());
+                assertEquals("Id for individual " + i + " is not correct.",
+                             expectedHeaders[i].getUniqueIdentifier(), data.getHeader(i).getUniqueIdentifier());
+            }
 
             // check frequencies
             for (int m = 0; m < data.getNumberOfMarkers(); m++) {
