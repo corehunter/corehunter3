@@ -19,23 +19,21 @@
 
 package org.corehunter.data;
 
-import org.jamesframework.core.problems.datatypes.IntegerIdentifiedData;
-
 /**
- * Extends IntegerIdentifiedData to introduce the concept of a distance that indicates how closely two entries are
- * similar to each other. A value of zero for the distance indicates that specific measure used to evaluate the distance
- * can differentiate between the two entities
+ * A distance matrix that indicates how different each pair of entries is.
+ * All values are between 0.0 and 1.0 where the former means that the specific
+ * measure used to evaluate the distance can not differentiate between two entries.
  *
- * @author Guy Davenport
+ * @author Guy Davenport, Herman De Beukelaer
  */
-public interface DistanceMatrixData extends IntegerIdentifiedData {
+public interface DistanceMatrixData extends NamedData {
 
     /**
-     * Gets the distance between two entities
+     * Get the distance between two entries.
      *
-     * @param idX the id of the first entity
-     * @param idY the id of the second entity
-     * @return the distance between two entities
+     * @param idX the id of the first entry
+     * @param idY the id of the second entry
+     * @return the distance between two entries
      */
     public double getDistance(int idX, int idY);
 

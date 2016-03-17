@@ -19,16 +19,16 @@
 
 package org.corehunter.objectives.multiallelic;
 
-import org.corehunter.data.MultiAllelicGenotypeVariantData;
 import org.jamesframework.core.problems.objectives.Objective;
 import org.jamesframework.core.problems.objectives.evaluations.Evaluation;
 import org.jamesframework.core.problems.objectives.evaluations.SimpleEvaluation;
 import org.jamesframework.core.subset.SubsetSolution;
+import org.corehunter.data.GenotypeVariantData;
 
 /**
  * @author Guy Davenport
  */
-public class CoverageMultiAllelic implements Objective<SubsetSolution, MultiAllelicGenotypeVariantData> {
+public class CoverageMultiAllelic implements Objective<SubsetSolution, GenotypeVariantData> {
 
     private ProportionNonInformativeAllelesMultiAllelic pn;
 
@@ -44,7 +44,7 @@ public class CoverageMultiAllelic implements Objective<SubsetSolution, MultiAlle
      */
     @Override
     public Evaluation evaluate(SubsetSolution solution,
-            MultiAllelicGenotypeVariantData data) {
+            GenotypeVariantData data) {
         return SimpleEvaluation.WITH_VALUE(1.0 - pn.evaluate(solution, data).getValue());
     }
 

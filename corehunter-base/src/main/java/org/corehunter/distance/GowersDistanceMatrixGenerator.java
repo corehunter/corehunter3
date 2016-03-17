@@ -19,8 +19,6 @@
 
 package org.corehunter.distance;
 
-import java.util.HashSet;
-import java.util.Set;
 
 import org.apache.commons.lang3.ObjectUtils;
 import org.corehunter.data.DistanceMatrixData;
@@ -39,7 +37,6 @@ public class GowersDistanceMatrixGenerator implements DistanceMatrixGenerator {
     private static final int DISCRETE_SCALE_TYPE = 1;
     private static final int RANGED_SCALE_TYPE = 2;
 
-    private Set<Integer> ids;
     private Object[][] data;
     private Feature[] features;
 
@@ -54,12 +51,6 @@ public class GowersDistanceMatrixGenerator implements DistanceMatrixGenerator {
     public GowersDistanceMatrixGenerator(Object[][] data, Feature[] features) {
         if (data == null || features == null) {
             throw new IllegalArgumentException("Features and data must be defined!");
-        }
-
-        ids = new HashSet<>();
-
-        for (int id = 0; id < data.length; ++id) {
-            ids.add(id);
         }
 
         scales = new Scale[features.length];
@@ -91,8 +82,8 @@ public class GowersDistanceMatrixGenerator implements DistanceMatrixGenerator {
                         case INTEGER:
                         case LONG:
                         case SHORT:
-                            ranges[i] = calculateRange(data, i, scales[i]);
-
+                            ranges[i] = scales[i].getMaximumValue().doubleValue()
+                                        - scales[i].getMinimumValue().doubleValue();
                             if (ranges[i] > 0) {
                                 scaleTypes[i] = RANGED_SCALE_TYPE;
                             } else {
@@ -120,10 +111,11 @@ public class GowersDistanceMatrixGenerator implements DistanceMatrixGenerator {
 
     @Override
     public DistanceMatrixData generateDistanceMatrix() {
-        double[][] distances = new double[ids.size()][ids.size()];
-        double[][] weights = new double[ids.size()][ids.size()];
+        int n = data.length;
+        double[][] distances = new double[n][n];
+        double[][] weights = new double[n][n];
 
-        for (int i = 0; i < data.length; ++i) {
+        for (int i = 0; i < n; ++i) {
             if (data[i].length != features.length) {
                 throw new IllegalArgumentException("Number of features must match number of elements in a row!");
             }
@@ -145,45 +137,7 @@ public class GowersDistanceMatrixGenerator implements DistanceMatrixGenerator {
             }
         }
 
-        return new SimpleDistanceMatrixData(ids, distances);
-    }
-
-    private double calculateRange(Object[][] data, int index, Scale scale) {
-        if (scale.getMinimumValue() != null && scale.getMaximumValue() != null) {
-            return scale.getMaximumValue().doubleValue() - scale.getMinimumValue().doubleValue();
-        } else {
-            return calculateRange(data, index);
-        }
-    }
-
-    private double calculateRange(Object[][] data, int index) {
-        double max = Double.MIN_VALUE;
-        double min = Double.MAX_VALUE;
-        double value;
-
-        boolean valid = true;
-
-        for (int i = 0; i < data.length && valid; ++i) {
-            if (data[i][index] instanceof Number) {
-                value = ((Number) data[i][index]).doubleValue();
-
-                if (value > max) {
-                    max = value;
-                }
-
-                if (value < min) {
-                    min = value;
-                }
-            } else {
-                valid = false;
-            }
-        }
-
-        if (valid) {
-            return max - min;
-        } else {
-            return 0.0;
-        }
+        return new SimpleDistanceMatrixData(distances);
     }
 
     private double distance(int scaleType, double range, Object elementA, Object elementB) {
@@ -191,26 +145,27 @@ public class GowersDistanceMatrixGenerator implements DistanceMatrixGenerator {
             switch (scaleType) {
                 case BINARY_SCALE_TYPE:
                     if ((Boolean) elementA && (Boolean) elementB) {
-                        return 1;
+                        return 0.0;
                     } else {
-                        return 0;
+                        return 1.0;
                     }
                 case DISCRETE_SCALE_TYPE:
                     if (ObjectUtils.equals(elementA, elementB)) {
-                        return 1;
+                        return 0.0;
                     } else {
-                        return 0;
+                        return 1.0;
                     }
                 case RANGED_SCALE_TYPE:
                     double aValue = ((Number) elementA).doubleValue();
                     double bValue = ((Number) elementB).doubleValue();
-                    return 1.0 - (Math.abs(aValue - bValue) / range);
+                    return Math.abs(aValue - bValue) / range;
                 default:
-                    break;
+                    throw new RuntimeException(
+                            "This should not happen: unexpected scale type in Gower distance matrix generator."
+                    );
             }
         }
-
-        return 0;
+        return 0.0;
     }
 
     private double weight(int scaleType, double range, Object elementA, Object elementB) {
@@ -218,17 +173,19 @@ public class GowersDistanceMatrixGenerator implements DistanceMatrixGenerator {
             switch (scaleType) {
                 case BINARY_SCALE_TYPE:
                     if ((Boolean) elementA || (Boolean) elementB) {
-                        return 1;
+                        return 1.0;
                     } else {
-                        return 0;
+                        return 0.0;
                     }
                 case DISCRETE_SCALE_TYPE:
                 case RANGED_SCALE_TYPE:
+                    return 1.0;
                 default:
-                    return 1;
+                    throw new RuntimeException(
+                            "This should not happen: unexpected scale type in Gower distance matrix generator."
+                    );
             }
         }
-
-        return 0;
+        return 0.0;
     }
 }

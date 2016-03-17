@@ -22,10 +22,11 @@ package org.corehunter.objectives.distance.biallelic;
 import java.util.Set;
 
 import org.corehunter.data.BiAllelicGenotypeVariantData;
-import org.corehunter.data.MultiAllelicGenotypeVariantData;
 import org.corehunter.objectives.distance.GenotypeVariantDistanceMetric;
+import org.corehunter.data.GenotypeVariantData;
+import uno.informatics.data.SimpleEntity;
 
-public class ModifiedRogersDistanceBiAllelic implements GenotypeVariantDistanceMetric<MultiAllelicGenotypeVariantData> {
+public class ModifiedRogersDistanceBiAllelic implements GenotypeVariantDistanceMetric<GenotypeVariantData> {
 
     public ModifiedRogersDistanceBiAllelic(BiAllelicGenotypeVariantData dataset) {
         // TODO Auto-generated constructor stub
@@ -44,9 +45,19 @@ public class ModifiedRogersDistanceBiAllelic implements GenotypeVariantDistanceM
     }
 
     @Override
-    public MultiAllelicGenotypeVariantData getData() {
+    public GenotypeVariantData getData() {
         // TODO Auto-generated method stub
         return null;
+    }
+
+    @Override
+    public SimpleEntity getHeader(int id) {
+        throw new UnsupportedOperationException("Not supported yet."); 
+    }
+
+    @Override
+    public int getDatasetSize() {
+        throw new UnsupportedOperationException("Not supported yet."); 
     }
 
 }

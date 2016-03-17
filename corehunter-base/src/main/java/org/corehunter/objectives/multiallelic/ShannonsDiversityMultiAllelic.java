@@ -19,26 +19,21 @@
 
 package org.corehunter.objectives.multiallelic;
 
-import org.corehunter.data.MultiAllelicGenotypeVariantData;
 import org.jamesframework.core.problems.objectives.Objective;
 import org.jamesframework.core.problems.objectives.evaluations.Evaluation;
 import org.jamesframework.core.problems.objectives.evaluations.SimpleEvaluation;
 import org.jamesframework.core.subset.SubsetSolution;
+import org.corehunter.data.GenotypeVariantData;
 
 /**
- * @author Guy Davenport
+ * @author Guy Davenport, Herman De Beukelaer
  */
-public class ShannonsDiversityMultiAllelic implements
-        Objective<SubsetSolution, MultiAllelicGenotypeVariantData> {
+public class ShannonsDiversityMultiAllelic implements Objective<SubsetSolution, GenotypeVariantData> {
 
-    /*
-     * (non-Javadoc)
-     * @see org.jamesframework.core.problems.objectives.Objective#evaluate(org.
-     * jamesframework.core.problems.solutions.Solution, java.lang.Object)
-     */
+    //TODO: handle missing data
     @Override
-    public Evaluation evaluate(SubsetSolution solution,
-            MultiAllelicGenotypeVariantData data) {
+    public Evaluation evaluate(SubsetSolution solution, GenotypeVariantData data) {
+        
         int numberOfMarkers = data.getNumberOfMarkers();
         int numberOfAlleles;
 
@@ -46,8 +41,8 @@ public class ShannonsDiversityMultiAllelic implements
         double alleleFrequency;
 
         for (int markerIndex = 0; markerIndex < numberOfMarkers; ++markerIndex) {
+            
             numberOfAlleles = data.getNumberOfAlleles(markerIndex);
-
             for (int alleleIndex = 0; alleleIndex < numberOfAlleles; ++alleleIndex) {
                 alleleFrequency = data.getAverageAlelleFrequency(solution.getSelectedIDs(), markerIndex,
                         alleleIndex) / numberOfMarkers;
@@ -56,17 +51,16 @@ public class ShannonsDiversityMultiAllelic implements
                     summedDiversity = summedDiversity + (alleleFrequency * Math.log(alleleFrequency));
                 }
             }
+            
         }
 
         return SimpleEvaluation.WITH_VALUE(-summedDiversity);
+        
     }
 
-    /*
-     * (non-Javadoc)
-     * @see org.jamesframework.core.problems.objectives.Objective#isMinimizing()
-     */
     @Override
     public boolean isMinimizing() {
         return false;
     }
+    
 }

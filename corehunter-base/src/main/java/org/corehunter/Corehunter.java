@@ -23,7 +23,6 @@ import java.util.concurrent.TimeUnit;
 
 import org.corehunter.data.BiAllelicGenotypeVariantData;
 import org.corehunter.data.DistanceMatrixData;
-import org.corehunter.data.MultiAllelicGenotypeVariantData;
 import org.corehunter.distance.GowersDistanceMatrixGenerator;
 import org.corehunter.objectives.biallelic.CoverageBiAllelic;
 import org.corehunter.objectives.biallelic.HetrozygousLociDiversityBiAllelic;
@@ -51,6 +50,7 @@ import org.jamesframework.core.search.stopcriteria.MaxRuntime;
 import org.jamesframework.core.subset.neigh.SinglePerturbationNeighbourhood;
 
 import uno.informatics.data.FeatureDataset;
+import org.corehunter.data.GenotypeVariantData;
 
 /**
  * Provides support for executing pre-defined core subset searches. Can be re-used.
@@ -87,9 +87,8 @@ public class Corehunter {
         } else if (arguments.getDataset() instanceof DistanceMatrixData) {
             // Any data for which a distance matrix has already been generated
             search = createDistanceSearch((DistanceMatrixData) arguments.getDataset(), arguments);
-        } else if (arguments.getDataset() instanceof MultiAllelicGenotypeVariantData) {
-            search = createMultiAllelicGenotypeSearch(
-                        (MultiAllelicGenotypeVariantData) arguments.getDataset(),
+        } else if (arguments.getDataset() instanceof GenotypeVariantData) {
+            search = createMultiAllelicGenotypeSearch((GenotypeVariantData) arguments.getDataset(),
                         arguments
                      );
         } else if (arguments.getDataset() instanceof BiAllelicGenotypeVariantData) {
@@ -135,7 +134,7 @@ public class Corehunter {
     }
 
     protected Search<SubsetSolution> createMultiAllelicGenotypeSearch(
-            MultiAllelicGenotypeVariantData dataset,
+            GenotypeVariantData dataset,
             CorehunterArguments arguments) {
         
         switch (arguments.getObjective()) {
@@ -172,10 +171,10 @@ public class Corehunter {
     }
     
     private Search<SubsetSolution> createMultiAllelicGenotypeSearch(
-            Objective<SubsetSolution, MultiAllelicGenotypeVariantData> objective,
-            MultiAllelicGenotypeVariantData dataset, CorehunterArguments arguments) {
+            Objective<SubsetSolution, GenotypeVariantData> objective,
+            GenotypeVariantData dataset, CorehunterArguments arguments) {
         
-        SubsetProblem<MultiAllelicGenotypeVariantData> problem;
+        SubsetProblem<GenotypeVariantData> problem;
 
         if (arguments.getMinimumSubsetSize() == arguments.getMaximumSubsetSize()) {
             problem = new SubsetProblem<>(dataset, objective, arguments.getMinimumSubsetSize());
@@ -244,13 +243,13 @@ public class Corehunter {
     }
 
     private Search<SubsetSolution> createMultiAllelicGenotypeDistanceSearch(
-            GenotypeVariantDistanceMetric<MultiAllelicGenotypeVariantData> genotypeVariantDistanceMetric,
-            MultiAllelicGenotypeVariantData dataset, CorehunterArguments arguments) {
+            GenotypeVariantDistanceMetric<GenotypeVariantData> genotypeVariantDistanceMetric,
+            GenotypeVariantData dataset, CorehunterArguments arguments) {
         return createDistanceSearch(genotypeVariantDistanceMetric, arguments);
     }
 
     private Search<SubsetSolution> createBiAllelicGenotypeDistanceSearch(
-            GenotypeVariantDistanceMetric<MultiAllelicGenotypeVariantData> genotypeVariantDistanceMetric,
+            GenotypeVariantDistanceMetric<GenotypeVariantData> genotypeVariantDistanceMetric,
             BiAllelicGenotypeVariantData dataset, CorehunterArguments arguments) {
         return createDistanceSearch(genotypeVariantDistanceMetric, arguments);
     }
