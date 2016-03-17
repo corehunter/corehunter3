@@ -22,28 +22,55 @@ package org.corehunter.tests;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.corehunter.data.simple.NamedDistanceMatrixData;
+import org.corehunter.data.simple.SimpleDistanceMatrixData;
 import org.jamesframework.core.problems.objectives.evaluations.Evaluation;
 import org.jamesframework.core.problems.objectives.evaluations.SimpleEvaluation;
+import uno.informatics.data.SimpleEntity;
+import uno.informatics.data.pojo.SimpleEntityPojo;
 
 /**
- * @author Guy Davenport
+ * @author Guy Davenport, Herman De Beukelaer
  */
 public class TestData {
 
-    public static final double PRECISION = 0.000000001;
+    public static final double PRECISION = 1e-10;
 
     public static final double[][] DISTANCES = new double[][]{
-        new double[]{1.0, 0.8, 0.6, 0.4, 0.2},
-        new double[]{0.8, 1.0, 0.8, 0.6, 0.4},
-        new double[]{0.6, 0.8, 1.0, 0.9, 0.6},
-        new double[]{0.4, 0.6, 0.9, 1.0, 0.8},
-        new double[]{0.2, 0.4, 0.6, 0.8, 1.0}};
+        new double[]{0.0, 0.2, 0.4, 0.6, 0.8},
+        new double[]{0.2, 0.0, 0.2, 0.4, 0.6},
+        new double[]{0.4, 0.2, 0.0, 0.1, 0.4},
+        new double[]{0.6, 0.4, 0.1, 0.0, 0.2},
+        new double[]{0.8, 0.6, 0.4, 0.2, 0.0}};
 
-    public static final String NAME = "Dataset Name";
+    public static final String NAME = "Test Dataset";
 
-    public static final String[] NAMES = new String[]{"Name1",
-        "Name2", "Name3", "Name4", "Name5"};
+    public static final String[] UNIQUE_NAMES = new String[]{
+        "Alice", "Dave", "Bob", "Carol", "Eve"
+    };
+    
+    public static final String[] NON_UNIQUE_NAMES = new String[]{
+        "Alice", null, "Bob", "Bob", "Carol"
+    };
+    
+    public static final String[] UNIQUE_IDENTIFIERS = new String[]{
+        "Alice", "Unknown", "Bob-1", "Bob-2", "Carol"
+    };
+    
+    public static final SimpleEntity[] HEADERS_UNIQUE_NAMES;
+    public static final SimpleEntity[] HEADERS_NON_UNIQUE_NAMES;
+    public static final SimpleEntity[] BLANK_HEADERS;
+    
+    static{
+        HEADERS_UNIQUE_NAMES = new SimpleEntity[NON_UNIQUE_NAMES.length];
+        for(int i = 0; i < HEADERS_UNIQUE_NAMES.length; i++){
+            HEADERS_UNIQUE_NAMES[i] = new SimpleEntityPojo(UNIQUE_NAMES[i]);
+        }
+        HEADERS_NON_UNIQUE_NAMES = new SimpleEntity[NON_UNIQUE_NAMES.length];
+        for(int i = 0; i < HEADERS_NON_UNIQUE_NAMES.length; i++){
+            HEADERS_NON_UNIQUE_NAMES[i] = new SimpleEntityPojo(UNIQUE_IDENTIFIERS[i], NON_UNIQUE_NAMES[i]);
+        }
+        BLANK_HEADERS = new SimpleEntity[NON_UNIQUE_NAMES.length];
+    }
 
     public static final Set<Integer> SET = new TreeSet<>();
 
@@ -55,17 +82,11 @@ public class TestData {
         SET.add(4);
     }
 
-    public static final Set<Integer> SUBSET1 = new TreeSet<>();
+    public static final SimpleDistanceMatrixData DATA = new SimpleDistanceMatrixData(
+            NAME, HEADERS_NON_UNIQUE_NAMES, DISTANCES
+    );
 
-    static {
-        SUBSET1.add(2);
-        SUBSET1.add(3);
-    }
-
-    public static final NamedDistanceMatrixData DATA = new NamedDistanceMatrixData(NAME,
-            NAMES, DISTANCES);
-
-    public static final String[] MARKER_NAMES = new String[]{
+    public static final String[] MARKER_NAMES = {
         "mk1",
         "mk2",
         "mk3",
@@ -74,99 +95,273 @@ public class TestData {
         "mk6",
         "mk7"
     };
-
-    public static final int[][] ALLELE_SCORES = new int[][]{
-        new int[]{1, 0, 2, 1, 1, 0, 0},
-        new int[]{2, 0, 2, 0, 1, 2, 1},
-        new int[]{1, 0, 1, 0, 1, 1, 0},
-        new int[]{1, 0, 1, 1, 1, 2, 2},
-        new int[]{1, 0, 2, 0, 1, 2, 0}
+    public static final String[] UNDEFINED_MARKER_NAMES = {
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+    };
+    
+    public static final String[] MARKER_NAMES_DIPLOID = {
+        "mk1",
+        "mk2",
+        "mk3",
+        "mk4"
+    };
+    public static final String[] UNDEFINED_MARKER_NAMES_DIPLOID = {
+        null,
+        null,
+        null,
+        null
     };
 
-    public static final double[][][] ALLELES = new double[][][]{
-        new double[][]{
-            new double[]{0.33, 0.33, 0.33},
-            new double[]{0.5, 0.5},
-            new double[]{0, 0.5, 0.5},
-            new double[]{0.0, 0.0, 0.5, 0.5},
-            new double[]{0.33, 0.33, 0.33},
-            new double[]{0.0, 1.0},
-            new double[]{1.0, 0.0}
+    public static final Double[][][] ALLELE_FREQUENCIES = {
+        {
+            {null, null, null},
+            {0.5, 0.5},
+            {0.0, 0.5, 0.5},
+            {0.0, 0.0, 0.5, 0.5},
+            {null, null, null},
+            {0.0, 1.0},
+            {1.0, 0.0}
         },
-        new double[][]{
-            new double[]{1, 0.0, 0.0},
-            new double[]{0.5, 0.5},
-            new double[]{0, 0.5, 0.5},
-            new double[]{1.0, 0.0, 0.0, 0.0},
-            new double[]{0.33, 0.33, 0.33},
-            new double[]{1.0, 0.0},
-            new double[]{0.0, 1.0}
+        {
+            {1.0, 0.0, 0.0},
+            {0.5, 0.5},
+            {0.0, 0.5, 0.5},
+            {1.0, 0.0, 0.0, 0.0},
+            {0.33, 0.33, 0.33},
+            {1.0, 0.0},
+            {0.0, 1.0}
         },
-        new double[][]{
-            new double[]{0.5, 0.0, 0.4},
-            new double[]{0.5, 0.5},
-            new double[]{0, 0.5, 0.5},
-            new double[]{0.25, 0.25, 0.25, 0.25},
-            new double[]{0.0, 0.5, 0.5},
-            new double[]{0.0, 1.0},
-            new double[]{1.0, 0.0}
+        {
+            {0.6, 0.0, 0.4},
+            {0.5, 0.5},
+            {0.0, 0.5, 0.5},
+            {0.25, 0.25, 0.25, 0.25},
+            {0.0, 0.5, 0.5},
+            {0.0, 1.0},
+            {1.0, 0.0}
         },
-        new double[][]{
-            new double[]{0.33, 0.33, 0.33},
-            new double[]{1.0, 0.0},
-            new double[]{0.5, 0.0, 0.5},
-            new double[]{0.0, 0.0, 1.0, 0.0},
-            new double[]{0.33, 0.33, 0.33},
-            new double[]{0.0, 1.0},
-            new double[]{1.0, 0.0}
+        {
+            {null, null, null},
+            {1.0, 0.0},
+            {null, null, null},
+            {0.0, 0.0, 1.0, 0.0},
+            {0.33, 0.33, 0.33},
+            {0.0, 1.0},
+            {1.0, 0.0}
         },
-        new double[][]{
-            new double[]{0.33, 0.33, 0.33},
-            new double[]{0.5, 0.5},
-            new double[]{0, 0.5, 0.5},
-            new double[]{0.5, 0.0, 0.5, 0.0},
-            new double[]{0.33, 0.33, 0.33},
-            new double[]{1.0, 0.0},
-            new double[]{0.0, 1.0}
+        {
+            {0.33, 0.33, 0.33},
+            {0.5, 0.5},
+            {0.0, 0.5, 0.5},
+            {0.5, 0.0, 0.5, 0.0},
+            {0.33, 0.33, 0.33},
+            {1.0, 0.0},
+            {null, null}
+        }
+    };
+    
+    public static final Double[][][] ALLELE_FREQUENCIES_DIPLOID = {
+        {
+            {0.5, 0.0, 0.5},
+            {0.0, 1.0, 0.0, 0.0},
+            {1.0, 0.0},
+            {null, null}
+        },
+        {
+            {0.0, 1.0, 0.0},
+            {0.5, 0.0, 0.5, 0.0},
+            {0.5, 0.5},
+            {0.5, 0.5}
+        },
+        {
+            {0.5, 0.5, 0.0},
+            {0.0, 0.0, 0.0, 1.0},
+            {0.0, 1.0},
+            {1.0, 0.0}
+        },
+        {
+            {0.0, 0.5, 0.5},
+            {0.0, 1.0, 0.0, 0.0},
+            {0.5, 0.5},
+            {0.5, 0.5}
+        },
+        {
+            {1.0, 0.0, 0.0},
+            {null, null, null, null},
+            {1.0, 0.0},
+            {0.0, 1.0}
         }
     };
 
-    public static final String[][] ALLELE_NAMES = new String[][]{
-        new String[]{"mk1-1", "mk1-2", "mk1-3"},
-        new String[]{"mk2-1", "mk2-2"},
-        new String[]{"mk3-1", "mk3-2", "mk3-3"},
-        new String[]{"mk4-1", "mk4-2", "mk4-3", "mk4-4"},
-        new String[]{"mk5-1", "mk5-2", "mk5-3"},
-        new String[]{"mk6-1", "mk6-2"},
-        new String[]{"mk7-1", "mk7-2"}
+    public static final String[][] ALLELE_NAMES = {
+        {"mk1-1", "mk1-2", "mk1-3"},
+        {"mk2-1", "mk2-2"},
+        {null, "mk3-2", null},
+        {"mk4-1", "mk4-2", "mk4-3", "mk4-4"},
+        {null, "mk5-2", "mk5-3"},
+        {"mk6-1", "mk6-2"},
+        {"mk7-1", "mk7-2"}
+    };
+    public static final String[][] UNDEFINED_ALLELE_NAMES = {
+        {null, null, null},
+        {null, null},
+        {null, null, null},
+        {null, null, null, null},
+        {null, null, null},
+        {null, null},
+        {null, null}
+    };
+    
+    public static final String[][] ALLELE_NAMES_DIPLOID = {
+        {"1", "2", "3"},
+        {"A", "B", "C", "D"},
+        {"a1", "a2"},
+        {"+", "-"}
+    };
+    
+    public static final Integer[][] ALLELE_SCORES_BIALLELIC = {
+        {1, 0, 2, 1, 1, 0, 0},
+        {2, 0, 2, 0, 1, 2, 1},
+        {1, 0, null, 0, 1, 1, 0},
+        {1, 0, 1, 1, 1, 2, null},
+        {1, 0, null, 0, null, 2, 0}
+    };
+    
+    public static final Double[][][] ALLELE_FREQUENCIES_BIALLELIC = {
+        {
+            {0.5, 0.5},
+            {1.0, 0.0},
+            {0.0, 1.0},
+            {0.5, 0.5},
+            {0.5, 0.5},
+            {1.0, 0.0},
+            {1.0, 0.0}
+        },
+        {
+            {0.0, 1.0},
+            {1.0, 0.0},
+            {0.0, 1.0},
+            {1.0, 0.0},
+            {0.5, 0.5},
+            {0.0, 1.0},
+            {0.5, 0.5}
+        },
+        {
+            {0.5, 0.5},
+            {1.0, 0.0},
+            {null, null},
+            {1.0, 0.0},
+            {0.5, 0.5},
+            {0.5, 0.5},
+            {1.0, 0.0}
+        },
+        {
+            {0.5, 0.5},
+            {1.0, 0.0},
+            {0.5, 0.5},
+            {0.5, 0.5},
+            {0.5, 0.5},
+            {0.0, 1.0},
+            {null, null}
+        },
+        {
+            {0.5, 0.5},
+            {1.0, 0.0},
+            {null, null},
+            {1.0, 0.0},
+            {null, null},
+            {0.0, 1.0},
+            {1.0, 0.0}
+        },
+    };
+    
+    
+    public static final String[] PHENOTYPIC_TRAIT_NAMES  = {
+        "trait 1",
+        "trait 2",
+        "trait 3",
+        "trait 4",
+        "trait 5"
+    };
+    
+    public static final Object[][] PHENOTYPIC_TRAIT_VALUES  = {
+        {"A", 3, 4, 1.4, false},
+        {"B", 1, 5, 0.5, true},
+        {"A", 0, 6, 0.5, true},
+        {"C", 2, 9, 0.5, false},
+        {"B", 2, 1, 1.3, true}
+    };
+    
+    public static final Object[][] PHENOTYPIC_TRAIT_INFERRED_BOUNDS = {
+        {null, null},
+        {0, 3},
+        {1, 9},
+        {0.5, 1.4},
+        {null, null}
+    };
+    public static final Object[][] PHENOTYPIC_TRAIT_EXPLICIT_BOUNDS = {
+        {null, null},
+        {0, 5},
+        {0, 10},
+        {0.0, 2.0},
+        {null, null}
+    };
+    
+    public static final double[][] CAVALLI_SFORZA_EDWARDS_DISTANCES = {
+        {0, 0.654653670707977, 0.204552898786406, 0.289281483686467, 0.462910049886276},
+        {0.654653670707977, 0, 0.644537429955437, 0.685866836181303, 0.319248437552872},
+        {0.204552898786406, 0.644537429955437, 0, 0.3733036638965, 0.487295660710711},
+        {0.289281483686467, 0.685866836181303, 0.3733036638965, 0, 0.475963149477968},
+        {0.462910049886276, 0.319248437552872, 0.487295660710711, 0.475963149477968, 0}
     };
 
-    public static final double[][] CAVALLI_SFORZA_EDWARDS_DISTANCES = new double[][]{
-        new double[]{0.0, 1.1918656532286669, 0.6489245625096675, 0.8806598328310853, 0.8451542547285167},
-        new double[]{1.1918656532286669, 0.0, 1.0175629857867965, 1.4243377137815967, 0.766753734228849},
-        new double[]{0.6489245625096675, 1.0175629857867965, 0.0, 1.0712814791124459, 0.9217779105618619},
-        new double[]{0.8806598328310853, 1.4243377137815967, 1.0712814791124459, 0.0, 1.0973300186058448},
-        new double[]{0.8451542547285167, 0.766753734228849, 0.9217779105618619, 1.0973300186058448, 0.0}
+    public static final double[][] MODIFIED_ROGERS_DISTANCES = {
+        {0, 0.626783170528009, 0.133630620956212, 0.267261241912424, 0.422577127364258},
+        {0.626783170528009, 0, 0.611596272061889, 0.681385143869247, 0.288679258495851},
+        {0.133630620956212, 0.611596272061889, 0, 0.318108247524105, 0.431227483884252},
+        {0.267261241912424, 0.681385143869247, 0.318108247524105, 0, 0.462910049886276},
+        {0.422577127364258, 0.288679258495851, 0.431227483884252, 0.462910049886276, 0}
     };
 
-    public static final double[][] MODIFIED_ROGERS_DISTANCES = new double[][]{
-        new double[]{0.0, 1.0910970887793887, 0.4224926034855522, 0.7319250547113999, 0.7559289460184545},
-        new double[]{1.0910970887793887, 0.0, 0.9399886017546019, 1.3138520247185916, 0.6900776353839783},
-        new double[]{0.4224926034855522, 0.9399886017546019, 0.0, 0.8451119959592845, 0.7791478862009629},
-        new double[]{0.7319250547113999, 1.3138520247185916, 0.8451119959592845, 0.0, 0.9819805060619657},
-        new double[]{0.7559289460184545, 0.6900776353839783, 0.7791478862009629, 0.9819805060619657, 0.0}
-    };
+    // subset with missing data
+    public static final Set<Integer> SUBSET1 = new TreeSet<>();
 
-    public static final Evaluation COVERAGE_SUBSET1 = SimpleEvaluation.WITH_VALUE(1.0 - 0.10526315789473684);
+    static {
+        SUBSET1.add(2);
+        SUBSET1.add(3);
+    }
+    
+    // subset without missing data
+    public static final Set<Integer> SUBSET2 = new TreeSet<>();
 
-    public static final Evaluation HETROZYGOUS_LOCI_DIVERSITY_SUBSET1
-            = SimpleEvaluation.WITH_VALUE(0.40830714285714287);
+    static {
+        SUBSET2.add(1);
+        SUBSET2.add(2);
+    }
+    
+    public static final Evaluation COVERAGE_SUBSET1 = SimpleEvaluation.WITH_VALUE(0.7894736842105263);
+    public static final Evaluation PROPORTION_NON_INFORMATIVE_ALLELES_SUBSET1 = SimpleEvaluation.WITH_VALUE(
+            1.0 - COVERAGE_SUBSET1.getValue()
+    );
 
-    public static final Evaluation NUMBER_EFFECTIVE_ALLELES_SUBSET1 = SimpleEvaluation.WITH_VALUE(2.0355486159192213);
+    // TODO: determine value for subset 1 (with missing data)
+    public static final Evaluation SHANNONS_DIVERSITY_SUBSET1 = SimpleEvaluation.WITH_VALUE(-1.0);
+    public static final Evaluation SHANNONS_DIVERSITY_SUBSET2 = SimpleEvaluation.WITH_VALUE(2.71220568749008);
+    
+    // TODO: determine value for subset 1 (with missing data)
+    public static final Evaluation HETROZYGOUS_LOCI_DIVERSITY_SUBSET1 = SimpleEvaluation.WITH_VALUE(-1.0);
+    public static final Evaluation HETROZYGOUS_LOCI_DIVERSITY_SUBSET2 = SimpleEvaluation.WITH_VALUE(0.5015464285714285);
 
-    public static final Evaluation PROPORTION_NON_INFORMATIVE_ALLELES_SUBSET1
-            = SimpleEvaluation.WITH_VALUE(0.10526315789473684);
+    // TODO: determine value for subset 1 (with missing data)
+    public static final Evaluation NUMBER_EFFECTIVE_ALLELES_SUBSET1 = SimpleEvaluation.WITH_VALUE(-1.0);
+    public static final Evaluation NUMBER_EFFECTIVE_ALLELES_SUBSET2 = SimpleEvaluation.WITH_VALUE(2.063832165004294);
 
-    public static final Evaluation SHANNONS_DIVERSITY_SUBSET1 = SimpleEvaluation.WITH_VALUE(2.605375591343493);
+
 
 }

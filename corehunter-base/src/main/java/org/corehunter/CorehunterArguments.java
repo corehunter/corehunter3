@@ -19,7 +19,7 @@
 
 package org.corehunter;
 
-import uno.informatics.data.Dataset;
+import org.corehunter.data.NamedData;
 
 public class CorehunterArguments {
 
@@ -29,7 +29,7 @@ public class CorehunterArguments {
 
     private CorehunterObjective objective;
 
-    private Dataset dataset;
+    private NamedData dataset;
 
     public CorehunterArguments(int subsetSize) {
         this(subsetSize, subsetSize);
@@ -57,11 +57,11 @@ public class CorehunterArguments {
         this.maximumSubsetSize = maximumSubsetSize;
     }
 
-    public final Dataset getDataset() {
+    public final NamedData getDataset() {
         return dataset;
     }
 
-    public final void setDataset(Dataset dataset) {
+    public final void setDataset(NamedData dataset) {
         this.dataset = dataset;
     }
 
