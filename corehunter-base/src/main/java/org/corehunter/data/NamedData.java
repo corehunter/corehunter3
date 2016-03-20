@@ -20,6 +20,8 @@
 package org.corehunter.data;
 
 import org.jamesframework.core.problems.datatypes.IntegerIdentifiedData;
+
+import uno.informatics.data.Data;
 import uno.informatics.data.SimpleEntity;
 
 /**
@@ -28,7 +30,7 @@ import uno.informatics.data.SimpleEntity;
  *
  * @author Guy Davenport, Herman De Beukelaer
  */
-public interface NamedData extends IntegerIdentifiedData {
+public interface NamedData extends Data, IntegerIdentifiedData {
 
     /**
      * Get the header of an entry by id.

@@ -23,25 +23,24 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import org.corehunter.data.NamedData;
 import uno.informatics.data.SimpleEntity;
+import uno.informatics.data.pojo.DataPojo;
 
 /**
  * Stores headers of n dataset entries which are assigned consecutive IDs from 0 to n-1.
  * 
  * @author Guy Davenport, Herman De Beukelaer
  */
-public class SimpleNamedData implements NamedData {
+public class SimpleNamedData extends DataPojo implements NamedData {
 
     // headers
     private final SimpleEntity[] headers;
     // item IDs (0..n-1)
     private final Set<Integer> ids;
-    
-    // dataset name (e.g. name of file from which data was read)
-    private final String datasetName;
     
     /**
      * Initialize data. IDs are set to [0, n-1].
@@ -57,17 +56,17 @@ public class SimpleNamedData implements NamedData {
      * Initialize data with given dataset name. IDs are set to [0, n-1].
      * All names are set to <code>null</code>.
      * 
-     * @param datasetName name of the dataset
+     * @param name name of the data
      * @param n number of entries
      */
-    public SimpleNamedData(String datasetName, int n) {
-        this(datasetName, n, null);
+    public SimpleNamedData(String name, int n) {
+        this(name, n, null);
     }
     
     /**
-     * Initialize data with given dataset name and item headers. IDs are set to [0, n-1].
+     * Initialize data with given data name and item headers. IDs are set to [0, n-1].
      * 
-     * @param datasetName name of the dataset
+     * @param name name of the data
      * @param n number of entries
      * @param headers item headers, <code>null</code> if no headers are assigned;
      *                if not <code>null</code> its length should equal <code>n</code>
@@ -76,11 +75,12 @@ public class SimpleNamedData implements NamedData {
      *                                  or if unique identifiers are missing in one or
      *                                  more headers
      */
-    public SimpleNamedData(String datasetName, int n, SimpleEntity[] headers){
+    public SimpleNamedData(String name, int n, SimpleEntity[] headers){
+        super(UUID.randomUUID().toString(), name) ;
+        
         ids = Collections.unmodifiableSet(
                 IntStream.range(0, n).boxed().collect(Collectors.toSet())
         );
-        this.datasetName = datasetName;
         if(headers == null){
             this.headers = null;
         } else {
@@ -123,14 +123,4 @@ public class SimpleNamedData implements NamedData {
     public int getDatasetSize() {
         return ids.size();
     }
-    
-    /**
-     * Get the name of the dataset as specified at construction.
-     * 
-     * @return dataset name
-     */
-    public String getDatasetName() {
-        return datasetName;
-    }
-
 }

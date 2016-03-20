@@ -292,10 +292,10 @@ public class CoreHunterDataTest {
     private void testData(CoreHunterData data){
         
         // check dataset name
-        assertEquals("Incorrect dataset name.", "Core Hunter data", data.getDatasetName());
+        assertEquals("Incorrect data name.", "Core Hunter data", data.getName());
         
         // check dataset size
-        assertEquals("Incorrect dataset size.", expectedHeaders.length, data.getDatasetSize());
+        assertEquals("Incorrect data size.", expectedHeaders.length, data.getDatasetSize());
         
         // check IDs
         assertEquals("Incorrect integer IDs.", TestData.SET, data.getIDs());

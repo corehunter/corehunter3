@@ -19,11 +19,11 @@
 
 package org.corehunter.data;
 
-import uno.informatics.data.FeatureDataset;
+import uno.informatics.data.dataset.FeatureData;
 
 /**
  * Phenotypic trait data consisting of observations of variables of possibly mixed type.
- * Wraps a {@link FeatureDataset} acting as an adapter to the {@link NamedData} interface.
+ * Wraps a {@link FeatureData} acting as an adapter to the {@link NamedData} interface.
  * 
  * @author Herman De Beukelaer
  */
@@ -34,6 +34,6 @@ public interface PhenotypicTraitData extends NamedData {
      * 
      * @return feature data
      */
-    public FeatureDataset getData();
+    public FeatureData getData();
     
 }

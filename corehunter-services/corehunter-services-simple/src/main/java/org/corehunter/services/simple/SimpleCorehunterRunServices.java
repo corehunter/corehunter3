@@ -230,8 +230,9 @@ public class SimpleCorehunterRunServices implements CorehunterRunServices {
                 // TODO get from arugments
                 arguments.setObjective(CorehunterObjective.GD);
 
-                arguments.setDataset(new CoreHunterData(
-                        (PhenotypicTraitData) datasetServices.getDataset(corehunterRunArguments.getDatasetId())));
+                // needs to assess type of each dataset, group and merge datasets if needed
+                arguments.setData(new CoreHunterData((PhenotypicTraitData) datasetServices
+                        .getDataset(corehunterRunArguments.getDatasetIds().get(0))));
 
                 corehunter = new Corehunter(arguments);
 

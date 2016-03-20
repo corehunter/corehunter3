@@ -20,17 +20,20 @@
 package org.corehunter.objectives.distance.biallelic;
 
 import java.util.Set;
+import java.util.UUID;
 
 import org.corehunter.data.BiAllelicGenotypeVariantData;
 import org.corehunter.objectives.distance.GenotypeVariantDistanceMetric;
 import org.corehunter.data.GenotypeVariantData;
 import uno.informatics.data.SimpleEntity;
+import uno.informatics.data.pojo.DataPojo;
 
-public class CavalliSforzaEdwardsDistanceBiAllelic
+// TODO needs to be implemented or deleted
+public class CavalliSforzaEdwardsDistanceBiAllelic extends DataPojo
         implements GenotypeVariantDistanceMetric<GenotypeVariantData> {
 
     public CavalliSforzaEdwardsDistanceBiAllelic(BiAllelicGenotypeVariantData dataset) {
-        // TODO Auto-generated constructor stub
+        super("Not implemented yet" , UUID.randomUUID().toString()) ;
     }
 
     @Override

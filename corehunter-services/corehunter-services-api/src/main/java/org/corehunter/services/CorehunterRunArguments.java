@@ -16,10 +16,13 @@
 
 package org.corehunter.services;
 
-public interface CorehunterRunArguments {
-    public String getName() ;
+import java.util.List;
+
+import uno.informatics.data.SimpleEntity;
+
+public interface CorehunterRunArguments extends SimpleEntity {
     
     public int getSubsetSize() ;
 
-    public String getDatasetId();
+    public List<String> getDatasetIds();
 }

@@ -29,7 +29,7 @@ public class CorehunterArguments {
 
     private CorehunterObjective objective;
 
-    private NamedData dataset;
+    private NamedData data;
 
     public CorehunterArguments(int subsetSize) {
         this(subsetSize, subsetSize);
@@ -57,12 +57,12 @@ public class CorehunterArguments {
         this.maximumSubsetSize = maximumSubsetSize;
     }
 
-    public final NamedData getDataset() {
-        return dataset;
+    public final NamedData getData() {
+        return data;
     }
 
-    public final void setDataset(NamedData dataset) {
-        this.dataset = dataset;
+    public final void setData(NamedData data) {
+        this.data = data;
     }
 
     public final CorehunterObjective getObjective() {

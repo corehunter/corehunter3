@@ -81,7 +81,7 @@ public class SimpleGenotypeVariantDataTest {
     private SimpleEntity[] expectedHeaders;
     private String[] expectedMarkerNames;
     private String[][] expectedAlleleNames;
-    private String datasetName;
+    private String dataName;
     
     @BeforeClass
     public static void beforeClass(){
@@ -100,7 +100,7 @@ public class SimpleGenotypeVariantDataTest {
     @Test
     public void inMemory() {
         System.out.println(" |- In memory test");
-        datasetName = null;
+        dataName = null;
         expectedHeaders = HEADERS_NON_UNIQUE_NAMES;
         expectedMarkerNames = MARKER_NAMES;
         expectedAlleleNames = ALLELE_NAMES;
@@ -112,7 +112,7 @@ public class SimpleGenotypeVariantDataTest {
     @Test
     public void inMemoryWithName() {
         System.out.println(" |- In memory test with dataset name");
-        datasetName = NAME;
+        dataName = NAME;
         expectedHeaders = HEADERS_NON_UNIQUE_NAMES;
         expectedMarkerNames = MARKER_NAMES;
         expectedAlleleNames = ALLELE_NAMES;
@@ -123,11 +123,11 @@ public class SimpleGenotypeVariantDataTest {
 
     @Test
     public void fromTxtFileWithNames() throws IOException {
-        datasetName = "names.txt";
+        dataName = "names.txt";
         expectedHeaders = HEADERS_UNIQUE_NAMES;
         expectedMarkerNames = MARKER_NAMES;
         expectedAlleleNames = ALLELE_NAMES;
-        System.out.println(" |- File " + datasetName);
+        System.out.println(" |- File " + dataName);
         testDataGeneral(SimpleGenotypeVariantData.readData(
             Paths.get(SimpleGenotypeVariantDataTest.class.getResource(TXT_NAMES).getPath()),
             FileType.TXT
@@ -136,11 +136,11 @@ public class SimpleGenotypeVariantDataTest {
     
     @Test
     public void fromCsvFileWithNames() throws IOException {
-        datasetName = "names.csv";
+        dataName = "names.csv";
         expectedHeaders = HEADERS_UNIQUE_NAMES;
         expectedMarkerNames = MARKER_NAMES;
         expectedAlleleNames = ALLELE_NAMES;
-        System.out.println(" |- File " + datasetName);
+        System.out.println(" |- File " + dataName);
         testDataGeneral(SimpleGenotypeVariantData.readData(
             Paths.get(SimpleGenotypeVariantDataTest.class.getResource(CSV_NAMES).getPath()),
             FileType.CSV
@@ -149,11 +149,11 @@ public class SimpleGenotypeVariantDataTest {
     
     @Test
     public void fromCsvFileWithNamesAndIDs() throws IOException {
-        datasetName = "names-and-ids.csv";
+        dataName = "names-and-ids.csv";
         expectedHeaders = HEADERS_NON_UNIQUE_NAMES;
         expectedMarkerNames = MARKER_NAMES;
         expectedAlleleNames = ALLELE_NAMES;
-        System.out.println(" |- File " + datasetName);
+        System.out.println(" |- File " + dataName);
         testDataGeneral(SimpleGenotypeVariantData.readData(
             Paths.get(SimpleGenotypeVariantDataTest.class.getResource(CSV_NAMES_IDS).getPath()),
             FileType.CSV
@@ -162,11 +162,11 @@ public class SimpleGenotypeVariantDataTest {
     
     @Test
     public void fromCsvFileWithoutNames() throws IOException {
-        datasetName = "no-names.csv";
+        dataName = "no-names.csv";
         expectedHeaders = BLANK_HEADERS;
         expectedMarkerNames = MARKER_NAMES;
         expectedAlleleNames = ALLELE_NAMES;
-        System.out.println(" |- File " + datasetName);
+        System.out.println(" |- File " + dataName);
         testDataGeneral(SimpleGenotypeVariantData.readData(
             Paths.get(SimpleGenotypeVariantDataTest.class.getResource(CSV_NO_NAMES).getPath()),
             FileType.CSV
@@ -175,11 +175,11 @@ public class SimpleGenotypeVariantDataTest {
     
     @Test
     public void fromCsvFileWithoutAlleleNames() throws IOException {
-        datasetName = "no-allele-names.csv";
+        dataName = "no-allele-names.csv";
         expectedHeaders = HEADERS_UNIQUE_NAMES;
         expectedMarkerNames = MARKER_NAMES;
         expectedAlleleNames = UNDEFINED_ALLELE_NAMES;
-        System.out.println(" |- File " + datasetName);
+        System.out.println(" |- File " + dataName);
         testDataGeneral(SimpleGenotypeVariantData.readData(
             Paths.get(SimpleGenotypeVariantDataTest.class.getResource(CSV_NO_ALLELE_NAMES).getPath()),
             FileType.CSV
@@ -188,11 +188,11 @@ public class SimpleGenotypeVariantDataTest {
     
     @Test
     public void fromCsvFileWithoutNamesOrAlleleNames() throws IOException {
-        datasetName = "no-names-no-allele-names.csv";
+        dataName = "no-names-no-allele-names.csv";
         expectedHeaders = BLANK_HEADERS;
         expectedMarkerNames = MARKER_NAMES;
         expectedAlleleNames = UNDEFINED_ALLELE_NAMES;
-        System.out.println(" |- File " + datasetName);
+        System.out.println(" |- File " + dataName);
         testDataGeneral(SimpleGenotypeVariantData.readData(
             Paths.get(SimpleGenotypeVariantDataTest.class.getResource(CSV_NO_NAMES_NO_ALLELE_NAMES).getPath()),
             FileType.CSV
@@ -228,7 +228,7 @@ public class SimpleGenotypeVariantDataTest {
     @Test
     public void diploidInMemory() {
         System.out.println(" |- In memory test (diploid)");
-        datasetName = NAME;
+        dataName = NAME;
         expectedHeaders = HEADERS_NON_UNIQUE_NAMES;
         expectedMarkerNames = MARKER_NAMES_DIPLOID;
         expectedAlleleNames = ALLELE_NAMES_DIPLOID;
@@ -238,11 +238,11 @@ public class SimpleGenotypeVariantDataTest {
     
     @Test
     public void diploidFromTxtFileWithNames() throws IOException {
-        datasetName = "names.txt";
+        dataName = "names.txt";
         expectedHeaders = HEADERS_UNIQUE_NAMES;
         expectedMarkerNames = MARKER_NAMES_DIPLOID;
         expectedAlleleNames = ALLELE_NAMES_DIPLOID;
-        System.out.println(" |- File diploid/" + datasetName);
+        System.out.println(" |- File diploid/" + dataName);
         testDataDiploid(SimpleGenotypeVariantData.readDiploidData(
             Paths.get(SimpleGenotypeVariantDataTest.class.getResource(DIPLOID_TXT_NAMES).getPath()),
             FileType.TXT
@@ -251,11 +251,11 @@ public class SimpleGenotypeVariantDataTest {
     
     @Test
     public void diploidFromCsvFileWithNames() throws IOException {
-        datasetName = "names.csv";
+        dataName = "names.csv";
         expectedHeaders = HEADERS_UNIQUE_NAMES;
         expectedMarkerNames = MARKER_NAMES_DIPLOID;
         expectedAlleleNames = ALLELE_NAMES_DIPLOID;
-        System.out.println(" |- File diploid/" + datasetName);
+        System.out.println(" |- File diploid/" + dataName);
         testDataDiploid(SimpleGenotypeVariantData.readDiploidData(
             Paths.get(SimpleGenotypeVariantDataTest.class.getResource(DIPLOID_CSV_NAMES).getPath()),
             FileType.CSV
@@ -264,11 +264,11 @@ public class SimpleGenotypeVariantDataTest {
     
     @Test
     public void diploidFromCsvFileWithNamesAndIDs() throws IOException {
-        datasetName = "names-and-ids.csv";
+        dataName = "names-and-ids.csv";
         expectedHeaders = HEADERS_NON_UNIQUE_NAMES;
         expectedMarkerNames = MARKER_NAMES_DIPLOID;
         expectedAlleleNames = ALLELE_NAMES_DIPLOID;
-        System.out.println(" |- File diploid/" + datasetName);
+        System.out.println(" |- File diploid/" + dataName);
         testDataDiploid(SimpleGenotypeVariantData.readDiploidData(
             Paths.get(SimpleGenotypeVariantDataTest.class.getResource(DIPLOID_CSV_NAMES_IDS).getPath()),
             FileType.CSV
@@ -277,11 +277,11 @@ public class SimpleGenotypeVariantDataTest {
     
     @Test
     public void diploidFromTxtFileWithoutNames() throws IOException {
-        datasetName = "no-names.txt";
+        dataName = "no-names.txt";
         expectedHeaders = BLANK_HEADERS;
         expectedMarkerNames = MARKER_NAMES_DIPLOID;
         expectedAlleleNames = ALLELE_NAMES_DIPLOID;
-        System.out.println(" |- File diploid/" + datasetName);
+        System.out.println(" |- File diploid/" + dataName);
         testDataDiploid(SimpleGenotypeVariantData.readDiploidData(
             Paths.get(SimpleGenotypeVariantDataTest.class.getResource(DIPLOID_TXT_NO_NAMES).getPath()),
             FileType.TXT
@@ -290,11 +290,11 @@ public class SimpleGenotypeVariantDataTest {
     
     @Test
     public void diploidFromTxtFileWithoutMarkerNames() throws IOException {
-        datasetName = "no-marker-names.txt";
+        dataName = "no-marker-names.txt";
         expectedHeaders = HEADERS_UNIQUE_NAMES;
         expectedMarkerNames = UNDEFINED_MARKER_NAMES_DIPLOID;
         expectedAlleleNames = ALLELE_NAMES_DIPLOID;
-        System.out.println(" |- File diploid/" + datasetName);
+        System.out.println(" |- File diploid/" + dataName);
         testDataDiploid(SimpleGenotypeVariantData.readDiploidData(
             Paths.get(SimpleGenotypeVariantDataTest.class.getResource(DIPLOID_TXT_NO_MARKER_NAMES).getPath()),
             FileType.TXT
@@ -303,11 +303,11 @@ public class SimpleGenotypeVariantDataTest {
     
     @Test
     public void diploidFromTxtFileWithoutNamesOrMarkerNames() throws IOException {
-        datasetName = "no-names-no-marker-names.txt";
+        dataName = "no-names-no-marker-names.txt";
         expectedHeaders = BLANK_HEADERS;
         expectedMarkerNames = UNDEFINED_MARKER_NAMES_DIPLOID;
         expectedAlleleNames = ALLELE_NAMES_DIPLOID;
-        System.out.println(" |- File diploid/" + datasetName);
+        System.out.println(" |- File diploid/" + dataName);
         testDataDiploid(SimpleGenotypeVariantData.readDiploidData(
             Paths.get(SimpleGenotypeVariantDataTest.class.getResource(DIPLOID_TXT_NO_NAMES_NO_MARKER_NAMES).getPath()),
             FileType.TXT
@@ -343,8 +343,8 @@ public class SimpleGenotypeVariantDataTest {
     private void testData(SimpleGenotypeVariantData data, Double[][][] freqs) {
         
         // check dataset name, if set
-        String expectedDatasetName = datasetName != null ? datasetName : "Multiallelic marker data";
-        assertEquals("Incorrect dataset name.", expectedDatasetName, data.getDatasetName());
+        String expectedDatasetName = dataName != null ? dataName : "Multiallelic marker data";
+        assertEquals("Incorrect data name.", expectedDatasetName, data.getName());
         
         // check IDs
         assertEquals("Ids not correct.", SET, data.getIDs());

@@ -42,7 +42,7 @@ public class ITCorehunter extends TestData {
     public void testExecuteDistanceMatrix() {
         CorehunterArguments arguments = new CorehunterArguments(2);
 
-        arguments.setDataset(DATA);
+        arguments.setData(DATA);
 
         Corehunter corehunter = new Corehunter(arguments);
 

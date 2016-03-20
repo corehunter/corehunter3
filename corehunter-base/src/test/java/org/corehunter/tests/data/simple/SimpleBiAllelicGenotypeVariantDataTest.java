@@ -198,7 +198,7 @@ public class SimpleBiAllelicGenotypeVariantDataTest {
         
         // check dataset name, if set
         String expectedDatasetName = datasetName != null ? datasetName : "Biallelic marker data";
-        assertEquals("Incorrect dataset name.", expectedDatasetName, data.getDatasetName());
+        assertEquals("Incorrect data name.", expectedDatasetName, data.getName());
         
         // check IDs
         assertEquals("Ids not correct.", SET, data.getIDs());

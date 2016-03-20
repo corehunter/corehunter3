@@ -49,7 +49,8 @@ import org.jamesframework.core.search.algo.RandomDescent;
 import org.jamesframework.core.search.stopcriteria.MaxRuntime;
 import org.jamesframework.core.subset.neigh.SinglePerturbationNeighbourhood;
 
-import uno.informatics.data.FeatureDataset;
+import uno.informatics.data.dataset.FeatureData;
+
 import org.corehunter.data.GenotypeVariantData;
 
 /**
@@ -76,31 +77,31 @@ public class Corehunter {
         
         Search<SubsetSolution> search = null;
 
-        if (arguments.getDataset() == null) {
+        if (arguments.getData() == null) {
             throw new IllegalArgumentException("Dataset not defined!");
         }
 
         // Phenotypic data where the distance matrix is generated before 
-        if (arguments.getDataset() instanceof FeatureDataset) {
-            search = createGowersDistanceSearch((FeatureDataset) arguments.getDataset(),
+        if (arguments.getData() instanceof FeatureData) {
+            search = createGowersDistanceSearch((FeatureData) arguments.getData(),
                                                 arguments, listener);
-        } else if (arguments.getDataset() instanceof DistanceMatrixData) {
+        } else if (arguments.getData() instanceof DistanceMatrixData) {
             // Any data for which a distance matrix has already been generated
-            search = createDistanceSearch((DistanceMatrixData) arguments.getDataset(), arguments);
-        } else if (arguments.getDataset() instanceof GenotypeVariantData) {
-            search = createMultiAllelicGenotypeSearch((GenotypeVariantData) arguments.getDataset(),
+            search = createDistanceSearch((DistanceMatrixData) arguments.getData(), arguments);
+        } else if (arguments.getData() instanceof GenotypeVariantData) {
+            search = createMultiAllelicGenotypeSearch((GenotypeVariantData) arguments.getData(),
                         arguments
                      );
-        } else if (arguments.getDataset() instanceof BiAllelicGenotypeVariantData) {
+        } else if (arguments.getData() instanceof BiAllelicGenotypeVariantData) {
             search = createBiAllelicGenotypeSearch(
-                        (BiAllelicGenotypeVariantData) arguments.getDataset(),
+                        (BiAllelicGenotypeVariantData) arguments.getData(),
                         arguments
                      );
         } else {
             // TODO support for combined genotype/phenotype
             // this could be via DistanceMatrixData or some other specific dataset type
             throw new IllegalArgumentException("Dataset type not supported by Core Hunter : "
-                                                + arguments.getDataset().getClass());
+                                                + arguments.getData().getClass());
         }
 
         search.addStopCriterion(new MaxRuntime(timeLimit, TimeUnit.SECONDS));
@@ -118,11 +119,11 @@ public class Corehunter {
         return search.getBestSolution();
     }
 
-    protected Search<SubsetSolution> createGowersDistanceSearch(FeatureDataset dataset,
+    protected Search<SubsetSolution> createGowersDistanceSearch(FeatureData dataset,
                                                                 CorehunterArguments arguments,
                                                                 CorehunterListener listener) {
         GowersDistanceMatrixGenerator generator = new GowersDistanceMatrixGenerator(
-                (FeatureDataset) arguments.getDataset());
+                (FeatureData) arguments.getData());
 
         listener.preprocessingStarted("Generating distance matrix using gowers distance.");
 
@@ -278,7 +279,7 @@ public class Corehunter {
     }
 
     private void validate() throws IllegalArgumentException {
-        if (arguments.getDataset() instanceof FeatureDataset) {
+        if (arguments.getData() instanceof FeatureData) {
             if (!CorehunterObjective.GD.equals(arguments.getObjective())) {
                 throw new IllegalArgumentException(
                         CorehunterObjective.GD.getName() + " must be used for characterisation datasets!");

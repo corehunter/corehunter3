@@ -23,17 +23,18 @@ import java.util.Set;
 
 import org.corehunter.data.GenotypeVariantData;
 import uno.informatics.data.SimpleEntity;
+import uno.informatics.data.pojo.DataPojo;
 
 /**
  * @author Guy Davenport
  */
 public abstract class AbstractGenotypeVariantDistanceMetric<GenotypeVariantDataType extends GenotypeVariantData>
-        implements GenotypeVariantDistanceMetric<GenotypeVariantDataType> {
+        extends DataPojo implements GenotypeVariantDistanceMetric<GenotypeVariantDataType> {
 
     private GenotypeVariantDataType data;
 
     public AbstractGenotypeVariantDistanceMetric(GenotypeVariantDataType data) {
-        super();
+        super(data); // TODO review - copies UID, name and data from data
 
         setData(data);
     }

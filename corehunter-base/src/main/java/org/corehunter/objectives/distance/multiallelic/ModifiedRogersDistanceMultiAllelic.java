@@ -22,6 +22,7 @@ package org.corehunter.objectives.distance.multiallelic;
 import org.corehunter.objectives.distance.AbstractGenotypeVariantDistanceMetric;
 import org.corehunter.data.GenotypeVariantData;
 
+//TODO needs to be implemented or deleted
 /**
  * @author Guy Davenport, Herman De Beukelaer
  */

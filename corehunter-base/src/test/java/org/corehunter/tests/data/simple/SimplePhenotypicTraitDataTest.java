@@ -37,9 +37,9 @@ import static org.corehunter.tests.TestData.HEADERS_NON_UNIQUE_NAMES;
 import static org.corehunter.tests.TestData.SET;
 
 import uno.informatics.common.io.FileType;
-import uno.informatics.data.FeatureDataset;
-import uno.informatics.data.FeatureDatasetRow;
 import uno.informatics.data.SimpleEntity;
+import uno.informatics.data.dataset.FeatureData;
+import uno.informatics.data.dataset.FeatureDataRow;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -148,9 +148,9 @@ public class SimplePhenotypicTraitDataTest {
 
     private void testData(SimplePhenotypicTraitData data) {
         
-        // check dataset name, if set
+        // check data name, if set
         String expectedDatasetName = datasetName != null ? datasetName : "Phenotypic trait data";
-        assertEquals("Incorrect dataset name.", expectedDatasetName, data.getDatasetName());
+        assertEquals("Incorrect dataset name.", expectedDatasetName, data.getName());
         
         // check IDs
         assertEquals("Ids not correct.", SET, data.getIDs());
@@ -158,7 +158,7 @@ public class SimplePhenotypicTraitDataTest {
         assertEquals("Incorrect dataset size.", SET.size(), data.getDatasetSize());
         
         // check trait names and bounds (min/max)
-        FeatureDataset fData = data.getData();
+        FeatureData fData = data.getData();
         for(int t = 0; t < fData.getFeatures().size(); t++){
             
             // check name
@@ -190,7 +190,7 @@ public class SimplePhenotypicTraitDataTest {
             }
 
             // check trait values
-            FeatureDatasetRow row = fData.getRow(i);
+            FeatureDataRow row = fData.getRow(i);
             for(int t = 0; t < row.getColumnCount(); t++){
                 assertEquals(
                     "Incorrect value for trait " + t + " in individual " + i + ".",

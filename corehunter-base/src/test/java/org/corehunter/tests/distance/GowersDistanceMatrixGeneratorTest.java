@@ -33,9 +33,9 @@ import org.junit.Test;
 import uno.informatics.common.io.FileType;
 import uno.informatics.data.DataType;
 import uno.informatics.data.Feature;
-import uno.informatics.data.FeatureDataset;
 import uno.informatics.data.ScaleType;
 import uno.informatics.data.dataset.DatasetException;
+import uno.informatics.data.dataset.FeatureData;
 import uno.informatics.data.feature.array.ArrayFeatureDataset;
 import uno.informatics.data.pojo.SimpleFeaturePojo;
 
@@ -100,7 +100,7 @@ public class GowersDistanceMatrixGeneratorTest {
     @Test
     public void testGenerateDistanceMatrixFromFile() throws IOException, DatasetException {
 
-        FeatureDataset dataset = ArrayFeatureDataset.readFeatureDatasetFromTextFile(
+        FeatureData dataset = ArrayFeatureDataset.readFeatureDatasetFromTextFile(
                 new File(GowersDistanceMatrixGeneratorTest.class.getResource(DATA_FILE).getPath()),
                 FileType.CSV
         );

@@ -25,8 +25,8 @@ import org.corehunter.data.DistanceMatrixData;
 import org.corehunter.data.simple.SimpleDistanceMatrixData;
 
 import uno.informatics.data.Feature;
-import uno.informatics.data.FeatureDataset;
 import uno.informatics.data.Scale;
+import uno.informatics.data.dataset.FeatureData;
 
 /**
  * @author Guy Davenport
@@ -44,7 +44,7 @@ public class GowersDistanceMatrixGenerator implements DistanceMatrixGenerator {
     private int[] scaleTypes;
     private double[] ranges;
 
-    public GowersDistanceMatrixGenerator(FeatureDataset dataset) {
+    public GowersDistanceMatrixGenerator(FeatureData dataset) {
         this(dataset.getValuesAsArray(), dataset.getFeaturesAsArray());
     }
 

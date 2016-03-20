@@ -14,13 +14,15 @@ import java.util.List;
 import org.corehunter.services.CorehunterRun;
 import org.corehunter.services.CorehunterRunArguments;
 import org.corehunter.services.CorehunterRunStatus;
-import org.corehunter.services.DatasetType;
+import org.corehunter.services.DataType;
 import org.corehunter.services.simple.CorehunterRunArgumentsPojo;
 import org.corehunter.services.simple.FileBasedDatasetServices;
 import org.corehunter.services.simple.SimpleCorehunterRunServices;
 import org.junit.Test;
 
 import uno.informatics.common.io.FileType;
+import uno.informatics.data.Dataset;
+import uno.informatics.data.pojo.DatasetPojo;
 
 public class SimpleCorehunterRunServicesTest {
 
@@ -30,6 +32,8 @@ public class SimpleCorehunterRunServicesTest {
     private static final String UNIQUE_IDENTIFIER1 = "phenotypic_data.csv";
     private static final String DESCRIPTION1 = "Dataset loading from ";
     private static final String ABBREVIATION1 = null;
+    private static final String DATA_UID = "dataset1";
+    private static final String DATASET_NAME = "dataset 1";
 
     @Test
     public void testSimpleCorehunterRunServices() {
@@ -53,11 +57,19 @@ public class SimpleCorehunterRunServicesTest {
         try {
             FileBasedDatasetServices fileBasedDatasetServices = new FileBasedDatasetServices(
                     Files.createTempDirectory(null));
+            
+            Dataset dataset = new DatasetPojo(DATA_UID, DATASET_NAME);
+            
+            String datasetId = dataset.getUniqueIdentifier() ;
+
+            fileBasedDatasetServices.addDataset(dataset);
 
             Path phenotypicDataPath = Paths.get(ClassLoader.getSystemResource(PHENOTYPIC_FILE).toURI());
 
-            String datasetId = fileBasedDatasetServices.addDataset(phenotypicDataPath, FileType.CSV,
-                    DatasetType.PHENOTYPIC);
+            fileBasedDatasetServices.loadData(dataset, phenotypicDataPath, FileType.CSV,
+                    DataType.PHENOTYPIC);
+            
+            
 
             SimpleCorehunterRunServices simpleCorehunterRunServices = new SimpleCorehunterRunServices(
                     fileBasedDatasetServices);

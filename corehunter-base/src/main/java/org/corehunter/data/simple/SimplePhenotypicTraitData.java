@@ -26,9 +26,9 @@ import java.util.HashSet;
 import java.util.Set;
 import org.corehunter.data.PhenotypicTraitData;
 import uno.informatics.common.io.FileType;
-import uno.informatics.data.FeatureDataset;
 import uno.informatics.data.SimpleEntity;
 import uno.informatics.data.dataset.DatasetException;
+import uno.informatics.data.dataset.FeatureData;
 import uno.informatics.data.feature.array.ArrayFeatureDataset;
 
 /**
@@ -36,32 +36,27 @@ import uno.informatics.data.feature.array.ArrayFeatureDataset;
  */
 public class SimplePhenotypicTraitData extends SimpleNamedData implements PhenotypicTraitData {
 
-    private final FeatureDataset data;
+    private final FeatureData data;
     
     /**
      * Create dataset.
      * 
      * @param data feature data
      */
-    public SimplePhenotypicTraitData(FeatureDataset data){
-        super(data.getRowCount());
+    public SimplePhenotypicTraitData(FeatureData data){
+        super(data.getName(), data.getRowCount());
         this.data = data;
     }
     
     @Override
-    public FeatureDataset getData() {
+    public FeatureData getData() {
         return data;
     }
 
     @Override
     public SimpleEntity getHeader(int id) {
         return data.getRow(id).getHeader();
-    }
-    
-    @Override
-    public String getDatasetName() {
-        return data.getName();
-    }       
+    } 
     
     /**
      * Read phenotypic trait data from file. Only file types {@link FileType#TXT} and {@link FileType#CSV} are allowed.
@@ -98,7 +93,7 @@ public class SimplePhenotypicTraitData extends SimpleNamedData implements Phenot
         // read data from file
         try {
             
-            FeatureDataset data = ArrayFeatureDataset.readFeatureDatasetFromTextFile(filePath.toFile(), type);
+            FeatureData data = ArrayFeatureDataset.readFeatureDatasetFromTextFile(filePath.toFile(), type);
             
             if(data == null){
                 throw new IOException("Cannot read file. File may be empty.");

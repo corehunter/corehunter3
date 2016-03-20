@@ -213,9 +213,9 @@ public class SimpleDistanceMatrixDataTest {
 
     private void testData(SimpleDistanceMatrixData data) {
         
-        // check dataset name, if set
+        // check data name, if set
         String expectedDatasetName = datasetName != null ? datasetName : "Precomputed distance matrix";
-        assertEquals("Incorrect dataset name.", expectedDatasetName, data.getDatasetName());
+        assertEquals("Incorrect data name.", expectedDatasetName, data.getName());
         
         // check IDs
         assertEquals("Ids not correct.", SET, data.getIDs());
