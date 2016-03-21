@@ -23,7 +23,7 @@ import uno.informatics.data.dataset.FeatureData;
 
 /**
  * Phenotypic trait data consisting of observations of variables of possibly mixed type.
- * Wraps a {@link FeatureData} acting as an adapter to the {@link NamedData} interface.
+ * Wraps {@link FeatureData} acting as an adapter to the {@link NamedData} interface.
  * 
  * @author Herman De Beukelaer
  */
