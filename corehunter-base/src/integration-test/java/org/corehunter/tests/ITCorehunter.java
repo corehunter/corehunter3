@@ -20,53 +20,49 @@
 package org.corehunter.tests;
 
 
+import java.util.Set;
 import org.corehunter.Corehunter;
 import org.corehunter.CorehunterArguments;
+import org.corehunter.objectives.distance.AverageDistanceObjective;
+import org.jamesframework.core.search.Search;
+import org.jamesframework.core.search.algo.exh.ExhaustiveSearch;
+import org.jamesframework.core.subset.SubsetProblem;
 import org.jamesframework.core.subset.SubsetSolution;
+import org.jamesframework.core.subset.algo.exh.SubsetSolutionIterator;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertEquals;
 
 /**
- * @author Guy Davenport
+ * @author Guy Davenport, Herman De Beukelaer
  */
 public class ITCorehunter extends TestData {
 
     /**
-     * Test method for {@link Corehunter#execute()}.
+     * Test execution with distance matrix.
      */
-    //@Test
+    @Test
     public void testExecuteDistanceMatrix() {
-        CorehunterArguments arguments = new CorehunterArguments(2);
-
+        
+        int size = 2;
+        int time = 2;
+        
+        // determine optimal solution through exhaustive search
+        SubsetProblem problem = new SubsetProblem(DATA, new AverageDistanceObjective(), size);
+        Search<SubsetSolution> exh = new ExhaustiveSearch<>(problem, new SubsetSolutionIterator(SET, size));
+        exh.run();
+        Set<Integer> opt = exh.getBestSolution().getSelectedIDs();
+        
+        // run Core Hunter
+        CorehunterArguments arguments = new CorehunterArguments(size);
         arguments.setData(DATA);
-
         Corehunter corehunter = new Corehunter(arguments);
-
-        corehunter.setTimeLimit(2);
-
+        corehunter.setTimeLimit(time);
         SubsetSolution result = corehunter.execute();
 
-        assertEquals(SUBSET1, result.getSelectedIDs());
+        // compare
+        assertEquals(opt, result.getSelectedIDs());
+        
     }
 
-    /**
-     * Test method for {@link org.corehunter.Corehunter#getTimeLimit()}.
-     */
-    @Test
-    public void testGetTimeLimit() {
-
-    }
-
-    /**
-     * Test method for {@link org.corehunter.Corehunter#setTimeLimit(long)}.
-     */
-    @Test
-    public void testSetTimeLimit() {
-
-    }
-    
 }
