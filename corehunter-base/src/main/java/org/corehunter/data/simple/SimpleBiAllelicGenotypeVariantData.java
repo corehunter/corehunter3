@@ -49,8 +49,7 @@ public class SimpleBiAllelicGenotypeVariantData extends DataPojo implements BiAl
     private static final String IDENTIFIERS_HEADER = "ID";
 
     private final Integer[][] alleleScores; // null element means missing value
-    private final String[] markerNames; // null element means no marker name
-                                        // assigned
+    private final String[] markerNames; // null element means no marker name assigned
 
     /**
      * Create data with name "Biallelic marker data". For details of the
@@ -471,8 +470,8 @@ public class SimpleBiAllelicGenotypeVariantData extends DataPojo implements BiAl
                     String.format("Only file types TXT and CSV are supported. Got: %s.", fileType));
         }
 
-        Files.createDirectories(filePath.getParent()) ;
-        
+        Files.createDirectories(filePath.getParent());
+
         // read data from file
         try (RowWriter writer = IOUtilities.createRowWriter(filePath.toFile(), fileType,
                 TextFileRowReader.REMOVE_WHITE_SPACE)) {

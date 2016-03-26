@@ -39,7 +39,7 @@ public class CoreHunterData extends DataPojo implements IntegerIdentifiedData {
 
     private final GenotypeVariantData genotypicData; 
     private final FeatureData phenotypicData;
-    private final DistanceMatrixData distances;
+    private final DistanceMatrixData distancesData;
     
     /**
      * Initialize Core Hunter data consisting of genotypic data, phenotypic traits and/or a precomputed distance matrix.
@@ -51,29 +51,54 @@ public class CoreHunterData extends DataPojo implements IntegerIdentifiedData {
      * Integer IDs as required by {@link IntegerIdentifiedData} are set to [0, n-1].
      * The name of the dataset is set to "Core Hunter data".
      * 
-     * @param markers marker data (bi- or multiallelic)
+     * @param genotypicData genotypic data (bi- or multiallelic)
      * @param phenotypicData phenotypic traits
-     * @param distances precomputed distance matrix
+     * @param distancesData precomputed distance matrix
      */
-    public CoreHunterData(GenotypeVariantData genotypicData, FeatureData phenotypicData, DistanceMatrixData distances) {
+    public CoreHunterData(GenotypeVariantData genotypicData, FeatureData phenotypicData, 
+               DistanceMatrixData distancesData) {
         super("Core Hunter data",
-              mergeHeaders(genotypicData, phenotypicData, distances));
+              mergeHeaders(genotypicData, phenotypicData, distancesData));
         // store data
         this.genotypicData = genotypicData;
         this.phenotypicData = phenotypicData;
-        this.distances = distances;
+        this.distancesData = distancesData;
     }
     
-    public CoreHunterData(GenotypeVariantData markers){
-        this(markers, null, null);
+    /**
+     * Initialize Core Hunter data consisting only of genotypic data.
+     * <p>
+     * Integer IDs as required by {@link IntegerIdentifiedData} are set to [0, n-1].
+     * The name of the dataset is set to "Core Hunter data".
+     * 
+     * @param genotypicData genotypic data (bi- or multiallelic)
+     */
+    public CoreHunterData(GenotypeVariantData genotypicData){
+        this(genotypicData, null, null);
     }
     
-    public CoreHunterData(FeatureData phenotypes){
-        this(null, phenotypes, null);
+    /**
+     * Initialize Core Hunter data consisting only of phenotypicData data.
+     * <p>
+     * Integer IDs as required by {@link IntegerIdentifiedData} are set to [0, n-1].
+     * The name of the dataset is set to "Core Hunter data".
+     * 
+     * @param phenotypicData phenotypic traits
+     */
+    public CoreHunterData(FeatureData phenotypicData){
+        this(null, phenotypicData, null);
     }
     
-    public CoreHunterData(DistanceMatrixData distances){
-        this(null, null, distances);
+    /**
+     * Initialize Core Hunter data consisting only of distances data.
+     * <p>
+     * Integer IDs as required by {@link IntegerIdentifiedData} are set to [0, n-1].
+     * The name of the dataset is set to "Core Hunter data".
+     * 
+     * @param distancesData precomputed distance matrix
+     */
+    public CoreHunterData(DistanceMatrixData distancesData){
+        this(null, null, distancesData);
     }
     
     public GenotypeVariantData getGenotypicData() {
@@ -84,21 +109,21 @@ public class CoreHunterData extends DataPojo implements IntegerIdentifiedData {
         return phenotypicData;
     }
 
-    public DistanceMatrixData getDistances() {
-        return distances;
+    public DistanceMatrixData getDistancesData() {
+        return distancesData;
     }
 
     private static int inferSize(GenotypeVariantData genotypicData,
-            FeatureData phenotypicData, DistanceMatrixData distances){
+            FeatureData phenotypicData, DistanceMatrixData distancesData){
         
         // check not all undefined
-        if(genotypicData == null && phenotypicData == null && distances == null){
+        if(genotypicData == null && phenotypicData == null && distancesData == null){
             throw new IllegalArgumentException(
-                    "At least one type of data (markers, phenotypes, distances) should be defined."
+                    "At least one type of data (genotypic, phenotypic, distances) should be defined."
             );
         }
         // check same size
-        int[] sizes = Arrays.asList(genotypicData, phenotypicData, distances).stream()
+        int[] sizes = Arrays.asList(genotypicData, phenotypicData, distancesData).stream()
                                                                    .filter(Objects::nonNull)
                                                                    .mapToInt(Data::getSize)
                                                                    .distinct()
@@ -115,11 +140,11 @@ public class CoreHunterData extends DataPojo implements IntegerIdentifiedData {
     
     // assumes that sizes have already been checked
     private static SimpleEntity[] mergeHeaders(GenotypeVariantData genotypicData,
-            FeatureData phenotypicData, DistanceMatrixData distances){
+            FeatureData phenotypicData, DistanceMatrixData distancesData){
         
-        int size = inferSize(genotypicData, phenotypicData, distances) ;
+        int size = inferSize(genotypicData, phenotypicData, distancesData) ;
         
-        SimpleEntity[] headers = Arrays.asList(genotypicData, phenotypicData, distances)
+        SimpleEntity[] headers = Arrays.asList(genotypicData, phenotypicData, distancesData)
                 .stream()
                 .filter(Objects::nonNull)
                 // extract headers from each dataset

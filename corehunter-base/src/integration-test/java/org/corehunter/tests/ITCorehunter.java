@@ -19,7 +19,6 @@
 
 package org.corehunter.tests;
 
-
 import java.util.Set;
 
 import org.corehunter.Corehunter;
@@ -43,16 +42,17 @@ public class ITCorehunter extends TestData {
      */
     @Test
     public void testExecuteDistanceMatrix() {
-        
+
         int size = 2;
         int time = 2;
-        
+
         // determine optimal solution through exhaustive search
-        SubsetProblem problem = new SubsetProblem<CoreHunterData>(new CoreHunterData(DATA), new AverageDistanceObjective(), size);
+        SubsetProblem problem = new SubsetProblem<CoreHunterData>(new CoreHunterData(DATA),
+                new AverageDistanceObjective(), size);
         Search<SubsetSolution> exh = new ExhaustiveSearch<>(problem, new SubsetSolutionIterator(SET, size));
         exh.run();
         Set<Integer> opt = exh.getBestSolution().getSelectedIDs();
-        
+
         // run Core Hunter
         CorehunterArguments arguments = new CorehunterArguments(new CoreHunterData(DATA), size);
         Corehunter corehunter = new Corehunter(arguments);
@@ -60,8 +60,8 @@ public class ITCorehunter extends TestData {
         SubsetSolution result = corehunter.execute();
 
         // compare
-        //assertEquals(opt, result.getSelectedIDs());
-        
+        // assertEquals(opt, result.getSelectedIDs());
+
     }
 
 }

@@ -49,35 +49,26 @@ public class GowersDistanceMatrixGeneratorTest {
     private static final String DATA_FILE = "/phenotypes/phenotypic_data.csv";
     private static final String MATRIX_FILE = "/phenotypes/matrix.csv";
 
-    private static final Object[][] DATA = {
-        {"row1", 1, 1.0, "1", true},
-        {"row2", 2, 3.0, "2", true},
-        {"row3", 3, 3.0, "1", false},
-        {"row4", 4, 5.0, "2", false},
-        {"row5", 5, 4.0, "1", true}
-    };
+    private static final Object[][] DATA = { { "row1", 1, 1.0, "1", true }, { "row2", 2, 3.0, "2", true },
+        { "row3", 3, 3.0, "1", false }, { "row4", 4, 5.0, "2", false }, { "row5", 5, 4.0, "1", true } };
 
-    private static final Feature[] FEATURES = new Feature[]{
+    private static final Feature[] FEATURES = new Feature[] {
         new SimpleFeaturePojo("feature1", "feature1", DataType.INTEGER, ScaleType.INTERVAL, 0, 5),
         new SimpleFeaturePojo("feature2", "feature2", DataType.DOUBLE, ScaleType.RATIO, 0.0, 5.0),
         new SimpleFeaturePojo("feature3", "feature3", DataType.STRING, ScaleType.NOMINAL),
-        new SimpleFeaturePojo("feature4", "feature4", DataType.BOOLEAN, ScaleType.NOMINAL)
-    };
+        new SimpleFeaturePojo("feature4", "feature4", DataType.BOOLEAN, ScaleType.NOMINAL) };
 
-    private static final double[][] MATRIX = new double[][]{
-        new double[]{0.00, 0.40, 0.45, 0.85, 0.35},
-        new double[]{0.40, 0.00, 0.55, 0.45, 0.45},
-        new double[]{0.45, 0.55, 0.00, 0.65, 0.40},
-        new double[]{0.85, 0.45, 0.65, 0.00, 0.60},
-        new double[]{0.35, 0.45, 0.40, 0.60, 0.00}
-    };
+    private static final double[][] MATRIX = new double[][] { new double[] { 0.00, 0.40, 0.45, 0.85, 0.35 },
+        new double[] { 0.40, 0.00, 0.55, 0.45, 0.45 }, new double[] { 0.45, 0.55, 0.00, 0.65, 0.40 },
+        new double[] { 0.85, 0.45, 0.65, 0.00, 0.60 }, new double[] { 0.35, 0.45, 0.40, 0.60, 0.00 } };
 
     private static final double DELTA = 1e-8;
     private static final String NAME = "Name";
 
     @Test
     public void testGenerateDistanceMatrix() {
-        GowersDistanceMatrixGenerator generator = new GowersDistanceMatrixGenerator(new ArrayFeatureData(NAME, FEATURES, DATA));
+        GowersDistanceMatrixGenerator generator = new GowersDistanceMatrixGenerator(
+                new ArrayFeatureData(NAME, FEATURES, DATA));
 
         DistanceMatrixData matrix = generator.generateDistanceMatrix();
 
@@ -92,39 +83,31 @@ public class GowersDistanceMatrixGeneratorTest {
 
             while (iterator2.hasNext()) {
                 index2 = iterator2.next();
-                assertEquals("cell (" + index1 + "," + index2 + ")",
-                             MATRIX[index1][index2], matrix.getDistance(index1, index2), 0.0000000001);
+                assertEquals("cell (" + index1 + "," + index2 + ")", MATRIX[index1][index2],
+                        matrix.getDistance(index1, index2), 0.0000000001);
             }
         }
     }
-    
+
     @Test
     public void testGenerateDistanceMatrixFromFile() throws IOException, DatasetException, URISyntaxException {
 
         FeatureData data = ArrayFeatureData.readData(
-                Paths.get(GowersDistanceMatrixGeneratorTest.class.getResource(DATA_FILE).toURI()),
-                FileType.CSV
-        );
+                Paths.get(GowersDistanceMatrixGeneratorTest.class.getResource(DATA_FILE).toURI()), FileType.CSV);
 
         GowersDistanceMatrixGenerator generator = new GowersDistanceMatrixGenerator(data);
 
         DistanceMatrixData distances = generator.generateDistanceMatrix();
         DistanceMatrixData expected = SimpleDistanceMatrixData.readData(
-                Paths.get(GowersDistanceMatrixGeneratorTest.class.getResource(MATRIX_FILE).getPath()),
-                FileType.CSV, SymmetricMatrixFormat.FULL
-        );
+                Paths.get(GowersDistanceMatrixGeneratorTest.class.getResource(MATRIX_FILE).getPath()), FileType.CSV,
+                SymmetricMatrixFormat.FULL);
 
         int n = data.getRowCount();
         for (int x = 0; x < n; x++) {
             for (int y = 0; y < n; y++) {
-                assertEquals(
-                        "x=" + x + " y=" + y,
-                        expected.getDistance(x, y),
-                        distances.getDistance(x, y),
-                        DELTA
-                );
+                assertEquals("x=" + x + " y=" + y, expected.getDistance(x, y), distances.getDistance(x, y), DELTA);
             }
         }
-        
+
     }
 }

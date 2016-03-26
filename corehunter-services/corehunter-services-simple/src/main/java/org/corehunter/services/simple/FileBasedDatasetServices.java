@@ -217,7 +217,7 @@ public class FileBasedDatasetServices implements DatasetServices {
 
                 if (coreHunterData != null) {
                     coreHunterData = new CoreHunterData(biAllelicenotypeData, coreHunterData.getPhenotypicData(),
-                            coreHunterData.getDistances());
+                            coreHunterData.getDistancesData());
                 } else {
                     coreHunterData = new CoreHunterData(biAllelicenotypeData, null, null);
 
@@ -239,7 +239,7 @@ public class FileBasedDatasetServices implements DatasetServices {
 
                 if (coreHunterData != null) {
                     coreHunterData = new CoreHunterData(genotypeData, coreHunterData.getPhenotypicData(),
-                            coreHunterData.getDistances());
+                            coreHunterData.getDistancesData());
                 } else {
                     coreHunterData = new CoreHunterData(genotypeData, null, null);
 
@@ -259,7 +259,7 @@ public class FileBasedDatasetServices implements DatasetServices {
                 ArrayFeatureData arrayFeatureData = ArrayFeatureData.readData(path, fileType);
                 if (coreHunterData != null) {
                     coreHunterData = new CoreHunterData(coreHunterData.getGenotypicData(), arrayFeatureData,
-                            coreHunterData.getDistances());
+                            coreHunterData.getDistancesData());
                 } else {
                     coreHunterData = new CoreHunterData(null, arrayFeatureData, null);
 

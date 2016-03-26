@@ -47,7 +47,7 @@ public class AverageDistanceObjective implements
     public Evaluation evaluate(SubsetSolution solution, CoreHunterData data) {
         double value = 0.0;
         
-        DistanceMatrixData distanceData = data.getDistances() ;
+        DistanceMatrixData distanceData = data.getDistancesData() ;
         
         if (solution.getNumSelectedIDs() >= 2) {
             // at least two items selected: compute average distance
@@ -70,7 +70,7 @@ public class AverageDistanceObjective implements
     public Evaluation evaluate(Move move, SubsetSolution curSolution,
                                Evaluation curEvaluation, CoreHunterData data) {
         
-        DistanceMatrixData distanceData = data.getDistances() ;
+        DistanceMatrixData distanceData = data.getDistancesData() ;
         // check move type
         if (!(move instanceof SubsetMove)) {
             throw new IncompatibleDeltaEvaluationException("Core subset objective should be used in combination "
