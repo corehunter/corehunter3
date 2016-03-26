@@ -17,16 +17,17 @@
 /* under the License.                                           */
 /*--------------------------------------------------------------*/
 
-package org.corehunter.data.simple;
+package org.corehunter.data;
 
 import java.util.Arrays;
 import java.util.Objects;
-import org.corehunter.data.DistanceMatrixData;
-import org.corehunter.data.GenotypeVariantData;
-import org.corehunter.data.NamedData;
-import org.corehunter.data.PhenotypicTraitData;
+
 import org.jamesframework.core.problems.datatypes.IntegerIdentifiedData;
+
+import uno.informatics.data.Data;
 import uno.informatics.data.SimpleEntity;
+import uno.informatics.data.dataset.FeatureData;
+import uno.informatics.data.pojo.DataPojo;
 
 /**
  * Combines all data used in Core Hunter.
@@ -34,14 +35,14 @@ import uno.informatics.data.SimpleEntity;
  * 
  * @author Herman De Beukelaer
  */
-public class CoreHunterData extends SimpleNamedData {
+public class CoreHunterData extends DataPojo implements IntegerIdentifiedData {
 
-    private final GenotypeVariantData markers;
-    private final PhenotypicTraitData phenotypes;
+    private final GenotypeVariantData genotypicData; 
+    private final FeatureData phenotypicData;
     private final DistanceMatrixData distances;
     
     /**
-     * Initialize Core Hunter data consisting of marker data, phenotypic traits and/or a precomputed distance matrix.
+     * Initialize Core Hunter data consisting of genotypic data, phenotypic traits and/or a precomputed distance matrix.
      * At least one of these should be defined (i.e. non <code>null</code>). Items should be ordered in the same way
      * across all datasets, which should all be of the same size n. If headers are specified (item names and/or unique
      * identifiers) in some or all datasets these should also be consistent across datasets. If this is not the case,
@@ -51,16 +52,15 @@ public class CoreHunterData extends SimpleNamedData {
      * The name of the dataset is set to "Core Hunter data".
      * 
      * @param markers marker data (bi- or multiallelic)
-     * @param phenotypes phenotypic traits
+     * @param phenotypicData phenotypic traits
      * @param distances precomputed distance matrix
      */
-    public CoreHunterData(GenotypeVariantData markers, PhenotypicTraitData phenotypes, DistanceMatrixData distances) {
+    public CoreHunterData(GenotypeVariantData genotypicData, FeatureData phenotypicData, DistanceMatrixData distances) {
         super("Core Hunter data",
-              inferSize(markers, phenotypes, distances),
-              mergeHeaders(markers, phenotypes, distances));
+              mergeHeaders(genotypicData, phenotypicData, distances));
         // store data
-        this.markers = markers;
-        this.phenotypes = phenotypes;
+        this.genotypicData = genotypicData;
+        this.phenotypicData = phenotypicData;
         this.distances = distances;
     }
     
@@ -68,7 +68,7 @@ public class CoreHunterData extends SimpleNamedData {
         this(markers, null, null);
     }
     
-    public CoreHunterData(PhenotypicTraitData phenotypes){
+    public CoreHunterData(FeatureData phenotypes){
         this(null, phenotypes, null);
     }
     
@@ -76,32 +76,31 @@ public class CoreHunterData extends SimpleNamedData {
         this(null, null, distances);
     }
     
-    public GenotypeVariantData getMarkers() {
-        return markers;
+    public GenotypeVariantData getGenotypicData() {
+        return genotypicData;
     }
 
-    public PhenotypicTraitData getPhenotypes() {
-        return phenotypes;
+    public FeatureData getPhenotypicData() {
+        return phenotypicData;
     }
 
     public DistanceMatrixData getDistances() {
         return distances;
     }
 
-    private static int inferSize(GenotypeVariantData markers,
-                                 PhenotypicTraitData phenotypes,
-                                 DistanceMatrixData distances){
+    private static int inferSize(GenotypeVariantData genotypicData,
+            FeatureData phenotypicData, DistanceMatrixData distances){
         
         // check not all undefined
-        if(markers == null && phenotypes == null && distances == null){
+        if(genotypicData == null && phenotypicData == null && distances == null){
             throw new IllegalArgumentException(
                     "At least one type of data (markers, phenotypes, distances) should be defined."
             );
         }
         // check same size
-        int[] sizes = Arrays.asList(markers, phenotypes, distances).stream()
+        int[] sizes = Arrays.asList(genotypicData, phenotypicData, distances).stream()
                                                                    .filter(Objects::nonNull)
-                                                                   .mapToInt(NamedData::getDatasetSize)
+                                                                   .mapToInt(Data::getSize)
                                                                    .distinct()
                                                                    .toArray();
         boolean sameSize = (sizes.length == 1);
@@ -115,16 +114,17 @@ public class CoreHunterData extends SimpleNamedData {
     }
     
     // assumes that sizes have already been checked
-    private static SimpleEntity[] mergeHeaders(GenotypeVariantData markers,
-                                               PhenotypicTraitData phenotypes,
-                                               DistanceMatrixData distances){
+    private static SimpleEntity[] mergeHeaders(GenotypeVariantData genotypicData,
+            FeatureData phenotypicData, DistanceMatrixData distances){
         
-        SimpleEntity[] headers = Arrays.asList(markers, phenotypes, distances)
+        int size = inferSize(genotypicData, phenotypicData, distances) ;
+        
+        SimpleEntity[] headers = Arrays.asList(genotypicData, phenotypicData, distances)
                 .stream()
                 .filter(Objects::nonNull)
                 // extract headers from each dataset
                 .map(data -> {
-                    SimpleEntity[] h = new SimpleEntity[data.getDatasetSize()];
+                    SimpleEntity[] h = new SimpleEntity[data.getSize()];
                     for(int i = 0; i < h.length; i++){
                         h[i] = data.getHeader(i);
                     }
@@ -169,9 +169,9 @@ public class CoreHunterData extends SimpleNamedData {
                 })
                 .get();
         
-        // omit headers if not provided in any dataset
+        // create headers if not provided in any dataset
         if(Arrays.stream(headers).allMatch(Objects::isNull)){
-            headers = null;
+            headers = DataPojo.updateOrCreateHeaders(null, size);
         }
         
         return headers;

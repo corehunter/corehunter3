@@ -21,8 +21,11 @@ package org.corehunter.tests.distance;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Iterator;
+import java.util.List;
 
 import org.corehunter.data.DistanceMatrixData;
 import org.corehunter.data.matrix.SymmetricMatrixFormat;
@@ -36,7 +39,7 @@ import uno.informatics.data.Feature;
 import uno.informatics.data.ScaleType;
 import uno.informatics.data.dataset.DatasetException;
 import uno.informatics.data.dataset.FeatureData;
-import uno.informatics.data.feature.array.ArrayFeatureDataset;
+import uno.informatics.data.feature.array.ArrayFeatureData;
 import uno.informatics.data.pojo.SimpleFeaturePojo;
 
 import static org.junit.Assert.assertEquals;
@@ -50,18 +53,18 @@ public class GowersDistanceMatrixGeneratorTest {
     private static final String MATRIX_FILE = "/phenotypes/matrix.csv";
 
     private static final Object[][] DATA = {
-        {1, 1.0, "1", true},
-        {2, 3.0, "2", true},
-        {3, 3.0, "1", false},
-        {4, 5.0, "2", false},
-        {5, 4.0, "1", true}
+        {"row1", 1, 1.0, "1", true},
+        {"row2", 2, 3.0, "2", true},
+        {"row3", 3, 3.0, "1", false},
+        {"row4", 4, 5.0, "2", false},
+        {"row5", 5, 4.0, "1", true}
     };
 
     private static final Feature[] FEATURES = new Feature[]{
-        new SimpleFeaturePojo("feature1", DataType.INTEGER, ScaleType.INTERVAL, 0, 5),
-        new SimpleFeaturePojo("feature2", DataType.DOUBLE, ScaleType.RATIO, 0.0, 5.0),
-        new SimpleFeaturePojo("feature3", DataType.STRING, ScaleType.NOMINAL),
-        new SimpleFeaturePojo("feature4", DataType.BOOLEAN, ScaleType.NOMINAL)
+        new SimpleFeaturePojo("feature1", "feature1", DataType.INTEGER, ScaleType.INTERVAL, 0, 5),
+        new SimpleFeaturePojo("feature2", "feature2", DataType.DOUBLE, ScaleType.RATIO, 0.0, 5.0),
+        new SimpleFeaturePojo("feature3", "feature3", DataType.STRING, ScaleType.NOMINAL),
+        new SimpleFeaturePojo("feature4", "feature4", DataType.BOOLEAN, ScaleType.NOMINAL)
     };
 
     private static final double[][] MATRIX = new double[][]{
@@ -73,10 +76,11 @@ public class GowersDistanceMatrixGeneratorTest {
     };
 
     private static final double DELTA = 1e-8;
+    private static final String NAME = "Name";
 
     @Test
     public void testGenerateDistanceMatrix() {
-        GowersDistanceMatrixGenerator generator = new GowersDistanceMatrixGenerator(DATA, FEATURES);
+        GowersDistanceMatrixGenerator generator = new GowersDistanceMatrixGenerator(new ArrayFeatureData(NAME, FEATURES, DATA));
 
         DistanceMatrixData matrix = generator.generateDistanceMatrix();
 
@@ -98,14 +102,14 @@ public class GowersDistanceMatrixGeneratorTest {
     }
     
     @Test
-    public void testGenerateDistanceMatrixFromFile() throws IOException, DatasetException {
+    public void testGenerateDistanceMatrixFromFile() throws IOException, DatasetException, URISyntaxException {
 
-        FeatureData dataset = ArrayFeatureDataset.readFeatureDatasetFromTextFile(
-                new File(GowersDistanceMatrixGeneratorTest.class.getResource(DATA_FILE).getPath()),
+        FeatureData data = ArrayFeatureData.readData(
+                Paths.get(GowersDistanceMatrixGeneratorTest.class.getResource(DATA_FILE).toURI()),
                 FileType.CSV
         );
 
-        GowersDistanceMatrixGenerator generator = new GowersDistanceMatrixGenerator(dataset);
+        GowersDistanceMatrixGenerator generator = new GowersDistanceMatrixGenerator(data);
 
         DistanceMatrixData distances = generator.generateDistanceMatrix();
         DistanceMatrixData expected = SimpleDistanceMatrixData.readData(
@@ -113,7 +117,7 @@ public class GowersDistanceMatrixGeneratorTest {
                 FileType.CSV, SymmetricMatrixFormat.FULL
         );
 
-        int n = dataset.getRowCount();
+        int n = data.getRowCount();
         for (int x = 0; x < n; x++) {
             for (int y = 0; y < n; y++) {
                 assertEquals(

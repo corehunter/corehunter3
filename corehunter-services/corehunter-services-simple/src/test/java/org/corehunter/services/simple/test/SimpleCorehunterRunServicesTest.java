@@ -92,7 +92,7 @@ public class SimpleCorehunterRunServicesTest {
             SimpleCorehunterRunServices simpleCorehunterRunServices = new SimpleCorehunterRunServices(
                     fileBasedDatasetServices);
 
-            CorehunterRunArguments arguments = new CorehunterRunArgumentsPojo(NAME1, SUBSET_SIZE1, datasetId);
+            CorehunterRunArguments arguments = new CorehunterRunArgumentsPojo(NAME1, SUBSET_SIZE1, datasetId, null);
 
             CorehunterRun startCorehunterRun = simpleCorehunterRunServices.executeCorehunter(arguments);
             

@@ -31,10 +31,13 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.corehunter.data.NamedData;
+import org.corehunter.data.BiAllelicGenotypeVariantData;
+import org.corehunter.data.CoreHunterData;
+import org.corehunter.data.GenotypeVariantData;
+import org.corehunter.data.matrix.SymmetricMatrixFormat;
 import org.corehunter.data.simple.SimpleBiAllelicGenotypeVariantData;
+import org.corehunter.data.simple.SimpleDistanceMatrixData;
 import org.corehunter.data.simple.SimpleGenotypeVariantData;
-import org.corehunter.data.simple.SimplePhenotypicTraitData;
 import org.corehunter.services.DatasetServices;
 import org.corehunter.services.DataType;
 
@@ -42,22 +45,26 @@ import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.StaxDriver;
 
 import uno.informatics.common.io.FileType;
+import uno.informatics.data.Data;
 import uno.informatics.data.Dataset;
 import uno.informatics.data.dataset.DatasetException;
+import uno.informatics.data.feature.array.ArrayFeatureData;
 
 public class FileBasedDatasetServices implements DatasetServices {
     private static final String DATASETS = "datasets.xml";
 
     private static final String BI_ALLELIC_GENOTYPIC_PATH = "BI_ALLELIC_GENOTYPIC_PATH";
 
-    private static final String MULTI_ALLELIC_GENOTYPIC_PATH = "MULTI_ALLELIC_GENOTYPIC_PATH";
+    private static final String GENOTYPIC_PATH = "GENOTYPIC_PATH";
 
     private static final String PHENOTYPIC_PATH = "PHENOTYPIC_PATH";
+
+    private static final String DISTANCE_PATH = "DISTANCE_PATH";
 
     private static final String TXT_SUFFIX = ".txt";
 
     private static Map<String, Dataset> datasetMap;
-    private static Map<String, NamedData> dataCache;
+    private static Map<String, CoreHunterData> dataCache;
 
     private Path path;
 
@@ -108,7 +115,7 @@ public class FileBasedDatasetServices implements DatasetServices {
         if (!datasetMap.containsKey(dataset.getUniqueIdentifier())) {
             datasetMap.put(dataset.getUniqueIdentifier(), dataset);
         } else {
-            throw new DatasetException("Dataset already loaded : " + dataset.getUniqueIdentifier());
+            throw new DatasetException("Dataset already added : " + dataset.getUniqueIdentifier());
         }
 
         ArrayList<Dataset> datasets = new ArrayList<Dataset>(datasetMap.values());
@@ -129,28 +136,34 @@ public class FileBasedDatasetServices implements DatasetServices {
     }
 
     @Override
-    public boolean removeDataset(String datasetId) {
+    public boolean removeDataset(String datasetId) throws DatasetException {
 
-        Dataset dataset = datasetMap.remove(datasetId);
-
-        return dataset != null;
-    }
-
-    @Override
-    public NamedData getData(String datasetId) throws DatasetException {
         Dataset dataset = getDataset(datasetId);
 
         if (dataset == null) {
             throw new DatasetException("Unknown dataset with datasetId : " + datasetId);
         }
 
-        NamedData data = dataCache.get(datasetId);
+        removeDataInternal(datasetId);
+
+        return datasetMap.remove(datasetId, dataset);
+    }
+
+    @Override
+    public CoreHunterData getData(String datasetId) throws DatasetException {
+        Dataset dataset = getDataset(datasetId);
+
+        if (dataset == null) {
+            throw new DatasetException("Unknown dataset with datasetId : " + datasetId);
+        }
+
+        CoreHunterData data = dataCache.get(datasetId);
 
         if (data != null) {
             return data;
         } else {
             try {
-                return readData(datasetId);
+                return readDataInternal(datasetId);
             } catch (IOException e) {
                 throw new DatasetException(e);
             }
@@ -158,7 +171,18 @@ public class FileBasedDatasetServices implements DatasetServices {
     }
 
     @Override
-    public void loadData(Dataset dataset, Path path, FileType fileType, DataType datasetType)
+    public void removeData(String datasetId) throws DatasetException {
+        Dataset dataset = getDataset(datasetId);
+
+        if (dataset == null) {
+            throw new DatasetException("Unknown dataset with datasetId : " + datasetId);
+        }
+
+        removeDataInternal(datasetId);
+    }
+
+    @Override
+    public void loadData(Dataset dataset, Path path, FileType fileType, DataType dataType)
             throws IOException, DatasetException {
 
         if (dataset == null) {
@@ -175,57 +199,121 @@ public class FileBasedDatasetServices implements DatasetServices {
             throw new DatasetException("Unknown path : " + path);
         }
 
-        NamedData data = readData(path, fileType, datasetType);
+        String datasetId = internalDataset.getUniqueIdentifier();
 
         Path newPath;
 
-        switch (datasetType) {
+        CoreHunterData coreHunterData = getData(internalDataset.getUniqueIdentifier());
+
+        switch (dataType) {
             case BI_ALLELIC_GENOTYPIC:
-                newPath = Paths.get(getPath().toString(), BI_ALLELIC_GENOTYPIC_PATH,
-                        internalDataset.getUniqueIdentifier() + TXT_SUFFIX);
+                if (coreHunterData != null && coreHunterData.getGenotypicData() != null) {
+                    throw new DatasetException(
+                            "Genotypic Data is already associated for this dataset : " + dataset.getName());
+                }
+
+                SimpleBiAllelicGenotypeVariantData biAllelicenotypeData = SimpleBiAllelicGenotypeVariantData
+                        .readData(path, fileType);
+
+                if (coreHunterData != null) {
+                    coreHunterData = new CoreHunterData(biAllelicenotypeData, coreHunterData.getPhenotypicData(),
+                            coreHunterData.getDistances());
+                } else {
+                    coreHunterData = new CoreHunterData(biAllelicenotypeData, null, null);
+
+                    dataCache.put(datasetId, coreHunterData);
+                }
+
+                newPath = Paths.get(getPath().toString(), BI_ALLELIC_GENOTYPIC_PATH, datasetId + TXT_SUFFIX);
+
+                SimpleBiAllelicGenotypeVariantData.writeData(newPath, biAllelicenotypeData, fileType);
+
                 break;
-            case MULTI_ALLELIC_GENOTYPIC:
-                newPath = Paths.get(getPath().toString(), MULTI_ALLELIC_GENOTYPIC_PATH,
-                        internalDataset.getUniqueIdentifier() + TXT_SUFFIX);
+            case GENOTYPIC:
+                if (coreHunterData != null && coreHunterData.getGenotypicData() != null) {
+                    throw new DatasetException(
+                            "Genotypic Data is already associated for this dataset : " + dataset.getName());
+                }
+
+                SimpleGenotypeVariantData genotypeData = SimpleGenotypeVariantData.readData(path, fileType);
+
+                if (coreHunterData != null) {
+                    coreHunterData = new CoreHunterData(genotypeData, coreHunterData.getPhenotypicData(),
+                            coreHunterData.getDistances());
+                } else {
+                    coreHunterData = new CoreHunterData(genotypeData, null, null);
+
+                    dataCache.put(datasetId, coreHunterData);
+                }
+
+                newPath = Paths.get(getPath().toString(), GENOTYPIC_PATH, datasetId + TXT_SUFFIX);
+
+                SimpleGenotypeVariantData.writeData(newPath, genotypeData, fileType);
                 break;
             case PHENOTYPIC:
-                newPath = Paths.get(getPath().toString(), PHENOTYPIC_PATH,
-                        internalDataset.getUniqueIdentifier() + TXT_SUFFIX);
+                if (coreHunterData != null && coreHunterData.getGenotypicData() != null) {
+                    throw new DatasetException(
+                            "Genotypic Data is already associated for this dataset : " + dataset.getName());
+                }
+
+                ArrayFeatureData arrayFeatureData = ArrayFeatureData.readData(path, fileType);
+                if (coreHunterData != null) {
+                    coreHunterData = new CoreHunterData(coreHunterData.getGenotypicData(), arrayFeatureData,
+                            coreHunterData.getDistances());
+                } else {
+                    coreHunterData = new CoreHunterData(null, arrayFeatureData, null);
+
+                    dataCache.put(datasetId, coreHunterData);
+                }
+
+                newPath = Paths.get(getPath().toString(), PHENOTYPIC_PATH, datasetId + TXT_SUFFIX);
+
+                ArrayFeatureData.writeData(newPath, arrayFeatureData, fileType);
+                
+                break;
+            case DISTANCE:
+                if (coreHunterData != null && coreHunterData.getGenotypicData() != null) {
+                    throw new DatasetException(
+                            "Genotypic Data is already associated for this dataset : " + dataset.getName());
+                }
+
+                SimpleDistanceMatrixData distance = SimpleDistanceMatrixData.readData(path, fileType,
+                        SymmetricMatrixFormat.FULL);
+
+                if (coreHunterData != null) {
+                    coreHunterData = new CoreHunterData(coreHunterData.getGenotypicData(),
+                            coreHunterData.getPhenotypicData(), distance);
+                } else {
+                    coreHunterData = new CoreHunterData(null, null, distance);
+
+                    dataCache.put(datasetId, coreHunterData);
+                }
+
+                newPath = Paths.get(getPath().toString(), GENOTYPIC_PATH, datasetId + TXT_SUFFIX);
+
+                SimpleDistanceMatrixData.writeData(newPath, distance, fileType);
+                
                 break;
             default:
-                throw new IllegalArgumentException("Unknown dataset type : " + datasetType);
+                throw new IllegalArgumentException("Unknown data type : " + dataType);
         }
-
-        if (!Files.exists(newPath)) {
-            throw new DatasetException("Data of this type already associate for this dataset : " + dataset.getName());
-        }
-
-        writeData(data, newPath, FileType.TXT, DataType.BI_ALLELIC_GENOTYPIC);
-
-        dataCache.put(internalDataset.getUniqueIdentifier(), data);
-    }
-
-    @Override
-    public boolean removeData(Dataset dataset, String dataId) {
-        // TODO Auto-generated method stub
-        return false;
     }
 
     @SuppressWarnings("unchecked")
     private void initialise() throws IOException {
 
         datasetMap = new HashMap<String, Dataset>();
-        dataCache = new HashMap<String, NamedData>();
+        dataCache = new HashMap<String, CoreHunterData>();
 
         if (!Files.exists(getPath())) {
             Files.createDirectories(getPath());
         }
 
-        Path datasetDescriptionsPath = Paths.get(getPath().toString(), DATASETS);
+        Path datasetsPath = Paths.get(getPath().toString(), DATASETS);
 
         List<Dataset> datasets;
-        if (Files.exists(datasetDescriptionsPath)) {
-            InputStream inputStream = Files.newInputStream(datasetDescriptionsPath);
+        if (Files.exists(datasetsPath)) {
+            InputStream inputStream = Files.newInputStream(datasetsPath);
 
             XStream xstream = createXStream();
 
@@ -244,77 +332,56 @@ public class FileBasedDatasetServices implements DatasetServices {
         }
     }
 
-    private NamedData readData(String datasetId) throws IOException {
-
-        Path biAllelicGenotypicPath = Paths.get(getPath().toString(), BI_ALLELIC_GENOTYPIC_PATH,
-                datasetId + TXT_SUFFIX);
-
-        if (!Files.exists(biAllelicGenotypicPath)) {
-            biAllelicGenotypicPath = null;
-        }
-
-        Path multiAllelicGenotypicPath = Paths.get(getPath().toString(), MULTI_ALLELIC_GENOTYPIC_PATH,
-                datasetId + TXT_SUFFIX);
-
-        if (!Files.exists(multiAllelicGenotypicPath)) {
-            multiAllelicGenotypicPath = null;
-        }
-
-        Path phenotypicPath = Paths.get(getPath().toString(), PHENOTYPIC_PATH, datasetId + TXT_SUFFIX);
-
-        if (Files.exists(phenotypicPath)) {
-            phenotypicPath = null;
-        }
-
-        return readData(biAllelicGenotypicPath, multiAllelicGenotypicPath, phenotypicPath);
-    }
-
-    private NamedData readData(Path biAllelicGenotypicPath, Path multiAllelicGenotypicPath, Path phenotypicPath) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    private NamedData readData(Path path, FileType fileType, DataType datasetType) throws IOException {
-        NamedData data = null;
-
-        switch (datasetType) {
+    private Path getDataPath(String datasetId, DataType dataType) {
+        switch (dataType) {
             case BI_ALLELIC_GENOTYPIC:
-                data = createBiAllelicGenotypicData(path, fileType);
-                break;
-            case MULTI_ALLELIC_GENOTYPIC:
-                data = createMultiAllelicGenotypicData(path, fileType);
-                break;
+                return Paths.get(getPath().toString(), BI_ALLELIC_GENOTYPIC_PATH, datasetId + TXT_SUFFIX);
+            case GENOTYPIC:
+                return Paths.get(getPath().toString(), GENOTYPIC_PATH, datasetId + TXT_SUFFIX);
             case PHENOTYPIC:
-                data = createPhenotypicData(path, fileType);
-                break;
+                return Paths.get(getPath().toString(), PHENOTYPIC_PATH, datasetId + TXT_SUFFIX);
+            case DISTANCE:
+                return Paths.get(getPath().toString(), DISTANCE_PATH, datasetId + TXT_SUFFIX);
             default:
-                throw new IllegalArgumentException("Unknown dataset type : " + datasetType);
+                throw new IllegalArgumentException("Unknown dataset type : " + dataType);
+        }
+    }
+
+    private CoreHunterData readDataInternal(String datasetId) throws IOException {
+
+        GenotypeVariantData genotypicData = null;
+        ArrayFeatureData phenotypicData = null;
+        SimpleDistanceMatrixData distance = null;
+
+        Path path = Paths.get(getPath().toString(), BI_ALLELIC_GENOTYPIC_PATH, datasetId + TXT_SUFFIX);
+
+        if (Files.exists(path)) {
+            genotypicData = SimpleBiAllelicGenotypeVariantData.readData(path, FileType.TXT);
         }
 
-        return data;
-    }
+        path = Paths.get(getPath().toString(), BI_ALLELIC_GENOTYPIC_PATH, datasetId + TXT_SUFFIX);
 
-    private void writeData(NamedData data, Path newPath, FileType txt, DataType biAllelicGenotypic) {
-        // TODO Auto-generated method stub
+        if (Files.exists(path)) {
+            genotypicData = SimpleGenotypeVariantData.readData(path, FileType.TXT);
+        }
 
-    }
+        path = Paths.get(getPath().toString(), PHENOTYPIC_PATH, datasetId + TXT_SUFFIX);
 
-    private NamedData createBiAllelicGenotypicData(Path path, FileType type) throws IOException {
-        NamedData data = SimpleBiAllelicGenotypeVariantData.readData(path, type);
+        if (Files.exists(path)) {
+            phenotypicData = ArrayFeatureData.readData(path, FileType.TXT);
+        }
 
-        return data;
-    }
+        path = Paths.get(getPath().toString(), DISTANCE_PATH, datasetId + TXT_SUFFIX);
 
-    private NamedData createMultiAllelicGenotypicData(Path path, FileType type) throws IOException {
-        NamedData data = SimpleGenotypeVariantData.readData(path, type);
+        if (Files.exists(path)) {
+            distance = SimpleDistanceMatrixData.readData(path, FileType.TXT, SymmetricMatrixFormat.FULL);
+        }
 
-        return data;
-    }
-
-    private NamedData createPhenotypicData(Path path, FileType type) throws IOException {
-        NamedData data = SimplePhenotypicTraitData.readData(path, type);
-
-        return data;
+        if (genotypicData != null || phenotypicData != null || distance != null) {
+            return new CoreHunterData(genotypicData, phenotypicData, distance);
+        } else {
+            return null ;
+        }
     }
 
     private XStream createXStream() {
@@ -323,5 +390,22 @@ public class FileBasedDatasetServices implements DatasetServices {
         xstream.setClassLoader(getClass().getClassLoader());
 
         return xstream;
+    }
+
+    private void removeDataInternal(String datasetId) throws DatasetException {
+
+        dataCache.remove(datasetId);
+
+        try {
+            Files.deleteIfExists(getDataPath(datasetId, DataType.BI_ALLELIC_GENOTYPIC));
+
+            Files.deleteIfExists(getDataPath(datasetId, DataType.GENOTYPIC));
+
+            Files.deleteIfExists(getDataPath(datasetId, DataType.PHENOTYPIC));
+
+            Files.deleteIfExists(getDataPath(datasetId, DataType.DISTANCE));
+        } catch (IOException e) {
+            throw new DatasetException(e);
+        }
     }
 }

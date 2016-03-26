@@ -81,7 +81,7 @@ public class Corehunter {
             throw new IllegalArgumentException("Dataset not defined!");
         }
 
-        // Phenotypic data where the distance matrix is generated before 
+        /*// Phenotypic data where the distance matrix is generated before 
         if (arguments.getData() instanceof FeatureData) {
             search = createGowersDistanceSearch((FeatureData) arguments.getData(),
                                                 arguments, listener);
@@ -114,12 +114,14 @@ public class Corehunter {
         search.start();
 
         // dispose search
-        search.dispose();
+        search.dispose();*/
 
-        return search.getBestSolution();
+        //return search.getBestSolution();
+        
+        return null ;
     }
 
-    protected Search<SubsetSolution> createGowersDistanceSearch(FeatureData dataset,
+    /*protected Search<SubsetSolution> createGowersDistanceSearch(FeatureData dataset,
                                                                 CorehunterArguments arguments,
                                                                 CorehunterListener listener) {
         GowersDistanceMatrixGenerator generator = new GowersDistanceMatrixGenerator(
@@ -268,7 +270,7 @@ public class Corehunter {
         RandomDescent<SubsetSolution> search = new RandomDescent<>(problem, new SinglePerturbationNeighbourhood());
 
         return search;
-    }
+    }*/
 
     public final long getTimeLimit() {
         return timeLimit;

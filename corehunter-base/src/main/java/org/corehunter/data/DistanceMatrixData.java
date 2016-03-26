@@ -19,6 +19,8 @@
 
 package org.corehunter.data;
 
+import uno.informatics.data.Data;
+
 /**
  * A distance matrix that indicates how different each pair of entries is.
  * All values are between 0.0 and 1.0 where the former means that the specific
@@ -26,7 +28,7 @@ package org.corehunter.data;
  *
  * @author Guy Davenport, Herman De Beukelaer
  */
-public interface DistanceMatrixData extends NamedData {
+public interface DistanceMatrixData extends Data {
 
     /**
      * Get the distance between two entries.

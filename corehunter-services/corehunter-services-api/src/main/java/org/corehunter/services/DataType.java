@@ -22,7 +22,8 @@ package org.corehunter.services;
 public enum DataType {
     PHENOTYPIC("Phenotypic"), 
     BI_ALLELIC_GENOTYPIC("Bi-allelic Genotypic"), 
-    MULTI_ALLELIC_GENOTYPIC("Multi-allelic Genotypic");
+    GENOTYPIC("Genotypic"), 
+    DISTANCE("Distance");
 
     private String name;
 

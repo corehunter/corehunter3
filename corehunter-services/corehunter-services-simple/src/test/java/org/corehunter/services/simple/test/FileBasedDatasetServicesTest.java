@@ -20,17 +20,24 @@
 package org.corehunter.services.simple.test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.net.URI;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 
+import org.corehunter.data.CoreHunterData;
+import org.corehunter.services.DataType;
 import org.corehunter.services.simple.FileBasedDatasetServices;
 import org.junit.Test;
 
+import uno.informatics.common.io.FileType;
 import uno.informatics.data.Dataset;
 import uno.informatics.data.pojo.DatasetPojo;
 
@@ -42,7 +49,7 @@ public class FileBasedDatasetServicesTest {
     private static final String DATASET_NAME = "dataset 1";
 
     @Test
-    public void testSimpleAddAndRemoveDataset() {
+    public void testAddDatasetNoData() {
         try {
             FileBasedDatasetServices fileBasedDatasetServices = new FileBasedDatasetServices(
                     Files.createTempDirectory(null));
@@ -51,39 +58,33 @@ public class FileBasedDatasetServicesTest {
 
             fileBasedDatasetServices.addDataset(dataset);
 
-            Dataset dataset1 = fileBasedDatasetServices.getDataset(dataset.getUniqueIdentifier());
+            Dataset addedDataset = fileBasedDatasetServices.getDataset(dataset.getUniqueIdentifier());
 
-            assertEquals("Dataset 1 name is not correct", dataset.getName(), dataset1.getName());
-            assertEquals("Dataset 1 unique identifier is not correct", dataset.getUniqueIdentifier(),
-                    dataset1.getUniqueIdentifier());
-            assertEquals("Dataset 1 abbreviation is not correct", dataset.getAbbreviation(),
-                    dataset1.getAbbreviation());
-            assertEquals("Dataset 1 description is not correct", dataset.getDescription(), dataset1.getDescription());
+            assertEquals("Added Dataset name is not correct", dataset.getName(), addedDataset.getName());
+            assertEquals("Added Dataset unique identifier is not correct", dataset.getUniqueIdentifier(),
+                    addedDataset.getUniqueIdentifier());
+            assertEquals("Added Dataset abbreviation is not correct", dataset.getAbbreviation(),
+                    addedDataset.getAbbreviation());
+            assertEquals("Added Dataset description is not correct", dataset.getDescription(),
+                    addedDataset.getDescription());
+            assertEquals("Added Dataset type is not correct", dataset.getType(), addedDataset.getType());
+            assertEquals("Added Dataset study is not correct", dataset.getStudy(), addedDataset.getStudy());
 
             List<Dataset> datasets = fileBasedDatasetServices.getAllDatasets();
 
-            assertEquals("Number of dataset id is not 1", 1, datasets.size());
+            assertEquals("Number of datasets is not 1", 1, datasets.size());
 
-            Dataset dataset2 = datasets.get(0);
+            Dataset addedDatasetInList = datasets.get(0);
 
-            assertEquals("Dataset 2 name is not correct", dataset.getName(), dataset2.getName());
-            assertEquals("Dataset 2 unique identifier is not correct", dataset.getUniqueIdentifier(),
-                    dataset2.getUniqueIdentifier());
-            assertEquals("Dataset 2 abbreviation is not correct", dataset.getAbbreviation(),
-                    dataset2.getAbbreviation());
-            assertEquals("Dataset 2 description is not correct", dataset.getDescription(), dataset2.getDescription());
-
-            boolean removed = fileBasedDatasetServices.removeDataset(dataset.getUniqueIdentifier());
-            
-            assertTrue("Dataset not removed", removed);
-
-            datasets = fileBasedDatasetServices.getAllDatasets();
-
-            assertEquals("Number of dataset is not 0", 0, datasets.size());
-
-            Dataset dataset3 = fileBasedDatasetServices.getDataset(dataset.getUniqueIdentifier());
-
-            assertNull("Dataset 3 not null", dataset3);
+            assertEquals("Added Dataset In List is not correct", dataset.getName(), addedDatasetInList.getName());
+            assertEquals("Added Dataset In List  unique identifier is not correct", dataset.getUniqueIdentifier(),
+                    addedDatasetInList.getUniqueIdentifier());
+            assertEquals("Added Dataset In List abbreviation is not correct", dataset.getAbbreviation(),
+                    addedDatasetInList.getAbbreviation());
+            assertEquals("Added Dataset In List description is not correct", dataset.getDescription(),
+                    addedDatasetInList.getDescription());
+            assertEquals("Added Dataset type is not correct", dataset.getType(), addedDatasetInList.getType());
+            assertEquals("Added Dataset study is not correct", dataset.getStudy(), addedDatasetInList.getStudy());
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -93,7 +94,40 @@ public class FileBasedDatasetServicesTest {
     }
 
     @Test
-    public void testSimpleRestore() {
+    public void testRemoveDatasetNoData() {
+        try {
+            FileBasedDatasetServices fileBasedDatasetServices = new FileBasedDatasetServices(
+                    Files.createTempDirectory(null));
+
+            Dataset dataset = new DatasetPojo(DATA_UID, DATASET_NAME);
+
+            fileBasedDatasetServices.addDataset(dataset);
+
+            Dataset addedDataset = fileBasedDatasetServices.getDataset(dataset.getUniqueIdentifier());
+
+            assertNotNull("Added dataset found", addedDataset);
+
+            boolean removed = fileBasedDatasetServices.removeDataset(addedDataset.getUniqueIdentifier());
+
+            assertTrue("Dataset not removed", removed);
+
+            List<Dataset> datasets = fileBasedDatasetServices.getAllDatasets();
+
+            assertEquals("Number of dataset is not 0", 0, datasets.size());
+
+            Dataset dataset3 = fileBasedDatasetServices.getDataset(dataset.getUniqueIdentifier());
+
+            assertNull("Dataset is still found after removing!", dataset3);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+
+            fail(e.getMessage());
+        }
+    }
+
+    @Test
+    public void testSimpleRestoreNoData() {
         try {
             FileBasedDatasetServices fileBasedDatasetServices = new FileBasedDatasetServices(
                     Files.createTempDirectory(null));
@@ -106,27 +140,95 @@ public class FileBasedDatasetServicesTest {
 
             fileBasedDatasetServices = new FileBasedDatasetServices(path);
 
-            Dataset dataset1 = fileBasedDatasetServices.getDataset(dataset.getUniqueIdentifier());
+            Dataset addedDataset = fileBasedDatasetServices.getDataset(dataset.getUniqueIdentifier());
 
-            assertEquals("Dataset 1 name is not correct", dataset.getName(), dataset1.getName());
-            assertEquals("Dataset 1 unique identifier is not correct", dataset.getUniqueIdentifier(),
-                    dataset1.getUniqueIdentifier());
-            assertEquals("Dataset 1 abbreviation is not correct", dataset.getAbbreviation(),
-                    dataset1.getAbbreviation());
-            assertEquals("Dataset 1 description is not correct", dataset.getDescription(), dataset1.getDescription());
+            assertEquals("Restored Dataset name is not correct", dataset.getName(), addedDataset.getName());
+            assertEquals("Restored Dataset unique identifier is not correct", dataset.getUniqueIdentifier(),
+                    addedDataset.getUniqueIdentifier());
+            assertEquals("Restored Dataset abbreviation is not correct", dataset.getAbbreviation(),
+                    addedDataset.getAbbreviation());
+            assertEquals("Restored Dataset description is not correct", dataset.getDescription(),
+                    addedDataset.getDescription());
+            assertEquals("Restored Dataset type is not correct", dataset.getType(), addedDataset.getType());
+            assertEquals("Restored Dataset study is not correct", dataset.getStudy(), addedDataset.getStudy());
 
             List<Dataset> datasets = fileBasedDatasetServices.getAllDatasets();
 
-            assertEquals("Number of dataset id is not 1", 1, datasets.size());
+            assertEquals("Number of datasets is not 1", 1, datasets.size());
 
-            Dataset dataset2 = datasets.get(0);
+            Dataset addedDatasetInList = datasets.get(0);
 
-            assertEquals("Dataset 2 name is not correct", dataset.getName(), dataset2.getName());
-            assertEquals("Dataset 2 unique identifier is not correct", dataset.getUniqueIdentifier(),
-                    dataset2.getUniqueIdentifier());
-            assertEquals("Dataset 2 abbreviation is not correct", dataset.getAbbreviation(),
-                    dataset2.getAbbreviation());
-            assertEquals("Dataset 2 description is not correct", dataset.getDescription(), dataset2.getDescription());
+            assertEquals("Restored Dataset In List is not correct", dataset.getName(), addedDatasetInList.getName());
+            assertEquals("Restored Dataset In List  unique identifier is not correct", dataset.getUniqueIdentifier(),
+                    addedDatasetInList.getUniqueIdentifier());
+            assertEquals("Restored Dataset In List abbreviation is not correct", dataset.getAbbreviation(),
+                    addedDatasetInList.getAbbreviation());
+            assertEquals("Restored Dataset In List description is not correct", dataset.getDescription(),
+                    addedDatasetInList.getDescription());
+            assertEquals("Restored Dataset type is not correct", dataset.getType(), addedDatasetInList.getType());
+            assertEquals("Restored Dataset study is not correct", dataset.getStudy(), addedDatasetInList.getStudy());
+
+        } catch (Exception e) {
+            e.printStackTrace();
+
+            fail(e.getMessage());
+        }
+    }
+    
+    @Test
+    public void testAddDatasetWithPhenotypicData() {
+        try {
+            FileBasedDatasetServices fileBasedDatasetServices = new FileBasedDatasetServices(
+                    Files.createTempDirectory(null));
+
+            Dataset dataset = new DatasetPojo(DATA_UID, DATASET_NAME);
+
+            fileBasedDatasetServices.addDataset(dataset);
+
+            Dataset addedDataset = fileBasedDatasetServices.getDataset(dataset.getUniqueIdentifier());
+
+            Path phenotypicDataPath = Paths.get(ClassLoader.getSystemResource(PHENOTYPIC_FILE).toURI());
+
+            fileBasedDatasetServices.loadData(addedDataset, phenotypicDataPath, FileType.CSV, DataType.PHENOTYPIC);
+
+            CoreHunterData data = fileBasedDatasetServices.getData(dataset.getUniqueIdentifier());
+
+            assertNotNull("Data not found", data);
+
+            assertNotNull("Phenotypic Data not found", data.getPhenotypicData());
+
+        } catch (Exception e) {
+            e.printStackTrace();
+
+            fail(e.getMessage());
+        }
+    }
+    
+    @Test
+    public void testRestoreDatasetWithPhenotypicData() {
+        try {
+            FileBasedDatasetServices fileBasedDatasetServices = new FileBasedDatasetServices(
+                    Files.createTempDirectory(null));
+            
+            Path path = fileBasedDatasetServices.getPath();
+
+            Dataset dataset = new DatasetPojo(DATA_UID, DATASET_NAME);
+
+            fileBasedDatasetServices.addDataset(dataset);
+
+            Dataset addedDataset = fileBasedDatasetServices.getDataset(dataset.getUniqueIdentifier());
+
+            Path phenotypicDataPath = Paths.get(ClassLoader.getSystemResource(PHENOTYPIC_FILE).toURI());
+
+            fileBasedDatasetServices.loadData(addedDataset, phenotypicDataPath, FileType.CSV, DataType.PHENOTYPIC);
+            
+            fileBasedDatasetServices = new FileBasedDatasetServices(path);
+
+            CoreHunterData data = fileBasedDatasetServices.getData(dataset.getUniqueIdentifier());
+
+            assertNotNull("Restored data not found", data);
+
+            assertNotNull("Restored Phenotypic Data not found", data.getPhenotypicData());
 
         } catch (Exception e) {
             e.printStackTrace();

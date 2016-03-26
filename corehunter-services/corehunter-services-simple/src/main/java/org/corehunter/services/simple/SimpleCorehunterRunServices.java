@@ -34,8 +34,7 @@ import java.util.concurrent.Executors;
 import org.corehunter.Corehunter;
 import org.corehunter.CorehunterArguments;
 import org.corehunter.CorehunterObjective;
-import org.corehunter.data.PhenotypicTraitData;
-import org.corehunter.data.simple.CoreHunterData;
+import org.corehunter.data.CoreHunterData;
 import org.corehunter.listener.SimpleCorehunterListener;
 import org.corehunter.services.CorehunterRun;
 import org.corehunter.services.CorehunterRunArguments;
@@ -228,14 +227,12 @@ public class SimpleCorehunterRunServices implements CorehunterRunServices {
             try {
                 startDate = new DateTime();
 
-                CorehunterArguments arguments = new CorehunterArguments(corehunterRunArguments.getSubsetSize());
+                CorehunterArguments arguments = new CorehunterArguments(
+                        datasetServices.getData(corehunterRunArguments.getDatasetId()),
+                        corehunterRunArguments.getSubsetSize());
 
                 // TODO get from arugments
                 arguments.setObjective(CorehunterObjective.GD);
-
-                // needs to assess type of each dataset, group and merge datasets if needed
-                arguments.setData(new CoreHunterData((PhenotypicTraitData) datasetServices
-                        .getDataset(corehunterRunArguments.getDatasetIds().get(0))));
 
                 corehunter = new Corehunter(arguments);
 

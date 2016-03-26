@@ -32,7 +32,6 @@ import static org.corehunter.tests.TestData.ALLELE_FREQUENCIES_DIPLOID;
 import static org.corehunter.tests.TestData.ALLELE_FREQUENCIES;
 import static org.corehunter.tests.TestData.HEADERS_UNIQUE_NAMES;
 import static org.corehunter.tests.TestData.HEADERS_NON_UNIQUE_NAMES;
-import static org.corehunter.tests.TestData.BLANK_HEADERS;
 
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
@@ -161,19 +160,6 @@ public class SimpleGenotypeVariantDataTest {
     }
     
     @Test
-    public void fromCsvFileWithoutNames() throws IOException {
-        dataName = "no-names.csv";
-        expectedHeaders = BLANK_HEADERS;
-        expectedMarkerNames = MARKER_NAMES;
-        expectedAlleleNames = ALLELE_NAMES;
-        System.out.println(" |- File " + dataName);
-        testDataGeneral(SimpleGenotypeVariantData.readData(
-            Paths.get(SimpleGenotypeVariantDataTest.class.getResource(CSV_NO_NAMES).getPath()),
-            FileType.CSV
-        ));
-    }
-    
-    @Test
     public void fromCsvFileWithoutAlleleNames() throws IOException {
         dataName = "no-allele-names.csv";
         expectedHeaders = HEADERS_UNIQUE_NAMES;
@@ -182,19 +168,6 @@ public class SimpleGenotypeVariantDataTest {
         System.out.println(" |- File " + dataName);
         testDataGeneral(SimpleGenotypeVariantData.readData(
             Paths.get(SimpleGenotypeVariantDataTest.class.getResource(CSV_NO_ALLELE_NAMES).getPath()),
-            FileType.CSV
-        ));
-    }
-    
-    @Test
-    public void fromCsvFileWithoutNamesOrAlleleNames() throws IOException {
-        dataName = "no-names-no-allele-names.csv";
-        expectedHeaders = BLANK_HEADERS;
-        expectedMarkerNames = MARKER_NAMES;
-        expectedAlleleNames = UNDEFINED_ALLELE_NAMES;
-        System.out.println(" |- File " + dataName);
-        testDataGeneral(SimpleGenotypeVariantData.readData(
-            Paths.get(SimpleGenotypeVariantDataTest.class.getResource(CSV_NO_NAMES_NO_ALLELE_NAMES).getPath()),
             FileType.CSV
         ));
     }
@@ -276,19 +249,6 @@ public class SimpleGenotypeVariantDataTest {
     }
     
     @Test
-    public void diploidFromTxtFileWithoutNames() throws IOException {
-        dataName = "no-names.txt";
-        expectedHeaders = BLANK_HEADERS;
-        expectedMarkerNames = MARKER_NAMES_DIPLOID;
-        expectedAlleleNames = ALLELE_NAMES_DIPLOID;
-        System.out.println(" |- File diploid/" + dataName);
-        testDataDiploid(SimpleGenotypeVariantData.readDiploidData(
-            Paths.get(SimpleGenotypeVariantDataTest.class.getResource(DIPLOID_TXT_NO_NAMES).getPath()),
-            FileType.TXT
-        ));
-    }
-    
-    @Test
     public void diploidFromTxtFileWithoutMarkerNames() throws IOException {
         dataName = "no-marker-names.txt";
         expectedHeaders = HEADERS_UNIQUE_NAMES;
@@ -297,19 +257,6 @@ public class SimpleGenotypeVariantDataTest {
         System.out.println(" |- File diploid/" + dataName);
         testDataDiploid(SimpleGenotypeVariantData.readDiploidData(
             Paths.get(SimpleGenotypeVariantDataTest.class.getResource(DIPLOID_TXT_NO_MARKER_NAMES).getPath()),
-            FileType.TXT
-        ));
-    }
-    
-    @Test
-    public void diploidFromTxtFileWithoutNamesOrMarkerNames() throws IOException {
-        dataName = "no-names-no-marker-names.txt";
-        expectedHeaders = BLANK_HEADERS;
-        expectedMarkerNames = UNDEFINED_MARKER_NAMES_DIPLOID;
-        expectedAlleleNames = ALLELE_NAMES_DIPLOID;
-        System.out.println(" |- File diploid/" + dataName);
-        testDataDiploid(SimpleGenotypeVariantData.readDiploidData(
-            Paths.get(SimpleGenotypeVariantDataTest.class.getResource(DIPLOID_TXT_NO_NAMES_NO_MARKER_NAMES).getPath()),
             FileType.TXT
         ));
     }
@@ -373,7 +320,7 @@ public class SimpleGenotypeVariantDataTest {
         }
         
         // check individuals (headers and frequencies)
-        int size = data.getDatasetSize();
+        int size = data.getSize();
 
         for (int i = 0; i < size; i++) {
             

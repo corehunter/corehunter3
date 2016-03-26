@@ -19,57 +19,26 @@
 
 package org.corehunter.services.simple;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 import java.util.UUID;
 
+import org.corehunter.data.CoreHunterData;
 import org.corehunter.services.CorehunterRunArguments;
+import org.jamesframework.core.problems.objectives.Objective;
+import org.jamesframework.core.subset.SubsetSolution;
 
 import uno.informatics.data.pojo.SimpleEntityPojo;
 
 public class CorehunterRunArgumentsPojo extends SimpleEntityPojo implements CorehunterRunArguments {
     private int subsetSize;
-    private List<String> datasetIds;
+    private String datasetId;
+    private Objective<SubsetSolution, CoreHunterData> objective;
 
-    private CorehunterRunArgumentsPojo(String name, int subsetSize) {
+    public CorehunterRunArgumentsPojo(String name, int subsetSize, String datasetId,
+            Objective<SubsetSolution, CoreHunterData> objective) {
         super(UUID.randomUUID().toString(), name);
         this.subsetSize = subsetSize;
-        this.datasetIds = new ArrayList<String>();
-    }
-
-    public CorehunterRunArgumentsPojo(String name, int subsetSize, String... datasetId) {
-        this(name, subsetSize);
-
-        this.datasetIds = new ArrayList<String>();
-
-        for (int i = 0; i < datasetId.length; ++i) {
-            if (!this.datasetIds.contains(datasetId[i])) {
-                this.datasetIds.add(datasetId[i]);
-            } else {
-                throw new IllegalArgumentException("Dataset id already present in list of ids" + datasetId[i]);
-            }
-        }
-    }
-
-    public CorehunterRunArgumentsPojo(String name, int subsetSize, List<String> datasetIds) {
-        this(name, subsetSize);
-
-        this.datasetIds = new ArrayList<String>();
-
-        Iterator<String> iterator = datasetIds.iterator();
-
-        String datasetId;
-
-        while (iterator.hasNext()) {
-            datasetId = iterator.next();
-
-            if (!this.datasetIds.contains(datasetId)) {
-                this.datasetIds.add(datasetId);
-            } else {
-                throw new IllegalArgumentException("Dataset id already present in list of ids" + datasetId);
-            }
-        }
+        this.datasetId = datasetId;
+        this.objective = objective;
     }
 
     @Override
@@ -78,8 +47,13 @@ public class CorehunterRunArgumentsPojo extends SimpleEntityPojo implements Core
     }
 
     @Override
-    public List<String> getDatasetIds() {
-        return datasetIds;
+    public String getDatasetId() {
+        return datasetId;
+    }
+
+    @Override
+    public Objective<SubsetSolution, CoreHunterData> getObjective() {
+        return objective;
     }
 
 }

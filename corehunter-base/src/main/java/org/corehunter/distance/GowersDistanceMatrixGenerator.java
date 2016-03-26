@@ -20,6 +20,8 @@
 package org.corehunter.distance;
 
 
+import java.util.List;
+
 import org.apache.commons.lang3.ObjectUtils;
 import org.corehunter.data.DistanceMatrixData;
 import org.corehunter.data.simple.SimpleDistanceMatrixData;
@@ -36,23 +38,22 @@ public class GowersDistanceMatrixGenerator implements DistanceMatrixGenerator {
     private static final int BINARY_SCALE_TYPE = 0;
     private static final int DISCRETE_SCALE_TYPE = 1;
     private static final int RANGED_SCALE_TYPE = 2;
-
-    private Object[][] data;
-    private Feature[] features;
+    
+    FeatureData data ;
 
     private Scale[] scales;
     private int[] scaleTypes;
     private double[] ranges;
 
-    public GowersDistanceMatrixGenerator(FeatureData dataset) {
-        this(dataset.getValuesAsArray(), dataset.getFeaturesAsArray());
-    }
-
-    public GowersDistanceMatrixGenerator(Object[][] data, Feature[] features) {
-        if (data == null || features == null) {
-            throw new IllegalArgumentException("Features and data must be defined!");
+    public GowersDistanceMatrixGenerator(FeatureData data) {
+        if (data == null) {
+            throw new IllegalArgumentException("Data must be defined!");
         }
+        
+        this.data = data;
 
+        Feature[] features = data.getFeaturesAsArray();
+        
         scales = new Scale[features.length];
         scaleTypes = new int[features.length];
         ranges = new double[features.length];
@@ -104,29 +105,29 @@ public class GowersDistanceMatrixGenerator implements DistanceMatrixGenerator {
                     throw new IllegalArgumentException("Illegal scale type : " + scales[i].getScaleType());
             }
         }
-
-        this.data = data;
-        this.features = features;
     }
 
     @Override
     public DistanceMatrixData generateDistanceMatrix() {
-        int n = data.length;
+        int n = data.getRowCount();
         double[][] distances = new double[n][n];
         double[][] weights = new double[n][n];
-
+        
+        Object[][] values = data.getValuesAsArray() ;
+        Feature[] features = data.getFeaturesAsArray();
+        
         for (int i = 0; i < n; ++i) {
-            if (data[i].length != features.length) {
+            if (values[i].length != features.length) {
                 throw new IllegalArgumentException("Number of features must match number of elements in a row!");
             }
 
             double distance;
             double weight;
 
-            for (int j = i; j < data.length; ++j) {
+            for (int j = i; j < values.length; ++j) {
                 for (int k = 0; k < features.length; ++k) {
-                    distance = distance(scaleTypes[k], ranges[k], data[i][k], data[j][k]);
-                    weight = weight(scaleTypes[k], ranges[k], data[i][k], data[j][k]);
+                    distance = distance(scaleTypes[k], ranges[k], values[i][k], values[j][k]);
+                    weight = weight(scaleTypes[k], ranges[k], values[i][k], values[j][k]);
 
                     distances[i][j] = distances[i][j] + (distance * weight);
                     weights[i][j] = weights[i][j] + weight;
@@ -137,7 +138,7 @@ public class GowersDistanceMatrixGenerator implements DistanceMatrixGenerator {
             }
         }
 
-        return new SimpleDistanceMatrixData(distances);
+        return new SimpleDistanceMatrixData(data.getRowHeadersAsArray(), distances);
     }
 
     private double distance(int scaleType, double range, Object elementA, Object elementB) {

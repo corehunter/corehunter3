@@ -40,12 +40,13 @@ import uno.informatics.common.io.FileType;
 import static uno.informatics.common.Constants.UNKNOWN_COUNT;
 import uno.informatics.common.io.text.TextFileRowReader;
 import uno.informatics.data.SimpleEntity;
+import uno.informatics.data.pojo.DataPojo;
 import uno.informatics.data.pojo.SimpleEntityPojo;
 
 /**
  * @author Guy Davenport, Herman De Beukelaer
  */
-public class SimpleGenotypeVariantData extends SimpleNamedData implements GenotypeVariantData {
+public class SimpleGenotypeVariantData extends DataPojo implements GenotypeVariantData {
 
     private static final double SUM_TO_ONE_PRECISION = 0.01 + 1e-8;
     private static final int UNDEFINED_COLUMN = -1;
@@ -119,7 +120,7 @@ public class SimpleGenotypeVariantData extends SimpleNamedData implements Genoty
                                      String[][] alleleNames, Double[][][] alleleFrequencies) {
         
         // pass dataset name, size and item headers to parent
-        super(datasetName, alleleFrequencies.length, itemHeaders);
+        super(datasetName, updateOrCreateHeaders(itemHeaders, alleleFrequencies.length));
 
         // check allele frequencies and infer number of individuals, markers and alleles per marker
         int n = alleleFrequencies.length;
@@ -475,7 +476,7 @@ public class SimpleGenotypeVariantData extends SimpleNamedData implements Genoty
                 String identifier = withIds ? itemIdentifiers.get(i) : null;
                 if(name != null || identifier != null){
                     if(identifier == null){
-                        headers[i] = new SimpleEntityPojo(name);
+                        headers[i] = new SimpleEntityPojo(name, name);
                     } else {
                         headers[i] = new SimpleEntityPojo(identifier, name);
                     }
@@ -499,6 +500,11 @@ public class SimpleGenotypeVariantData extends SimpleNamedData implements Genoty
             }
             
         }
+        
+    }
+    
+    public static void writeData(Path newPath, SimpleGenotypeVariantData genotypeData, FileType fileType) {
+        // TODO Auto-generated method stub
         
     }
     
@@ -806,6 +812,5 @@ public class SimpleGenotypeVariantData extends SimpleNamedData implements Genoty
     
     private static void increaseFrequency(Double[] freqs, int a, double incr){
         freqs[a] = freqs[a] == null ? incr : freqs[a] + incr;
-    }
-    
+    }    
 }

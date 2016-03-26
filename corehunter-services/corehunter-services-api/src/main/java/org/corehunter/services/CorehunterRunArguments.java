@@ -19,13 +19,17 @@
 
 package org.corehunter.services;
 
-import java.util.List;
+import org.corehunter.data.CoreHunterData;
+import org.jamesframework.core.problems.objectives.Objective;
+import org.jamesframework.core.subset.SubsetSolution;
 
 import uno.informatics.data.SimpleEntity;
 
 public interface CorehunterRunArguments extends SimpleEntity {
-    
+   
     public int getSubsetSize() ;
 
-    public List<String> getDatasetIds();
+    public String getDatasetId();
+    
+    public Objective<SubsetSolution, CoreHunterData> getObjective() ;
 }

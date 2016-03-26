@@ -19,6 +19,7 @@
 
 package org.corehunter.tests.objectives.distance;
 
+import org.corehunter.data.CoreHunterData;
 import org.corehunter.objectives.distance.AverageDistanceObjective;
 import org.corehunter.tests.TestData;
 import org.jamesframework.core.subset.SubsetSolution;
@@ -35,7 +36,7 @@ public class AverageDistanceObjectiveTest extends TestData {
 
         SubsetSolution solution = new SubsetSolution(SET, SUBSET1);
 
-        objective.evaluate(solution, DATA);
+        objective.evaluate(solution, new CoreHunterData(DATA));
     }
 
 }

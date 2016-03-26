@@ -67,7 +67,7 @@ public abstract class AbstractGenotypeVariantDistanceMetric<GenotypeVariantDataT
     }
 
     @Override
-    public int getDatasetSize() {
+    public int getSize() {
         throw new UnsupportedOperationException("Not supported yet."); 
     }
     

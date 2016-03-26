@@ -23,7 +23,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 
-import org.corehunter.data.NamedData;
+import org.corehunter.data.CoreHunterData;
 
 import uno.informatics.common.io.FileType;
 import uno.informatics.data.Dataset;
@@ -64,8 +64,10 @@ public interface DatasetServices {
      *            the identifier of the dataset to be removed
      * @return <code>true</code> if the dataset was present and was removed,
      *         <code>false</code> otherwise
+     * @throws DatasetException
+     *             if the dataset does not exist
      */
-    public boolean removeDataset(String datasetId);
+    public boolean removeDataset(String datasetId) throws DatasetException;
 
     /**
      * Gets the data associated with a dataset by unique dataset identifier
@@ -74,14 +76,14 @@ public interface DatasetServices {
      *            the identifier of the dataset
      * @return the data associated with a dataset by unique dataset identifier
      * @throws DatasetException
-     *             if the data can not be accessed
+     *             if the data can not be accessed or the dataset does not exist
      */
-    public NamedData getData(String datasetId) throws DatasetException;
-
+    public CoreHunterData getData(String datasetId) throws DatasetException;
+    
     /**
      * Loads the data and associates it with a dataset. If the dataset already
      * has data associated with it, an attempt will be made to add to the
-     * dataset.
+     * dataset merging with existing data.
      * 
      * @param dataset
      *            the dataset to which the data will be associated
@@ -101,13 +103,13 @@ public interface DatasetServices {
             throws IOException, DatasetException;
     
     /**
-     * Removes the data associated with a dataset
+     * Removes the all the data associated with a dataset
      *      
-     * @param dataset the dataset to which the data belongs
-     * @param dataId
-     *            the identifier of the data to be removed
-     * @return <code>true</code> if the data was present and was removed, <code>false</code> otherwise
+     * @param datasetId
+     *            the identifier of the dataset for which all data will be removed
+     * @throws DatasetException
+     *             if the data can not be accessed or the dataset does not exist
      */
-    public boolean removeData(Dataset dataset, String dataId);
+    public void removeData(String datasetId) throws DatasetException;
 
 }

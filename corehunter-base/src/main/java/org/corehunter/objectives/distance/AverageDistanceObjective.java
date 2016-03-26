@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import org.corehunter.data.CoreHunterData;
 import org.corehunter.data.DistanceMatrixData;
 import org.jamesframework.core.exceptions.IncompatibleDeltaEvaluationException;
 import org.jamesframework.core.problems.objectives.Objective;
@@ -33,7 +34,7 @@ import org.jamesframework.core.subset.SubsetSolution;
 import org.jamesframework.core.subset.neigh.moves.SubsetMove;
 
 public class AverageDistanceObjective implements
-        Objective<SubsetSolution, DistanceMatrixData> {
+        Objective<SubsetSolution, CoreHunterData> {
 
     /**
      * Evaluates the given subset solution using the given data, by computing the average distance between all pairs of
@@ -43,8 +44,11 @@ public class AverageDistanceObjective implements
      * @param data the distance matrix
      */
     @Override
-    public Evaluation evaluate(SubsetSolution solution, DistanceMatrixData data) {
+    public Evaluation evaluate(SubsetSolution solution, CoreHunterData data) {
         double value = 0.0;
+        
+        DistanceMatrixData distanceData = data.getDistances() ;
+        
         if (solution.getNumSelectedIDs() >= 2) {
             // at least two items selected: compute average distance
             int numDist = 0;
@@ -53,7 +57,7 @@ public class AverageDistanceObjective implements
             solution.getSelectedIDs().toArray(selected);
             for (int i = 0; i < selected.length; i++) {
                 for (int j = i + 1; j < selected.length; j++) {
-                    sumDist += data.getDistance(selected[i], selected[j]);
+                    sumDist += distanceData.getDistance(selected[i], selected[j]);
                     numDist++;
                 }
             }
@@ -64,7 +68,9 @@ public class AverageDistanceObjective implements
 
     @Override
     public Evaluation evaluate(Move move, SubsetSolution curSolution,
-                               Evaluation curEvaluation, DistanceMatrixData data) {
+                               Evaluation curEvaluation, CoreHunterData data) {
+        
+        DistanceMatrixData distanceData = data.getDistances() ;
         // check move type
         if (!(move instanceof SubsetMove)) {
             throw new IncompatibleDeltaEvaluationException("Core subset objective should be used in combination "
@@ -90,7 +96,7 @@ public class AverageDistanceObjective implements
         // subtract distances from removed items to retained items
         for (int rem : removed) {
             for (int ret : retained) {
-                sumDist -= data.getDistance(rem, ret);
+                sumDist -= distanceData.getDistance(rem, ret);
                 numDistances--;
             }
         }
@@ -100,7 +106,7 @@ public class AverageDistanceObjective implements
             for (int rem2 : removed) {
                 // account for each distinct pair only once
                 if (rem1 < rem2) {
-                    sumDist -= data.getDistance(rem1, rem2);
+                    sumDist -= distanceData.getDistance(rem1, rem2);
                     numDistances--;
                 }
             }
@@ -109,7 +115,7 @@ public class AverageDistanceObjective implements
         // add distances from new items to retained items
         for (int add : added) {
             for (int ret : retained) {
-                sumDist += data.getDistance(add, ret);
+                sumDist += distanceData.getDistance(add, ret);
                 numDistances++;
             }
         }
@@ -119,7 +125,7 @@ public class AverageDistanceObjective implements
             for (int add2 : added) {
                 // account for each distinct pair only once
                 if (add1 < add2) {
-                    sumDist += data.getDistance(add1, add2);
+                    sumDist += distanceData.getDistance(add1, add2);
                     numDistances++;
                 }
             }

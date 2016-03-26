@@ -21,6 +21,8 @@ package org.corehunter.data;
 
 import java.util.Collection;
 
+import uno.informatics.data.Data;
+
 /**
  * Genotype variant data contains relative frequencies of markers that have two or more alleles.
  * If all the markers used in these data have two and only two alleles, such as SNP data, then it
@@ -28,7 +30,7 @@ import java.util.Collection;
  *
  * @author Guy Davenport, Herman De Beukelaer
  */
-public interface GenotypeVariantData extends NamedData {
+public interface GenotypeVariantData extends Data {
 
     /**
      * Get the total number of markers used in this dataset.

@@ -33,7 +33,7 @@ public class CavalliSforzaEdwardsDistanceBiAllelic extends DataPojo
         implements GenotypeVariantDistanceMetric<GenotypeVariantData> {
 
     public CavalliSforzaEdwardsDistanceBiAllelic(BiAllelicGenotypeVariantData dataset) {
-        super("Not implemented yet" , UUID.randomUUID().toString()) ;
+        super("Not implemented yet" , UUID.randomUUID().toString(), null) ;
     }
 
     @Override
@@ -43,25 +43,8 @@ public class CavalliSforzaEdwardsDistanceBiAllelic extends DataPojo
     }
 
     @Override
-    public Set<Integer> getIDs() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
     public GenotypeVariantData getData() {
         // TODO Auto-generated method stub
         return null;
     }
-
-    @Override
-    public SimpleEntity getHeader(int id) {
-        throw new UnsupportedOperationException("Not supported yet."); 
-    }
-
-    @Override
-    public int getDatasetSize() {
-        throw new UnsupportedOperationException("Not supported yet."); 
-    }
-
 }

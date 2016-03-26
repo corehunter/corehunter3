@@ -37,6 +37,7 @@ import uno.informatics.common.io.IOUtilities;
 import uno.informatics.common.io.RowReader;
 import uno.informatics.common.io.text.TextFileRowReader;
 import uno.informatics.data.SimpleEntity;
+import uno.informatics.data.pojo.DataPojo;
 import uno.informatics.data.pojo.SimpleEntityPojo;
 
 /**
@@ -45,7 +46,7 @@ import uno.informatics.data.pojo.SimpleEntityPojo;
  * 
  * @author Guy Davenport, Herman De Beukelaer
  */
-public class SimpleDistanceMatrixData extends SimpleNamedData implements DistanceMatrixData {
+public class SimpleDistanceMatrixData extends DataPojo implements DistanceMatrixData {
 
     private static final double DELTA = 1e-10;
     private static final String NAMES_HEADER = "NAME";
@@ -53,23 +54,6 @@ public class SimpleDistanceMatrixData extends SimpleNamedData implements Distanc
     
     // distance matrix
     private final double[][] distances;
-
-    /**
-     * Create distance matrix with given distances.
-     * Distances are copied to an internal data structure. The dataset name
-     * is set to "Precomputed distance matrix".
-     * <p>
-     * All values should be positive and the diagonal values equal to zero.
-     * The distance matrix should be symmetric with all rows of equal length.
-     * Violating any of these requirements will produce an exception.
-     * 
-     * @param distances pairwise distances
-     * @throws IllegalArgumentException if an illegal distance matrix is given
-     */
-    public SimpleDistanceMatrixData(double[][] distances) {
-        // name of each item is set to null
-        this(null, distances);
-    }
     
     /**
      * Create distance matrix data given the item headers and distances.
@@ -121,7 +105,7 @@ public class SimpleDistanceMatrixData extends SimpleNamedData implements Distanc
     public SimpleDistanceMatrixData(String name, SimpleEntity[] headers, double[][] distances) {
         
         // pass dataset name, size and item headers to parent
-        super(name, distances.length, headers);
+        super(name, headers);
         
         // validate distances and copy to internal array
         int n = distances.length;
@@ -346,7 +330,7 @@ public class SimpleDistanceMatrixData extends SimpleNamedData implements Distanc
                     String name = names != null ? names[i] : null;
                     String identifier = identifiers != null ? identifiers[i] : null;
                     if(identifier == null){
-                        headers[i] = new SimpleEntityPojo(name);
+                        headers[i] = new SimpleEntityPojo(name, name);
                     } else {
                         headers[i] = new SimpleEntityPojo(identifier, name);
                     }
@@ -375,15 +359,13 @@ public class SimpleDistanceMatrixData extends SimpleNamedData implements Distanc
                 }
             }
             
-            try{
-                // create data
-                return new SimpleDistanceMatrixData(filePath.getFileName().toString(), headers, dist);
-            } catch(IllegalArgumentException ex){
-                // convert to IO exception
-                throw new IOException(ex.getMessage());
-            }
-
+            return new SimpleDistanceMatrixData(filePath.getFileName().toString(), headers, dist);
         }
+    }
+    
+    public static void writeData(Path newPath, SimpleDistanceMatrixData distance, FileType fileType) {
+        // TODO Auto-generated method stub
+        
     }
     
     private static void checkNumValuesInRow(SymmetricMatrixFormat format, int row,
@@ -414,6 +396,11 @@ public class SimpleDistanceMatrixData extends SimpleNamedData implements Distanc
             ));
         }
         
+    }
+    
+    private static SimpleEntity[] checkHeader(SimpleEntity[] headers) {
+        // TODO Auto-generated method stub
+        return null;
     }
     
 }
