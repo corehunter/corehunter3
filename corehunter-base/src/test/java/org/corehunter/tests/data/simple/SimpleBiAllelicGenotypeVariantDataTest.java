@@ -20,34 +20,33 @@
 package org.corehunter.tests.data.simple;
 
 
+import static org.corehunter.tests.TestData.ALLELE_FREQUENCIES_BIALLELIC;
+import static org.corehunter.tests.TestData.ALLELE_SCORES_BIALLELIC;
+import static org.corehunter.tests.TestData.HEADERS_NON_UNIQUE_NAMES;
+import static org.corehunter.tests.TestData.HEADERS_UNIQUE_NAMES;
+import static org.corehunter.tests.TestData.MARKER_NAMES;
+import static org.corehunter.tests.TestData.NAME;
+import static org.corehunter.tests.TestData.PRECISION;
+import static org.corehunter.tests.TestData.SET;
+import static org.corehunter.tests.TestData.UNDEFINED_MARKER_NAMES;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+
 import org.corehunter.data.simple.SimpleBiAllelicGenotypeVariantData;
-
-import static org.corehunter.tests.TestData.ALLELE_FREQUENCIES_BIALLELIC;
-import static org.corehunter.tests.TestData.ALLELE_SCORES_BIALLELIC;
-import static org.corehunter.tests.TestData.HEADERS_UNIQUE_NAMES;
-import static org.corehunter.tests.TestData.HEADERS_NON_UNIQUE_NAMES;
-import static org.corehunter.tests.TestData.MARKER_NAMES;
-import static org.corehunter.tests.TestData.UNDEFINED_MARKER_NAMES;
-import static org.corehunter.tests.TestData.NAME;
-import static org.corehunter.tests.TestData.PRECISION;
-import static org.corehunter.tests.TestData.SET;
-
-import uno.informatics.common.io.FileType;
-import uno.informatics.data.SimpleEntity;
-
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import uno.informatics.common.io.FileType;
+import uno.informatics.data.SimpleEntity;
 
 /**
  * @author Guy Davenport, Herman De Beukelaer
@@ -55,11 +54,9 @@ import static org.junit.Assert.assertTrue;
 public class SimpleBiAllelicGenotypeVariantDataTest {
 
     private static final String TXT_NAMES = "/biallelic/names.txt";
-    private static final String TXT_NO_NAMES = "/biallelic/no-names.txt";
     private static final String CSV_NAMES = "/biallelic/names.csv";
     private static final String CSV_NAMES_IDS = "/biallelic/names-and-ids.csv";
     private static final String CSV_NO_MARKER_NAMES = "/biallelic/no-marker-names.csv";
-    private static final String CSV_NO_NAMES_NO_MARKER_NAMES = "/biallelic/no-names-no-marker-names.csv";
 
     private static final String ERRONEOUS_FILES_DIR = "/biallelic/err/";
     

@@ -19,7 +19,9 @@
 
 package org.corehunter.tests.objectives.multiallelic;
 
+import static org.corehunter.tests.TestData.ALLELE_FREQUENCIES;
 import static org.corehunter.tests.TestData.ALLELE_NAMES;
+import static org.corehunter.tests.TestData.HEADERS_NON_UNIQUE_NAMES;
 import static org.corehunter.tests.TestData.MARKER_NAMES;
 import static org.corehunter.tests.TestData.NAME;
 import static org.corehunter.tests.TestData.NUMBER_EFFECTIVE_ALLELES_SUBSET1;
@@ -27,15 +29,12 @@ import static org.corehunter.tests.TestData.NUMBER_EFFECTIVE_ALLELES_SUBSET2;
 import static org.corehunter.tests.TestData.PRECISION;
 import static org.corehunter.tests.TestData.SUBSET1;
 import static org.corehunter.tests.TestData.SUBSET2;
-import static org.corehunter.tests.TestData.ALLELE_FREQUENCIES;
-import static org.corehunter.tests.TestData.HEADERS_NON_UNIQUE_NAMES;
+import static org.junit.Assert.assertFalse;
 
 import org.corehunter.data.simple.SimpleGenotypeVariantData;
 import org.corehunter.objectives.multiallelic.NumberEffectiveAllelesMultiAllelic;
 import org.jamesframework.core.subset.SubsetSolution;
 import org.junit.Test;
-
-import static org.junit.Assert.assertFalse;
 
 /**
  * @author Guy Davenport, Herman De Beukelaer

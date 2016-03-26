@@ -19,8 +19,6 @@
 
 package org.corehunter.data.simple;
 
-import uno.informatics.common.Constants;
-
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -32,6 +30,7 @@ import org.corehunter.data.DistanceMatrixData;
 import org.corehunter.data.matrix.SymmetricMatrixFormat;
 import org.corehunter.util.StringUtils;
 
+import uno.informatics.common.Constants;
 import uno.informatics.common.io.FileType;
 import uno.informatics.common.io.IOUtilities;
 import uno.informatics.common.io.RowReader;
@@ -397,10 +396,4 @@ public class SimpleDistanceMatrixData extends DataPojo implements DistanceMatrix
         }
         
     }
-    
-    private static SimpleEntity[] checkHeader(SimpleEntity[] headers) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-    
 }

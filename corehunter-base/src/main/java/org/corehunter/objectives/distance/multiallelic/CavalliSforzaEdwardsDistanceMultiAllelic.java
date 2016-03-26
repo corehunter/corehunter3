@@ -19,8 +19,8 @@
 
 package org.corehunter.objectives.distance.multiallelic;
 
-import org.corehunter.objectives.distance.AbstractGenotypeVariantDistanceMetric;
 import org.corehunter.data.GenotypeVariantData;
+import org.corehunter.objectives.distance.AbstractGenotypeVariantDistanceMetric;
 
 /**
  * @author Guy Davenport, Herman De Beukelaer

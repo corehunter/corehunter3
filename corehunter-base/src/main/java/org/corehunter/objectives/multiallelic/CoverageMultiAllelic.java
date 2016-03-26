@@ -19,11 +19,11 @@
 
 package org.corehunter.objectives.multiallelic;
 
+import org.corehunter.data.GenotypeVariantData;
 import org.jamesframework.core.problems.objectives.Objective;
 import org.jamesframework.core.problems.objectives.evaluations.Evaluation;
 import org.jamesframework.core.problems.objectives.evaluations.SimpleEvaluation;
 import org.jamesframework.core.subset.SubsetSolution;
-import org.corehunter.data.GenotypeVariantData;
 
 /**
  * @author Guy Davenport

@@ -19,13 +19,12 @@
 
 package org.corehunter.objectives.distance.biallelic;
 
-import java.util.Set;
 import java.util.UUID;
 
 import org.corehunter.data.BiAllelicGenotypeVariantData;
-import org.corehunter.objectives.distance.GenotypeVariantDistanceMetric;
 import org.corehunter.data.GenotypeVariantData;
-import uno.informatics.data.SimpleEntity;
+import org.corehunter.objectives.distance.GenotypeVariantDistanceMetric;
+
 import uno.informatics.data.pojo.DataPojo;
 
 //TODO needs to be implemented or deleted

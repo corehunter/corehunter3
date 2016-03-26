@@ -19,19 +19,23 @@
 
 package org.corehunter.tests.data.simple;
 
+import static org.corehunter.tests.TestData.ALLELE_FREQUENCIES;
+import static org.corehunter.tests.TestData.ALLELE_FREQUENCIES_DIPLOID;
 import static org.corehunter.tests.TestData.ALLELE_NAMES;
-import static org.corehunter.tests.TestData.UNDEFINED_ALLELE_NAMES;
-import static org.corehunter.tests.TestData.MARKER_NAMES;
 import static org.corehunter.tests.TestData.ALLELE_NAMES_DIPLOID;
+import static org.corehunter.tests.TestData.HEADERS_NON_UNIQUE_NAMES;
+import static org.corehunter.tests.TestData.HEADERS_UNIQUE_NAMES;
+import static org.corehunter.tests.TestData.MARKER_NAMES;
 import static org.corehunter.tests.TestData.MARKER_NAMES_DIPLOID;
-import static org.corehunter.tests.TestData.UNDEFINED_MARKER_NAMES_DIPLOID;
 import static org.corehunter.tests.TestData.NAME;
 import static org.corehunter.tests.TestData.PRECISION;
 import static org.corehunter.tests.TestData.SET;
-import static org.corehunter.tests.TestData.ALLELE_FREQUENCIES_DIPLOID;
-import static org.corehunter.tests.TestData.ALLELE_FREQUENCIES;
-import static org.corehunter.tests.TestData.HEADERS_UNIQUE_NAMES;
-import static org.corehunter.tests.TestData.HEADERS_NON_UNIQUE_NAMES;
+import static org.corehunter.tests.TestData.UNDEFINED_ALLELE_NAMES;
+import static org.corehunter.tests.TestData.UNDEFINED_MARKER_NAMES_DIPLOID;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
@@ -41,15 +45,9 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 
 import org.corehunter.data.simple.SimpleGenotypeVariantData;
-
-import org.junit.BeforeClass;
 import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 
 import uno.informatics.common.io.FileType;
 import uno.informatics.data.SimpleEntity;
@@ -62,17 +60,12 @@ public class SimpleGenotypeVariantDataTest {
     private static final String TXT_NAMES = "/multiallelic/names.txt";
     private static final String CSV_NAMES = "/multiallelic/names.csv";
     private static final String CSV_NAMES_IDS = "/multiallelic/names-and-ids.csv";
-    private static final String CSV_NO_NAMES = "/multiallelic/no-names.csv";
     private static final String CSV_NO_ALLELE_NAMES = "/multiallelic/no-allele-names.csv";
-    private static final String CSV_NO_NAMES_NO_ALLELE_NAMES = "/multiallelic/no-names-no-allele-names.csv";
     
     private static final String DIPLOID_TXT_NAMES = "/multiallelic/diploid/names.txt";
     private static final String DIPLOID_CSV_NAMES = "/multiallelic/diploid/names.csv";
     private static final String DIPLOID_CSV_NAMES_IDS = "/multiallelic/diploid/names-and-ids.csv";
-    private static final String DIPLOID_TXT_NO_NAMES = "/multiallelic/diploid/no-names.txt";
     private static final String DIPLOID_TXT_NO_MARKER_NAMES = "/multiallelic/diploid/no-marker-names.txt";
-    private static final String DIPLOID_TXT_NO_NAMES_NO_MARKER_NAMES
-                                                            = "/multiallelic/diploid/no-names-no-marker-names.txt";
 
     private static final String ERRONEOUS_FILES_DIR = "/multiallelic/err/";
     private static final String DIPLOID_ERRONEOUS_FILES_DIR = "/multiallelic/diploid/err/";

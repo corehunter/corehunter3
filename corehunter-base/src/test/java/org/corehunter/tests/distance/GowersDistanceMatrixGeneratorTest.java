@@ -19,13 +19,12 @@
 
 package org.corehunter.tests.distance;
 
-import java.io.File;
+import static org.junit.Assert.assertEquals;
+
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Iterator;
-import java.util.List;
 
 import org.corehunter.data.DistanceMatrixData;
 import org.corehunter.data.matrix.SymmetricMatrixFormat;
@@ -41,8 +40,6 @@ import uno.informatics.data.dataset.DatasetException;
 import uno.informatics.data.dataset.FeatureData;
 import uno.informatics.data.feature.array.ArrayFeatureData;
 import uno.informatics.data.pojo.SimpleFeaturePojo;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * @author Guy Davenport

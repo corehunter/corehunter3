@@ -20,32 +20,32 @@
 package org.corehunter.tests.data.simple;
 
 
+import static org.corehunter.tests.TestData.HEADERS_NON_UNIQUE_NAMES;
+import static org.corehunter.tests.TestData.HEADERS_UNIQUE_NAMES;
+import static org.corehunter.tests.TestData.PHENOTYPIC_TRAIT_EXPLICIT_BOUNDS;
+import static org.corehunter.tests.TestData.PHENOTYPIC_TRAIT_INFERRED_BOUNDS;
+import static org.corehunter.tests.TestData.PHENOTYPIC_TRAIT_NAMES;
+import static org.corehunter.tests.TestData.PHENOTYPIC_TRAIT_VALUES;
+import static org.corehunter.tests.TestData.SET;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import static org.corehunter.tests.TestData.HEADERS_UNIQUE_NAMES;
-import static org.corehunter.tests.TestData.PHENOTYPIC_TRAIT_INFERRED_BOUNDS;
-import static org.corehunter.tests.TestData.PHENOTYPIC_TRAIT_EXPLICIT_BOUNDS;
-import static org.corehunter.tests.TestData.PHENOTYPIC_TRAIT_NAMES;
-import static org.corehunter.tests.TestData.PHENOTYPIC_TRAIT_VALUES;
-import static org.corehunter.tests.TestData.HEADERS_NON_UNIQUE_NAMES;
-import static org.corehunter.tests.TestData.SET;
+
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 import uno.informatics.common.io.FileType;
 import uno.informatics.data.SimpleEntity;
 import uno.informatics.data.dataset.FeatureData;
 import uno.informatics.data.dataset.FeatureDataRow;
 import uno.informatics.data.feature.array.ArrayFeatureData;
-
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
 
 /**
@@ -56,7 +56,6 @@ public class SimplePhenotypicTraitDataTest {
     private static final String CSV_NAMES = "/phenotypes/names.csv";
     private static final String CSV_NAMES_IDS = "/phenotypes/names-and-ids.csv";
     private static final String CSV_NAMES_MIN_MAX = "/phenotypes/names-min-max.csv";
-    private static final String TXT_NO_NAMES = "/phenotypes/no-names.txt";
 
     private static final String ERRONEOUS_FILES_DIR = "/phenotypes/err/";
     
@@ -121,7 +120,7 @@ public class SimplePhenotypicTraitDataTest {
                 boolean thrown = false;
                 try {
                     ArrayFeatureData.readData(file, type);
-                } catch (IOException ex){
+                } catch (IOException | IllegalArgumentException ex){
                     thrown = true;
                     System.out.print(ex.getMessage());
                 } finally {

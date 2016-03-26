@@ -20,6 +20,8 @@
 package org.corehunter.data.simple;
 
 
+import static uno.informatics.common.Constants.UNKNOWN_COUNT;
+
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -31,13 +33,12 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
 
-import uno.informatics.common.io.IOUtilities;
-import uno.informatics.common.io.RowReader;
 import org.corehunter.data.GenotypeVariantData;
 import org.corehunter.util.StringUtils;
-import uno.informatics.common.io.FileType;
 
-import static uno.informatics.common.Constants.UNKNOWN_COUNT;
+import uno.informatics.common.io.FileType;
+import uno.informatics.common.io.IOUtilities;
+import uno.informatics.common.io.RowReader;
 import uno.informatics.common.io.text.TextFileRowReader;
 import uno.informatics.data.SimpleEntity;
 import uno.informatics.data.pojo.DataPojo;
@@ -120,7 +121,7 @@ public class SimpleGenotypeVariantData extends DataPojo implements GenotypeVaria
                                      String[][] alleleNames, Double[][][] alleleFrequencies) {
         
         // pass dataset name, size and item headers to parent
-        super(datasetName, updateOrCreateHeaders(itemHeaders, alleleFrequencies.length));
+        super(datasetName, itemHeaders);
 
         // check allele frequencies and infer number of individuals, markers and alleles per marker
         int n = alleleFrequencies.length;

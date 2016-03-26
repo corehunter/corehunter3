@@ -19,39 +19,10 @@
 
 package org.corehunter;
 
-import java.util.concurrent.TimeUnit;
-
-import org.corehunter.data.BiAllelicGenotypeVariantData;
-import org.corehunter.data.DistanceMatrixData;
-import org.corehunter.distance.GowersDistanceMatrixGenerator;
-import org.corehunter.objectives.biallelic.CoverageBiAllelic;
-import org.corehunter.objectives.biallelic.HetrozygousLociDiversityBiAllelic;
-import org.corehunter.objectives.biallelic.NumberEffectiveAllelesBiAllelic;
-import org.corehunter.objectives.biallelic.ProportionNonInformativeAllelesBiAllelic;
-import org.corehunter.objectives.biallelic.ShannonsDiversityBiAllelic;
-import org.corehunter.objectives.distance.AverageDistanceObjective;
-import org.corehunter.objectives.distance.GenotypeVariantDistanceMetric;
-import org.corehunter.objectives.distance.biallelic.CavalliSforzaEdwardsDistanceBiAllelic;
-import org.corehunter.objectives.distance.biallelic.ModifiedRogersDistanceBiAllelic;
-import org.corehunter.objectives.distance.multiallelic.CavalliSforzaEdwardsDistanceMultiAllelic;
-import org.corehunter.objectives.distance.multiallelic.ModifiedRogersDistanceMultiAllelic;
-import org.corehunter.objectives.multiallelic.CoverageMultiAllelic;
-import org.corehunter.objectives.multiallelic.HetrozygousLociDiversityMultiAllelic;
-import org.corehunter.objectives.multiallelic.NumberEffectiveAllelesMultiAllelic;
-import org.corehunter.objectives.multiallelic.ProportionNonInformativeAllelesMultiAllelic;
-import org.corehunter.objectives.multiallelic.ShannonsDiversityMultiAllelic;
-
-import org.jamesframework.core.problems.objectives.Objective;
-import org.jamesframework.core.subset.SubsetProblem;
-import org.jamesframework.core.subset.SubsetSolution;
 import org.jamesframework.core.search.Search;
-import org.jamesframework.core.search.algo.RandomDescent;
-import org.jamesframework.core.search.stopcriteria.MaxRuntime;
-import org.jamesframework.core.subset.neigh.SinglePerturbationNeighbourhood;
+import org.jamesframework.core.subset.SubsetSolution;
 
 import uno.informatics.data.dataset.FeatureData;
-
-import org.corehunter.data.GenotypeVariantData;
 
 /**
  * Provides support for executing pre-defined core subset searches. Can be re-used.

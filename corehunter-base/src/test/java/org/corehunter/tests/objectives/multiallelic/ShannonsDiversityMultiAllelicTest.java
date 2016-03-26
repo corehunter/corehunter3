@@ -19,7 +19,9 @@
 
 package org.corehunter.tests.objectives.multiallelic;
 
+import static org.corehunter.tests.TestData.ALLELE_FREQUENCIES;
 import static org.corehunter.tests.TestData.ALLELE_NAMES;
+import static org.corehunter.tests.TestData.HEADERS_NON_UNIQUE_NAMES;
 import static org.corehunter.tests.TestData.MARKER_NAMES;
 import static org.corehunter.tests.TestData.NAME;
 import static org.corehunter.tests.TestData.PRECISION;
@@ -27,8 +29,6 @@ import static org.corehunter.tests.TestData.SHANNONS_DIVERSITY_SUBSET1;
 import static org.corehunter.tests.TestData.SHANNONS_DIVERSITY_SUBSET2;
 import static org.corehunter.tests.TestData.SUBSET1;
 import static org.corehunter.tests.TestData.SUBSET2;
-import static org.corehunter.tests.TestData.ALLELE_FREQUENCIES;
-import static org.corehunter.tests.TestData.HEADERS_NON_UNIQUE_NAMES;
 
 import org.corehunter.data.simple.SimpleGenotypeVariantData;
 import org.corehunter.objectives.multiallelic.ShannonsDiversityMultiAllelic;

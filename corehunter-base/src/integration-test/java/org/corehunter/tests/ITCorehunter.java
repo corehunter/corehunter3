@@ -21,6 +21,7 @@ package org.corehunter.tests;
 
 
 import java.util.Set;
+
 import org.corehunter.Corehunter;
 import org.corehunter.CorehunterArguments;
 import org.corehunter.data.CoreHunterData;
@@ -31,8 +32,6 @@ import org.jamesframework.core.subset.SubsetProblem;
 import org.jamesframework.core.subset.SubsetSolution;
 import org.jamesframework.core.subset.algo.exh.SubsetSolutionIterator;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * @author Guy Davenport, Herman De Beukelaer

@@ -19,41 +19,36 @@
 
 package org.corehunter.tests.data.simple;
 
-import org.corehunter.data.matrix.SymmetricMatrixFormat;
-import org.corehunter.data.simple.SimpleDistanceMatrixData;
+import static org.corehunter.tests.TestData.DISTANCES;
+import static org.corehunter.tests.TestData.HEADERS_NON_UNIQUE_NAMES;
+import static org.corehunter.tests.TestData.HEADERS_UNIQUE_NAMES;
+import static org.corehunter.tests.TestData.NAME;
+import static org.corehunter.tests.TestData.PRECISION;
+import static org.corehunter.tests.TestData.SET;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import org.corehunter.data.matrix.SymmetricMatrixFormat;
+import org.corehunter.data.simple.SimpleDistanceMatrixData;
 import org.junit.AfterClass;
-import org.junit.Test;
 import org.junit.BeforeClass;
-
+import org.junit.Test;
 
 import uno.informatics.common.io.FileType;
 import uno.informatics.data.SimpleEntity;
-
-import static org.corehunter.tests.TestData.DISTANCES;
-import static org.corehunter.tests.TestData.NAME;
-import static org.corehunter.tests.TestData.PRECISION;
-import static org.corehunter.tests.TestData.SET;
-import static org.corehunter.tests.TestData.HEADERS_UNIQUE_NAMES;
-
-import static org.corehunter.tests.TestData.HEADERS_NON_UNIQUE_NAMES;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 /**
  * @author Guy Davenport, Herman De Beukelaer
  */
 public class SimpleDistanceMatrixDataTest {
 
-    private static final String TXT_FULL = "/distances/full.txt";
     private static final String TXT_FULL_NAMES = "/distances/full-names.txt";
     private static final String TXT_FULL_NAMES_IDS = "/distances/full-names-ids.txt";
-    private static final String CSV_LOWER = "/distances/lower.csv";
     private static final String CSV_LOWER_DIAG_NAMES = "/distances/lower-diag-names.csv";
     
     private static final String[] ERRONEOUS_FILES = {

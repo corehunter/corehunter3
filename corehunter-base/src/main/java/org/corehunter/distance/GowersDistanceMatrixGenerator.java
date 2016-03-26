@@ -20,8 +20,6 @@
 package org.corehunter.distance;
 
 
-import java.util.List;
-
 import org.apache.commons.lang3.ObjectUtils;
 import org.corehunter.data.DistanceMatrixData;
 import org.corehunter.data.simple.SimpleDistanceMatrixData;

@@ -22,6 +22,7 @@ package org.corehunter.objectives.distance;
 import java.util.Set;
 
 import org.corehunter.data.GenotypeVariantData;
+
 import uno.informatics.data.SimpleEntity;
 import uno.informatics.data.pojo.DataPojo;
 
