@@ -346,9 +346,6 @@ public class TestData {
     }
     
     public static final Evaluation COVERAGE_SUBSET1 = SimpleEvaluation.WITH_VALUE(0.7894736842105263);
-    public static final Evaluation PROPORTION_NON_INFORMATIVE_ALLELES_SUBSET1 = SimpleEvaluation.WITH_VALUE(
-            1.0 - COVERAGE_SUBSET1.getValue()
-    );
 
     // TODO: determine value for subset 1 (with missing data)
     public static final Evaluation SHANNONS_DIVERSITY_SUBSET1 = SimpleEvaluation.WITH_VALUE(-1.0);
