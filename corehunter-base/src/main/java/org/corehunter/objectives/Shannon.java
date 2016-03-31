@@ -17,50 +17,53 @@
 /* under the License.                                           */
 /*--------------------------------------------------------------*/
 
-package org.corehunter.objectives.multiallelic;
+package org.corehunter.objectives;
 
-import java.util.Iterator;
+import org.corehunter.data.GenotypeVariantData;
 import org.jamesframework.core.problems.objectives.Objective;
 import org.jamesframework.core.problems.objectives.evaluations.Evaluation;
 import org.jamesframework.core.problems.objectives.evaluations.SimpleEvaluation;
 import org.jamesframework.core.subset.SubsetSolution;
-import org.corehunter.data.GenotypeVariantData;
+import org.corehunter.data.simple.CoreHunterData;
+import org.corehunter.exceptions.CoreHunterException;
 
 /**
  * @author Guy Davenport, Herman De Beukelaer
  */
-public class CoverageMultiAllelic implements Objective<SubsetSolution, GenotypeVariantData> {
+public class Shannon implements Objective<SubsetSolution, CoreHunterData> {
 
+    //TODO: handle missing data
     @Override
-    public Evaluation evaluate(SubsetSolution solution, GenotypeVariantData data) {
+    public Evaluation evaluate(SubsetSolution solution, CoreHunterData data) {
         
-        int numberOfMarkers = data.getNumberOfMarkers();
+        GenotypeVariantData genotypes = data.getMarkers();
+        
+        if(genotypes == null){
+            throw new CoreHunterException("Genotypes are required for Shannon's index.");
+        }
+        
+        int numberOfMarkers = genotypes.getNumberOfMarkers();
+        int numberOfAlleles;
 
-        double alleleCount = 0;
+        double summedDiversity = 0;
+        double alleleFrequency;
 
-        for (int m = 0; m < numberOfMarkers; m++) {
-            int numberOfAlleles = data.getNumberOfAlleles(m);
-            for (int a = 0; a < numberOfAlleles; a++) {
-                
-                Iterator<Integer> iterator = solution.getSelectedIDs().iterator();
-                int scanned = 0;
-                while (iterator.hasNext() && !observed(data.getAlleleFrequency(iterator.next(), m, a))){
-                    scanned++;
+        for (int markerIndex = 0; markerIndex < numberOfMarkers; ++markerIndex) {
+            
+            numberOfAlleles = genotypes.getNumberOfAlleles(markerIndex);
+            for (int alleleIndex = 0; alleleIndex < numberOfAlleles; ++alleleIndex) {
+                alleleFrequency = genotypes.getAverageAlelleFrequency(solution.getSelectedIDs(), markerIndex,
+                        alleleIndex) / numberOfMarkers;
+
+                if (alleleFrequency > 0) {
+                    summedDiversity = summedDiversity + (alleleFrequency * Math.log(alleleFrequency));
                 }
-                
-                if (scanned < solution.getNumSelectedIDs()) {
-                    alleleCount++;
-                }
-                
             }
+            
         }
 
-        return SimpleEvaluation.WITH_VALUE(alleleCount/data.getTotalNumberOfAlleles());
+        return SimpleEvaluation.WITH_VALUE(-summedDiversity);
         
-    }
-    
-    private boolean observed(Double freq){
-        return freq != null && freq > 0.0;
     }
 
     @Override

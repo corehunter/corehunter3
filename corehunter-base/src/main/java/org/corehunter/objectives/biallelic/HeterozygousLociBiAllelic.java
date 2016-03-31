@@ -17,15 +17,25 @@
 /* under the License.                                           */
 /*--------------------------------------------------------------*/
 
-package org.corehunter.distance;
+package org.corehunter.objectives.biallelic;
 
-import org.corehunter.data.DistanceMatrixData;
+import org.corehunter.data.simple.CoreHunterData;
+import org.jamesframework.core.problems.objectives.Objective;
+import org.jamesframework.core.problems.objectives.evaluations.Evaluation;
+import org.jamesframework.core.subset.SubsetSolution;
 
-/**
- * @author Guy Davenport
- */
-public interface DistanceMatrixGenerator {
+public class HeterozygousLociBiAllelic implements Objective<SubsetSolution, CoreHunterData> {
 
-    public DistanceMatrixData generateDistanceMatrix();
-    
+    @Override
+    public Evaluation evaluate(SubsetSolution solution, CoreHunterData data) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public boolean isMinimizing() {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
 }

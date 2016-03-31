@@ -17,47 +17,65 @@
 /* under the License.                                           */
 /*--------------------------------------------------------------*/
 
-package org.corehunter.objectives.multiallelic;
+package org.corehunter.objectives;
 
+import org.corehunter.data.GenotypeVariantData;
 import org.jamesframework.core.problems.objectives.Objective;
 import org.jamesframework.core.problems.objectives.evaluations.Evaluation;
 import org.jamesframework.core.problems.objectives.evaluations.SimpleEvaluation;
 import org.jamesframework.core.subset.SubsetSolution;
-import org.corehunter.data.GenotypeVariantData;
+import org.corehunter.data.simple.CoreHunterData;
+import org.corehunter.exceptions.CoreHunterException;
 
 /**
+ * Expected proportion of heterozygous loci in offspring.
+ * 
  * @author Guy Davenport, Herman De Beukelaer
  */
-public class ShannonsDiversityMultiAllelic implements Objective<SubsetSolution, GenotypeVariantData> {
+public class HeterozygousLoci implements Objective<SubsetSolution, CoreHunterData> {
 
-    //TODO: handle missing data
+    // TODO: handle missing data
     @Override
-    public Evaluation evaluate(SubsetSolution solution, GenotypeVariantData data) {
+    public Evaluation evaluate(SubsetSolution solution, CoreHunterData data) {
         
-        int numberOfMarkers = data.getNumberOfMarkers();
+        GenotypeVariantData genotypes = data.getMarkers();
+        
+        if(genotypes == null){
+            throw new CoreHunterException(
+                    "Genotypes are required for expected proportion of heterozygous loci objective."
+            );
+        }
+        
+        double summedAverageAlleleFrequencySquared;
+        double total = 0.0;
+
+        double averageAlleleFrequency, squared;
+
+        int numberOfMarkers = genotypes.getNumberOfMarkers();
         int numberOfAlleles;
 
-        double summedDiversity = 0;
-        double alleleFrequency;
-
         for (int markerIndex = 0; markerIndex < numberOfMarkers; ++markerIndex) {
-            
-            numberOfAlleles = data.getNumberOfAlleles(markerIndex);
-            for (int alleleIndex = 0; alleleIndex < numberOfAlleles; ++alleleIndex) {
-                alleleFrequency = data.getAverageAlelleFrequency(solution.getSelectedIDs(), markerIndex,
-                        alleleIndex) / numberOfMarkers;
+            numberOfAlleles = genotypes.getNumberOfAlleles(markerIndex);
 
-                if (alleleFrequency > 0) {
-                    summedDiversity = summedDiversity + (alleleFrequency * Math.log(alleleFrequency));
-                }
+            summedAverageAlleleFrequencySquared = 0.0;
+
+            for (int alleleIndex = 0; alleleIndex < numberOfAlleles; ++alleleIndex) {
+                
+                averageAlleleFrequency = genotypes.getAverageAlelleFrequency(
+                                                solution.getSelectedIDs(),
+                                                markerIndex,
+                                                alleleIndex);
+                squared = averageAlleleFrequency * averageAlleleFrequency;
+                summedAverageAlleleFrequencySquared = summedAverageAlleleFrequencySquared + squared;
+                
             }
-            
+
+            total = total + (1.0 - summedAverageAlleleFrequencySquared);
         }
 
-        return SimpleEvaluation.WITH_VALUE(-summedDiversity);
-        
+        return SimpleEvaluation.WITH_VALUE(total / (double) numberOfMarkers);
     }
-
+    
     @Override
     public boolean isMinimizing() {
         return false;

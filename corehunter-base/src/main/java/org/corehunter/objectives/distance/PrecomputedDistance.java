@@ -17,25 +17,28 @@
 /* under the License.                                           */
 /*--------------------------------------------------------------*/
 
-package org.corehunter.objectives.biallelic;
+package org.corehunter.objectives.distance;
 
-import org.corehunter.data.BiAllelicGenotypeVariantData;
-import org.jamesframework.core.problems.objectives.Objective;
-import org.jamesframework.core.problems.objectives.evaluations.Evaluation;
-import org.jamesframework.core.subset.SubsetSolution;
+import org.corehunter.data.DistanceMatrixData;
+import org.corehunter.data.simple.CoreHunterData;
+import org.corehunter.exceptions.CoreHunterException;
 
-public class HetrozygousLociDiversityBiAllelic implements Objective<SubsetSolution, BiAllelicGenotypeVariantData> {
-
-    @Override
-    public Evaluation evaluate(SubsetSolution solution, BiAllelicGenotypeVariantData data) {
-        // TODO Auto-generated method stub
-        return null;
-    }
+/**
+ * @author Herman De Beukelaer
+ */
+public class PrecomputedDistance implements DistanceMeasure {
 
     @Override
-    public boolean isMinimizing() {
-        // TODO Auto-generated method stub
-        return false;
+    public double getDistance(int idX, int idY, CoreHunterData data) {
+        
+        DistanceMatrixData dist = data.getDistances();
+        
+        if(dist == null){
+            throw new CoreHunterException("No precomputed distance matrix has been defined.");
+        }
+        
+        return dist.getDistance(idX, idY);
+        
     }
 
 }

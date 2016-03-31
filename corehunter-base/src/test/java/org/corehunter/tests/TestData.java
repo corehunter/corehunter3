@@ -345,8 +345,17 @@ public class TestData {
         SUBSET2.add(2);
     }
     
-    public static final Evaluation COVERAGE_SUBSET1 = SimpleEvaluation.WITH_VALUE(0.7894736842105263);
+    // larger subset
+    public static final Set<Integer> SUBSET3 = new TreeSet<>();
 
+    static {
+        SUBSET3.add(1);
+        SUBSET3.add(2);
+        SUBSET3.add(4);
+    }
+        
+    public static final Evaluation COVERAGE_SUBSET1 = SimpleEvaluation.WITH_VALUE(0.7894736842105263);
+    
     // TODO: determine value for subset 1 (with missing data)
     public static final Evaluation SHANNONS_DIVERSITY_SUBSET1 = SimpleEvaluation.WITH_VALUE(-1.0);
     public static final Evaluation SHANNONS_DIVERSITY_SUBSET2 = SimpleEvaluation.WITH_VALUE(2.71220568749008);
@@ -355,10 +364,20 @@ public class TestData {
     public static final Evaluation HETROZYGOUS_LOCI_DIVERSITY_SUBSET1 = SimpleEvaluation.WITH_VALUE(-1.0);
     public static final Evaluation HETROZYGOUS_LOCI_DIVERSITY_SUBSET2 = SimpleEvaluation.WITH_VALUE(0.5015464285714285);
 
-    // TODO: determine value for subset 1 (with missing data)
-    public static final Evaluation NUMBER_EFFECTIVE_ALLELES_SUBSET1 = SimpleEvaluation.WITH_VALUE(-1.0);
-    public static final Evaluation NUMBER_EFFECTIVE_ALLELES_SUBSET2 = SimpleEvaluation.WITH_VALUE(2.063832165004294);
-
-
-
+    public static final Evaluation ENTRY_TO_ENTRY_MODIFIED_ROGERS_SUBSET2 = SimpleEvaluation.WITH_VALUE(
+            MODIFIED_ROGERS_DISTANCES[1][2]
+    );
+    public static final Evaluation ENTRY_TO_ENTRY_CAVALLI_SFORZA_SUBSET2 = SimpleEvaluation.WITH_VALUE(
+            CAVALLI_SFORZA_EDWARDS_DISTANCES[1][2]
+    );
+    
+    public static final Evaluation ENTRY_TO_ENTRY_MODIFIED_ROGERS_SUBSET3 = SimpleEvaluation.WITH_VALUE(
+            (MODIFIED_ROGERS_DISTANCES[1][2] + MODIFIED_ROGERS_DISTANCES[2][4] + MODIFIED_ROGERS_DISTANCES[1][4]) / 3.0
+    );
+    public static final Evaluation ENTRY_TO_ENTRY_CAVALLI_SFORZA_SUBSET3 = SimpleEvaluation.WITH_VALUE(
+            (CAVALLI_SFORZA_EDWARDS_DISTANCES[1][2]
+            + CAVALLI_SFORZA_EDWARDS_DISTANCES[2][4]
+            + CAVALLI_SFORZA_EDWARDS_DISTANCES[1][4]) / 3.0
+    );
+    
 }

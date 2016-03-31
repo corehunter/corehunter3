@@ -17,22 +17,21 @@
 /* under the License.                                           */
 /*--------------------------------------------------------------*/
 
-package org.corehunter.tests.objectives.distance.multiallelic;
+package org.corehunter.tests.objectives.distance;
 
 import static org.corehunter.tests.TestData.ALLELE_NAMES;
+import static org.corehunter.tests.TestData.CAVALLI_SFORZA_EDWARDS_DISTANCES;
 import static org.corehunter.tests.TestData.MARKER_NAMES;
-import static org.corehunter.tests.TestData.MODIFIED_ROGERS_DISTANCES;
 import static org.corehunter.tests.TestData.NAME;
 import static org.corehunter.tests.TestData.PRECISION;
-import static org.corehunter.tests.TestData.SET;
 import static org.corehunter.tests.TestData.ALLELE_FREQUENCIES;
 import static org.corehunter.tests.TestData.HEADERS_NON_UNIQUE_NAMES;
 
 import java.util.Iterator;
+import org.corehunter.data.simple.CoreHunterData;
 
 import org.corehunter.data.simple.SimpleGenotypeVariantData;
-import org.corehunter.objectives.distance.multiallelic.ModifiedRogersDistanceMultiAllelic;
-import org.junit.Assert;
+import org.corehunter.objectives.distance.CavalliSforzaEdwardsDistance;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -40,48 +39,34 @@ import static org.junit.Assert.assertEquals;
 /**
  * @author Guy Davenport, Herman De Beukelaer
  */
-public class ModifiedRogersDistanceMultiAllelicTest {
+public class CavalliSforzaEdwardsDistanceTest {
 
     @Test
     public void test() {
-        SimpleGenotypeVariantData data = new SimpleGenotypeVariantData(
+        
+        SimpleGenotypeVariantData geno = new SimpleGenotypeVariantData(
                 NAME, HEADERS_NON_UNIQUE_NAMES, MARKER_NAMES, ALLELE_NAMES, ALLELE_FREQUENCIES
         );
+        CoreHunterData data = new CoreHunterData(geno);
 
-        ModifiedRogersDistanceMultiAllelic distanceMetric
-                = new ModifiedRogersDistanceMultiAllelic(data);
+        CavalliSforzaEdwardsDistance distanceMetric = new CavalliSforzaEdwardsDistance();
 
-        Assert.assertEquals("Data is not correct!", data, distanceMetric.getData());
-
-        Assert.assertEquals("Ids not correct!", SET, distanceMetric.getIDs());
-
-        Iterator<Integer> iteratorX = distanceMetric.getIDs().iterator();
+        Iterator<Integer> iteratorX = data.getIDs().iterator();
         Iterator<Integer> iteratorY;
 
-        Integer idX;
-        Integer idY;
-
-        int i = 0;
-        int j = 0;
-
         while (iteratorX.hasNext()) {
-            idX = iteratorX.next();
-
-            iteratorY = distanceMetric.getIDs().iterator();
-
-            j = 0;
-
+            int idX = iteratorX.next();
+            iteratorY = data.getIDs().iterator();
             while (iteratorY.hasNext()) {
-                idY = iteratorY.next();
-
-                assertEquals("Distance[" + i + "][" + j + "] not correct!",
-                             MODIFIED_ROGERS_DISTANCES[i][j], distanceMetric.getDistance(idX, idY), PRECISION);
-
-                ++j;
+                int idY = iteratorY.next();
+                assertEquals(
+                        "Distance[" + idX + "][" + idY + "] not correct!",
+                        CAVALLI_SFORZA_EDWARDS_DISTANCES[idX][idY],
+                        distanceMetric.getDistance(idX, idY, data),
+                        PRECISION
+                );
             }
-
-            ++i;
         }
     }
-    
+
 }

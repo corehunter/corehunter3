@@ -17,35 +17,37 @@
 /* under the License.                                           */
 /*--------------------------------------------------------------*/
 
-package org.corehunter.objectives.distance.multiallelic;
+package org.corehunter.objectives.distance;
 
-import org.corehunter.objectives.distance.AbstractGenotypeVariantDistanceMetric;
 import org.corehunter.data.GenotypeVariantData;
+import org.corehunter.data.simple.CoreHunterData;
+import org.corehunter.exceptions.CoreHunterException;
 
 /**
  * @author Guy Davenport, Herman De Beukelaer
  */
-public class CavalliSforzaEdwardsDistanceMultiAllelic extends
-        AbstractGenotypeVariantDistanceMetric<GenotypeVariantData> {
+public class CavalliSforzaEdwardsDistance implements DistanceMeasure {
 
-    public CavalliSforzaEdwardsDistanceMultiAllelic(
-            GenotypeVariantData data) {
-        super(data);
-    }
-
+    // TODO review treatment of missing data
     @Override
-    public double getDistance(int idX, int idY) {
+    public double getDistance(int idX, int idY, CoreHunterData data) {
         
-        int numberOfMarkers = getData().getNumberOfMarkers();
+        GenotypeVariantData genotypes = data.getMarkers();
+        
+        if(genotypes == null){
+            throw new CoreHunterException("Genotypes are required for Cavalli-Sforza and Edwards distance.");
+        }
+        
+        int numberOfMarkers = genotypes.getNumberOfMarkers();
         double sumSquareDiff = 0.0;
         
         for (int markerIndex = 0; markerIndex < numberOfMarkers; ++markerIndex) {
             
-            int numberOfAlleles = getData().getNumberOfAlleles(markerIndex);
+            int numberOfAlleles = genotypes.getNumberOfAlleles(markerIndex);
             for (int alleleIndex = 0; alleleIndex < numberOfAlleles; ++alleleIndex) {
                 
-                Double pxla = getData().getAlleleFrequency(idX, markerIndex, alleleIndex);
-                Double pyla = getData().getAlleleFrequency(idY, markerIndex, alleleIndex);
+                Double pxla = genotypes.getAlleleFrequency(idX, markerIndex, alleleIndex);
+                Double pyla = genotypes.getAlleleFrequency(idY, markerIndex, alleleIndex);
                 if (pxla != null && pyla != null) {
                     double diff = Math.sqrt(pxla) - Math.sqrt(pyla);
                     sumSquareDiff += diff * diff;
@@ -58,7 +60,6 @@ public class CavalliSforzaEdwardsDistanceMultiAllelic extends
         double distance = Math.sqrt(sumSquareDiff / (2*numberOfMarkers));
 
         return distance;
-        
     }
 
 }

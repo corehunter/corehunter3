@@ -17,38 +17,55 @@
 /* under the License.                                           */
 /*--------------------------------------------------------------*/
 
-package org.corehunter.tests.objectives.multiallelic;
+package org.corehunter.tests.objectives.distance;
 
 import static org.corehunter.tests.TestData.ALLELE_NAMES;
-import static org.corehunter.tests.TestData.COVERAGE_SUBSET1;
 import static org.corehunter.tests.TestData.MARKER_NAMES;
+import static org.corehunter.tests.TestData.MODIFIED_ROGERS_DISTANCES;
 import static org.corehunter.tests.TestData.NAME;
 import static org.corehunter.tests.TestData.PRECISION;
-import static org.corehunter.tests.TestData.SUBSET1;
 import static org.corehunter.tests.TestData.ALLELE_FREQUENCIES;
 import static org.corehunter.tests.TestData.HEADERS_NON_UNIQUE_NAMES;
 
+import java.util.Iterator;
+import org.corehunter.data.simple.CoreHunterData;
+
 import org.corehunter.data.simple.SimpleGenotypeVariantData;
-import org.corehunter.objectives.multiallelic.CoverageMultiAllelic;
-import org.jamesframework.core.subset.SubsetSolution;
+import org.corehunter.objectives.distance.ModifiedRogersDistance;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Guy Davenport, Herman De Beukelaer
  */
-public class CoverageMultiAllelicTest extends EvaluationTest {
+public class ModifiedRogersDistanceTest {
 
     @Test
     public void test() {
-        SimpleGenotypeVariantData data = new SimpleGenotypeVariantData(
+        
+        SimpleGenotypeVariantData geno = new SimpleGenotypeVariantData(
                 NAME, HEADERS_NON_UNIQUE_NAMES, MARKER_NAMES, ALLELE_NAMES, ALLELE_FREQUENCIES
         );
+        CoreHunterData data = new CoreHunterData(geno);
 
-        CoverageMultiAllelic distanceMetric = new CoverageMultiAllelic();
+        ModifiedRogersDistance distanceMetric = new ModifiedRogersDistance();
 
-        assertEquals("Evaluation for subset 1 is not correct!", COVERAGE_SUBSET1,
-                distanceMetric.evaluate(new SubsetSolution(data.getIDs(), SUBSET1), data), PRECISION);
+        Iterator<Integer> iteratorX = data.getIDs().iterator();
+        Iterator<Integer> iteratorY;
 
+        while (iteratorX.hasNext()) {
+            int idX = iteratorX.next();
+            iteratorY = data.getIDs().iterator();
+            while (iteratorY.hasNext()) {
+                int idY = iteratorY.next();
+                assertEquals(
+                        "Distance[" + idX + "][" + idY + "] not correct!",
+                        MODIFIED_ROGERS_DISTANCES[idX][idY],
+                        distanceMetric.getDistance(idX, idY, data),
+                        PRECISION);
+            }
+        }
     }
-
+    
 }

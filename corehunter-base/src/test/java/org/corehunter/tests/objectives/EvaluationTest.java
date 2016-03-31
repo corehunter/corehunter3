@@ -17,14 +17,14 @@
 /* under the License.                                           */
 /*--------------------------------------------------------------*/
 
-package org.corehunter.objectives.distance;
+package org.corehunter.tests.objectives;
 
-import org.corehunter.data.DistanceMatrixData;
-import org.corehunter.data.GenotypeVariantData;
+import org.jamesframework.core.problems.objectives.evaluations.Evaluation;
+import org.junit.Assert;
 
-public interface GenotypeVariantDistanceMetric<GenotypeVariantDataType extends GenotypeVariantData>
-        extends DistanceMatrixData {
+public class EvaluationTest {
 
-    public GenotypeVariantDataType getData();
-    
+    protected void assertEquals(String message, Evaluation expected, Evaluation actual, double precision) {
+        Assert.assertEquals(message, expected.getValue(), actual.getValue(), precision);
+    }
 }

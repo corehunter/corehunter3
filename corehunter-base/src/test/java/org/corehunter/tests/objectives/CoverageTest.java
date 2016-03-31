@@ -17,52 +17,45 @@
 /* under the License.                                           */
 /*--------------------------------------------------------------*/
 
-package org.corehunter.tests.objectives.multiallelic;
+package org.corehunter.tests.objectives;
 
 import static org.corehunter.tests.TestData.ALLELE_NAMES;
+import static org.corehunter.tests.TestData.COVERAGE_SUBSET1;
 import static org.corehunter.tests.TestData.MARKER_NAMES;
 import static org.corehunter.tests.TestData.NAME;
 import static org.corehunter.tests.TestData.PRECISION;
-import static org.corehunter.tests.TestData.SHANNONS_DIVERSITY_SUBSET1;
-import static org.corehunter.tests.TestData.SHANNONS_DIVERSITY_SUBSET2;
 import static org.corehunter.tests.TestData.SUBSET1;
-import static org.corehunter.tests.TestData.SUBSET2;
 import static org.corehunter.tests.TestData.ALLELE_FREQUENCIES;
 import static org.corehunter.tests.TestData.HEADERS_NON_UNIQUE_NAMES;
 
 import org.corehunter.data.simple.SimpleGenotypeVariantData;
-import org.corehunter.objectives.multiallelic.ShannonsDiversityMultiAllelic;
+import org.corehunter.data.simple.CoreHunterData;
+import org.corehunter.objectives.Coverage;
 import org.jamesframework.core.subset.SubsetSolution;
 import org.junit.Test;
 
 /**
  * @author Guy Davenport, Herman De Beukelaer
  */
-public class ShannonsDiversityMultiAllelicTest extends EvaluationTest {
+public class CoverageTest extends EvaluationTest {
 
-    // TODO: for this test we need to agree how to handle missing data in Shannon's index
-    //@Test
-    public void test() {
-        SimpleGenotypeVariantData data = new SimpleGenotypeVariantData(
-                NAME, HEADERS_NON_UNIQUE_NAMES, MARKER_NAMES, ALLELE_NAMES, ALLELE_FREQUENCIES
-        );
-
-        ShannonsDiversityMultiAllelic objective = new ShannonsDiversityMultiAllelic();
-
-        assertEquals("Evaluation for subset 1 is not correct!", SHANNONS_DIVERSITY_SUBSET1,
-                objective.evaluate(new SubsetSolution(data.getIDs(), SUBSET1), data), PRECISION);
-    }
-    
     @Test
-    public void testNoMissingData() {
-        SimpleGenotypeVariantData data = new SimpleGenotypeVariantData(
+    public void test() {
+        
+        SimpleGenotypeVariantData geno = new SimpleGenotypeVariantData(
                 NAME, HEADERS_NON_UNIQUE_NAMES, MARKER_NAMES, ALLELE_NAMES, ALLELE_FREQUENCIES
         );
+        CoreHunterData data = new CoreHunterData(geno);
 
-        ShannonsDiversityMultiAllelic objective = new ShannonsDiversityMultiAllelic();
+        Coverage objective = new Coverage();
 
-        assertEquals("Evaluation for subset 2 is not correct!", SHANNONS_DIVERSITY_SUBSET2,
-                objective.evaluate(new SubsetSolution(data.getIDs(), SUBSET2), data), PRECISION);
+        assertEquals(
+                "Evaluation for subset 1 is not correct!",
+                COVERAGE_SUBSET1,
+                objective.evaluate(new SubsetSolution(data.getIDs(), SUBSET1), data),
+                PRECISION
+        );
+
     }
-    
+
 }

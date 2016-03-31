@@ -17,64 +17,61 @@
 /* under the License.                                           */
 /*--------------------------------------------------------------*/
 
-package org.corehunter.distance;
-
+package org.corehunter.objectives.distance;
 
 import org.apache.commons.lang3.ObjectUtils;
-import org.corehunter.data.DistanceMatrixData;
-import org.corehunter.data.simple.SimpleDistanceMatrixData;
-
+import org.corehunter.data.PhenotypicTraitData;
+import org.corehunter.data.simple.CoreHunterData;
+import org.corehunter.exceptions.CoreHunterException;
 import uno.informatics.data.Feature;
 import uno.informatics.data.FeatureDataset;
 import uno.informatics.data.Scale;
 
 /**
- * @author Guy Davenport
+ * @author Herman De Beukelaer, Guy Davenport
  */
-public class GowersDistanceMatrixGenerator implements DistanceMatrixGenerator {
+public class GowerDistance implements DistanceMeasure {
 
     private static final int BINARY_SCALE_TYPE = 0;
     private static final int DISCRETE_SCALE_TYPE = 1;
     private static final int RANGED_SCALE_TYPE = 2;
+    
+    // TODO cache (also scale types and ranges)
+    @Override
+    public double getDistance(int idX, int idY, CoreHunterData data) {
 
-    private Object[][] data;
-    private Feature[] features;
-
-    private Scale[] scales;
-    private int[] scaleTypes;
-    private double[] ranges;
-
-    public GowersDistanceMatrixGenerator(FeatureDataset dataset) {
-        this(dataset.getValuesAsArray(), dataset.getFeaturesAsArray());
-    }
-
-    public GowersDistanceMatrixGenerator(Object[][] data, Feature[] features) {
-        if (data == null || features == null) {
-            throw new IllegalArgumentException("Features and data must be defined!");
+        PhenotypicTraitData phenotypes = data.getPhenotypes();
+                
+        if(phenotypes == null){
+            throw new CoreHunterException("Phenotypes are required for Gower distance.");
         }
-
-        scales = new Scale[features.length];
-        scaleTypes = new int[features.length];
-        ranges = new double[features.length];
-
-        for (int i = 0; i < features.length; ++i) {
-            scales[i] = features[i].getMethod().getScale();
-
-            switch (scales[i].getScaleType()) {
+        
+        FeatureDataset featureData = phenotypes.getData();
+        Object[][] values = featureData.getValuesAsArray();
+        Feature[] features = featureData.getFeaturesAsArray();
+        
+        double distSum = 0.0;
+        double weightSum = 0.0;
+        for (int k = 0; k < features.length; k++) {
+            
+            Scale scale = features[k].getMethod().getScale();
+            int scaleType = -1;
+            double range = 0.0;
+            
+            switch (scale.getScaleType()) {
                 case NOMINAL:
-                    switch (scales[i].getDataType()) {
+                    switch (scale.getDataType()) {
                         case BOOLEAN:
-                            scaleTypes[i] = BINARY_SCALE_TYPE;
+                            scaleType = BINARY_SCALE_TYPE; // assymetric binary
                             break;
                         default:
-                            scaleTypes[i] = DISCRETE_SCALE_TYPE;
-                            break;
+                            scaleType = DISCRETE_SCALE_TYPE; // default nominal
                     }
                     break;
                 case INTERVAL:
                 case ORDINAL:
                 case RATIO:
-                    switch (scales[i].getDataType()) {
+                    switch (scale.getDataType()) {
                         case BIG_DECIMAL:
                         case BIG_INTEGER:
                         case DOUBLE:
@@ -82,64 +79,35 @@ public class GowersDistanceMatrixGenerator implements DistanceMatrixGenerator {
                         case INTEGER:
                         case LONG:
                         case SHORT:
-                            ranges[i] = scales[i].getMaximumValue().doubleValue()
-                                        - scales[i].getMinimumValue().doubleValue();
-                            if (ranges[i] > 0) {
-                                scaleTypes[i] = RANGED_SCALE_TYPE;
-                            } else {
-                                scaleTypes[i] = DISCRETE_SCALE_TYPE; // default to discrete 
-                            }
+                            scaleType = RANGED_SCALE_TYPE;
+                            range = scale.getMaximumValue().doubleValue() - scale.getMinimumValue().doubleValue();
                             break;
                         case BOOLEAN:
                         case DATE:
                         case STRING:
+                        case UNKNOWN:
                         default:
-                            throw new IllegalArgumentException("Illegal scale type : "
-                                    + scales[i].getScaleType()
-                                    + " for data type " + scales[i].getDataType());
+                            throw new IllegalArgumentException("Illegal data type " + scale.getDataType()
+                                                             + " for scale type " + scale.getScaleType());
                     }
                     break;
                 case NONE:
                 default:
-                    throw new IllegalArgumentException("Illegal scale type : " + scales[i].getScaleType());
+                    throw new IllegalArgumentException("Illegal scale type: " + scale.getScaleType());
             }
+            
+            double distance = distance(scaleType, range, values[idX][k], values[idY][k]);
+            double weight = weight(scaleType, range, values[idX][k], values[idY][k]);
+            distSum += distance * weight;
+            weightSum += weight;
+            
         }
+        
+        return distSum/weightSum;
 
-        this.data = data;
-        this.features = features;
     }
-
-    @Override
-    public DistanceMatrixData generateDistanceMatrix() {
-        int n = data.length;
-        double[][] distances = new double[n][n];
-        double[][] weights = new double[n][n];
-
-        for (int i = 0; i < n; ++i) {
-            if (data[i].length != features.length) {
-                throw new IllegalArgumentException("Number of features must match number of elements in a row!");
-            }
-
-            double distance;
-            double weight;
-
-            for (int j = i; j < data.length; ++j) {
-                for (int k = 0; k < features.length; ++k) {
-                    distance = distance(scaleTypes[k], ranges[k], data[i][k], data[j][k]);
-                    weight = weight(scaleTypes[k], ranges[k], data[i][k], data[j][k]);
-
-                    distances[i][j] = distances[i][j] + (distance * weight);
-                    weights[i][j] = weights[i][j] + weight;
-                }
-
-                distances[i][j] = distances[i][j] / weights[i][j];
-                distances[j][i] = distances[i][j];
-            }
-        }
-
-        return new SimpleDistanceMatrixData(distances);
-    }
-
+    
+    // TODO review treatment of missing data
     private double distance(int scaleType, double range, Object elementA, Object elementB) {
         if (elementA != null && elementB != null) {
             switch (scaleType) {
@@ -161,13 +129,14 @@ public class GowersDistanceMatrixGenerator implements DistanceMatrixGenerator {
                     return Math.abs(aValue - bValue) / range;
                 default:
                     throw new RuntimeException(
-                            "This should not happen: unexpected scale type in Gower distance matrix generator."
+                            "This should not happen: unexpected scale type " + scaleType + " in Gower distance."
                     );
             }
         }
         return 0.0;
     }
 
+    // TODO review treatment of missing data
     private double weight(int scaleType, double range, Object elementA, Object elementB) {
         if (elementA != null && elementB != null) {
             switch (scaleType) {
@@ -188,4 +157,5 @@ public class GowersDistanceMatrixGenerator implements DistanceMatrixGenerator {
         }
         return 0.0;
     }
+
 }

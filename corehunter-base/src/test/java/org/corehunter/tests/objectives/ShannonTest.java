@@ -17,52 +17,57 @@
 /* under the License.                                           */
 /*--------------------------------------------------------------*/
 
-package org.corehunter.tests.objectives.multiallelic;
+package org.corehunter.tests.objectives;
 
 import static org.corehunter.tests.TestData.ALLELE_NAMES;
-import static org.corehunter.tests.TestData.HETROZYGOUS_LOCI_DIVERSITY_SUBSET1;
-import static org.corehunter.tests.TestData.HETROZYGOUS_LOCI_DIVERSITY_SUBSET2;
 import static org.corehunter.tests.TestData.MARKER_NAMES;
 import static org.corehunter.tests.TestData.NAME;
 import static org.corehunter.tests.TestData.PRECISION;
+import static org.corehunter.tests.TestData.SHANNONS_DIVERSITY_SUBSET1;
+import static org.corehunter.tests.TestData.SHANNONS_DIVERSITY_SUBSET2;
 import static org.corehunter.tests.TestData.SUBSET1;
 import static org.corehunter.tests.TestData.SUBSET2;
 import static org.corehunter.tests.TestData.ALLELE_FREQUENCIES;
 import static org.corehunter.tests.TestData.HEADERS_NON_UNIQUE_NAMES;
 
+import org.corehunter.data.simple.CoreHunterData;
 import org.corehunter.data.simple.SimpleGenotypeVariantData;
-import org.corehunter.objectives.multiallelic.HetrozygousLociDiversityMultiAllelic;
+import org.corehunter.objectives.Shannon;
 import org.jamesframework.core.subset.SubsetSolution;
 import org.junit.Test;
 
 /**
  * @author Guy Davenport, Herman De Beukelaer
  */
-public class HetrozygousLociDiversityMultiAllelicTest extends EvaluationTest {
+public class ShannonTest extends EvaluationTest {
 
-    // TODO: for this test we need to agree how to handle missing data
+    // TODO: for this test we need to agree how to handle missing data in Shannon's index
     //@Test
     public void test() {
-        SimpleGenotypeVariantData data = new SimpleGenotypeVariantData(
+        
+        SimpleGenotypeVariantData geno = new SimpleGenotypeVariantData(
                 NAME, HEADERS_NON_UNIQUE_NAMES, MARKER_NAMES, ALLELE_NAMES, ALLELE_FREQUENCIES
         );
+        CoreHunterData data = new CoreHunterData(geno);
 
-        HetrozygousLociDiversityMultiAllelic objective = new HetrozygousLociDiversityMultiAllelic();
+        Shannon objective = new Shannon();
 
-        assertEquals("Evaluation for subset 1 is not correct!", HETROZYGOUS_LOCI_DIVERSITY_SUBSET1,
+        assertEquals("Evaluation for subset 1 is not correct!", SHANNONS_DIVERSITY_SUBSET1,
                 objective.evaluate(new SubsetSolution(data.getIDs(), SUBSET1), data), PRECISION);
     }
     
     @Test
     public void testNoMissingData() {
-        SimpleGenotypeVariantData data = new SimpleGenotypeVariantData(
+        
+        SimpleGenotypeVariantData geno = new SimpleGenotypeVariantData(
                 NAME, HEADERS_NON_UNIQUE_NAMES, MARKER_NAMES, ALLELE_NAMES, ALLELE_FREQUENCIES
         );
+        CoreHunterData data = new CoreHunterData(geno);
+        
+        Shannon objective = new Shannon();
 
-        HetrozygousLociDiversityMultiAllelic objective = new HetrozygousLociDiversityMultiAllelic();
-
-        assertEquals("Evaluation for subset 2 is not correct!", HETROZYGOUS_LOCI_DIVERSITY_SUBSET2,
+        assertEquals("Evaluation for subset 2 is not correct!", SHANNONS_DIVERSITY_SUBSET2,
                 objective.evaluate(new SubsetSolution(data.getIDs(), SUBSET2), data), PRECISION);
     }
-
+    
 }

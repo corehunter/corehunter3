@@ -17,16 +17,25 @@
 /* under the License.                                           */
 /*--------------------------------------------------------------*/
 
-package org.corehunter.tests.objectives.multiallelic;
+package org.corehunter.objectives.distance;
 
-import static org.corehunter.tests.TestData.PRECISION;
+import org.corehunter.data.simple.CoreHunterData;
+import org.corehunter.exceptions.CoreHunterException;
 
-import org.jamesframework.core.problems.objectives.evaluations.Evaluation;
-import org.junit.Assert;
+/**
+ * @author Herman De Beukelaer
+ */
+public interface DistanceMeasure {
 
-public class EvaluationTest {
-
-    protected void assertEquals(String message, Evaluation expected, Evaluation actual, double precision) {
-        Assert.assertEquals(message, expected.getValue(), actual.getValue(), PRECISION);
-    }
+    /**
+     * Calculates the distance between two items with given ID.
+     * 
+     * @param idX id of first item
+     * @param idY id of second item
+     * @param data Core Hunter data
+     * @return distance
+     * @throws CoreHunterException if the data needed for the applied distance measure is not available
+     */
+    public double getDistance(int idX, int idY, CoreHunterData data);
+    
 }

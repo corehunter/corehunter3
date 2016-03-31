@@ -19,15 +19,15 @@
 
 package org.corehunter.objectives.biallelic;
 
-import org.corehunter.data.BiAllelicGenotypeVariantData;
+import org.corehunter.data.simple.CoreHunterData;
 import org.jamesframework.core.problems.objectives.Objective;
 import org.jamesframework.core.problems.objectives.evaluations.Evaluation;
 import org.jamesframework.core.subset.SubsetSolution;
 
-public class ShannonsDiversityBiAllelic implements Objective<SubsetSolution, BiAllelicGenotypeVariantData> {
+public class ShannonBiAllelic implements Objective<SubsetSolution, CoreHunterData> {
 
     @Override
-    public Evaluation evaluate(SubsetSolution solution, BiAllelicGenotypeVariantData data) {
+    public Evaluation evaluate(SubsetSolution solution, CoreHunterData data) {
         // TODO Auto-generated method stub
         return null;
     }

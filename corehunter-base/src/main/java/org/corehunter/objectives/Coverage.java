@@ -17,55 +17,60 @@
 /* under the License.                                           */
 /*--------------------------------------------------------------*/
 
-package org.corehunter.objectives.multiallelic;
+package org.corehunter.objectives;
 
+import java.util.Iterator;
 import org.jamesframework.core.problems.objectives.Objective;
 import org.jamesframework.core.problems.objectives.evaluations.Evaluation;
 import org.jamesframework.core.problems.objectives.evaluations.SimpleEvaluation;
 import org.jamesframework.core.subset.SubsetSolution;
 import org.corehunter.data.GenotypeVariantData;
+import org.corehunter.data.simple.CoreHunterData;
+import org.corehunter.exceptions.CoreHunterException;
 
 /**
  * @author Guy Davenport, Herman De Beukelaer
  */
-public class HetrozygousLociDiversityMultiAllelic
-        implements Objective<SubsetSolution, GenotypeVariantData> {
+public class Coverage implements Objective<SubsetSolution, CoreHunterData> {
 
-    // TODO: handle missing data
     @Override
-    public Evaluation evaluate(SubsetSolution solution,
-            GenotypeVariantData data) {
+    public Evaluation evaluate(SubsetSolution solution, CoreHunterData data) {
         
-        double summedAverageAlleleFrequencySquared;
-        double total = 0.0;
+        GenotypeVariantData genotypes = data.getMarkers();
+        
+        if(genotypes == null){
+            throw new CoreHunterException("Genotypes are required for coverage objective.");
+        }
+        
+        int numberOfMarkers = genotypes.getNumberOfMarkers();
 
-        double averageAlleleFrequency, squared;
+        double alleleCount = 0;
 
-        int numberOfMarkers = data.getNumberOfMarkers();
-        int numberOfAlleles;
-
-        for (int markerIndex = 0; markerIndex < numberOfMarkers; ++markerIndex) {
-            numberOfAlleles = data.getNumberOfAlleles(markerIndex);
-
-            summedAverageAlleleFrequencySquared = 0.0;
-
-            for (int alleleIndex = 0; alleleIndex < numberOfAlleles; ++alleleIndex) {
+        for (int m = 0; m < numberOfMarkers; m++) {
+            int numberOfAlleles = genotypes.getNumberOfAlleles(m);
+            for (int a = 0; a < numberOfAlleles; a++) {
                 
-                averageAlleleFrequency = data.getAverageAlelleFrequency(
-                                                solution.getSelectedIDs(),
-                                                markerIndex,
-                                                alleleIndex);
-                squared = averageAlleleFrequency * averageAlleleFrequency;
-                summedAverageAlleleFrequencySquared = summedAverageAlleleFrequencySquared + squared;
+                Iterator<Integer> iterator = solution.getSelectedIDs().iterator();
+                int scanned = 0;
+                while (iterator.hasNext() && !observed(genotypes.getAlleleFrequency(iterator.next(), m, a))){
+                    scanned++;
+                }
+                
+                if (scanned < solution.getNumSelectedIDs()) {
+                    alleleCount++;
+                }
                 
             }
-
-            total = total + (1.0 - summedAverageAlleleFrequencySquared);
         }
 
-        return SimpleEvaluation.WITH_VALUE(total / (double) numberOfMarkers);
+        return SimpleEvaluation.WITH_VALUE(alleleCount/genotypes.getTotalNumberOfAlleles());
+        
     }
     
+    private boolean observed(Double freq){
+        return freq != null && freq > 0.0;
+    }
+
     @Override
     public boolean isMinimizing() {
         return false;

@@ -17,13 +17,14 @@
 /* under the License.                                           */
 /*--------------------------------------------------------------*/
 
-package org.corehunter.objectives.distance;
+package org.corehunter.objectives.distance.aggregation;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import org.corehunter.data.DistanceMatrixData;
+import org.corehunter.data.simple.CoreHunterData;
+import org.corehunter.objectives.distance.DistanceMeasure;
 import org.jamesframework.core.exceptions.IncompatibleDeltaEvaluationException;
 import org.jamesframework.core.problems.objectives.Objective;
 import org.jamesframework.core.problems.objectives.evaluations.Evaluation;
@@ -32,43 +33,48 @@ import org.jamesframework.core.search.neigh.Move;
 import org.jamesframework.core.subset.SubsetSolution;
 import org.jamesframework.core.subset.neigh.moves.SubsetMove;
 
-public class AverageDistanceObjective implements
-        Objective<SubsetSolution, DistanceMatrixData> {
+/**
+ * Evaluates a core set by computing the average distance between all pairs of selected items.
+ * If less than two items are selected, 0.0 is returned.
+ * 
+ * @author Guy Davenport, Herman De Beukelaer
+ */
+public class AverageEntryToEntryDistance implements Objective<SubsetSolution, CoreHunterData> {
 
-    /**
-     * Evaluates the given subset solution using the given data, by computing the average distance between all pairs of
-     * selected items. If less than two items are selected, this method always returns 0.
-     *
-     * @param solution the subset solution to be evaluated
-     * @param data the distance matrix
-     */
+    private final DistanceMeasure distanceMeasure;
+
+    public AverageEntryToEntryDistance(DistanceMeasure distanceMeasure) {
+        this.distanceMeasure = distanceMeasure;
+    }
+    
     @Override
-    public Evaluation evaluate(SubsetSolution solution, DistanceMatrixData data) {
+    public Evaluation evaluate(SubsetSolution solution, CoreHunterData data) {
         double value = 0.0;
         if (solution.getNumSelectedIDs() >= 2) {
-            // at least two items selected: compute average distance
-            int numDist = 0;
+            // at least two items selected: compute average pairwise distance
             double sumDist = 0.0;
             Integer[] selected = new Integer[solution.getNumSelectedIDs()];
             solution.getSelectedIDs().toArray(selected);
-            for (int i = 0; i < selected.length; i++) {
-                for (int j = i + 1; j < selected.length; j++) {
-                    sumDist += data.getDistance(selected[i], selected[j]);
-                    numDist++;
+            int n = selected.length;
+            for (int i = 0; i < n; i++) {
+                for (int j = i + 1; j < n; j++) {
+                    sumDist += distanceMeasure.getDistance(selected[i], selected[j], data);
                 }
             }
-            value = sumDist / numDist;
+            int numDist = n*(n-1)/2;
+            value = sumDist/numDist;
         }
         return SimpleEvaluation.WITH_VALUE(value);
     }
 
     @Override
-    public Evaluation evaluate(Move move, SubsetSolution curSolution,
-                               Evaluation curEvaluation, DistanceMatrixData data) {
+    public Evaluation evaluate(Move move, SubsetSolution curSolution, Evaluation curEvaluation, CoreHunterData data) {
         // check move type
         if (!(move instanceof SubsetMove)) {
-            throw new IncompatibleDeltaEvaluationException("Core subset objective should be used in combination "
-                    + "with neighbourhoods that generate moves of type SubsetMove.");
+            throw new IncompatibleDeltaEvaluationException(
+                    "Entry-to-entry distance objective should be used in combination "
+                  + "with neighbourhoods that generate moves of type SubsetMove."
+            );
         }
         // cast move
         SubsetMove subsetMove = (SubsetMove) move;
@@ -76,8 +82,8 @@ public class AverageDistanceObjective implements
         // get current evaluation
         double curEval = curEvaluation.getValue();
         // undo average to get sum of distances
-        int numSelected = curSolution.getNumSelectedIDs();
-        int numDistances = numSelected * (numSelected - 1) / 2;
+        int n = curSolution.getNumSelectedIDs();
+        int numDistances = n*(n-1)/2;
         double sumDist = curEval * numDistances;
 
         // get set of added and removed IDs
@@ -90,7 +96,7 @@ public class AverageDistanceObjective implements
         // subtract distances from removed items to retained items
         for (int rem : removed) {
             for (int ret : retained) {
-                sumDist -= data.getDistance(rem, ret);
+                sumDist -= distanceMeasure.getDistance(rem, ret, data);
                 numDistances--;
             }
         }
@@ -100,7 +106,7 @@ public class AverageDistanceObjective implements
             for (int rem2 : removed) {
                 // account for each distinct pair only once
                 if (rem1 < rem2) {
-                    sumDist -= data.getDistance(rem1, rem2);
+                    sumDist -= distanceMeasure.getDistance(rem1, rem2, data);
                     numDistances--;
                 }
             }
@@ -109,7 +115,7 @@ public class AverageDistanceObjective implements
         // add distances from new items to retained items
         for (int add : added) {
             for (int ret : retained) {
-                sumDist += data.getDistance(add, ret);
+                sumDist += distanceMeasure.getDistance(add, ret, data);
                 numDistances++;
             }
         }
@@ -119,7 +125,7 @@ public class AverageDistanceObjective implements
             for (int add2 : added) {
                 // account for each distinct pair only once
                 if (add1 < add2) {
-                    sumDist += data.getDistance(add1, add2);
+                    sumDist += distanceMeasure.getDistance(add1, add2, data);
                     numDistances++;
                 }
             }

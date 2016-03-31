@@ -17,18 +17,22 @@
 /* under the License.                                           */
 /*--------------------------------------------------------------*/
 
-package org.corehunter.tests.distance;
+package org.corehunter.tests.objectives.distance;
 
-import java.io.File;
+import static org.corehunter.tests.TestData.PRECISION;
+
 import java.io.IOException;
 import java.nio.file.Paths;
-import java.util.Iterator;
+import java.util.Arrays;
+import java.util.List;
 
 import org.corehunter.data.DistanceMatrixData;
+import org.corehunter.data.PhenotypicTraitData;
 import org.corehunter.data.matrix.SymmetricMatrixFormat;
+import org.corehunter.data.simple.CoreHunterData;
 import org.corehunter.data.simple.SimpleDistanceMatrixData;
-import org.corehunter.distance.GowersDistanceMatrixGenerator;
-import org.junit.Test;
+import org.corehunter.data.simple.SimplePhenotypicTraitData;
+import org.corehunter.objectives.distance.GowerDistance;
 
 import uno.informatics.common.io.FileType;
 import uno.informatics.data.DataType;
@@ -39,12 +43,14 @@ import uno.informatics.data.dataset.DatasetException;
 import uno.informatics.data.feature.array.ArrayFeatureDataset;
 import uno.informatics.data.pojo.SimpleFeaturePojo;
 
+import org.junit.Test;
+
 import static org.junit.Assert.assertEquals;
 
 /**
- * @author Guy Davenport
+ * @author Guy Davenport, Herman De Beukelaer
  */
-public class GowersDistanceMatrixGeneratorTest {
+public class GowerDistanceTest {
 
     private static final String DATA_FILE = "/phenotypes/phenotypic_data.csv";
     private static final String MATRIX_FILE = "/phenotypes/matrix.csv";
@@ -57,70 +63,67 @@ public class GowersDistanceMatrixGeneratorTest {
         {5, 4.0, "1", true}
     };
 
-    private static final Feature[] FEATURES = new Feature[]{
+    private static final List<Feature> FEATURES = Arrays.asList(
         new SimpleFeaturePojo("feature1", DataType.INTEGER, ScaleType.INTERVAL, 0, 5),
         new SimpleFeaturePojo("feature2", DataType.DOUBLE, ScaleType.RATIO, 0.0, 5.0),
         new SimpleFeaturePojo("feature3", DataType.STRING, ScaleType.NOMINAL),
         new SimpleFeaturePojo("feature4", DataType.BOOLEAN, ScaleType.NOMINAL)
-    };
+    );
 
     private static final double[][] MATRIX = new double[][]{
         new double[]{0.00, 0.40, 0.45, 0.85, 0.35},
         new double[]{0.40, 0.00, 0.55, 0.45, 0.45},
-        new double[]{0.45, 0.55, 0.00, 0.65, 0.40},
-        new double[]{0.85, 0.45, 0.65, 0.00, 0.60},
+        new double[]{0.45, 0.55, 0.00, 0.5333333, 0.40},
+        new double[]{0.85, 0.45, 0.5333333, 0.00, 0.60},
         new double[]{0.35, 0.45, 0.40, 0.60, 0.00}
     };
 
-    private static final double DELTA = 1e-8;
-
     @Test
-    public void testGenerateDistanceMatrix() {
-        GowersDistanceMatrixGenerator generator = new GowersDistanceMatrixGenerator(DATA, FEATURES);
+    public void testInMemory() {
 
-        DistanceMatrixData matrix = generator.generateDistanceMatrix();
+        FeatureDataset featureData = new ArrayFeatureDataset("in-memory", FEATURES, DATA);
+        PhenotypicTraitData pheno = new SimplePhenotypicTraitData(featureData);
+        CoreHunterData data = new CoreHunterData(pheno);
+        
+        GowerDistance distanceMetric = new GowerDistance();
 
-        Iterator<Integer> iterator1 = matrix.getIDs().iterator();
-        Iterator<Integer> iterator2 = matrix.getIDs().iterator();
-
-        int index1;
-        int index2;
-
-        while (iterator1.hasNext()) {
-            index1 = iterator1.next();
-
-            while (iterator2.hasNext()) {
-                index2 = iterator2.next();
-                assertEquals("cell (" + index1 + "," + index2 + ")",
-                             MATRIX[index1][index2], matrix.getDistance(index1, index2), 0.0000000001);
+        int n = data.getDatasetSize();
+        for (int x = 0; x < n; x++) {
+            for (int y = 0; y < n; y++) {
+                assertEquals(
+                        "x=" + x + " y=" + y,
+                        MATRIX[x][y],
+                        distanceMetric.getDistance(x, y, data),
+                        1e-7
+                );
             }
         }
     }
     
     @Test
-    public void testGenerateDistanceMatrixFromFile() throws IOException, DatasetException {
-
-        FeatureDataset dataset = ArrayFeatureDataset.readFeatureDatasetFromTextFile(
-                new File(GowersDistanceMatrixGeneratorTest.class.getResource(DATA_FILE).getPath()),
+    public void testFromFile() throws IOException, DatasetException {
+        
+        PhenotypicTraitData pheno = SimplePhenotypicTraitData.readData(
+                Paths.get(GowerDistanceTest.class.getResource(DATA_FILE).getPath()),
                 FileType.CSV
         );
+        CoreHunterData data = new CoreHunterData(pheno);
 
-        GowersDistanceMatrixGenerator generator = new GowersDistanceMatrixGenerator(dataset);
-
-        DistanceMatrixData distances = generator.generateDistanceMatrix();
         DistanceMatrixData expected = SimpleDistanceMatrixData.readData(
-                Paths.get(GowersDistanceMatrixGeneratorTest.class.getResource(MATRIX_FILE).getPath()),
+                Paths.get(GowerDistanceTest.class.getResource(MATRIX_FILE).getPath()),
                 FileType.CSV, SymmetricMatrixFormat.FULL
         );
+        
+        GowerDistance distanceMetric = new GowerDistance();
 
-        int n = dataset.getRowCount();
+        int n = data.getDatasetSize();
         for (int x = 0; x < n; x++) {
             for (int y = 0; y < n; y++) {
                 assertEquals(
                         "x=" + x + " y=" + y,
                         expected.getDistance(x, y),
-                        distances.getDistance(x, y),
-                        DELTA
+                        distanceMetric.getDistance(x, y, data),
+                        PRECISION
                 );
             }
         }

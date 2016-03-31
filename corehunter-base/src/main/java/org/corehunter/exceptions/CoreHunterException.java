@@ -17,25 +17,26 @@
 /* under the License.                                           */
 /*--------------------------------------------------------------*/
 
-package org.corehunter.tests.objectives.distance;
-
-import org.corehunter.objectives.distance.AverageDistanceObjective;
-import org.corehunter.tests.TestData;
-import org.jamesframework.core.subset.SubsetSolution;
-import org.junit.Test;
+package org.corehunter.exceptions;
 
 /**
- * @author Guy Davenport
+ * @author Herman De Beukelaer
  */
-public class AverageDistanceObjectiveTest extends TestData {
+public class CoreHunterException extends RuntimeException {
 
-    @Test
-    public void test() {
-        AverageDistanceObjective objective = new AverageDistanceObjective();
-
-        SubsetSolution solution = new SubsetSolution(SET, SUBSET1);
-
-        objective.evaluate(solution, DATA);
+    public CoreHunterException() {
     }
 
+    public CoreHunterException(String message) {
+        super(message);
+    }
+
+    public CoreHunterException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    public CoreHunterException(Throwable cause) {
+        super(cause);
+    }
+    
 }

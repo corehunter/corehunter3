@@ -17,70 +17,57 @@
 /* under the License.                                           */
 /*--------------------------------------------------------------*/
 
-package org.corehunter.tests.objectives.distance.multiallelic;
+package org.corehunter.tests.objectives;
 
 import static org.corehunter.tests.TestData.ALLELE_NAMES;
-import static org.corehunter.tests.TestData.CAVALLI_SFORZA_EDWARDS_DISTANCES;
+import static org.corehunter.tests.TestData.HETROZYGOUS_LOCI_DIVERSITY_SUBSET1;
+import static org.corehunter.tests.TestData.HETROZYGOUS_LOCI_DIVERSITY_SUBSET2;
 import static org.corehunter.tests.TestData.MARKER_NAMES;
 import static org.corehunter.tests.TestData.NAME;
 import static org.corehunter.tests.TestData.PRECISION;
-import static org.corehunter.tests.TestData.SET;
+import static org.corehunter.tests.TestData.SUBSET1;
+import static org.corehunter.tests.TestData.SUBSET2;
 import static org.corehunter.tests.TestData.ALLELE_FREQUENCIES;
 import static org.corehunter.tests.TestData.HEADERS_NON_UNIQUE_NAMES;
 
-import java.util.Iterator;
-
+import org.corehunter.data.simple.CoreHunterData;
 import org.corehunter.data.simple.SimpleGenotypeVariantData;
-import org.corehunter.objectives.distance.multiallelic.CavalliSforzaEdwardsDistanceMultiAllelic;
+import org.corehunter.objectives.HeterozygousLoci;
+import org.jamesframework.core.subset.SubsetSolution;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * @author Guy Davenport, Herman De Beukelaer
  */
-public class CavalliSforzaEdwardsDistanceMultiAllelicTest {
+public class HeterozygousLociTest extends EvaluationTest {
 
-    @Test
+    // TODO: for this test we need to agree how to handle missing data
+    //@Test
     public void test() {
-        SimpleGenotypeVariantData data = new SimpleGenotypeVariantData(
+        
+        SimpleGenotypeVariantData geno = new SimpleGenotypeVariantData(
                 NAME, HEADERS_NON_UNIQUE_NAMES, MARKER_NAMES, ALLELE_NAMES, ALLELE_FREQUENCIES
         );
+        CoreHunterData data = new CoreHunterData(geno);
 
-        CavalliSforzaEdwardsDistanceMultiAllelic distanceMetric
-                = new CavalliSforzaEdwardsDistanceMultiAllelic(data);
+        HeterozygousLoci objective = new HeterozygousLoci();
 
-        assertEquals("Data is not correct!", data, distanceMetric.getData());
+        assertEquals("Evaluation for subset 1 is not correct!", HETROZYGOUS_LOCI_DIVERSITY_SUBSET1,
+                objective.evaluate(new SubsetSolution(data.getIDs(), SUBSET1), data), PRECISION);
+    }
+    
+    @Test
+    public void testNoMissingData() {
+        
+        SimpleGenotypeVariantData geno = new SimpleGenotypeVariantData(
+                NAME, HEADERS_NON_UNIQUE_NAMES, MARKER_NAMES, ALLELE_NAMES, ALLELE_FREQUENCIES
+        );
+        CoreHunterData data = new CoreHunterData(geno);
 
-        assertEquals("Ids not correct!", SET, distanceMetric.getIDs());
+        HeterozygousLoci objective = new HeterozygousLoci();
 
-        Iterator<Integer> iteratorX = distanceMetric.getIDs().iterator();
-        Iterator<Integer> iteratorY;
-
-        Integer idX;
-        Integer idY;
-
-        int i = 0;
-        int j = 0;
-
-        while (iteratorX.hasNext()) {
-            idX = iteratorX.next();
-
-            iteratorY = distanceMetric.getIDs().iterator();
-
-            j = 0;
-
-            while (iteratorY.hasNext()) {
-                idY = iteratorY.next();
-
-                assertEquals("Distance[" + i + "][" + j + "] not correct!",
-                             CAVALLI_SFORZA_EDWARDS_DISTANCES[i][j], distanceMetric.getDistance(idX, idY), PRECISION);
-
-                ++j;
-            }
-
-            ++i;
-        }
+        assertEquals("Evaluation for subset 2 is not correct!", HETROZYGOUS_LOCI_DIVERSITY_SUBSET2,
+                objective.evaluate(new SubsetSolution(data.getIDs(), SUBSET2), data), PRECISION);
     }
 
 }
