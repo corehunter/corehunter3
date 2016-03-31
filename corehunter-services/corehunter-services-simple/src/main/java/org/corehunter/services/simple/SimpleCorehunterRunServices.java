@@ -28,9 +28,9 @@ import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import org.corehunter.Corehunter;
-import org.corehunter.CorehunterArguments;
-import org.corehunter.CorehunterObjective;
+import org.corehunter.CoreHunter;
+import org.corehunter.CoreHunterArguments;
+import org.corehunter.CoreHunterObjective;
 import org.corehunter.data.PhenotypicTraitData;
 import org.corehunter.data.simple.CoreHunterData;
 import org.corehunter.listener.SimpleCorehunterListener;
@@ -167,7 +167,7 @@ public class SimpleCorehunterRunServices implements CorehunterRunServices {
 
     private class CorehunterRunnable extends SimpleEntityPojo implements Runnable {
         private CorehunterRunArguments corehunterRunArguments;
-        private Corehunter corehunter;
+        private CoreHunter corehunter;
         private ByteArrayOutputStream outputStream;
         private ByteArrayOutputStream errorStream;
         private String errorMessage;
@@ -225,15 +225,15 @@ public class SimpleCorehunterRunServices implements CorehunterRunServices {
             try {
                 startDate = new DateTime();
 
-                CorehunterArguments arguments = new CorehunterArguments(corehunterRunArguments.getSubsetSize());
+                CoreHunterArguments arguments = new CoreHunterArguments(corehunterRunArguments.getSubsetSize());
 
                 // TODO get from arugments
-                arguments.setObjective(CorehunterObjective.GD);
+                arguments.setObjective(CoreHunterObjective.GD);
 
                 arguments.setDataset(new CoreHunterData(
                         (PhenotypicTraitData) datasetServices.getDataset(corehunterRunArguments.getDatasetId())));
 
-                corehunter = new Corehunter(arguments);
+                corehunter = new CoreHunter(arguments);
 
                 outputStream = new ByteArrayOutputStream();
                 PrintStream printStream = new PrintStream(outputStream);
