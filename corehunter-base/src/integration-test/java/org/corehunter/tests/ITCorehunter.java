@@ -20,8 +20,8 @@
 package org.corehunter.tests;
 
 
-import org.corehunter.Corehunter;
-import org.corehunter.CorehunterArguments;
+import org.corehunter.CoreHunter;
+import org.corehunter.CoreHunterArguments;
 import org.jamesframework.core.subset.SubsetSolution;
 import org.junit.Test;
 
@@ -36,15 +36,15 @@ import static org.junit.Assert.assertEquals;
 public class ITCorehunter extends TestData {
 
     /**
-     * Test method for {@link Corehunter#execute()}.
+     * Test method for {@link CoreHunter#execute()}.
      */
     //@Test
     public void testExecuteDistanceMatrix() {
-        CorehunterArguments arguments = new CorehunterArguments(2);
+        CoreHunterArguments arguments = new CoreHunterArguments(2);
 
         arguments.setDataset(DATA);
 
-        Corehunter corehunter = new Corehunter(arguments);
+        CoreHunter corehunter = new CoreHunter(arguments);
 
         corehunter.setTimeLimit(2);
 
@@ -54,7 +54,7 @@ public class ITCorehunter extends TestData {
     }
 
     /**
-     * Test method for {@link org.corehunter.Corehunter#getTimeLimit()}.
+     * Test method for {@link org.corehunter.CoreHunter#getTimeLimit()}.
      */
     @Test
     public void testGetTimeLimit() {
@@ -62,7 +62,7 @@ public class ITCorehunter extends TestData {
     }
 
     /**
-     * Test method for {@link org.corehunter.Corehunter#setTimeLimit(long)}.
+     * Test method for {@link org.corehunter.CoreHunter#setTimeLimit(long)}.
      */
     @Test
     public void testSetTimeLimit() {

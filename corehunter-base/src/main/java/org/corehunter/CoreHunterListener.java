@@ -27,7 +27,7 @@ import org.jamesframework.core.subset.SubsetSolution;
  *
  * @author Guy Davenport
  */
-public interface CorehunterListener extends SearchListener<SubsetSolution> {
+public interface CoreHunterListener extends SearchListener<SubsetSolution> {
 
     /**
      * Fired when the pre-processing has started. Called only once prior to the search run.

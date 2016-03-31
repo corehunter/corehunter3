@@ -19,7 +19,7 @@
 
 package org.corehunter;
 
-public enum CorehunterObjective {
+public enum CoreHunterObjective {
     MR("Modified Rogers distance"),
     CE("Cavalli-Sforza and Edwards distance"),
     SH("Shannon diversity index"),
@@ -29,7 +29,7 @@ public enum CorehunterObjective {
 
     private String name;
 
-    CorehunterObjective(String name) {
+    CoreHunterObjective(String name) {
         this.name = name;
     }
 

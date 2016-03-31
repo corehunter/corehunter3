@@ -43,12 +43,12 @@ import org.corehunter.data.simple.CoreHunterData;
  *
  * @author Guy Davenport
  */
-public class Corehunter {
+public class CoreHunter {
 
-    private CorehunterArguments arguments;
+    private CoreHunterArguments arguments;
     private long timeLimit = 60;
 
-    public Corehunter(CorehunterArguments arguments) {
+    public CoreHunter(CoreHunterArguments arguments) {
         this.arguments = arguments;
     }
 
@@ -56,7 +56,7 @@ public class Corehunter {
         return execute(null);
     }
 
-    public SubsetSolution execute(CorehunterListener listener) {
+    public SubsetSolution execute(CoreHunterListener listener) {
         
         if (arguments.getDataset() == null) {
             throw new IllegalArgumentException("Dataset not defined!");
@@ -78,7 +78,7 @@ public class Corehunter {
         return search.getBestSolution();
     }
 
-    protected Search<SubsetSolution> createSearch(CorehunterArguments arguments) {
+    protected Search<SubsetSolution> createSearch(CoreHunterArguments arguments) {
         
         Objective<SubsetSolution, CoreHunterData> objective;
         switch (arguments.getObjective()) {

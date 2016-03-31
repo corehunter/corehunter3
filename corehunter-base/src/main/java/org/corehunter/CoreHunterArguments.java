@@ -21,21 +21,21 @@ package org.corehunter;
 
 import org.corehunter.data.NamedData;
 
-public class CorehunterArguments {
+public class CoreHunterArguments {
 
     private int minimumSubsetSize;
 
     private int maximumSubsetSize;
 
-    private CorehunterObjective objective;
+    private CoreHunterObjective objective;
 
     private NamedData dataset;
 
-    public CorehunterArguments(int subsetSize) {
+    public CoreHunterArguments(int subsetSize) {
         this(subsetSize, subsetSize);
     }
 
-    public CorehunterArguments(int minimumSubsetSize, int maximumSubsetSize) {
+    public CoreHunterArguments(int minimumSubsetSize, int maximumSubsetSize) {
         super();
         this.minimumSubsetSize = minimumSubsetSize;
         this.maximumSubsetSize = maximumSubsetSize;
@@ -65,11 +65,11 @@ public class CorehunterArguments {
         this.dataset = dataset;
     }
 
-    public final CorehunterObjective getObjective() {
+    public final CoreHunterObjective getObjective() {
         return objective;
     }
 
-    public final void setObjective(CorehunterObjective objective) {
+    public final void setObjective(CoreHunterObjective objective) {
         this.objective = objective;
     }
 }
