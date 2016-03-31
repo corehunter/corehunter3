@@ -26,8 +26,6 @@ import org.corehunter.data.DistanceMatrixData;
 import org.corehunter.distance.GowersDistanceMatrixGenerator;
 import org.corehunter.objectives.biallelic.CoverageBiAllelic;
 import org.corehunter.objectives.biallelic.HetrozygousLociDiversityBiAllelic;
-import org.corehunter.objectives.biallelic.NumberEffectiveAllelesBiAllelic;
-import org.corehunter.objectives.biallelic.ProportionNonInformativeAllelesBiAllelic;
 import org.corehunter.objectives.biallelic.ShannonsDiversityBiAllelic;
 import org.corehunter.objectives.distance.AverageDistanceObjective;
 import org.corehunter.objectives.distance.GenotypeVariantDistanceMetric;
@@ -37,8 +35,6 @@ import org.corehunter.objectives.distance.multiallelic.CavalliSforzaEdwardsDista
 import org.corehunter.objectives.distance.multiallelic.ModifiedRogersDistanceMultiAllelic;
 import org.corehunter.objectives.multiallelic.CoverageMultiAllelic;
 import org.corehunter.objectives.multiallelic.HetrozygousLociDiversityMultiAllelic;
-import org.corehunter.objectives.multiallelic.NumberEffectiveAllelesMultiAllelic;
-import org.corehunter.objectives.multiallelic.ProportionNonInformativeAllelesMultiAllelic;
 import org.corehunter.objectives.multiallelic.ShannonsDiversityMultiAllelic;
 
 import org.jamesframework.core.problems.objectives.Objective;
@@ -155,13 +151,6 @@ public class Corehunter {
                 return createMultiAllelicGenotypeDistanceSearch(
                             new ModifiedRogersDistanceMultiAllelic(dataset),
                             dataset, arguments);
-            case NE:
-                return createMultiAllelicGenotypeSearch(new NumberEffectiveAllelesMultiAllelic(),
-                                                        dataset, arguments);
-            case PN:
-                return createMultiAllelicGenotypeSearch(
-                            new ProportionNonInformativeAllelesMultiAllelic(),
-                            dataset, arguments);
             case SH:
                 return createMultiAllelicGenotypeSearch(new ShannonsDiversityMultiAllelic(),
                                                         dataset, arguments);
@@ -209,12 +198,6 @@ public class Corehunter {
                 return createBiAllelicGenotypeDistanceSearch(
                             new ModifiedRogersDistanceBiAllelic(dataset),
                             dataset, arguments);
-            case NE:
-                return createBiAllelicGenotypeSearch(new NumberEffectiveAllelesBiAllelic(),
-                                                     dataset, arguments);
-            case PN:
-                return createBiAllelicGenotypeSearch(new ProportionNonInformativeAllelesBiAllelic(),
-                                                     dataset, arguments);
             case SH:
                 return createBiAllelicGenotypeSearch(new ShannonsDiversityBiAllelic(),
                                                      dataset, arguments);

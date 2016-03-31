@@ -24,8 +24,6 @@ public enum CorehunterObjective {
     CE("Cavalli-Sforza and Edwards distance"),
     SH("Shannon diversity index"),
     HE("Expected proportion of heterozygous loci per individual"),
-    NE("Number of effective alleles"),
-    PN("Proportion of non-informative alleles"),
     CV("Coverage of alleles"),
     GD("Gowers Distance");
 
