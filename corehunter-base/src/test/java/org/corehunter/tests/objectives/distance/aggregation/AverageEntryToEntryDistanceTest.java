@@ -25,6 +25,7 @@ import org.corehunter.data.simple.SimpleDistanceMatrixData;
 import org.corehunter.data.simple.SimpleGenotypeVariantData;
 import org.corehunter.objectives.distance.CavalliSforzaEdwardsDistance;
 import org.corehunter.objectives.distance.ModifiedRogersDistance;
+import org.corehunter.objectives.distance.PrecomputedDistance;
 import org.corehunter.objectives.distance.aggregation.AverageEntryToEntryDistance;
 
 import static org.corehunter.tests.TestData.ALLELE_FREQUENCIES;
@@ -108,7 +109,7 @@ public class AverageEntryToEntryDistanceTest extends EvaluationTest {
         DistanceMatrixData dist = new SimpleDistanceMatrixData(MODIFIED_ROGERS_DISTANCES);
         CoreHunterData data = new CoreHunterData(dist);
         
-        AverageEntryToEntryDistance objective = new AverageEntryToEntryDistance(new CavalliSforzaEdwardsDistance());
+        AverageEntryToEntryDistance objective = new AverageEntryToEntryDistance(new PrecomputedDistance());
 
         assertEquals(
                 "Evaluation for subset 2 is not correct!",

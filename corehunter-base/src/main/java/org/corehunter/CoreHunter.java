@@ -37,6 +37,7 @@ import org.jamesframework.core.search.stopcriteria.MaxRuntime;
 import org.jamesframework.core.subset.neigh.SinglePerturbationNeighbourhood;
 
 import org.corehunter.data.simple.CoreHunterData;
+import org.corehunter.objectives.distance.GowerDistance;
 
 /**
  * Provides support for executing pre-defined core subset searches. Can be re-used.
@@ -98,8 +99,8 @@ public class CoreHunter {
                 objective = new Shannon();
                 break;
             case GD:
-                throw new IllegalArgumentException("Invalid objective for multiallelic data : "
-                                                    + arguments.getObjective());
+                objective = new AverageEntryToEntryDistance(new GowerDistance());
+                break;
             default:
                 throw new IllegalArgumentException("Unknown objective : " + arguments.getObjective());
         }

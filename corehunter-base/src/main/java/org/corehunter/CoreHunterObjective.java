@@ -23,7 +23,7 @@ public enum CoreHunterObjective {
     MR("Modified Rogers distance"),
     CE("Cavalli-Sforza and Edwards distance"),
     SH("Shannon diversity index"),
-    HE("Expected proportion of heterozygous loci per individual"),
+    HE("Expected proportion of heterozygous loci"),
     CV("Coverage of alleles"),
     GD("Gowers Distance");
 
