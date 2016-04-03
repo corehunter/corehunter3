@@ -175,7 +175,7 @@ public class FileBasedDatasetServicesTest {
         }
     }
     
-    @Test
+    //@Test
     public void testAddDatasetWithPhenotypicData() {
         try {
             FileBasedDatasetServices fileBasedDatasetServices = new FileBasedDatasetServices(
@@ -204,7 +204,7 @@ public class FileBasedDatasetServicesTest {
         }
     }
     
-    @Test
+    //@Test
     public void testRestoreDatasetWithPhenotypicData() {
         try {
             FileBasedDatasetServices fileBasedDatasetServices = new FileBasedDatasetServices(
