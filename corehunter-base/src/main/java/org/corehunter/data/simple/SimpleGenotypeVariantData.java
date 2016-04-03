@@ -23,6 +23,7 @@ package org.corehunter.data.simple;
 import static uno.informatics.common.Constants.UNKNOWN_COUNT;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -39,6 +40,7 @@ import org.corehunter.util.StringUtils;
 import uno.informatics.common.io.FileType;
 import uno.informatics.common.io.IOUtilities;
 import uno.informatics.common.io.RowReader;
+import uno.informatics.common.io.RowWriter;
 import uno.informatics.common.io.text.TextFileRowReader;
 import uno.informatics.data.SimpleEntity;
 import uno.informatics.data.pojo.DataPojo;
@@ -501,12 +503,88 @@ public class SimpleGenotypeVariantData extends DataPojo implements GenotypeVaria
             }
             
         }
-        
     }
     
-    public static void writeData(Path newPath, SimpleGenotypeVariantData genotypeData, FileType fileType) {
-        // TODO Auto-generated method stub
-        
+    public static void writeData(Path filePath, SimpleGenotypeVariantData genotypicData, 
+            FileType fileType) throws IOException {
+
+        if (filePath == null) {
+            throw new IllegalArgumentException("File path not defined.");
+        }
+
+        if (filePath.toFile().exists()) {
+            throw new IOException("File already exists : " + filePath + ".");
+        }
+
+        if (fileType == null) {
+            throw new IllegalArgumentException("File type not defined.");
+        }
+
+        if (fileType != FileType.TXT && fileType != FileType.CSV) {
+            throw new IllegalArgumentException(
+                    String.format("Only file types TXT and CSV are supported. Got: %s.", fileType));
+        }
+
+        Files.createDirectories(filePath.getParent());
+
+        // read data from file
+        try (RowWriter writer = IOUtilities.createRowWriter(filePath.toFile(), fileType,
+                TextFileRowReader.REMOVE_WHITE_SPACE)) {
+
+            if (writer == null || !writer.ready()) {
+                throw new IOException("Can not create writer for file " + filePath + ".");
+            }
+
+            String[] markerNames = genotypicData.markerNames;
+
+            writer.writeCell(NAMES_HEADER);
+            
+            writer.newColumn() ;
+
+            writer.writeCell(IDENTIFIERS_HEADER);
+
+            String[][] alleleNames = genotypicData.alleleNames ;
+            
+            for (int i = 0 ; i < alleleNames.length ; ++i) {
+                for (int j = 0 ; j < alleleNames[i].length ; ++j) {
+                    writer.newColumn() ;
+                    writer.writeCell(markerNames[i]);  
+                }
+            }
+            
+            writer.newRow() ;
+            
+            writer.writeCell(ALLELE_NAMES_HEADER);
+            
+            for (int i = 0 ; i < alleleNames.length ; ++i) {
+                writer.newColumn() ;
+                writer.writeRowCellsAsArray(alleleNames[i]);  
+            }
+
+            Double[][][] alleleFrequencies = genotypicData.alleleFrequencies ;
+
+            SimpleEntity header;
+
+            for (int i = 0; i < alleleFrequencies.length; ++i) {
+
+                writer.newRow();
+                
+                header = genotypicData.getHeader(i);
+                writer.writeCell(header.getName());
+                
+                writer.newColumn() ;
+                
+                writer.writeCell(header.getUniqueIdentifier());
+
+                for (int j = 0; j < alleleFrequencies[i].length; ++j) {
+                    writer.newColumn() ;
+                    
+                    writer.writeRowCellsAsArray(alleleFrequencies[i][j]);
+                }
+            }
+
+            writer.close();
+        }
     }
     
     /**
@@ -783,6 +861,96 @@ public class SimpleGenotypeVariantData extends DataPojo implements GenotypeVaria
                 
     }
     
+
+    public static void writeDiploidData(Path filePath, SimpleGenotypeVariantData genotypicData, 
+            FileType fileType) throws IOException {
+
+        if (filePath == null) {
+            throw new IllegalArgumentException("File path not defined.");
+        }
+
+        if (filePath.toFile().exists()) {
+            throw new IOException("File already exists : " + filePath + ".");
+        }
+
+        if (fileType == null) {
+            throw new IllegalArgumentException("File type not defined.");
+        }
+
+        if (fileType != FileType.TXT && fileType != FileType.CSV) {
+            throw new IllegalArgumentException(
+                    String.format("Only file types TXT and CSV are supported. Got: %s.", fileType));
+        }
+        
+        String[][] alleleNames = genotypicData.alleleNames ;
+        
+        String[] markerNames = genotypicData.markerNames;
+        
+        for (int i = 0 ; i < alleleNames.length ; ++i) {
+            if (alleleNames[i].length != 2) {
+                throw new IllegalArgumentException("Marker : " + markerNames[i]
+                        + " does not have 2 alleles : " + alleleNames.length);
+            }
+        }
+
+        Files.createDirectories(filePath.getParent());
+
+        // read data from file
+        try (RowWriter writer = IOUtilities.createRowWriter(filePath.toFile(), fileType,
+                TextFileRowReader.REMOVE_WHITE_SPACE)) {
+
+            if (writer == null || !writer.ready()) {
+                throw new IOException("Can not create writer for file " + filePath + ".");
+            }
+
+            writer.writeCell(NAMES_HEADER);
+            
+            writer.newColumn() ;
+
+            writer.writeCell(IDENTIFIERS_HEADER);
+            
+            for (int i = 0 ; i < alleleNames.length ; ++i) {
+                for (int j = 0 ; j < alleleNames[i].length ; ++j) {
+                    writer.newColumn() ;
+                    writer.writeCell(markerNames[i]);  
+                }
+            }
+            
+            writer.newRow() ;
+            
+            writer.writeCell(ALLELE_NAMES_HEADER);
+            
+            for (int i = 0 ; i < alleleNames.length ; ++i) {
+                writer.newColumn() ;
+                writer.writeRowCellsAsArray(alleleNames[i]);  
+            }
+
+            Double[][][] alleleFrequencies = genotypicData.alleleFrequencies ;
+
+            SimpleEntity header;
+
+            for (int i = 0; i < alleleFrequencies.length; ++i) {
+
+                writer.newRow();
+                
+                header = genotypicData.getHeader(i);
+                writer.writeCell(header.getName());
+                
+                writer.newColumn() ;
+                
+                writer.writeCell(header.getUniqueIdentifier());
+
+                for (int j = 0; j < alleleFrequencies[i].length; ++j) {
+                    writer.newColumn() ;
+                    
+                    writer.writeRowCellsAsArray(alleleFrequencies[i][j]);
+                }
+            }
+
+            writer.close();
+        }  
+    }  
+    
     private static String longestSharedPrefix(String str1, String str2){
         int end = 1;
         int l = Math.min(str1.length(), str2.length());
@@ -813,5 +981,5 @@ public class SimpleGenotypeVariantData extends DataPojo implements GenotypeVaria
     
     private static void increaseFrequency(Double[] freqs, int a, double incr){
         freqs[a] = freqs[a] == null ? incr : freqs[a] + incr;
-    }    
+    }  
 }

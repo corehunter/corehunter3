@@ -483,12 +483,14 @@ public class SimpleBiAllelicGenotypeVariantData extends DataPojo implements BiAl
             String[] markerNames = genotypicData.markerNames;
 
             writer.writeCell(NAMES_HEADER);
+            
+            writer.newColumn() ;
 
             writer.writeCell(IDENTIFIERS_HEADER);
+            
+            writer.newColumn() ;
 
             writer.writeRowCellsAsArray(markerNames);
-
-            writer.newRow();
 
             Integer[][] alleleScores = genotypicData.alleleScores;
 
@@ -496,11 +498,17 @@ public class SimpleBiAllelicGenotypeVariantData extends DataPojo implements BiAl
 
             for (int r = 0; r < alleleScores.length; ++r) {
 
+                writer.newRow();
+                
                 header = genotypicData.getHeader(r);
                 writer.writeCell(header.getName());
-
+                
+                writer.newColumn() ;
+                
                 writer.writeCell(header.getUniqueIdentifier());
-
+                
+                writer.newColumn() ;
+                
                 writer.writeRowCellsAsArray(alleleScores[r]);
             }
 

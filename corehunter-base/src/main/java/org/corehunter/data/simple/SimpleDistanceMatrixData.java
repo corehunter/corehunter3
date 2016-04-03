@@ -20,6 +20,7 @@
 package org.corehunter.data.simple;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -34,6 +35,7 @@ import uno.informatics.common.Constants;
 import uno.informatics.common.io.FileType;
 import uno.informatics.common.io.IOUtilities;
 import uno.informatics.common.io.RowReader;
+import uno.informatics.common.io.RowWriter;
 import uno.informatics.common.io.text.TextFileRowReader;
 import uno.informatics.data.SimpleEntity;
 import uno.informatics.data.pojo.DataPojo;
@@ -362,9 +364,74 @@ public class SimpleDistanceMatrixData extends DataPojo implements DistanceMatrix
         }
     }
     
-    public static void writeData(Path newPath, SimpleDistanceMatrixData distance, FileType fileType) {
-        // TODO Auto-generated method stub
-        
+    public static void writeData(Path filePath, SimpleDistanceMatrixData distanceData, 
+            FileType fileType) throws IOException {
+        // validate arguments
+
+        if (filePath == null) {
+            throw new IllegalArgumentException("File path not defined.");
+        }
+
+        if (filePath.toFile().exists()) {
+            throw new IOException("File already exists : " + filePath + ".");
+        }
+
+        if (fileType == null) {
+            throw new IllegalArgumentException("File type not defined.");
+        }
+
+        if (fileType != FileType.TXT && fileType != FileType.CSV) {
+            throw new IllegalArgumentException(
+                    String.format("Only file types TXT and CSV are supported. Got: %s.", fileType));
+        }
+
+        Files.createDirectories(filePath.getParent());
+
+        // read data from file
+        try (RowWriter writer = IOUtilities.createRowWriter(filePath.toFile(), fileType,
+                TextFileRowReader.REMOVE_WHITE_SPACE)) {
+
+            if (writer == null || !writer.ready()) {
+                throw new IOException("Can not create writer for file " + filePath + ".");
+            }
+
+            writer.writeCell(NAMES_HEADER);
+            
+            Iterator<Integer> iterator = distanceData.getIDs().iterator() ;
+            
+            while (iterator.hasNext()) {
+                
+                writer.newColumn() ;
+                
+                writer.writeCell(distanceData.getHeader(iterator.next()).getName()) ;
+            }
+            
+            writer.newRow() ;
+            
+            writer.writeCell(IDENTIFIERS_HEADER);
+                
+            iterator = distanceData.getIDs().iterator() ;
+            
+            while (iterator.hasNext()) {
+                
+                writer.newColumn() ;
+                
+                writer.writeCell(distanceData.getHeader(iterator.next()).getUniqueIdentifier()) ;
+            }
+                        
+            double[][] distances = distanceData.distances;
+
+            for (int i = 0; i < distances.length; ++i) {
+                writer.newRow() ;
+                writer.writeCell(distances[i][0]);
+                for (int j = 1; j < distances.length; ++j) {
+                    writer.newColumn() ;
+                    writer.writeCell(distances[i][j]);
+                }
+            }
+
+            writer.close();
+        } 
     }
     
     private static void checkNumValuesInRow(SymmetricMatrixFormat format, int row,

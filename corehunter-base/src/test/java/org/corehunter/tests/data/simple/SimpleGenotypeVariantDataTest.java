@@ -23,6 +23,7 @@ import static org.corehunter.tests.TestData.ALLELE_FREQUENCIES;
 import static org.corehunter.tests.TestData.ALLELE_FREQUENCIES_DIPLOID;
 import static org.corehunter.tests.TestData.ALLELE_NAMES;
 import static org.corehunter.tests.TestData.ALLELE_NAMES_DIPLOID;
+import static org.corehunter.tests.TestData.ALLELE_SCORES_BIALLELIC;
 import static org.corehunter.tests.TestData.HEADERS_NON_UNIQUE_NAMES;
 import static org.corehunter.tests.TestData.HEADERS_UNIQUE_NAMES;
 import static org.corehunter.tests.TestData.MARKER_NAMES;
@@ -44,6 +45,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 
+import org.corehunter.data.simple.SimpleBiAllelicGenotypeVariantData;
 import org.corehunter.data.simple.SimpleGenotypeVariantData;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -69,6 +71,7 @@ public class SimpleGenotypeVariantDataTest {
 
     private static final String ERRONEOUS_FILES_DIR = "/multiallelic/err/";
     private static final String DIPLOID_ERRONEOUS_FILES_DIR = "/multiallelic/diploid/err/";
+    private static final String TEST_OUTPUT = "target/testoutput";
     
     private SimpleEntity[] expectedHeaders;
     private String[] expectedMarkerNames;
@@ -152,6 +155,7 @@ public class SimpleGenotypeVariantDataTest {
         ));
     }
     
+    // TODO should not allele names be compulsory?
     @Test
     public void fromCsvFileWithoutAlleleNames() throws IOException {
         dataName = "no-allele-names.csv";
@@ -163,6 +167,60 @@ public class SimpleGenotypeVariantDataTest {
             Paths.get(SimpleGenotypeVariantDataTest.class.getResource(CSV_NO_ALLELE_NAMES).getPath()),
             FileType.CSV
         ));
+    }
+    
+    @Test
+    public void toTxtFileWithNames() throws IOException {
+        dataName = "names.txt";
+        expectedHeaders = HEADERS_UNIQUE_NAMES;
+        expectedMarkerNames = MARKER_NAMES;
+        expectedAlleleNames = UNDEFINED_ALLELE_NAMES;
+        
+        SimpleGenotypeVariantData genotypicData = new SimpleGenotypeVariantData(expectedHeaders, 
+                expectedMarkerNames, expectedAlleleNames, ALLELE_FREQUENCIES) ;
+        
+        Path path = Paths.get(TEST_OUTPUT) ;
+        
+        Files.createDirectories(path) ;
+        
+        path = Files.createTempDirectory(path, "TxtFileWithNames") ;
+        
+        path = Paths.get(path.toString(), dataName) ;
+        
+        Files.deleteIfExists(path) ;
+        
+        System.out.println(" |- Write File " + dataName);
+        SimpleGenotypeVariantData.writeData(path, genotypicData, FileType.TXT);
+        
+        System.out.println(" |- Read written File " + dataName);
+        testData(SimpleGenotypeVariantData.readData(path, FileType.TXT), ALLELE_FREQUENCIES);
+    }
+    
+    @Test
+    public void toCsvFileWithNames() throws IOException {
+        dataName = "names.csv";
+        expectedHeaders = HEADERS_UNIQUE_NAMES;
+        expectedMarkerNames = MARKER_NAMES;
+        expectedAlleleNames = UNDEFINED_ALLELE_NAMES;
+        
+        SimpleGenotypeVariantData genotypicData = new SimpleGenotypeVariantData(expectedHeaders, 
+                expectedMarkerNames, expectedAlleleNames, ALLELE_FREQUENCIES) ;
+        
+        Path path = Paths.get(TEST_OUTPUT) ;
+        
+        Files.createDirectories(path) ;
+        
+        path = Files.createTempDirectory(path, "TxtFileWithNames") ;
+        
+        path = Paths.get(path.toString(), dataName) ;
+        
+        Files.deleteIfExists(path) ;
+        
+        System.out.println(" |- Write File " + dataName);
+        SimpleGenotypeVariantData.writeData(path, genotypicData, FileType.CSV);
+        
+        System.out.println(" |- Read written File " + dataName);
+        testData(SimpleGenotypeVariantData.readData(path, FileType.CSV), ALLELE_FREQUENCIES);
     }
     
     @Test
@@ -252,6 +310,33 @@ public class SimpleGenotypeVariantDataTest {
             Paths.get(SimpleGenotypeVariantDataTest.class.getResource(DIPLOID_TXT_NO_MARKER_NAMES).getPath()),
             FileType.TXT
         ));
+    }
+    
+    //@Test
+    public void diploidToCsvFileWithNamesAndIDs() throws IOException {
+        dataName = "names.csv";
+        expectedHeaders = HEADERS_NON_UNIQUE_NAMES;
+        expectedMarkerNames = MARKER_NAMES_DIPLOID;
+        expectedAlleleNames = ALLELE_NAMES_DIPLOID;
+        
+        SimpleGenotypeVariantData genotypicData = new SimpleGenotypeVariantData(expectedHeaders, 
+                expectedMarkerNames, expectedAlleleNames, ALLELE_FREQUENCIES) ;
+        
+        Path path = Paths.get(TEST_OUTPUT) ;
+        
+        Files.createDirectories(path) ;
+        
+        path = Files.createTempDirectory(path, "TxtFileWithNames") ;
+        
+        path = Paths.get(path.toString(), dataName) ;
+        
+        Files.deleteIfExists(path) ;
+        
+        System.out.println(" |- Write diploid File " + dataName);
+        SimpleGenotypeVariantData.writeDiploidData(path, genotypicData, FileType.CSV);
+        
+        System.out.println(" |- Read written diploid File " + dataName);
+        testData(SimpleGenotypeVariantData.readDiploidData(path, FileType.CSV), ALLELE_FREQUENCIES);
     }
     
     @Test

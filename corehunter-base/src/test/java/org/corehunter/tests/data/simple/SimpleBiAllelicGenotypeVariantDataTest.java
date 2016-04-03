@@ -35,6 +35,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
+import java.net.URI;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -59,6 +60,7 @@ public class SimpleBiAllelicGenotypeVariantDataTest {
     private static final String CSV_NO_MARKER_NAMES = "/biallelic/no-marker-names.csv";
 
     private static final String ERRONEOUS_FILES_DIR = "/biallelic/err/";
+    private static final String TEST_OUTPUT = "target/testoutput";
     
     private SimpleEntity[] expectedHeaders;
     private String[] expectedMarkerNames;
@@ -132,6 +134,7 @@ public class SimpleBiAllelicGenotypeVariantDataTest {
         ));
     }
     
+    // TODO should not marker names be compulsory?
     @Test
     public void fromCsvFileWithoutMarkerNames() throws IOException {
         datasetName = "no-marker-names.csv";
@@ -149,11 +152,25 @@ public class SimpleBiAllelicGenotypeVariantDataTest {
         datasetName = "names.txt";
         expectedHeaders = HEADERS_UNIQUE_NAMES;
         expectedMarkerNames = MARKER_NAMES;
+        
+        SimpleBiAllelicGenotypeVariantData genotypicData = 
+                new SimpleBiAllelicGenotypeVariantData(expectedHeaders, expectedMarkerNames, ALLELE_SCORES_BIALLELIC) ;
+        
+        Path path = Paths.get(TEST_OUTPUT) ;
+        
+        Files.createDirectories(path) ;
+        
+        path = Files.createTempDirectory(path, "TxtFileWithNames") ;
+        
+        path = Paths.get(path.toString(), datasetName) ;
+        
+        Files.deleteIfExists(path) ;
+        
         System.out.println(" |- Write File " + datasetName);
-        testData(SimpleBiAllelicGenotypeVariantData.readData(
-            Paths.get(SimpleBiAllelicGenotypeVariantDataTest.class.getResource(TXT_NAMES).getPath()),
-            FileType.TXT
-        ));
+        SimpleBiAllelicGenotypeVariantData.writeData(path, genotypicData, FileType.TXT);
+        
+        System.out.println(" |- Read written File " + datasetName);
+        testData(SimpleBiAllelicGenotypeVariantData.readData(path, FileType.TXT));
     }
     
     @Test
@@ -161,35 +178,25 @@ public class SimpleBiAllelicGenotypeVariantDataTest {
         datasetName = "names.csv";
         expectedHeaders = HEADERS_UNIQUE_NAMES;
         expectedMarkerNames = MARKER_NAMES;
+        
+        SimpleBiAllelicGenotypeVariantData genotypicData = 
+                new SimpleBiAllelicGenotypeVariantData(expectedHeaders, expectedMarkerNames, ALLELE_SCORES_BIALLELIC) ;
+        
+        Path path = Paths.get(TEST_OUTPUT) ;
+        
+        Files.createDirectories(path) ;
+        
+        path = Files.createTempDirectory(path, "TxtFileWithNames") ;
+        
+        path = Paths.get(path.toString(), datasetName) ;
+        
+        Files.deleteIfExists(path) ;
+        
         System.out.println(" |- Write File " + datasetName);
-        testData(SimpleBiAllelicGenotypeVariantData.readData(
-            Paths.get(SimpleBiAllelicGenotypeVariantDataTest.class.getResource(CSV_NAMES).getPath()),
-            FileType.CSV
-        ));
-    }
-    
-    @Test
-    public void toCsvFileWithNamesAndIds() throws IOException {
-        datasetName = "names-and-ids.csv";
-        expectedHeaders = HEADERS_NON_UNIQUE_NAMES;
-        expectedMarkerNames = MARKER_NAMES;
-        System.out.println(" |- Write File " + datasetName);
-        testData(SimpleBiAllelicGenotypeVariantData.readData(
-            Paths.get(SimpleBiAllelicGenotypeVariantDataTest.class.getResource(CSV_NAMES_IDS).getPath()),
-            FileType.CSV
-        ));
-    }
-    
-    @Test
-    public void toCsvFileWithoutMarkerNames() throws IOException {
-        datasetName = "no-marker-names.csv";
-        expectedHeaders = HEADERS_UNIQUE_NAMES;
-        expectedMarkerNames = UNDEFINED_MARKER_NAMES;
-        System.out.println(" |- Write File " + datasetName);
-        testData(SimpleBiAllelicGenotypeVariantData.readData(
-            Paths.get(SimpleBiAllelicGenotypeVariantDataTest.class.getResource(CSV_NO_MARKER_NAMES).getPath()),
-            FileType.CSV
-        ));
+        SimpleBiAllelicGenotypeVariantData.writeData(path, genotypicData, FileType.CSV);
+        
+        System.out.println(" |- Read written File " + datasetName);
+        testData(SimpleBiAllelicGenotypeVariantData.readData(path, FileType.CSV));
     }
     
     @Test
