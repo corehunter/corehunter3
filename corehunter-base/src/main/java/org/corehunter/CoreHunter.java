@@ -109,7 +109,7 @@ public class CoreHunter {
                 throw new IllegalArgumentException("Unknown objective : " + arguments.getObjective());
         }
         
-        CoreHunterData dataset = (CoreHunterData) arguments.getData();
+        CoreHunterData dataset = arguments.getData();
 
         SubsetProblem<CoreHunterData> problem = new SubsetProblem<>(
                 dataset, objective, arguments.getMinimumSubsetSize(), arguments.getMaximumSubsetSize()
