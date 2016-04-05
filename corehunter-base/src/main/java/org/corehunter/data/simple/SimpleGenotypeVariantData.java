@@ -52,7 +52,6 @@ import uno.informatics.data.pojo.SimpleEntityPojo;
 public class SimpleGenotypeVariantData extends DataPojo implements GenotypeVariantData {
 
     private static final double SUM_TO_ONE_PRECISION = 0.01 + 1e-8;
-    private static final int UNDEFINED_COLUMN = -1;
     private static final String NAMES_HEADER = "NAME";
     private static final String ALLELE_NAMES_HEADER = "ALLELE";
     private static final String IDENTIFIERS_HEADER = "ID";
@@ -92,12 +91,12 @@ public class SimpleGenotypeVariantData extends DataPojo implements GenotypeVaria
      * encoded as <code>null</code>. If one or more allele frequencies are missing at a certain marker for
      * a certain individual, the remaining frequencies should sum to a value less than or equal to one.
      * <p>
-     * Item headers and marker/allele names are optional. All three corresponding arguments may be
-     * <code>null</code>. If marker and/or allele names are given they need not be defined for all
-     * markers/alleles nor unique. If item headers are specified each item should at least have a
-     * unique identifier (names are optional). If not <code>null</code> the length of each header/name
-     * array should correspond to the dimensions of <code>alleleFrequencies</code> (number of individuals,
-     * markers and alleles per marker).
+     * Item headers are required and marker/allele names are optional. 
+     * If marker and/or allele names are given they need not be defined for all
+     * markers/alleles nor unique. Each item should at least have a unique identifier
+     * (names are optional). If not <code>null</code> the length of each header/name
+     * array should correspond to the dimensions of <code>alleleFrequencies</code>
+     * (number of individuals, markers and alleles per marker).
      * <p>
      * Violating any of the requirements will produce an exception.
      * <p>
@@ -105,9 +104,8 @@ public class SimpleGenotypeVariantData extends DataPojo implements GenotypeVaria
      * i.e. no references are retained to any of the arrays passed as arguments.
      * 
      * @param datasetName name of the dataset
-     * @param itemHeaders item headers, <code>null</code> if no headers are assigned; if not <code>null</code>
-     *                    its length should correspond to the number of individuals and each item should at
-     *                    least have a unique identifier
+     * @param itemHeaders item headers; its length should correspond to the number of individuals
+     *                    and each item should at least have a unique identifier (names are optional)
      * @param markerNames marker names, <code>null</code> if no marker names are assigned; if not
      *                    <code>null</code> its length should correspond to the number of markers
      *                    (can contain <code>null</code> values)
@@ -273,7 +271,7 @@ public class SimpleGenotypeVariantData extends DataPojo implements GenotypeVaria
      * <p>
      * The file starts with a compulsory header row from which (unique) marker names and allele counts are inferred.
      * All columns corresponding to the same marker occur consecutively in the file and are named after that marker.
-     * An optional header column with item names can also be provided, which is identified with column header "NAME".
+     * There is one required header column with item names, which is identified with column header "NAME".
      * If the provided item names are not unique or defined for some but not all items, a second header column "ID"
      * should be included to provide unique identifiers for at least those items whose name is undefined or not unique.
      * Finally, an optional second header row can be included to define allele names per marker, identified with row
@@ -596,10 +594,10 @@ public class SimpleGenotypeVariantData extends DataPojo implements GenotypeVaria
      * two (heterozygous) of all possible alleles of a certain marker. This means that all inferred frequencies
      * are either 0.0, 0.5 or 1.0. Missing values are encoding as empty cells.
      * <p>
-     * An optional first header row and column may be included to specify individual and marker names, identified
-     * with column/row header "NAME". If item names are not unique or defined for some but not all items, a second
-     * header column "ID" should be included to provide unique identifiers for at least those items whose name
-     * is undefined or not unique.
+     * An required first header row and optional header column are included to specify individual and marker names,
+     * respectively, identified with column/row header "NAME". If item names are not unique or defined for some but
+     * not all items, a second header column "ID" should be included to provide unique identifiers for at least those
+     * items whose name is undefined or not unique.
      * <p>
      * Each pair of two consecutive columns corresponds to a single marker and the headers of these two columns,
      * if provided, should share a unique prefix. The longest shared prefix of both column names is used as the marker

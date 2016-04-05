@@ -65,13 +65,12 @@ public class SimpleDistanceMatrixData extends DataPojo implements DistanceMatrix
      * The distance matrix should be symmetric with all rows of equal length.
      * Violating any of these requirements will produce an exception.
      * <p>
-     * Item headers are optional, missing headers should be encoded as <code>null</code>
-     * values in the header array. Alternatively, if no headers are assigned to any items,
-     * <code>headers</code> itself may also be <code>null</code>.
+     * Item headers are required. Each item should at least have a unique identifier
+     * (names are optional).
      * 
-     * @param headers item headers, <code>null</code> if no headers are assigned; if not
-     *                  <code>null</code> its length should be the same as the dimension
-     *                  of the given distance matrix
+     * @param headers item headers; its length should be the same as the dimension
+     *                of the given distance matrix and each item should at least have a
+     *                unique identifier (names are optional)
      * @param distances distance matrix (symmetric)
      * @throws IllegalArgumentException if an illegal distance matrix is given
      *                                  or the number of headers does not match
@@ -89,11 +88,11 @@ public class SimpleDistanceMatrixData extends DataPojo implements DistanceMatrix
      * The distance matrix should be symmetric with all rows of equal length.
      * Violating any of these requirements will produce an exception.
      * <p>
-     * Item headers are optional.
+     * Item headers are required. Each item should at least have a unique identifier
+     * (names are optional).
      * 
      * @param name dataset name
-     * @param headers item headers, <code>null</code> if no headers are assigned; if not
-     *                <code>null</code> its length should be the same as the dimension
+     * @param headers item headers; its length should be the same as the dimension
      *                of the given distance matrix and each item should at least have a
      *                unique identifier (names are optional)
      * @param distances distance matrix (symmetric)
@@ -152,8 +151,9 @@ public class SimpleDistanceMatrixData extends DataPojo implements DistanceMatrix
      * or {@link SymmetricMatrixFormat#LOWER_DIAG}) these should equal zero. If the full matrix is specified it
      * should be symmetric. Violating these requirements will produce an exception.
      * <p>
-     * Two optional header rows can be added at the beginning of the file to specify individual names and/or
-     * unique identifiers. The former is identified with row header "NAME", the latter with row header "ID".
+     * One required and one optional header row are included at the beginning of the file to specify individual
+     * names and (optionally) unique identifiers. The former is required and identified with row header "NAME".
+     * The latter is optional and has row header "ID".
      * If only names are specified they should be defined for each item and unique. Else, additional unique
      * identifiers are also required for at least those items whose name is undefined or not unique.
      * Leading and trailing whitespace is removed from names and unique identifiers and they are unquoted if

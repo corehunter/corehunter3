@@ -44,7 +44,6 @@ import uno.informatics.data.pojo.SimpleEntityPojo;
  */
 public class SimpleBiAllelicGenotypeVariantData extends DataPojo implements BiAllelicGenotypeVariantData {
 
-    private static final int UNDEFINED_COLUMN = -1;
     private static final String NAMES_HEADER = "NAME";
     private static final String IDENTIFIERS_HEADER = "ID";
 
@@ -53,16 +52,11 @@ public class SimpleBiAllelicGenotypeVariantData extends DataPojo implements BiAl
 
     /**
      * Create data with name "Biallelic marker data". For details of the
-     * arguments see
-     * {@link #SimpleBiAllelicGenotypeVariantData(String, SimpleEntity[], String[], Integer[][])}
-     * .
+     * arguments see {@link #SimpleBiAllelicGenotypeVariantData(String, SimpleEntity[], String[], Integer[][])} .
      * 
-     * @param itemHeaders
-     *            item headers (include name and/or unique identifier)
-     * @param markerNames
-     *            marker names
-     * @param alleleScores
-     *            0/1/2 allele score matrix
+     * @param itemHeaders item headers (include name and/or unique identifier)
+     * @param markerNames marker names
+     * @param alleleScores 0/1/2 allele score matrix
      */
     public SimpleBiAllelicGenotypeVariantData(SimpleEntity[] itemHeaders, String[] markerNames,
             Integer[][] alleleScores) {
@@ -76,12 +70,13 @@ public class SimpleBiAllelicGenotypeVariantData extends DataPojo implements BiAl
      * respectively. All entries in this matrix should be 0, 1 or 2 (or
      * <code>null</code> for missing values).
      * <p>
-     * Item headers and marker names are optional. Both arguments can be
-     * <code>null</code>. If marker names are given they need not be defined for
-     * all markers nor unique. If item headers are specified each item should at
-     * least have a unique identifier (names are optional). If not
-     * <code>null</code> the length of <code>itemHeaders</code> and
-     * <code>markerNames</code> should be equal to the number of items and
+     * Item headers are required but marker names are optional.
+     * If marker names are given they need not be defined for
+     * all markers nor unique. Each item should at
+     * least have a unique identifier (names are optional).
+     * The length of <code>itemHeaders</code> and
+     * <code>markerNames</code> (if not <code>null</code>)
+     * should be equal to the number of items and
      * markers, respectively, as inferred from the dimensions of
      * <code>alleleScores</code>.
      * <p>
@@ -94,8 +89,7 @@ public class SimpleBiAllelicGenotypeVariantData extends DataPojo implements BiAl
      * @param datasetName
      *            name of the dataset
      * @param itemHeaders
-     *            item headers, <code>null</code> if no headers are assigned; if
-     *            not <code>null</code> its length should equal the number of
+     *            item headers; its length should equal the number of
      *            rows in <code>alleleScores</code> and each item should at
      *            least have a unique identifier
      * @param markerNames
@@ -207,8 +201,7 @@ public class SimpleBiAllelicGenotypeVariantData extends DataPojo implements BiAl
     }
 
     /**
-     * The name of each allele is simply a string version of the allele index
-     * (0/1).
+     * The name of each allele is simply a string version of the allele index (0/1).
      * 
      * @param markerIndex
      *            marker index; ignored unless it falls outside the valid range
@@ -279,7 +272,7 @@ public class SimpleBiAllelicGenotypeVariantData extends DataPojo implements BiAl
      * column per marker. Only values 0, 1 and 2 are valid. Empty cells are also
      * allowed in case of missing data.
      * <p>
-     * An optional first header row and column may be included to specify
+     * A header row and column are included to specify
      * individual and marker names, identified with column/row header "NAME".
      * Some or all marker names may be undefined by leaving the corresponding
      * cells blank and marker names need not be unique. If item names are not
