@@ -35,7 +35,7 @@ import org.jamesframework.core.subset.neigh.moves.SubsetMove;
 
 /**
  * Evaluates a core set by computing the average distance between all pairs of selected items.
- * If less than two items are selected, 0.0 is returned.
+ * This value is to be maximized. If less than two items are selected, the value is set to 0.0.
  * 
  * @author Guy Davenport, Herman De Beukelaer
  */

@@ -23,17 +23,17 @@ import org.corehunter.data.DistanceMatrixData;
 import org.corehunter.data.CoreHunterData;
 import org.corehunter.data.simple.SimpleDistanceMatrixData;
 import org.corehunter.data.simple.SimpleGenotypeVariantData;
+import org.corehunter.objectives.distance.AverageAccessionToNearestEntryDistance;
 import org.corehunter.objectives.distance.measures.CavalliSforzaEdwardsDistance;
 import org.corehunter.objectives.distance.measures.ModifiedRogersDistance;
 import org.corehunter.objectives.distance.measures.PrecomputedDistance;
-import org.corehunter.objectives.distance.AverageEntryToEntryDistance;
 
+import static org.corehunter.tests.TestData.ACCESSION_TO_NEAREST_ENTRY_CAVALLI_SFORZA_SUBSET2;
+import static org.corehunter.tests.TestData.ACCESSION_TO_NEAREST_ENTRY_CAVALLI_SFORZA_SUBSET3;
+import static org.corehunter.tests.TestData.ACCESSION_TO_NEAREST_ENTRY_MODIFIED_ROGERS_SUBSET2;
+import static org.corehunter.tests.TestData.ACCESSION_TO_NEAREST_ENTRY_MODIFIED_ROGERS_SUBSET3;
 import static org.corehunter.tests.TestData.ALLELE_FREQUENCIES;
 import static org.corehunter.tests.TestData.ALLELE_NAMES;
-import static org.corehunter.tests.TestData.ENTRY_TO_ENTRY_CAVALLI_SFORZA_SUBSET2;
-import static org.corehunter.tests.TestData.ENTRY_TO_ENTRY_CAVALLI_SFORZA_SUBSET3;
-import static org.corehunter.tests.TestData.ENTRY_TO_ENTRY_MODIFIED_ROGERS_SUBSET2;
-import static org.corehunter.tests.TestData.ENTRY_TO_ENTRY_MODIFIED_ROGERS_SUBSET3;
 import static org.corehunter.tests.TestData.HEADERS_NON_UNIQUE_NAMES;
 import static org.corehunter.tests.TestData.HEADERS_UNIQUE_NAMES;
 import static org.corehunter.tests.TestData.MARKER_NAMES;
@@ -43,6 +43,7 @@ import static org.corehunter.tests.TestData.PRECISION;
 import static org.corehunter.tests.TestData.SUBSET2;
 import static org.corehunter.tests.TestData.SUBSET3;
 import static org.corehunter.tests.TestData.SUBSET_EMPTY;
+import static org.corehunter.tests.TestData.SUBSET_FULL;
 
 import org.corehunter.tests.objectives.EvaluationTest;
 import org.jamesframework.core.problems.objectives.evaluations.SimpleEvaluation;
@@ -51,9 +52,9 @@ import org.jamesframework.core.subset.SubsetSolution;
 import org.junit.Test;
 
 /**
- * @author Guy Davenport, Herman De Beukelaer
+ * @author Herman De Beukelaer
  */
-public class AverageEntryToEntryDistanceTest extends EvaluationTest {
+public class AverageAccessionToNearestEntryDistanceTest extends EvaluationTest {
 
     @Test
     public void testModifiedRogers() {
@@ -63,25 +64,34 @@ public class AverageEntryToEntryDistanceTest extends EvaluationTest {
         );
         CoreHunterData data = new CoreHunterData(geno);
         
-        AverageEntryToEntryDistance objective = new AverageEntryToEntryDistance(new ModifiedRogersDistance());
+        AverageAccessionToNearestEntryDistance objective = new AverageAccessionToNearestEntryDistance(
+                new ModifiedRogersDistance()
+        );
 
         assertEquals(
                 "Evaluation for subset 2 is not correct!",
-                ENTRY_TO_ENTRY_MODIFIED_ROGERS_SUBSET2,
+                ACCESSION_TO_NEAREST_ENTRY_MODIFIED_ROGERS_SUBSET2,
                 objective.evaluate(new SubsetSolution(data.getIDs(), SUBSET2), data),
                 PRECISION
         );
         
         assertEquals(
                 "Evaluation for subset 3 is not correct!",
-                ENTRY_TO_ENTRY_MODIFIED_ROGERS_SUBSET3,
+                ACCESSION_TO_NEAREST_ENTRY_MODIFIED_ROGERS_SUBSET3,
                 objective.evaluate(new SubsetSolution(data.getIDs(), SUBSET3), data),
                 PRECISION
         );
         
         assertEquals(
-                "Evaluation for empty subset is not correct!",
+                "Evaluation for full subset is not correct!",
                 SimpleEvaluation.WITH_VALUE(0.0),
+                objective.evaluate(new SubsetSolution(data.getIDs(), SUBSET_FULL), data),
+                PRECISION
+        );
+        
+        assertEquals(
+                "Evaluation for empty subset is not correct!",
+                SimpleEvaluation.WITH_VALUE(Double.POSITIVE_INFINITY),
                 objective.evaluate(new SubsetSolution(data.getIDs(), SUBSET_EMPTY), data),
                 PRECISION
         );
@@ -96,25 +106,34 @@ public class AverageEntryToEntryDistanceTest extends EvaluationTest {
         );
         CoreHunterData data = new CoreHunterData(geno);
         
-        AverageEntryToEntryDistance objective = new AverageEntryToEntryDistance(new CavalliSforzaEdwardsDistance());
+        AverageAccessionToNearestEntryDistance objective = new AverageAccessionToNearestEntryDistance(
+                new CavalliSforzaEdwardsDistance()
+        );
 
         assertEquals(
                 "Evaluation for subset 2 is not correct!",
-                ENTRY_TO_ENTRY_CAVALLI_SFORZA_SUBSET2,
+                ACCESSION_TO_NEAREST_ENTRY_CAVALLI_SFORZA_SUBSET2,
                 objective.evaluate(new SubsetSolution(data.getIDs(), SUBSET2), data),
                 PRECISION
         );
         
         assertEquals(
                 "Evaluation for subset 3 is not correct!",
-                ENTRY_TO_ENTRY_CAVALLI_SFORZA_SUBSET3,
+                ACCESSION_TO_NEAREST_ENTRY_CAVALLI_SFORZA_SUBSET3,
                 objective.evaluate(new SubsetSolution(data.getIDs(), SUBSET3), data),
                 PRECISION
         );
         
         assertEquals(
-                "Evaluation for empty subset is not correct!",
+                "Evaluation for full subset is not correct!",
                 SimpleEvaluation.WITH_VALUE(0.0),
+                objective.evaluate(new SubsetSolution(data.getIDs(), SUBSET_FULL), data),
+                PRECISION
+        );
+        
+        assertEquals(
+                "Evaluation for empty subset is not correct!",
+                SimpleEvaluation.WITH_VALUE(Double.POSITIVE_INFINITY),
                 objective.evaluate(new SubsetSolution(data.getIDs(), SUBSET_EMPTY), data),
                 PRECISION
         );
@@ -127,25 +146,34 @@ public class AverageEntryToEntryDistanceTest extends EvaluationTest {
         DistanceMatrixData dist = new SimpleDistanceMatrixData(HEADERS_UNIQUE_NAMES, MODIFIED_ROGERS_DISTANCES);
         CoreHunterData data = new CoreHunterData(dist);
         
-        AverageEntryToEntryDistance objective = new AverageEntryToEntryDistance(new PrecomputedDistance());
+        AverageAccessionToNearestEntryDistance objective = new AverageAccessionToNearestEntryDistance(
+                new PrecomputedDistance()
+        );
 
         assertEquals(
                 "Evaluation for subset 2 is not correct!",
-                ENTRY_TO_ENTRY_MODIFIED_ROGERS_SUBSET2,
+                ACCESSION_TO_NEAREST_ENTRY_MODIFIED_ROGERS_SUBSET2,
                 objective.evaluate(new SubsetSolution(data.getIDs(), SUBSET2), data),
                 PRECISION
         );
         
         assertEquals(
                 "Evaluation for subset 3 is not correct!",
-                ENTRY_TO_ENTRY_MODIFIED_ROGERS_SUBSET3,
+                ACCESSION_TO_NEAREST_ENTRY_MODIFIED_ROGERS_SUBSET3,
                 objective.evaluate(new SubsetSolution(data.getIDs(), SUBSET3), data),
                 PRECISION
         );
         
         assertEquals(
-                "Evaluation for empty subset is not correct!",
+                "Evaluation for full subset is not correct!",
                 SimpleEvaluation.WITH_VALUE(0.0),
+                objective.evaluate(new SubsetSolution(data.getIDs(), SUBSET_FULL), data),
+                PRECISION
+        );
+        
+        assertEquals(
+                "Evaluation for empty subset is not correct!",
+                SimpleEvaluation.WITH_VALUE(Double.POSITIVE_INFINITY),
                 objective.evaluate(new SubsetSolution(data.getIDs(), SUBSET_EMPTY), data),
                 PRECISION
         );

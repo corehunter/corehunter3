@@ -42,8 +42,10 @@ import static org.corehunter.tests.TestData.NAME;
 import static org.corehunter.tests.TestData.PRECISION;
 import static org.corehunter.tests.TestData.SUBSET2;
 import static org.corehunter.tests.TestData.SUBSET3;
+import static org.corehunter.tests.TestData.SUBSET_EMPTY;
 
 import org.corehunter.tests.objectives.EvaluationTest;
+import org.jamesframework.core.problems.objectives.evaluations.SimpleEvaluation;
 
 import org.jamesframework.core.subset.SubsetSolution;
 import org.junit.Test;
@@ -79,6 +81,13 @@ public class AverageEntryToNearestEntryDistanceTest extends EvaluationTest {
                 PRECISION
         );
         
+        assertEquals(
+                "Evaluation for empty subset is not correct!",
+                SimpleEvaluation.WITH_VALUE(0.0),
+                objective.evaluate(new SubsetSolution(data.getIDs(), SUBSET_EMPTY), data),
+                PRECISION
+        );
+        
     }
     
     @Test
@@ -99,10 +108,18 @@ public class AverageEntryToNearestEntryDistanceTest extends EvaluationTest {
                 objective.evaluate(new SubsetSolution(data.getIDs(), SUBSET2), data),
                 PRECISION
         );
+        
         assertEquals(
                 "Evaluation for subset 3 is not correct!",
                 ENTRY_TO_NEAREST_ENTRY_CAVALLI_SFORZA_SUBSET3,
                 objective.evaluate(new SubsetSolution(data.getIDs(), SUBSET3), data),
+                PRECISION
+        );
+        
+        assertEquals(
+                "Evaluation for empty subset is not correct!",
+                SimpleEvaluation.WITH_VALUE(0.0),
+                objective.evaluate(new SubsetSolution(data.getIDs(), SUBSET_EMPTY), data),
                 PRECISION
         );
         
@@ -129,6 +146,13 @@ public class AverageEntryToNearestEntryDistanceTest extends EvaluationTest {
                 "Evaluation for subset 3 is not correct!",
                 ENTRY_TO_NEAREST_ENTRY_MODIFIED_ROGERS_SUBSET3,
                 objective.evaluate(new SubsetSolution(data.getIDs(), SUBSET3), data),
+                PRECISION
+        );
+        
+        assertEquals(
+                "Evaluation for empty subset is not correct!",
+                SimpleEvaluation.WITH_VALUE(0.0),
+                objective.evaluate(new SubsetSolution(data.getIDs(), SUBSET_EMPTY), data),
                 PRECISION
         );
         

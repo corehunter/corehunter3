@@ -29,30 +29,39 @@ import org.jamesframework.core.problems.objectives.evaluations.SimpleEvaluation;
 import org.jamesframework.core.subset.SubsetSolution;
 
 /**
- * Evaluates a core set by computing the average distance between each selected item and the closest other
- * selected item. This value is to be maximized. If less than two items are selected, the value is set to 0.0.
+ * Evaluates a core set by computing the average distance between each unselected item and the closest selected item.
+ * This value is to be minimized. If all items are selected, the value is set to 0.0. If no items are selected, the
+ * value is set to {@link Double#POSITIVE_INFINITY}.
  * 
  * @author Herman De Beukelaer
  */
-public class AverageEntryToNearestEntryDistance implements Objective<SubsetSolution, CoreHunterData> {
+public class AverageAccessionToNearestEntryDistance implements Objective<SubsetSolution, CoreHunterData> {
 
     private final DistanceMeasure distanceMeasure;
 
-    public AverageEntryToNearestEntryDistance(DistanceMeasure distanceMeasure) {
+    public AverageAccessionToNearestEntryDistance(DistanceMeasure distanceMeasure) {
         this.distanceMeasure = distanceMeasure;
     }
     
     // TODO efficient delta evaluation
     @Override
     public Evaluation evaluate(SubsetSolution solution, CoreHunterData data) {
-        double value = 0.0;
-        if (solution.getNumSelectedIDs() >= 2) {
+        double value;
+        if (solution.getNumUnselectedIDs() == 0){
+            // all items selected
+            value = 0.0;
+        } else if (solution.getNumSelectedIDs() == 0){
+            // no items selected
+            value = Double.POSITIVE_INFINITY;
+        } else {
+            // at least one selected, at least one unselected
+            Set<Integer> unselected = solution.getUnselectedIDs();
             Set<Integer> selected = solution.getSelectedIDs();
-            value = selected.stream().mapToDouble(idX -> {
+            value = unselected.stream().mapToDouble(unsel -> {
                 double minDist = Double.POSITIVE_INFINITY;
-                for(int idY : selected){
-                    double dist = distanceMeasure.getDistance(idX, idY, data);
-                    if(idY != idX && dist < minDist){
+                for(int sel : selected){
+                    double dist = distanceMeasure.getDistance(unsel, sel, data);
+                    if(sel != unsel && dist < minDist){
                         minDist = dist;
                     }
                 }
@@ -64,7 +73,7 @@ public class AverageEntryToNearestEntryDistance implements Objective<SubsetSolut
 
     @Override
     public boolean isMinimizing() {
-        return false;
+        return true;
     }
 
 }
