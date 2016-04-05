@@ -19,7 +19,7 @@
 
 package org.corehunter;
 
-import org.corehunter.data.NamedData;
+import org.corehunter.data.CoreHunterData;
 
 public class CoreHunterArguments {
 
@@ -29,16 +29,18 @@ public class CoreHunterArguments {
 
     private CoreHunterObjective objective;
 
-    private NamedData dataset;
+    private CoreHunterData data;
 
-    public CoreHunterArguments(int subsetSize) {
-        this(subsetSize, subsetSize);
+    public CoreHunterArguments(CoreHunterData data, int subsetSize) {
+        this(data, subsetSize, subsetSize);
     }
 
-    public CoreHunterArguments(int minimumSubsetSize, int maximumSubsetSize) {
+    public CoreHunterArguments(CoreHunterData data, int minimumSubsetSize, int maximumSubsetSize) {
         super();
         this.minimumSubsetSize = minimumSubsetSize;
         this.maximumSubsetSize = maximumSubsetSize;
+        
+        setData(data) ;
     }
 
     public final int getMinimumSubsetSize() {
@@ -57,12 +59,12 @@ public class CoreHunterArguments {
         this.maximumSubsetSize = maximumSubsetSize;
     }
 
-    public final NamedData getDataset() {
-        return dataset;
+    public final CoreHunterData getData() {
+        return data;
     }
 
-    public final void setDataset(NamedData dataset) {
-        this.dataset = dataset;
+    public final void setData(CoreHunterData data) {
+        this.data = data;
     }
 
     public final CoreHunterObjective getObjective() {

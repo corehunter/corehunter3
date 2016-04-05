@@ -20,7 +20,7 @@
 package org.corehunter.tests.objectives.distance.aggregation;
 
 import org.corehunter.data.DistanceMatrixData;
-import org.corehunter.data.simple.CoreHunterData;
+import org.corehunter.data.CoreHunterData;
 import org.corehunter.data.simple.SimpleDistanceMatrixData;
 import org.corehunter.data.simple.SimpleGenotypeVariantData;
 import org.corehunter.objectives.distance.CavalliSforzaEdwardsDistance;
@@ -35,6 +35,7 @@ import static org.corehunter.tests.TestData.ENTRY_TO_ENTRY_CAVALLI_SFORZA_SUBSET
 import static org.corehunter.tests.TestData.ENTRY_TO_ENTRY_MODIFIED_ROGERS_SUBSET2;
 import static org.corehunter.tests.TestData.ENTRY_TO_ENTRY_MODIFIED_ROGERS_SUBSET3;
 import static org.corehunter.tests.TestData.HEADERS_NON_UNIQUE_NAMES;
+import static org.corehunter.tests.TestData.HEADERS_UNIQUE_NAMES;
 import static org.corehunter.tests.TestData.MARKER_NAMES;
 import static org.corehunter.tests.TestData.MODIFIED_ROGERS_DISTANCES;
 import static org.corehunter.tests.TestData.NAME;
@@ -106,7 +107,7 @@ public class AverageEntryToEntryDistanceTest extends EvaluationTest {
     @Test
     public void testPrecomputedModifiedRogers() {
 
-        DistanceMatrixData dist = new SimpleDistanceMatrixData(MODIFIED_ROGERS_DISTANCES);
+        DistanceMatrixData dist = new SimpleDistanceMatrixData(HEADERS_UNIQUE_NAMES, MODIFIED_ROGERS_DISTANCES);
         CoreHunterData data = new CoreHunterData(dist);
         
         AverageEntryToEntryDistance objective = new AverageEntryToEntryDistance(new PrecomputedDistance());

@@ -1,18 +1,21 @@
-/*******************************************************************************
- * Copyright 2016 Guy Davenport
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *******************************************************************************/
+/*--------------------------------------------------------------*/
+/* Licensed to the Apache Software Foundation (ASF) under one   */
+/* or more contributor license agreements.  See the NOTICE file */
+/* distributed with this work for additional information        */
+/* regarding copyright ownership.  The ASF licenses this file   */
+/* to you under the Apache License, Version 2.0 (the            */
+/* "License"); you may not use this file except in compliance   */
+/* with the License.  You may obtain a copy of the License at   */
+/*                                                              */
+/*   http://www.apache.org/licenses/LICENSE-2.0                 */
+/*                                                              */
+/* Unless required by applicable law or agreed to in writing,   */
+/* software distributed under the License is distributed on an  */
+/* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY       */
+/* KIND, either express or implied.  See the License for the    */
+/* specific language governing permissions and limitations      */
+/* under the License.                                           */
+/*--------------------------------------------------------------*/
 
 package org.corehunter.services.simple;
 
@@ -31,8 +34,6 @@ import java.util.concurrent.Executors;
 import org.corehunter.CoreHunter;
 import org.corehunter.CoreHunterArguments;
 import org.corehunter.CoreHunterObjective;
-import org.corehunter.data.PhenotypicTraitData;
-import org.corehunter.data.simple.CoreHunterData;
 import org.corehunter.listener.SimpleCorehunterListener;
 import org.corehunter.services.CorehunterRun;
 import org.corehunter.services.CorehunterRunArguments;
@@ -57,7 +58,7 @@ public class SimpleCorehunterRunServices implements CorehunterRunServices {
 
         executor = createExecutorService();
 
-        corehunterRunnableMap = new HashMap<String, CorehunterRunnable>();
+        corehunterRunnableMap = new HashMap<>();
     }
 
     @Override
@@ -95,7 +96,7 @@ public class SimpleCorehunterRunServices implements CorehunterRunServices {
 
         Iterator<CorehunterRunnable> iterator = corehunterRunnableMap.values().iterator();
 
-        corehunterRuns = new ArrayList<CorehunterRun>(corehunterRunnableMap.size());
+        corehunterRuns = new ArrayList<>(corehunterRunnableMap.size());
 
         while (iterator.hasNext()) {
             corehunterRuns.add(createCorehunterRunFromRunnable(iterator.next()));
@@ -225,13 +226,12 @@ public class SimpleCorehunterRunServices implements CorehunterRunServices {
             try {
                 startDate = new DateTime();
 
-                CoreHunterArguments arguments = new CoreHunterArguments(corehunterRunArguments.getSubsetSize());
+                CoreHunterArguments arguments = new CoreHunterArguments(
+                        datasetServices.getData(corehunterRunArguments.getDatasetId()),
+                        corehunterRunArguments.getSubsetSize());
 
                 // TODO get from arugments
                 arguments.setObjective(CoreHunterObjective.GD);
-
-                arguments.setDataset(new CoreHunterData(
-                        (PhenotypicTraitData) datasetServices.getDataset(corehunterRunArguments.getDatasetId())));
 
                 corehunter = new CoreHunter(arguments);
 

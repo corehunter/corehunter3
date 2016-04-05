@@ -19,7 +19,7 @@
 
 package org.corehunter.objectives.biallelic;
 
-import org.corehunter.data.simple.CoreHunterData;
+import org.corehunter.data.CoreHunterData;
 import org.jamesframework.core.problems.objectives.Objective;
 import org.jamesframework.core.problems.objectives.evaluations.Evaluation;
 import org.jamesframework.core.subset.SubsetSolution;

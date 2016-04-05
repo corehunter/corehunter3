@@ -19,22 +19,23 @@
 
 package org.corehunter.tests.objectives.distance;
 
+import java.util.Iterator;
+
+import org.corehunter.data.CoreHunterData;
+import org.corehunter.data.simple.SimpleGenotypeVariantData;
+import org.corehunter.objectives.distance.CavalliSforzaEdwardsDistance;
+
+import static org.corehunter.tests.TestData.ALLELE_FREQUENCIES;
 import static org.corehunter.tests.TestData.ALLELE_NAMES;
 import static org.corehunter.tests.TestData.CAVALLI_SFORZA_EDWARDS_DISTANCES;
+import static org.corehunter.tests.TestData.HEADERS_NON_UNIQUE_NAMES;
 import static org.corehunter.tests.TestData.MARKER_NAMES;
 import static org.corehunter.tests.TestData.NAME;
 import static org.corehunter.tests.TestData.PRECISION;
-import static org.corehunter.tests.TestData.ALLELE_FREQUENCIES;
-import static org.corehunter.tests.TestData.HEADERS_NON_UNIQUE_NAMES;
-
-import java.util.Iterator;
-import org.corehunter.data.simple.CoreHunterData;
-
-import org.corehunter.data.simple.SimpleGenotypeVariantData;
-import org.corehunter.objectives.distance.CavalliSforzaEdwardsDistance;
-import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+
+import org.junit.Test;
 
 /**
  * @author Guy Davenport, Herman De Beukelaer

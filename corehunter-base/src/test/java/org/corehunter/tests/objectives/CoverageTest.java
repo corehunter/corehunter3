@@ -19,17 +19,17 @@
 
 package org.corehunter.tests.objectives;
 
+import static org.corehunter.tests.TestData.ALLELE_FREQUENCIES;
 import static org.corehunter.tests.TestData.ALLELE_NAMES;
 import static org.corehunter.tests.TestData.COVERAGE_SUBSET1;
+import static org.corehunter.tests.TestData.HEADERS_NON_UNIQUE_NAMES;
 import static org.corehunter.tests.TestData.MARKER_NAMES;
 import static org.corehunter.tests.TestData.NAME;
 import static org.corehunter.tests.TestData.PRECISION;
 import static org.corehunter.tests.TestData.SUBSET1;
-import static org.corehunter.tests.TestData.ALLELE_FREQUENCIES;
-import static org.corehunter.tests.TestData.HEADERS_NON_UNIQUE_NAMES;
 
 import org.corehunter.data.simple.SimpleGenotypeVariantData;
-import org.corehunter.data.simple.CoreHunterData;
+import org.corehunter.data.CoreHunterData;
 import org.corehunter.objectives.Coverage;
 import org.jamesframework.core.subset.SubsetSolution;
 import org.junit.Test;

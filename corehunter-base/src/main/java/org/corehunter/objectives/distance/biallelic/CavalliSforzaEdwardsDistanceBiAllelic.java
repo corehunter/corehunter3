@@ -19,7 +19,7 @@
 
 package org.corehunter.objectives.distance.biallelic;
 
-import org.corehunter.data.simple.CoreHunterData;
+import org.corehunter.data.CoreHunterData;
 import org.corehunter.objectives.distance.DistanceMeasure;
 
 public class CavalliSforzaEdwardsDistanceBiAllelic implements DistanceMeasure {

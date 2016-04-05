@@ -27,14 +27,15 @@ import static org.corehunter.tests.TestData.PRECISION;
 import static org.corehunter.tests.TestData.ALLELE_FREQUENCIES;
 import static org.corehunter.tests.TestData.HEADERS_NON_UNIQUE_NAMES;
 
-import java.util.Iterator;
-import org.corehunter.data.simple.CoreHunterData;
-
 import org.corehunter.data.simple.SimpleGenotypeVariantData;
 import org.corehunter.objectives.distance.ModifiedRogersDistance;
-import org.junit.Test;
+import org.corehunter.data.CoreHunterData;
+
+import java.util.Iterator;
 
 import static org.junit.Assert.assertEquals;
+
+import org.junit.Test;
 
 /**
  * @author Guy Davenport, Herman De Beukelaer

@@ -19,7 +19,7 @@
 
 package org.corehunter.objectives.distance.biallelic;
 
-import org.corehunter.data.simple.CoreHunterData;
+import org.corehunter.data.CoreHunterData;
 import org.corehunter.objectives.distance.DistanceMeasure;
 
 public class ModifiedRogersDistanceBiAllelic implements DistanceMeasure {
@@ -28,4 +28,5 @@ public class ModifiedRogersDistanceBiAllelic implements DistanceMeasure {
     public double getDistance(int idX, int idY, CoreHunterData data) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
+    
 }

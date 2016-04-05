@@ -20,7 +20,10 @@
 package org.corehunter.data.simple;
 
 
+import static uno.informatics.common.Constants.UNKNOWN_COUNT;
+
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -31,24 +34,24 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
 
-import uno.informatics.common.io.IOUtilities;
-import uno.informatics.common.io.RowReader;
 import org.corehunter.data.GenotypeVariantData;
 import org.corehunter.util.StringUtils;
-import uno.informatics.common.io.FileType;
 
-import static uno.informatics.common.Constants.UNKNOWN_COUNT;
+import uno.informatics.common.io.FileType;
+import uno.informatics.common.io.IOUtilities;
+import uno.informatics.common.io.RowReader;
+import uno.informatics.common.io.RowWriter;
 import uno.informatics.common.io.text.TextFileRowReader;
 import uno.informatics.data.SimpleEntity;
+import uno.informatics.data.pojo.DataPojo;
 import uno.informatics.data.pojo.SimpleEntityPojo;
 
 /**
  * @author Guy Davenport, Herman De Beukelaer
  */
-public class SimpleGenotypeVariantData extends SimpleNamedData implements GenotypeVariantData {
+public class SimpleGenotypeVariantData extends DataPojo implements GenotypeVariantData {
 
     private static final double SUM_TO_ONE_PRECISION = 0.01 + 1e-8;
-    private static final int UNDEFINED_COLUMN = -1;
     private static final String NAMES_HEADER = "NAME";
     private static final String ALLELE_NAMES_HEADER = "ALLELE";
     private static final String IDENTIFIERS_HEADER = "ID";
@@ -88,12 +91,12 @@ public class SimpleGenotypeVariantData extends SimpleNamedData implements Genoty
      * encoded as <code>null</code>. If one or more allele frequencies are missing at a certain marker for
      * a certain individual, the remaining frequencies should sum to a value less than or equal to one.
      * <p>
-     * Item headers and marker/allele names are optional. All three corresponding arguments may be
-     * <code>null</code>. If marker and/or allele names are given they need not be defined for all
-     * markers/alleles nor unique. If item headers are specified each item should at least have a
-     * unique identifier (names are optional). If not <code>null</code> the length of each header/name
-     * array should correspond to the dimensions of <code>alleleFrequencies</code> (number of individuals,
-     * markers and alleles per marker).
+     * Item headers are required and marker/allele names are optional. 
+     * If marker and/or allele names are given they need not be defined for all
+     * markers/alleles nor unique. Each item should at least have a unique identifier
+     * (names are optional). If not <code>null</code> the length of each header/name
+     * array should correspond to the dimensions of <code>alleleFrequencies</code>
+     * (number of individuals, markers and alleles per marker).
      * <p>
      * Violating any of the requirements will produce an exception.
      * <p>
@@ -101,9 +104,8 @@ public class SimpleGenotypeVariantData extends SimpleNamedData implements Genoty
      * i.e. no references are retained to any of the arrays passed as arguments.
      * 
      * @param datasetName name of the dataset
-     * @param itemHeaders item headers, <code>null</code> if no headers are assigned; if not <code>null</code>
-     *                    its length should correspond to the number of individuals and each item should at
-     *                    least have a unique identifier
+     * @param itemHeaders item headers; its length should correspond to the number of individuals
+     *                    and each item should at least have a unique identifier (names are optional)
      * @param markerNames marker names, <code>null</code> if no marker names are assigned; if not
      *                    <code>null</code> its length should correspond to the number of markers
      *                    (can contain <code>null</code> values)
@@ -119,7 +121,7 @@ public class SimpleGenotypeVariantData extends SimpleNamedData implements Genoty
                                      String[][] alleleNames, Double[][][] alleleFrequencies) {
         
         // pass dataset name, size and item headers to parent
-        super(datasetName, alleleFrequencies.length, itemHeaders);
+        super(datasetName, itemHeaders);
 
         // check allele frequencies and infer number of individuals, markers and alleles per marker
         int n = alleleFrequencies.length;
@@ -269,7 +271,7 @@ public class SimpleGenotypeVariantData extends SimpleNamedData implements Genoty
      * <p>
      * The file starts with a compulsory header row from which (unique) marker names and allele counts are inferred.
      * All columns corresponding to the same marker occur consecutively in the file and are named after that marker.
-     * An optional header column with item names can also be provided, which is identified with column header "NAME".
+     * There is one required header column with item names, which is identified with column header "NAME".
      * If the provided item names are not unique or defined for some but not all items, a second header column "ID"
      * should be included to provide unique identifiers for at least those items whose name is undefined or not unique.
      * Finally, an optional second header row can be included to define allele names per marker, identified with row
@@ -475,7 +477,7 @@ public class SimpleGenotypeVariantData extends SimpleNamedData implements Genoty
                 String identifier = withIds ? itemIdentifiers.get(i) : null;
                 if(name != null || identifier != null){
                     if(identifier == null){
-                        headers[i] = new SimpleEntityPojo(name);
+                        headers[i] = new SimpleEntityPojo(name, name);
                     } else {
                         headers[i] = new SimpleEntityPojo(identifier, name);
                     }
@@ -499,7 +501,88 @@ public class SimpleGenotypeVariantData extends SimpleNamedData implements Genoty
             }
             
         }
-        
+    }
+    
+    public static void writeData(Path filePath, SimpleGenotypeVariantData genotypicData, 
+            FileType fileType) throws IOException {
+
+        if (filePath == null) {
+            throw new IllegalArgumentException("File path not defined.");
+        }
+
+        if (filePath.toFile().exists()) {
+            throw new IOException("File already exists : " + filePath + ".");
+        }
+
+        if (fileType == null) {
+            throw new IllegalArgumentException("File type not defined.");
+        }
+
+        if (fileType != FileType.TXT && fileType != FileType.CSV) {
+            throw new IllegalArgumentException(
+                    String.format("Only file types TXT and CSV are supported. Got: %s.", fileType));
+        }
+
+        Files.createDirectories(filePath.getParent());
+
+        // read data from file
+        try (RowWriter writer = IOUtilities.createRowWriter(filePath.toFile(), fileType,
+                TextFileRowReader.REMOVE_WHITE_SPACE)) {
+
+            if (writer == null || !writer.ready()) {
+                throw new IOException("Can not create writer for file " + filePath + ".");
+            }
+
+            String[] markerNames = genotypicData.markerNames;
+
+            writer.writeCell(NAMES_HEADER);
+            
+            writer.newColumn() ;
+
+            writer.writeCell(IDENTIFIERS_HEADER);
+
+            String[][] alleleNames = genotypicData.alleleNames ;
+            
+            for (int i = 0 ; i < alleleNames.length ; ++i) {
+                for (int j = 0 ; j < alleleNames[i].length ; ++j) {
+                    writer.newColumn() ;
+                    writer.writeCell(markerNames[i]);  
+                }
+            }
+            
+            writer.newRow() ;
+            
+            writer.writeCell(ALLELE_NAMES_HEADER);
+            
+            for (int i = 0 ; i < alleleNames.length ; ++i) {
+                writer.newColumn() ;
+                writer.writeRowCellsAsArray(alleleNames[i]);  
+            }
+
+            Double[][][] alleleFrequencies = genotypicData.alleleFrequencies ;
+
+            SimpleEntity header;
+
+            for (int i = 0; i < alleleFrequencies.length; ++i) {
+
+                writer.newRow();
+                
+                header = genotypicData.getHeader(i);
+                writer.writeCell(header.getName());
+                
+                writer.newColumn() ;
+                
+                writer.writeCell(header.getUniqueIdentifier());
+
+                for (int j = 0; j < alleleFrequencies[i].length; ++j) {
+                    writer.newColumn() ;
+                    
+                    writer.writeRowCellsAsArray(alleleFrequencies[i][j]);
+                }
+            }
+
+            writer.close();
+        }
     }
     
     /**
@@ -511,10 +594,10 @@ public class SimpleGenotypeVariantData extends SimpleNamedData implements Genoty
      * two (heterozygous) of all possible alleles of a certain marker. This means that all inferred frequencies
      * are either 0.0, 0.5 or 1.0. Missing values are encoding as empty cells.
      * <p>
-     * An optional first header row and column may be included to specify individual and marker names, identified
-     * with column/row header "NAME". If item names are not unique or defined for some but not all items, a second
-     * header column "ID" should be included to provide unique identifiers for at least those items whose name
-     * is undefined or not unique.
+     * An required first header row and optional header column are included to specify individual and marker names,
+     * respectively, identified with column/row header "NAME". If item names are not unique or defined for some but
+     * not all items, a second header column "ID" should be included to provide unique identifiers for at least those
+     * items whose name is undefined or not unique.
      * <p>
      * Each pair of two consecutive columns corresponds to a single marker and the headers of these two columns,
      * if provided, should share a unique prefix. The longest shared prefix of both column names is used as the marker
@@ -776,6 +859,96 @@ public class SimpleGenotypeVariantData extends SimpleNamedData implements Genoty
                 
     }
     
+
+    public static void writeDiploidData(Path filePath, SimpleGenotypeVariantData genotypicData, 
+            FileType fileType) throws IOException {
+
+        if (filePath == null) {
+            throw new IllegalArgumentException("File path not defined.");
+        }
+
+        if (filePath.toFile().exists()) {
+            throw new IOException("File already exists : " + filePath + ".");
+        }
+
+        if (fileType == null) {
+            throw new IllegalArgumentException("File type not defined.");
+        }
+
+        if (fileType != FileType.TXT && fileType != FileType.CSV) {
+            throw new IllegalArgumentException(
+                    String.format("Only file types TXT and CSV are supported. Got: %s.", fileType));
+        }
+        
+        String[][] alleleNames = genotypicData.alleleNames ;
+        
+        String[] markerNames = genotypicData.markerNames;
+        
+        for (int i = 0 ; i < alleleNames.length ; ++i) {
+            if (alleleNames[i].length != 2) {
+                throw new IllegalArgumentException("Marker : " + markerNames[i]
+                        + " does not have 2 alleles : " + alleleNames.length);
+            }
+        }
+
+        Files.createDirectories(filePath.getParent());
+
+        // read data from file
+        try (RowWriter writer = IOUtilities.createRowWriter(filePath.toFile(), fileType,
+                TextFileRowReader.REMOVE_WHITE_SPACE)) {
+
+            if (writer == null || !writer.ready()) {
+                throw new IOException("Can not create writer for file " + filePath + ".");
+            }
+
+            writer.writeCell(NAMES_HEADER);
+            
+            writer.newColumn() ;
+
+            writer.writeCell(IDENTIFIERS_HEADER);
+            
+            for (int i = 0 ; i < alleleNames.length ; ++i) {
+                for (int j = 0 ; j < alleleNames[i].length ; ++j) {
+                    writer.newColumn() ;
+                    writer.writeCell(markerNames[i]);  
+                }
+            }
+            
+            writer.newRow() ;
+            
+            writer.writeCell(ALLELE_NAMES_HEADER);
+            
+            for (int i = 0 ; i < alleleNames.length ; ++i) {
+                writer.newColumn() ;
+                writer.writeRowCellsAsArray(alleleNames[i]);  
+            }
+
+            Double[][][] alleleFrequencies = genotypicData.alleleFrequencies ;
+
+            SimpleEntity header;
+
+            for (int i = 0; i < alleleFrequencies.length; ++i) {
+
+                writer.newRow();
+                
+                header = genotypicData.getHeader(i);
+                writer.writeCell(header.getName());
+                
+                writer.newColumn() ;
+                
+                writer.writeCell(header.getUniqueIdentifier());
+
+                for (int j = 0; j < alleleFrequencies[i].length; ++j) {
+                    writer.newColumn() ;
+                    
+                    writer.writeRowCellsAsArray(alleleFrequencies[i][j]);
+                }
+            }
+
+            writer.close();
+        }  
+    }  
+    
     private static String longestSharedPrefix(String str1, String str2){
         int end = 1;
         int l = Math.min(str1.length(), str2.length());
@@ -806,6 +979,5 @@ public class SimpleGenotypeVariantData extends SimpleNamedData implements Genoty
     
     private static void increaseFrequency(Double[] freqs, int a, double incr){
         freqs[a] = freqs[a] == null ? incr : freqs[a] + incr;
-    }
-    
+    }  
 }

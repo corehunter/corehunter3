@@ -19,43 +19,41 @@
 
 package org.corehunter.tests.data.simple;
 
-import org.corehunter.data.matrix.SymmetricMatrixFormat;
-import org.corehunter.data.simple.SimpleDistanceMatrixData;
-
-import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-
-import org.junit.AfterClass;
-import org.junit.Test;
-import org.junit.BeforeClass;
-
-
-import uno.informatics.common.io.FileType;
-import uno.informatics.data.SimpleEntity;
-
+import static org.corehunter.tests.TestData.ALLELE_FREQUENCIES;
 import static org.corehunter.tests.TestData.DISTANCES;
+import static org.corehunter.tests.TestData.HEADERS_NON_UNIQUE_NAMES;
+import static org.corehunter.tests.TestData.HEADERS_UNIQUE_NAMES;
 import static org.corehunter.tests.TestData.NAME;
 import static org.corehunter.tests.TestData.PRECISION;
 import static org.corehunter.tests.TestData.SET;
-import static org.corehunter.tests.TestData.BLANK_HEADERS;
-import static org.corehunter.tests.TestData.HEADERS_UNIQUE_NAMES;
-
-import static org.corehunter.tests.TestData.HEADERS_NON_UNIQUE_NAMES;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
+import org.corehunter.data.matrix.SymmetricMatrixFormat;
+import org.corehunter.data.simple.SimpleDistanceMatrixData;
+import org.corehunter.data.simple.SimpleGenotypeVariantData;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.Test;
+
+import uno.informatics.common.io.FileType;
+import uno.informatics.data.SimpleEntity;
 
 /**
  * @author Guy Davenport, Herman De Beukelaer
  */
 public class SimpleDistanceMatrixDataTest {
 
-    private static final String TXT_FULL = "/distances/full.txt";
     private static final String TXT_FULL_NAMES = "/distances/full-names.txt";
     private static final String TXT_FULL_NAMES_IDS = "/distances/full-names-ids.txt";
-    private static final String CSV_LOWER = "/distances/lower.csv";
     private static final String CSV_LOWER_DIAG_NAMES = "/distances/lower-diag-names.csv";
+    private static final String TEST_OUTPUT = "target/testoutput";
     
     private static final String[] ERRONEOUS_FILES = {
         "/distances/err/empty.txt",        
@@ -108,7 +106,7 @@ public class SimpleDistanceMatrixDataTest {
     };
     
     private SimpleEntity[] expectedHeaders;
-    private String datasetName;
+    private String dataName;
 
     @BeforeClass
     public static void beforeClass(){
@@ -123,35 +121,16 @@ public class SimpleDistanceMatrixDataTest {
     @Test
     public void inMemoryWithHeaders() {
         System.out.println(" |- In memory test with headers");
-        datasetName = NAME;
+        dataName = NAME;
         expectedHeaders = HEADERS_NON_UNIQUE_NAMES;
         testData(new SimpleDistanceMatrixData(NAME, HEADERS_NON_UNIQUE_NAMES, DISTANCES));
     }
-    
-    @Test
-    public void inMemory() {
-        System.out.println(" |- In memory test without headers");
-        datasetName = null;
-        expectedHeaders = BLANK_HEADERS;
-        testData(new SimpleDistanceMatrixData(DISTANCES));
-    }
 
     @Test
-    public void fromFile() throws IOException {
-        datasetName = "full.txt";
-        expectedHeaders = BLANK_HEADERS;
-        System.out.println(" |- File " + datasetName);
-        testData(SimpleDistanceMatrixData.readData(
-                Paths.get(SimpleDistanceMatrixDataTest.class.getResource(TXT_FULL).getPath()),
-                FileType.TXT, SymmetricMatrixFormat.FULL
-        ));
-    }
-    
-    @Test
     public void fromFileWithNames() throws IOException {
-        datasetName = "full-names.txt";
+        dataName = "full-names.txt";
         expectedHeaders = HEADERS_UNIQUE_NAMES;
-        System.out.println(" |- File " + datasetName);
+        System.out.println(" |- File " + dataName);
         testData(SimpleDistanceMatrixData.readData(
                 Paths.get(SimpleDistanceMatrixDataTest.class.getResource(TXT_FULL_NAMES).getPath()),
                 FileType.TXT, SymmetricMatrixFormat.FULL
@@ -160,9 +139,9 @@ public class SimpleDistanceMatrixDataTest {
     
     @Test
     public void fromFileWithNamesAndIdentifiers() throws IOException {
-        datasetName = "full-names-ids.txt";
+        dataName = "full-names-ids.txt";
         expectedHeaders = HEADERS_NON_UNIQUE_NAMES;
-        System.out.println(" |- File " + datasetName);
+        System.out.println(" |- File " + dataName);
         testData(SimpleDistanceMatrixData.readData(
                 Paths.get(SimpleDistanceMatrixDataTest.class.getResource(TXT_FULL_NAMES_IDS).getPath()),
                 FileType.TXT, SymmetricMatrixFormat.FULL
@@ -170,24 +149,38 @@ public class SimpleDistanceMatrixDataTest {
     }
     
     @Test
-    public void fromFileLower() throws IOException {
-        datasetName = "lower.csv";
-        expectedHeaders = BLANK_HEADERS;
-        System.out.println(" |- File " + datasetName);
+    public void fromFileLowerDiagWithNames() throws IOException {
+        dataName = "lower-diag-names.csv";
+        expectedHeaders = HEADERS_UNIQUE_NAMES;
+        System.out.println(" |- File " + dataName);
         testData(SimpleDistanceMatrixData.readData(
-                Paths.get(SimpleDistanceMatrixDataTest.class.getResource(CSV_LOWER).getPath()),
-                FileType.CSV, SymmetricMatrixFormat.LOWER
+                Paths.get(SimpleDistanceMatrixDataTest.class.getResource(CSV_LOWER_DIAG_NAMES).getPath()),
+                FileType.CSV, SymmetricMatrixFormat.LOWER_DIAG
         ));
     }
     
     @Test
-    public void fromFileLowerDiagWithNames() throws IOException {
-        datasetName = "lower-diag-names.csv";
+    public void toFileWithNamesAndIdentifiers() throws IOException {
+        dataName = "full-names.txt";
         expectedHeaders = HEADERS_UNIQUE_NAMES;
-        System.out.println(" |- File " + datasetName);
-        testData(SimpleDistanceMatrixData.readData(
-                Paths.get(SimpleDistanceMatrixDataTest.class.getResource(CSV_LOWER_DIAG_NAMES).getPath()),
-                FileType.CSV, SymmetricMatrixFormat.LOWER_DIAG
+       
+        SimpleDistanceMatrixData distanceData = new SimpleDistanceMatrixData(expectedHeaders, DISTANCES) ;
+        
+        Path path = Paths.get(TEST_OUTPUT) ;
+        
+        Files.createDirectories(path) ;
+        
+        path = Files.createTempDirectory(path, "TxtFileWithNames") ;
+        
+        path = Paths.get(path.toString(), dataName) ;
+        
+        Files.deleteIfExists(path) ;
+        
+        System.out.println(" |- Write distance File " + dataName);
+        SimpleDistanceMatrixData.writeData(path, distanceData, FileType.CSV);        
+   
+        testData(SimpleDistanceMatrixData.readData(path,
+                FileType.CSV, SymmetricMatrixFormat.FULL
         ));
     }
     
@@ -201,7 +194,7 @@ public class SimpleDistanceMatrixDataTest {
             boolean thrown = false;
             try {
                 SimpleDistanceMatrixData.readData(file, type, ERRONEOUS_FILE_FORMATS[i]);
-            } catch (IOException ex){
+            } catch (IOException | IllegalArgumentException ex){
                 thrown = true;
                 System.out.print(ex.getMessage());
             } finally {
@@ -213,14 +206,14 @@ public class SimpleDistanceMatrixDataTest {
 
     private void testData(SimpleDistanceMatrixData data) {
         
-        // check dataset name, if set
-        String expectedDatasetName = datasetName != null ? datasetName : "Precomputed distance matrix";
-        assertEquals("Incorrect dataset name.", expectedDatasetName, data.getDatasetName());
+        // check data name, if set
+        String expectedDatasetName = dataName != null ? dataName : "Precomputed distance matrix";
+        assertEquals("Incorrect data name.", expectedDatasetName, data.getName());
         
         // check IDs
         assertEquals("Ids not correct.", SET, data.getIDs());
 
-        int size = data.getDatasetSize();
+        int size = data.getSize();
 
         // check items (headers and distances)
         for (int i = 0; i < size; i++) {

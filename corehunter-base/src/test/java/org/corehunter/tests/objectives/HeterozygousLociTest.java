@@ -19,7 +19,9 @@
 
 package org.corehunter.tests.objectives;
 
+import static org.corehunter.tests.TestData.ALLELE_FREQUENCIES;
 import static org.corehunter.tests.TestData.ALLELE_NAMES;
+import static org.corehunter.tests.TestData.HEADERS_NON_UNIQUE_NAMES;
 import static org.corehunter.tests.TestData.HETROZYGOUS_LOCI_DIVERSITY_SUBSET1;
 import static org.corehunter.tests.TestData.HETROZYGOUS_LOCI_DIVERSITY_SUBSET2;
 import static org.corehunter.tests.TestData.MARKER_NAMES;
@@ -27,10 +29,8 @@ import static org.corehunter.tests.TestData.NAME;
 import static org.corehunter.tests.TestData.PRECISION;
 import static org.corehunter.tests.TestData.SUBSET1;
 import static org.corehunter.tests.TestData.SUBSET2;
-import static org.corehunter.tests.TestData.ALLELE_FREQUENCIES;
-import static org.corehunter.tests.TestData.HEADERS_NON_UNIQUE_NAMES;
 
-import org.corehunter.data.simple.CoreHunterData;
+import org.corehunter.data.CoreHunterData;
 import org.corehunter.data.simple.SimpleGenotypeVariantData;
 import org.corehunter.objectives.HeterozygousLoci;
 import org.jamesframework.core.subset.SubsetSolution;

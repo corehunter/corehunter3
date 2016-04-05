@@ -20,35 +20,34 @@
 package org.corehunter.tests.data.simple;
 
 
-import java.io.IOException;
-import java.nio.file.DirectoryStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import org.corehunter.data.simple.SimpleBiAllelicGenotypeVariantData;
-
 import static org.corehunter.tests.TestData.ALLELE_FREQUENCIES_BIALLELIC;
 import static org.corehunter.tests.TestData.ALLELE_SCORES_BIALLELIC;
-import static org.corehunter.tests.TestData.HEADERS_UNIQUE_NAMES;
 import static org.corehunter.tests.TestData.HEADERS_NON_UNIQUE_NAMES;
-import static org.corehunter.tests.TestData.BLANK_HEADERS;
+import static org.corehunter.tests.TestData.HEADERS_UNIQUE_NAMES;
 import static org.corehunter.tests.TestData.MARKER_NAMES;
-import static org.corehunter.tests.TestData.UNDEFINED_MARKER_NAMES;
 import static org.corehunter.tests.TestData.NAME;
 import static org.corehunter.tests.TestData.PRECISION;
 import static org.corehunter.tests.TestData.SET;
-
-import uno.informatics.common.io.FileType;
-import uno.informatics.data.SimpleEntity;
-
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
+import static org.corehunter.tests.TestData.UNDEFINED_MARKER_NAMES;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+
+import java.io.IOException;
+import java.net.URI;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
+import org.corehunter.data.simple.SimpleBiAllelicGenotypeVariantData;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.Test;
+
+import uno.informatics.common.io.FileType;
+import uno.informatics.data.SimpleEntity;
 
 /**
  * @author Guy Davenport, Herman De Beukelaer
@@ -56,13 +55,12 @@ import static org.junit.Assert.assertTrue;
 public class SimpleBiAllelicGenotypeVariantDataTest {
 
     private static final String TXT_NAMES = "/biallelic/names.txt";
-    private static final String TXT_NO_NAMES = "/biallelic/no-names.txt";
     private static final String CSV_NAMES = "/biallelic/names.csv";
     private static final String CSV_NAMES_IDS = "/biallelic/names-and-ids.csv";
     private static final String CSV_NO_MARKER_NAMES = "/biallelic/no-marker-names.csv";
-    private static final String CSV_NO_NAMES_NO_MARKER_NAMES = "/biallelic/no-names-no-marker-names.csv";
 
     private static final String ERRONEOUS_FILES_DIR = "/biallelic/err/";
+    private static final String TEST_OUTPUT = "target/testoutput";
     
     private SimpleEntity[] expectedHeaders;
     private String[] expectedMarkerNames;
@@ -101,23 +99,11 @@ public class SimpleBiAllelicGenotypeVariantDataTest {
     }
     
     @Test
-    public void fromTxtFileWithoutNames() throws IOException {
-        datasetName = "no-names.txt";
-        expectedHeaders = BLANK_HEADERS;
-        expectedMarkerNames = MARKER_NAMES;
-        System.out.println(" |- File " + datasetName);
-        testData(SimpleBiAllelicGenotypeVariantData.readData(
-            Paths.get(SimpleBiAllelicGenotypeVariantDataTest.class.getResource(TXT_NO_NAMES).getPath()),
-            FileType.TXT
-        ));
-    }
-    
-    @Test
     public void fromTxtFileWithNames() throws IOException {
         datasetName = "names.txt";
         expectedHeaders = HEADERS_UNIQUE_NAMES;
         expectedMarkerNames = MARKER_NAMES;
-        System.out.println(" |- File " + datasetName);
+        System.out.println(" |- Read File " + datasetName);
         testData(SimpleBiAllelicGenotypeVariantData.readData(
             Paths.get(SimpleBiAllelicGenotypeVariantDataTest.class.getResource(TXT_NAMES).getPath()),
             FileType.TXT
@@ -129,7 +115,7 @@ public class SimpleBiAllelicGenotypeVariantDataTest {
         datasetName = "names.csv";
         expectedHeaders = HEADERS_UNIQUE_NAMES;
         expectedMarkerNames = MARKER_NAMES;
-        System.out.println(" |- File " + datasetName);
+        System.out.println(" |- Read File " + datasetName);
         testData(SimpleBiAllelicGenotypeVariantData.readData(
             Paths.get(SimpleBiAllelicGenotypeVariantDataTest.class.getResource(CSV_NAMES).getPath()),
             FileType.CSV
@@ -141,19 +127,20 @@ public class SimpleBiAllelicGenotypeVariantDataTest {
         datasetName = "names-and-ids.csv";
         expectedHeaders = HEADERS_NON_UNIQUE_NAMES;
         expectedMarkerNames = MARKER_NAMES;
-        System.out.println(" |- File " + datasetName);
+        System.out.println(" |- Read File " + datasetName);
         testData(SimpleBiAllelicGenotypeVariantData.readData(
             Paths.get(SimpleBiAllelicGenotypeVariantDataTest.class.getResource(CSV_NAMES_IDS).getPath()),
             FileType.CSV
         ));
     }
     
+    // TODO should not marker names be compulsory?
     @Test
     public void fromCsvFileWithoutMarkerNames() throws IOException {
         datasetName = "no-marker-names.csv";
         expectedHeaders = HEADERS_UNIQUE_NAMES;
         expectedMarkerNames = UNDEFINED_MARKER_NAMES;
-        System.out.println(" |- File " + datasetName);
+        System.out.println(" |- Read File " + datasetName);
         testData(SimpleBiAllelicGenotypeVariantData.readData(
             Paths.get(SimpleBiAllelicGenotypeVariantDataTest.class.getResource(CSV_NO_MARKER_NAMES).getPath()),
             FileType.CSV
@@ -161,15 +148,55 @@ public class SimpleBiAllelicGenotypeVariantDataTest {
     }
     
     @Test
-    public void fromCsvFileWithoutNamesOrMarkerNames() throws IOException {
-        datasetName = "no-names-no-marker-names.csv";
-        expectedHeaders = BLANK_HEADERS;
-        expectedMarkerNames = UNDEFINED_MARKER_NAMES;
-        System.out.println(" |- File " + datasetName);
-        testData(SimpleBiAllelicGenotypeVariantData.readData(
-            Paths.get(SimpleBiAllelicGenotypeVariantDataTest.class.getResource(CSV_NO_NAMES_NO_MARKER_NAMES).getPath()),
-            FileType.CSV
-        ));
+    public void toTxtFileWithNames() throws IOException {
+        datasetName = "names.txt";
+        expectedHeaders = HEADERS_UNIQUE_NAMES;
+        expectedMarkerNames = MARKER_NAMES;
+        
+        SimpleBiAllelicGenotypeVariantData genotypicData = 
+                new SimpleBiAllelicGenotypeVariantData(expectedHeaders, expectedMarkerNames, ALLELE_SCORES_BIALLELIC) ;
+        
+        Path path = Paths.get(TEST_OUTPUT) ;
+        
+        Files.createDirectories(path) ;
+        
+        path = Files.createTempDirectory(path, "TxtFileWithNames") ;
+        
+        path = Paths.get(path.toString(), datasetName) ;
+        
+        Files.deleteIfExists(path) ;
+        
+        System.out.println(" |- Write File " + datasetName);
+        SimpleBiAllelicGenotypeVariantData.writeData(path, genotypicData, FileType.TXT);
+        
+        System.out.println(" |- Read written File " + datasetName);
+        testData(SimpleBiAllelicGenotypeVariantData.readData(path, FileType.TXT));
+    }
+    
+    @Test
+    public void toCsvFileWithNames() throws IOException {
+        datasetName = "names.csv";
+        expectedHeaders = HEADERS_UNIQUE_NAMES;
+        expectedMarkerNames = MARKER_NAMES;
+        
+        SimpleBiAllelicGenotypeVariantData genotypicData = 
+                new SimpleBiAllelicGenotypeVariantData(expectedHeaders, expectedMarkerNames, ALLELE_SCORES_BIALLELIC) ;
+        
+        Path path = Paths.get(TEST_OUTPUT) ;
+        
+        Files.createDirectories(path) ;
+        
+        path = Files.createTempDirectory(path, "TxtFileWithNames") ;
+        
+        path = Paths.get(path.toString(), datasetName) ;
+        
+        Files.deleteIfExists(path) ;
+        
+        System.out.println(" |- Write File " + datasetName);
+        SimpleBiAllelicGenotypeVariantData.writeData(path, genotypicData, FileType.CSV);
+        
+        System.out.println(" |- Read written File " + datasetName);
+        testData(SimpleBiAllelicGenotypeVariantData.readData(path, FileType.CSV));
     }
     
     @Test
@@ -198,7 +225,7 @@ public class SimpleBiAllelicGenotypeVariantDataTest {
         
         // check dataset name, if set
         String expectedDatasetName = datasetName != null ? datasetName : "Biallelic marker data";
-        assertEquals("Incorrect dataset name.", expectedDatasetName, data.getDatasetName());
+        assertEquals("Incorrect data name.", expectedDatasetName, data.getName());
         
         // check IDs
         assertEquals("Ids not correct.", SET, data.getIDs());
@@ -226,7 +253,7 @@ public class SimpleBiAllelicGenotypeVariantDataTest {
         }
         
         // check individuals (headers, allele scores and frequencies)
-        int size = data.getDatasetSize();
+        int size = data.getSize();
 
         for (int i = 0; i < size; i++) {
             

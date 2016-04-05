@@ -23,30 +23,25 @@ import static org.corehunter.tests.TestData.PRECISION;
 
 import java.io.IOException;
 import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.List;
 
 import org.corehunter.data.DistanceMatrixData;
-import org.corehunter.data.PhenotypicTraitData;
 import org.corehunter.data.matrix.SymmetricMatrixFormat;
-import org.corehunter.data.simple.CoreHunterData;
+import org.corehunter.data.CoreHunterData;
 import org.corehunter.data.simple.SimpleDistanceMatrixData;
-import org.corehunter.data.simple.SimplePhenotypicTraitData;
 import org.corehunter.objectives.distance.GowerDistance;
 
 import uno.informatics.common.io.FileType;
 import uno.informatics.data.DataType;
 import uno.informatics.data.Feature;
-import uno.informatics.data.FeatureDataset;
 import uno.informatics.data.ScaleType;
 import uno.informatics.data.dataset.DatasetException;
-import uno.informatics.data.feature.array.ArrayFeatureDataset;
+import uno.informatics.data.dataset.FeatureData;
+import uno.informatics.data.feature.array.ArrayFeatureData;
 import uno.informatics.data.pojo.SimpleFeaturePojo;
 
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
-
 /**
  * @author Guy Davenport, Herman De Beukelaer
  */
@@ -56,19 +51,19 @@ public class GowerDistanceTest {
     private static final String MATRIX_FILE = "/phenotypes/matrix.csv";
 
     private static final Object[][] DATA = {
-        {1, 1.0, "1", true},
-        {2, 3.0, "2", true},
-        {3, 3.0, "1", false},
-        {4, 5.0, "2", false},
-        {5, 4.0, "1", true}
+        {"row1", 1, 1.0, "1", true},
+        {"row2", 2, 3.0, "2", true},
+        {"row3", 3, 3.0, "1", false},
+        {"row4", 4, 5.0, "2", false},
+        {"row5", 5, 4.0, "1", true}
     };
 
-    private static final List<Feature> FEATURES = Arrays.asList(
+    private static final Feature[] FEATURES = {
         new SimpleFeaturePojo("feature1", DataType.INTEGER, ScaleType.INTERVAL, 0, 5),
         new SimpleFeaturePojo("feature2", DataType.DOUBLE, ScaleType.RATIO, 0.0, 5.0),
         new SimpleFeaturePojo("feature3", DataType.STRING, ScaleType.NOMINAL),
         new SimpleFeaturePojo("feature4", DataType.BOOLEAN, ScaleType.NOMINAL)
-    );
+    };
 
     private static final double[][] MATRIX = new double[][]{
         new double[]{0.00, 0.40, 0.45, 0.85, 0.35},
@@ -81,13 +76,12 @@ public class GowerDistanceTest {
     @Test
     public void testInMemory() {
 
-        FeatureDataset featureData = new ArrayFeatureDataset("in-memory", FEATURES, DATA);
-        PhenotypicTraitData pheno = new SimplePhenotypicTraitData(featureData);
+        FeatureData pheno = new ArrayFeatureData("in-memory", FEATURES, DATA);
         CoreHunterData data = new CoreHunterData(pheno);
         
         GowerDistance distanceMetric = new GowerDistance();
 
-        int n = data.getDatasetSize();
+        int n = data.getSize();
         for (int x = 0; x < n; x++) {
             for (int y = 0; y < n; y++) {
                 assertEquals(
@@ -99,11 +93,11 @@ public class GowerDistanceTest {
             }
         }
     }
-    
+
     @Test
     public void testFromFile() throws IOException, DatasetException {
         
-        PhenotypicTraitData pheno = SimplePhenotypicTraitData.readData(
+        FeatureData pheno = ArrayFeatureData.readData(
                 Paths.get(GowerDistanceTest.class.getResource(DATA_FILE).getPath()),
                 FileType.CSV
         );
@@ -116,7 +110,7 @@ public class GowerDistanceTest {
         
         GowerDistance distanceMetric = new GowerDistance();
 
-        int n = data.getDatasetSize();
+        int n = data.getSize();
         for (int x = 0; x < n; x++) {
             for (int y = 0; y < n; y++) {
                 assertEquals(
@@ -127,6 +121,6 @@ public class GowerDistanceTest {
                 );
             }
         }
-        
+
     }
 }

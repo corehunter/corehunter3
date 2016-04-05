@@ -19,27 +19,26 @@
 
 package org.corehunter.tests.data.simple;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.IOException;
 import java.nio.file.Paths;
 
+import org.corehunter.data.CoreHunterData;
 import org.corehunter.data.DistanceMatrixData;
 import org.corehunter.data.GenotypeVariantData;
-import org.corehunter.data.PhenotypicTraitData;
 import org.corehunter.data.matrix.SymmetricMatrixFormat;
-import org.corehunter.data.simple.CoreHunterData;
 import org.corehunter.data.simple.SimpleBiAllelicGenotypeVariantData;
 import org.corehunter.data.simple.SimpleDistanceMatrixData;
-import org.corehunter.data.simple.SimplePhenotypicTraitData;
 import org.corehunter.tests.TestData;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 import uno.informatics.common.io.FileType;
 import uno.informatics.data.SimpleEntity;
-
-import org.junit.AfterClass;
-import org.junit.Test;
-import org.junit.BeforeClass;
-
-import static org.junit.Assert.assertEquals;
+import uno.informatics.data.dataset.FeatureData;
+import uno.informatics.data.feature.array.ArrayFeatureData;
 
 
 /**
@@ -47,8 +46,7 @@ import static org.junit.Assert.assertEquals;
  */
 public class CoreHunterDataTest {
 
-    private static final String DISTANCES_NO_HEADERS = "/distances/full.txt";
-    private static final String DISTANCES_NO_HEADERS_SMALL = "/distances/small.txt";
+    private static final String DISTANCES_SMALL = "/distances/small-names.txt";
     private static final String DISTANCES_UNIQUE_NAMES = "/distances/full-names.txt";
     private static final String DISTANCES_NON_UNIQUE_NAMES = "/distances/full-names-ids.txt";
     
@@ -57,7 +55,6 @@ public class CoreHunterDataTest {
     private static final String PHENOTYPES_NON_UNIQUE_NAMES = "/phenotypes/names-and-ids.csv";
     private static final String PHENOTYPES_SAME_IDS_DIFFERENT_NAMES = "/phenotypes/same-ids-different-names.csv";
     
-    private static final String MARKERS_NO_HEADERS = "/biallelic/no-names-no-marker-names.csv";
     private static final String MARKERS_UNIQUE_NAMES = "/biallelic/names.csv";
     private static final String MARKERS_NON_UNIQUE_NAMES = "/biallelic/names-and-ids.csv";
     private static final String MARKERS_IDS_SOME_NAMES = "/biallelic/ids-with-some-names.csv";
@@ -86,7 +83,7 @@ public class CoreHunterDataTest {
         System.out.println(" |- Test with incompatible headers");
         
         DistanceMatrixData dist = readDistanceMatrixData(DISTANCES_UNIQUE_NAMES);
-        PhenotypicTraitData pheno = readPhenotypicTraitData(PHENOTYPES_NO_HEADERS);
+        FeatureData pheno = readPhenotypicTraitData(PHENOTYPES_UNIQUE_NAMES);
         GenotypeVariantData geno = readMarkerData(MARKERS_NON_UNIQUE_NAMES);
                 
         CoreHunterData data = new CoreHunterData(geno, pheno, dist);
@@ -99,7 +96,7 @@ public class CoreHunterDataTest {
         System.out.println(" |- Test with incompatible headers (2)");
         
         DistanceMatrixData dist = readDistanceMatrixData(DISTANCES_UNIQUE_NAMES);
-        PhenotypicTraitData pheno = null;
+        FeatureData pheno = null;
         GenotypeVariantData geno = readMarkerData(MARKERS_NON_UNIQUE_NAMES);
                 
         CoreHunterData data = new CoreHunterData(geno, pheno, dist);
@@ -112,7 +109,7 @@ public class CoreHunterDataTest {
         System.out.println(" |- Test with incompatible headers (3)");
         
         DistanceMatrixData dist = readDistanceMatrixData(DISTANCES_UNIQUE_NAMES);
-        PhenotypicTraitData pheno = readPhenotypicTraitData(PHENOTYPES_UNIQUE_NAMES);
+        FeatureData pheno = readPhenotypicTraitData(PHENOTYPES_UNIQUE_NAMES);
         GenotypeVariantData geno = readMarkerData(MARKERS_NON_UNIQUE_NAMES);
                 
         CoreHunterData data = new CoreHunterData(geno, pheno, dist);
@@ -124,8 +121,8 @@ public class CoreHunterDataTest {
         
         System.out.println(" |- Test with different sizes");
         
-        DistanceMatrixData dist = readDistanceMatrixData(DISTANCES_NO_HEADERS_SMALL);
-        PhenotypicTraitData pheno = readPhenotypicTraitData(PHENOTYPES_UNIQUE_NAMES);
+        DistanceMatrixData dist = readDistanceMatrixData(DISTANCES_SMALL);
+        FeatureData pheno = readPhenotypicTraitData(PHENOTYPES_UNIQUE_NAMES);
         GenotypeVariantData geno = readMarkerData(MARKERS_NON_UNIQUE_NAMES);
                 
         CoreHunterData data = new CoreHunterData(geno, pheno, dist);
@@ -138,58 +135,10 @@ public class CoreHunterDataTest {
         System.out.println(" |- Test with same ids but different names");
         
         DistanceMatrixData dist = readDistanceMatrixData(DISTANCES_NON_UNIQUE_NAMES);
-        PhenotypicTraitData pheno = readPhenotypicTraitData(PHENOTYPES_SAME_IDS_DIFFERENT_NAMES);
+        FeatureData pheno = readPhenotypicTraitData(PHENOTYPES_SAME_IDS_DIFFERENT_NAMES);
         GenotypeVariantData geno = readMarkerData(MARKERS_NON_UNIQUE_NAMES);
                 
         CoreHunterData data = new CoreHunterData(geno, pheno, dist);
-        
-    }
-    
-    @Test
-    public void testWithoutAnyHeaders() throws IOException {
-        
-        System.out.println(" |- Test without any headers");
-        
-        DistanceMatrixData dist = readDistanceMatrixData(DISTANCES_NO_HEADERS);
-        PhenotypicTraitData pheno = readPhenotypicTraitData(PHENOTYPES_NO_HEADERS);
-        GenotypeVariantData geno = readMarkerData(MARKERS_NO_HEADERS);
-        
-        expectedHeaders = TestData.BLANK_HEADERS;
-        
-        CoreHunterData data = new CoreHunterData(geno, pheno, dist);
-        testData(data);
-        
-    }
-    
-    @Test
-    public void testWhenOneDatasetHasHeaders() throws IOException {
-        
-        System.out.println(" |- Test when one datset has headers");
-        
-        DistanceMatrixData dist = readDistanceMatrixData(DISTANCES_NO_HEADERS);
-        PhenotypicTraitData pheno = readPhenotypicTraitData(PHENOTYPES_UNIQUE_NAMES);
-        GenotypeVariantData geno = readMarkerData(MARKERS_NO_HEADERS);
-        
-        expectedHeaders = TestData.HEADERS_UNIQUE_NAMES;
-        
-        CoreHunterData data = new CoreHunterData(geno, pheno, dist);
-        testData(data);
-        
-    }
-    
-    @Test
-    public void testWhenMultipleDatasetsHaveSameHeaders() throws IOException {
-        
-        System.out.println(" |- Test when multiple datsets have same headers");
-        
-        DistanceMatrixData dist = readDistanceMatrixData(DISTANCES_NO_HEADERS);
-        PhenotypicTraitData pheno = readPhenotypicTraitData(PHENOTYPES_NON_UNIQUE_NAMES);
-        GenotypeVariantData geno = readMarkerData(MARKERS_NON_UNIQUE_NAMES);
-        
-        expectedHeaders = TestData.HEADERS_NON_UNIQUE_NAMES;
-        
-        CoreHunterData data = new CoreHunterData(geno, pheno, dist);
-        testData(data);
         
     }
     
@@ -199,7 +148,7 @@ public class CoreHunterDataTest {
         System.out.println(" |- Test when all datsets have same headers");
         
         DistanceMatrixData dist = readDistanceMatrixData(DISTANCES_UNIQUE_NAMES);
-        PhenotypicTraitData pheno = readPhenotypicTraitData(PHENOTYPES_UNIQUE_NAMES);
+        FeatureData pheno = readPhenotypicTraitData(PHENOTYPES_UNIQUE_NAMES);
         GenotypeVariantData geno = readMarkerData(MARKERS_UNIQUE_NAMES);
         
         expectedHeaders = TestData.HEADERS_UNIQUE_NAMES;
@@ -215,7 +164,7 @@ public class CoreHunterDataTest {
         System.out.println(" |- Test if names are merged");
         
         DistanceMatrixData dist = readDistanceMatrixData(DISTANCES_NON_UNIQUE_NAMES);
-        PhenotypicTraitData pheno = readPhenotypicTraitData(PHENOTYPES_NON_UNIQUE_NAMES);
+        FeatureData pheno = readPhenotypicTraitData(PHENOTYPES_NON_UNIQUE_NAMES);
         GenotypeVariantData geno = readMarkerData(MARKERS_IDS_SOME_NAMES);
         
         expectedHeaders = TestData.HEADERS_NON_UNIQUE_NAMES;
@@ -256,8 +205,8 @@ public class CoreHunterDataTest {
         
         System.out.println(" |- Test with phenotypes only");
         
-        PhenotypicTraitData pheno = readPhenotypicTraitData(PHENOTYPES_NO_HEADERS);
-        expectedHeaders = TestData.BLANK_HEADERS;
+        FeatureData pheno = readPhenotypicTraitData(PHENOTYPES_UNIQUE_NAMES);
+        expectedHeaders = TestData.HEADERS_UNIQUE_NAMES;
         
         CoreHunterData data = new CoreHunterData(pheno);
         testData(data);
@@ -271,8 +220,8 @@ public class CoreHunterDataTest {
         );
     }
     
-    private PhenotypicTraitData readPhenotypicTraitData(String file) throws IOException{
-        return SimplePhenotypicTraitData.readData(
+    private FeatureData readPhenotypicTraitData(String file) throws IOException {
+        return ArrayFeatureData.readData(
             Paths.get(CoreHunterDataTest.class.getResource(file).getPath()),
             inferFileType(file)
         );
@@ -292,16 +241,16 @@ public class CoreHunterDataTest {
     private void testData(CoreHunterData data){
         
         // check dataset name
-        assertEquals("Incorrect dataset name.", "Core Hunter data", data.getDatasetName());
+        assertEquals("Incorrect data name.", "Core Hunter data", data.getName());
         
         // check dataset size
-        assertEquals("Incorrect dataset size.", expectedHeaders.length, data.getDatasetSize());
+        assertEquals("Incorrect data size.", expectedHeaders.length, data.getSize());
         
         // check IDs
         assertEquals("Incorrect integer IDs.", TestData.SET, data.getIDs());
         
         // check headers
-        for(int i = 0; i < data.getDatasetSize(); i++){
+        for(int i = 0; i < data.getSize(); i++){
             
             assertEquals("Incorrect header for item " + i + ".", expectedHeaders[i], data.getHeader(i));
             

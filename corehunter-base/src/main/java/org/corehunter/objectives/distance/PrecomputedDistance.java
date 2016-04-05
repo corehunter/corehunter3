@@ -20,7 +20,7 @@
 package org.corehunter.objectives.distance;
 
 import org.corehunter.data.DistanceMatrixData;
-import org.corehunter.data.simple.CoreHunterData;
+import org.corehunter.data.CoreHunterData;
 import org.corehunter.exceptions.CoreHunterException;
 
 /**
@@ -31,7 +31,7 @@ public class PrecomputedDistance implements DistanceMeasure {
     @Override
     public double getDistance(int idX, int idY, CoreHunterData data) {
         
-        DistanceMatrixData dist = data.getDistances();
+        DistanceMatrixData dist = data.getDistancesData();
         
         if(dist == null){
             throw new CoreHunterException("No precomputed distance matrix has been defined.");

@@ -20,7 +20,7 @@
 package org.corehunter.objectives.distance;
 
 import org.corehunter.data.GenotypeVariantData;
-import org.corehunter.data.simple.CoreHunterData;
+import org.corehunter.data.CoreHunterData;
 import org.corehunter.exceptions.CoreHunterException;
 
 /**
@@ -32,7 +32,7 @@ public class CavalliSforzaEdwardsDistance implements DistanceMeasure {
     @Override
     public double getDistance(int idX, int idY, CoreHunterData data) {
         
-        GenotypeVariantData genotypes = data.getMarkers();
+        GenotypeVariantData genotypes = data.getGenotypicData();
         
         if(genotypes == null){
             throw new CoreHunterException("Genotypes are required for Cavalli-Sforza and Edwards distance.");

@@ -25,6 +25,7 @@ import java.util.TreeSet;
 import org.corehunter.data.simple.SimpleDistanceMatrixData;
 import org.jamesframework.core.problems.objectives.evaluations.Evaluation;
 import org.jamesframework.core.problems.objectives.evaluations.SimpleEvaluation;
+
 import uno.informatics.data.SimpleEntity;
 import uno.informatics.data.pojo.SimpleEntityPojo;
 
@@ -58,7 +59,6 @@ public class TestData {
     
     public static final SimpleEntity[] HEADERS_UNIQUE_NAMES;
     public static final SimpleEntity[] HEADERS_NON_UNIQUE_NAMES;
-    public static final SimpleEntity[] BLANK_HEADERS;
     
     static{
         HEADERS_UNIQUE_NAMES = new SimpleEntity[NON_UNIQUE_NAMES.length];
@@ -69,7 +69,6 @@ public class TestData {
         for(int i = 0; i < HEADERS_NON_UNIQUE_NAMES.length; i++){
             HEADERS_NON_UNIQUE_NAMES[i] = new SimpleEntityPojo(UNIQUE_IDENTIFIERS[i], NON_UNIQUE_NAMES[i]);
         }
-        BLANK_HEADERS = new SimpleEntity[NON_UNIQUE_NAMES.length];
     }
 
     public static final Set<Integer> SET = new TreeSet<>();

@@ -17,23 +17,21 @@
 /* under the License.                                           */
 /*--------------------------------------------------------------*/
 
-package org.corehunter.data;
+package org.corehunter.services;
 
-import uno.informatics.data.FeatureDataset;
+public enum DataType {
+    PHENOTYPIC("Phenotypic"), 
+    BI_ALLELIC_GENOTYPIC("Bi-allelic Genotypic"), 
+    GENOTYPIC("Genotypic"), 
+    DISTANCE("Distance");
 
-/**
- * Phenotypic trait data consisting of observations of variables of possibly mixed type.
- * Wraps a {@link FeatureDataset} acting as an adapter to the {@link NamedData} interface.
- * 
- * @author Herman De Beukelaer
- */
-public interface PhenotypicTraitData extends NamedData {
+    private String name;
 
-    /**
-     * Retrieves the actual data.
-     * 
-     * @return feature data
-     */
-    public FeatureDataset getData();
-    
+    private DataType(String name) {
+        this.name = name;
+    }
+
+    public synchronized final String getName() {
+        return name;
+    }
 }

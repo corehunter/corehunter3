@@ -20,34 +20,32 @@
 package org.corehunter.tests.data.simple;
 
 
+import static org.corehunter.tests.TestData.HEADERS_NON_UNIQUE_NAMES;
+import static org.corehunter.tests.TestData.HEADERS_UNIQUE_NAMES;
+import static org.corehunter.tests.TestData.PHENOTYPIC_TRAIT_EXPLICIT_BOUNDS;
+import static org.corehunter.tests.TestData.PHENOTYPIC_TRAIT_INFERRED_BOUNDS;
+import static org.corehunter.tests.TestData.PHENOTYPIC_TRAIT_NAMES;
+import static org.corehunter.tests.TestData.PHENOTYPIC_TRAIT_VALUES;
+import static org.corehunter.tests.TestData.SET;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import org.corehunter.data.simple.SimplePhenotypicTraitData;
-
-import static org.corehunter.tests.TestData.BLANK_HEADERS;
-import static org.corehunter.tests.TestData.HEADERS_UNIQUE_NAMES;
-import static org.corehunter.tests.TestData.PHENOTYPIC_TRAIT_INFERRED_BOUNDS;
-import static org.corehunter.tests.TestData.PHENOTYPIC_TRAIT_EXPLICIT_BOUNDS;
-import static org.corehunter.tests.TestData.PHENOTYPIC_TRAIT_NAMES;
-import static org.corehunter.tests.TestData.PHENOTYPIC_TRAIT_VALUES;
-import static org.corehunter.tests.TestData.HEADERS_NON_UNIQUE_NAMES;
-import static org.corehunter.tests.TestData.SET;
-
-import uno.informatics.common.io.FileType;
-import uno.informatics.data.FeatureDataset;
-import uno.informatics.data.FeatureDatasetRow;
-import uno.informatics.data.SimpleEntity;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import uno.informatics.common.io.FileType;
+import uno.informatics.data.SimpleEntity;
+import uno.informatics.data.dataset.FeatureData;
+import uno.informatics.data.dataset.FeatureDataRow;
+import uno.informatics.data.feature.array.ArrayFeatureData;
 
 
 /**
@@ -58,7 +56,6 @@ public class SimplePhenotypicTraitDataTest {
     private static final String CSV_NAMES = "/phenotypes/names.csv";
     private static final String CSV_NAMES_IDS = "/phenotypes/names-and-ids.csv";
     private static final String CSV_NAMES_MIN_MAX = "/phenotypes/names-min-max.csv";
-    private static final String TXT_NO_NAMES = "/phenotypes/no-names.txt";
 
     private static final String ERRONEOUS_FILES_DIR = "/phenotypes/err/";
     
@@ -82,7 +79,7 @@ public class SimplePhenotypicTraitDataTest {
         expectedHeaders = HEADERS_UNIQUE_NAMES;
         expectedBounds = PHENOTYPIC_TRAIT_INFERRED_BOUNDS;
         System.out.println(" |- File " + datasetName);
-        testData(SimplePhenotypicTraitData.readData(
+        testData(ArrayFeatureData.readData(
             Paths.get(SimplePhenotypicTraitDataTest.class.getResource(CSV_NAMES).getPath()),
             FileType.CSV
         ));
@@ -94,7 +91,7 @@ public class SimplePhenotypicTraitDataTest {
         expectedHeaders = HEADERS_NON_UNIQUE_NAMES;
         expectedBounds = PHENOTYPIC_TRAIT_INFERRED_BOUNDS;
         System.out.println(" |- File " + datasetName);
-        testData(SimplePhenotypicTraitData.readData(
+        testData(ArrayFeatureData.readData(
             Paths.get(SimplePhenotypicTraitDataTest.class.getResource(CSV_NAMES_IDS).getPath()),
             FileType.CSV
         ));
@@ -106,21 +103,9 @@ public class SimplePhenotypicTraitDataTest {
         expectedHeaders = HEADERS_UNIQUE_NAMES;
         expectedBounds = PHENOTYPIC_TRAIT_EXPLICIT_BOUNDS;
         System.out.println(" |- File " + datasetName);
-        testData(SimplePhenotypicTraitData.readData(
+        testData(ArrayFeatureData.readData(
             Paths.get(SimplePhenotypicTraitDataTest.class.getResource(CSV_NAMES_MIN_MAX).getPath()),
             FileType.CSV
-        ));
-    }
-    
-    @Test
-    public void fromTxtFileWithoutNames() throws IOException {
-        datasetName = "no-names.txt";
-        expectedHeaders = BLANK_HEADERS;
-        expectedBounds = PHENOTYPIC_TRAIT_INFERRED_BOUNDS;
-        System.out.println(" |- File " + datasetName);
-        testData(SimplePhenotypicTraitData.readData(
-            Paths.get(SimplePhenotypicTraitDataTest.class.getResource(TXT_NO_NAMES).getPath()),
-            FileType.TXT
         ));
     }
     
@@ -134,8 +119,8 @@ public class SimplePhenotypicTraitDataTest {
                 FileType type = file.toString().endsWith(".txt") ? FileType.TXT : FileType.CSV;
                 boolean thrown = false;
                 try {
-                    SimplePhenotypicTraitData.readData(file, type);
-                } catch (IOException ex){
+                    ArrayFeatureData.readData(file, type);
+                } catch (IOException | IllegalArgumentException ex){
                     thrown = true;
                     System.out.print(ex.getMessage());
                 } finally {
@@ -146,35 +131,34 @@ public class SimplePhenotypicTraitDataTest {
         }
     }
 
-    private void testData(SimplePhenotypicTraitData data) {
+    private void testData(FeatureData data) {
         
-        // check dataset name, if set
+        // check data name, if set
         String expectedDatasetName = datasetName != null ? datasetName : "Phenotypic trait data";
-        assertEquals("Incorrect dataset name.", expectedDatasetName, data.getDatasetName());
+        assertEquals("Incorrect dataset name.", expectedDatasetName, data.getName());
         
         // check IDs
         assertEquals("Ids not correct.", SET, data.getIDs());
         // check size
-        assertEquals("Incorrect dataset size.", SET.size(), data.getDatasetSize());
+        assertEquals("Incorrect dataset size.", SET.size(), data.getSize());
         
         // check trait names and bounds (min/max)
-        FeatureDataset fData = data.getData();
-        for(int t = 0; t < fData.getFeatures().size(); t++){
+        for(int t = 0; t < data.getFeatures().size(); t++){
             
             // check name
             assertEquals("Trait name for trait " + t + " is not correct.",
-                         PHENOTYPIC_TRAIT_NAMES[t], fData.getFeatures().get(t).getName());
+                         PHENOTYPIC_TRAIT_NAMES[t], data.getFeatures().get(t).getName());
             
             // check min and max
             assertEquals("Minimum value for trait " + t + " is not correct.",
-                         expectedBounds[t][0], fData.getFeatures().get(t).getMethod().getScale().getMinimumValue());
+                         expectedBounds[t][0], data.getFeatures().get(t).getMethod().getScale().getMinimumValue());
             assertEquals("Maximum value for trait " + t + " is not correct.",
-                         expectedBounds[t][1], fData.getFeatures().get(t).getMethod().getScale().getMaximumValue());
+                         expectedBounds[t][1], data.getFeatures().get(t).getMethod().getScale().getMaximumValue());
             
         }
         
         // check individuals (headers and trait values)
-        int size = data.getDatasetSize();
+        int size = data.getSize();
 
         for (int i = 0; i < size; i++) {
             
@@ -190,7 +174,7 @@ public class SimplePhenotypicTraitDataTest {
             }
 
             // check trait values
-            FeatureDatasetRow row = fData.getRow(i);
+            FeatureDataRow row = data.getRow(i);
             for(int t = 0; t < row.getColumnCount(); t++){
                 assertEquals(
                     "Incorrect value for trait " + t + " in individual " + i + ".",

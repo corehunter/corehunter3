@@ -19,7 +19,7 @@
 
 package org.corehunter.objectives.distance;
 
-import org.corehunter.data.simple.CoreHunterData;
+import org.corehunter.data.CoreHunterData;
 import org.corehunter.exceptions.CoreHunterException;
 
 /**

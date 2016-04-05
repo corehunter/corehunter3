@@ -22,10 +22,11 @@ package org.corehunter.tests.objectives.distance;
 import static org.corehunter.tests.TestData.MODIFIED_ROGERS_DISTANCES;
 import static org.corehunter.tests.TestData.CAVALLI_SFORZA_EDWARDS_DISTANCES;
 import static org.corehunter.tests.TestData.PRECISION;
+import static org.corehunter.tests.TestData.HEADERS_UNIQUE_NAMES;
 
 import java.util.Iterator;
 import org.corehunter.data.DistanceMatrixData;
-import org.corehunter.data.simple.CoreHunterData;
+import org.corehunter.data.CoreHunterData;
 import org.corehunter.data.simple.SimpleDistanceMatrixData;
 
 import org.corehunter.objectives.distance.DistanceMeasure;
@@ -42,7 +43,7 @@ public class PrecomputedDistanceTest {
     @Test
     public void testModifiedRogers() {
         
-        DistanceMatrixData dist = new SimpleDistanceMatrixData(MODIFIED_ROGERS_DISTANCES);
+        DistanceMatrixData dist = new SimpleDistanceMatrixData(HEADERS_UNIQUE_NAMES, MODIFIED_ROGERS_DISTANCES);
         CoreHunterData data = new CoreHunterData(dist);
 
         DistanceMeasure distanceMetric = new PrecomputedDistance();
@@ -68,7 +69,7 @@ public class PrecomputedDistanceTest {
     @Test
     public void testCavalliSforzaEdwards() {
         
-        DistanceMatrixData dist = new SimpleDistanceMatrixData(CAVALLI_SFORZA_EDWARDS_DISTANCES);
+        DistanceMatrixData dist = new SimpleDistanceMatrixData(HEADERS_UNIQUE_NAMES, CAVALLI_SFORZA_EDWARDS_DISTANCES);
         CoreHunterData data = new CoreHunterData(dist);
 
         DistanceMeasure distanceMetric = new PrecomputedDistance();

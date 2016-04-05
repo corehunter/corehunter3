@@ -20,12 +20,11 @@
 package org.corehunter.objectives.distance;
 
 import org.apache.commons.lang3.ObjectUtils;
-import org.corehunter.data.PhenotypicTraitData;
-import org.corehunter.data.simple.CoreHunterData;
+import org.corehunter.data.CoreHunterData;
 import org.corehunter.exceptions.CoreHunterException;
 import uno.informatics.data.Feature;
-import uno.informatics.data.FeatureDataset;
 import uno.informatics.data.Scale;
+import uno.informatics.data.dataset.FeatureData;
 
 /**
  * @author Herman De Beukelaer, Guy Davenport
@@ -40,15 +39,14 @@ public class GowerDistance implements DistanceMeasure {
     @Override
     public double getDistance(int idX, int idY, CoreHunterData data) {
 
-        PhenotypicTraitData phenotypes = data.getPhenotypes();
+        FeatureData phenotypes = data.getPhenotypicData();
                 
         if(phenotypes == null){
             throw new CoreHunterException("Phenotypes are required for Gower distance.");
         }
         
-        FeatureDataset featureData = phenotypes.getData();
-        Object[][] values = featureData.getValuesAsArray();
-        Feature[] features = featureData.getFeaturesAsArray();
+        Object[][] values = phenotypes.getValuesAsArray();
+        Feature[] features = phenotypes.getFeaturesAsArray();
         
         double distSum = 0.0;
         double weightSum = 0.0;
@@ -104,7 +102,7 @@ public class GowerDistance implements DistanceMeasure {
         }
         
         return distSum/weightSum;
-
+        
     }
     
     // TODO review treatment of missing data

@@ -22,6 +22,7 @@ package org.corehunter;
 public enum CoreHunterObjective {
     MR("Modified Rogers distance"),
     CE("Cavalli-Sforza and Edwards distance"),
+    PD("Precomputed distance"),
     SH("Shannon diversity index"),
     HE("Expected proportion of heterozygous loci"),
     CV("Coverage of alleles"),
