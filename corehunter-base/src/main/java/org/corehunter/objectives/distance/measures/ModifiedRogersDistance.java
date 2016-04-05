@@ -19,7 +19,6 @@
 
 package org.corehunter.objectives.distance.measures;
 
-import org.corehunter.objectives.distance.DistanceMeasure;
 import org.corehunter.data.GenotypeVariantData;
 import org.corehunter.data.CoreHunterData;
 import org.corehunter.exceptions.CoreHunterException;
@@ -27,11 +26,11 @@ import org.corehunter.exceptions.CoreHunterException;
 /**
  * @author Guy Davenport, Herman De Beukelaer
  */
-public class ModifiedRogersDistance implements DistanceMeasure {
+public class ModifiedRogersDistance extends CachedDistanceMeasure {
 
     // TODO review treatment of missing data
     @Override
-    public double getDistance(int idX, int idY, CoreHunterData data) {
+    public double computeDistance(int idX, int idY, CoreHunterData data) {
         
         GenotypeVariantData genotypes = data.getGenotypicData();
         

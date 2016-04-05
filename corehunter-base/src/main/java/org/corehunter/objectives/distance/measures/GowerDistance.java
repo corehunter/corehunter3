@@ -19,7 +19,6 @@
 
 package org.corehunter.objectives.distance.measures;
 
-import org.corehunter.objectives.distance.DistanceMeasure;
 import org.apache.commons.lang3.ObjectUtils;
 import org.corehunter.data.CoreHunterData;
 import org.corehunter.exceptions.CoreHunterException;
@@ -30,7 +29,7 @@ import uno.informatics.data.dataset.FeatureData;
 /**
  * @author Herman De Beukelaer, Guy Davenport
  */
-public class GowerDistance implements DistanceMeasure {
+public class GowerDistance extends CachedDistanceMeasure {
 
     private static final int BINARY_SCALE_TYPE = 0;
     private static final int DISCRETE_SCALE_TYPE = 1;
@@ -38,7 +37,7 @@ public class GowerDistance implements DistanceMeasure {
     
     // TODO cache (also scale types and ranges)
     @Override
-    public double getDistance(int idX, int idY, CoreHunterData data) {
+    public double computeDistance(int idX, int idY, CoreHunterData data) {
 
         FeatureData phenotypes = data.getPhenotypicData();
                 
