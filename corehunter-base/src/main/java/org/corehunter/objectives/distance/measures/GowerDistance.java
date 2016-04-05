@@ -17,8 +17,9 @@
 /* under the License.                                           */
 /*--------------------------------------------------------------*/
 
-package org.corehunter.objectives.distance;
+package org.corehunter.objectives.distance.measures;
 
+import org.corehunter.objectives.distance.DistanceMeasure;
 import org.apache.commons.lang3.ObjectUtils;
 import org.corehunter.data.CoreHunterData;
 import org.corehunter.exceptions.CoreHunterException;

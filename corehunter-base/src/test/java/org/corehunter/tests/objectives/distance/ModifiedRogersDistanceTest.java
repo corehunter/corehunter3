@@ -28,7 +28,7 @@ import static org.corehunter.tests.TestData.ALLELE_FREQUENCIES;
 import static org.corehunter.tests.TestData.HEADERS_NON_UNIQUE_NAMES;
 
 import org.corehunter.data.simple.SimpleGenotypeVariantData;
-import org.corehunter.objectives.distance.ModifiedRogersDistance;
+import org.corehunter.objectives.distance.measures.ModifiedRogersDistance;
 import org.corehunter.data.CoreHunterData;
 
 import java.util.Iterator;

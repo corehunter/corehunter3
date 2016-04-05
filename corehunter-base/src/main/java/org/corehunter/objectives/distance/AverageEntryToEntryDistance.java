@@ -17,13 +17,12 @@
 /* under the License.                                           */
 /*--------------------------------------------------------------*/
 
-package org.corehunter.objectives.distance.aggregation;
+package org.corehunter.objectives.distance;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import org.corehunter.objectives.distance.DistanceMeasure;
 import org.corehunter.data.CoreHunterData;
 import org.corehunter.data.DistanceMatrixData;
 

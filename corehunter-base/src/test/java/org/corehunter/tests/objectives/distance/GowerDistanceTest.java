@@ -28,7 +28,7 @@ import org.corehunter.data.DistanceMatrixData;
 import org.corehunter.data.matrix.SymmetricMatrixFormat;
 import org.corehunter.data.CoreHunterData;
 import org.corehunter.data.simple.SimpleDistanceMatrixData;
-import org.corehunter.objectives.distance.GowerDistance;
+import org.corehunter.objectives.distance.measures.GowerDistance;
 
 import uno.informatics.common.io.FileType;
 import uno.informatics.data.DataType;

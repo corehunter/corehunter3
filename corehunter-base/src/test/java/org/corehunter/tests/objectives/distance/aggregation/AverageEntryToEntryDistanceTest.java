@@ -23,10 +23,10 @@ import org.corehunter.data.DistanceMatrixData;
 import org.corehunter.data.CoreHunterData;
 import org.corehunter.data.simple.SimpleDistanceMatrixData;
 import org.corehunter.data.simple.SimpleGenotypeVariantData;
-import org.corehunter.objectives.distance.CavalliSforzaEdwardsDistance;
-import org.corehunter.objectives.distance.ModifiedRogersDistance;
-import org.corehunter.objectives.distance.PrecomputedDistance;
-import org.corehunter.objectives.distance.aggregation.AverageEntryToEntryDistance;
+import org.corehunter.objectives.distance.measures.CavalliSforzaEdwardsDistance;
+import org.corehunter.objectives.distance.measures.ModifiedRogersDistance;
+import org.corehunter.objectives.distance.measures.PrecomputedDistance;
+import org.corehunter.objectives.distance.AverageEntryToEntryDistance;
 
 import static org.corehunter.tests.TestData.ALLELE_FREQUENCIES;
 import static org.corehunter.tests.TestData.ALLELE_NAMES;

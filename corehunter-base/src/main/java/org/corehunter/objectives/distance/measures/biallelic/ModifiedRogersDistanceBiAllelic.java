@@ -17,28 +17,16 @@
 /* under the License.                                           */
 /*--------------------------------------------------------------*/
 
-package org.corehunter.objectives.distance;
+package org.corehunter.objectives.distance.measures.biallelic;
 
-import org.corehunter.data.DistanceMatrixData;
 import org.corehunter.data.CoreHunterData;
-import org.corehunter.exceptions.CoreHunterException;
+import org.corehunter.objectives.distance.DistanceMeasure;
 
-/**
- * @author Herman De Beukelaer
- */
-public class PrecomputedDistance implements DistanceMeasure {
+public class ModifiedRogersDistanceBiAllelic implements DistanceMeasure {
 
     @Override
     public double getDistance(int idX, int idY, CoreHunterData data) {
-        
-        DistanceMatrixData dist = data.getDistancesData();
-        
-        if(dist == null){
-            throw new CoreHunterException("No precomputed distance matrix has been defined.");
-        }
-        
-        return dist.getDistance(idX, idY);
-        
+        throw new UnsupportedOperationException("Not supported yet.");
     }
-
+    
 }

@@ -17,16 +17,16 @@
 /* under the License.                                           */
 /*--------------------------------------------------------------*/
 
-package org.corehunter.objectives.distance.biallelic;
+package org.corehunter.objectives.distance.measures.biallelic;
 
 import org.corehunter.data.CoreHunterData;
 import org.corehunter.objectives.distance.DistanceMeasure;
 
-public class ModifiedRogersDistanceBiAllelic implements DistanceMeasure {
+public class CavalliSforzaEdwardsDistanceBiAllelic implements DistanceMeasure {
 
     @Override
     public double getDistance(int idX, int idY, CoreHunterData data) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
-    
+
 }

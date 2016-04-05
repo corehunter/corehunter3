@@ -17,8 +17,9 @@
 /* under the License.                                           */
 /*--------------------------------------------------------------*/
 
-package org.corehunter.objectives.distance;
+package org.corehunter.objectives.distance.measures;
 
+import org.corehunter.objectives.distance.DistanceMeasure;
 import org.corehunter.data.GenotypeVariantData;
 import org.corehunter.data.CoreHunterData;
 import org.corehunter.exceptions.CoreHunterException;
@@ -26,7 +27,7 @@ import org.corehunter.exceptions.CoreHunterException;
 /**
  * @author Guy Davenport, Herman De Beukelaer
  */
-public class CavalliSforzaEdwardsDistance implements DistanceMeasure {
+public class ModifiedRogersDistance implements DistanceMeasure {
 
     // TODO review treatment of missing data
     @Override
@@ -35,7 +36,7 @@ public class CavalliSforzaEdwardsDistance implements DistanceMeasure {
         GenotypeVariantData genotypes = data.getGenotypicData();
         
         if(genotypes == null){
-            throw new CoreHunterException("Genotypes are required for Cavalli-Sforza and Edwards distance.");
+            throw new CoreHunterException("Genotypes are required for Modified Rogers distance.");
         }
         
         int numberOfMarkers = genotypes.getNumberOfMarkers();
@@ -49,8 +50,7 @@ public class CavalliSforzaEdwardsDistance implements DistanceMeasure {
                 Double pxla = genotypes.getAlleleFrequency(idX, markerIndex, alleleIndex);
                 Double pyla = genotypes.getAlleleFrequency(idY, markerIndex, alleleIndex);
                 if (pxla != null && pyla != null) {
-                    double diff = Math.sqrt(pxla) - Math.sqrt(pyla);
-                    sumSquareDiff += diff * diff;
+                    sumSquareDiff += (pxla - pyla) * (pxla - pyla);
                 }
                 
             }
@@ -60,6 +60,6 @@ public class CavalliSforzaEdwardsDistance implements DistanceMeasure {
         double distance = Math.sqrt(sumSquareDiff / (2*numberOfMarkers));
 
         return distance;
-    }
 
+    }
 }

@@ -23,7 +23,7 @@ import java.util.Iterator;
 
 import org.corehunter.data.CoreHunterData;
 import org.corehunter.data.simple.SimpleGenotypeVariantData;
-import org.corehunter.objectives.distance.CavalliSforzaEdwardsDistance;
+import org.corehunter.objectives.distance.measures.CavalliSforzaEdwardsDistance;
 
 import static org.corehunter.tests.TestData.ALLELE_FREQUENCIES;
 import static org.corehunter.tests.TestData.ALLELE_NAMES;

@@ -30,7 +30,7 @@ import org.corehunter.data.CoreHunterData;
 import org.corehunter.data.simple.SimpleDistanceMatrixData;
 
 import org.corehunter.objectives.distance.DistanceMeasure;
-import org.corehunter.objectives.distance.PrecomputedDistance;
+import org.corehunter.objectives.distance.measures.PrecomputedDistance;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

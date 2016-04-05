@@ -21,9 +21,9 @@ package org.corehunter;
 
 import java.util.concurrent.TimeUnit;
 
-import org.corehunter.objectives.distance.aggregation.AverageEntryToEntryDistance;
-import org.corehunter.objectives.distance.CavalliSforzaEdwardsDistance;
-import org.corehunter.objectives.distance.ModifiedRogersDistance;
+import org.corehunter.objectives.distance.AverageEntryToEntryDistance;
+import org.corehunter.objectives.distance.measures.CavalliSforzaEdwardsDistance;
+import org.corehunter.objectives.distance.measures.ModifiedRogersDistance;
 import org.corehunter.objectives.Coverage;
 import org.corehunter.objectives.HeterozygousLoci;
 import org.corehunter.objectives.Shannon;
@@ -37,8 +37,8 @@ import org.jamesframework.core.search.stopcriteria.MaxRuntime;
 import org.jamesframework.core.subset.neigh.SinglePerturbationNeighbourhood;
 
 import org.corehunter.data.CoreHunterData;
-import org.corehunter.objectives.distance.GowerDistance;
-import org.corehunter.objectives.distance.PrecomputedDistance;
+import org.corehunter.objectives.distance.measures.GowerDistance;
+import org.corehunter.objectives.distance.measures.PrecomputedDistance;
 
 /**
  * Provides support for executing pre-defined core subset searches. Can be re-used.
