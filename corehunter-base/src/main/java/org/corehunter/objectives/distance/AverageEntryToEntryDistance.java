@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.corehunter.data.CoreHunterData;
-import org.corehunter.data.DistanceMatrixData;
 
 import org.jamesframework.core.exceptions.IncompatibleDeltaEvaluationException;
 import org.jamesframework.core.problems.objectives.Objective;
@@ -51,9 +50,7 @@ public class AverageEntryToEntryDistance implements Objective<SubsetSolution, Co
     @Override
     public Evaluation evaluate(SubsetSolution solution, CoreHunterData data) {
         double value = 0.0;
-        
-        DistanceMatrixData distanceData = data.getDistancesData() ;
-        
+                
         if (solution.getNumSelectedIDs() >= 2) {
             // at least two items selected: compute average pairwise distance
             double sumDist = 0.0;

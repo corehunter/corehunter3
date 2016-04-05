@@ -375,8 +375,24 @@ public class TestData {
     );
     public static final Evaluation ENTRY_TO_ENTRY_CAVALLI_SFORZA_SUBSET3 = SimpleEvaluation.WITH_VALUE(
             (CAVALLI_SFORZA_EDWARDS_DISTANCES[1][2]
-            + CAVALLI_SFORZA_EDWARDS_DISTANCES[2][4]
-            + CAVALLI_SFORZA_EDWARDS_DISTANCES[1][4]) / 3.0
+           + CAVALLI_SFORZA_EDWARDS_DISTANCES[2][4]
+           + CAVALLI_SFORZA_EDWARDS_DISTANCES[1][4]) / 3.0
+    );
+    
+    public static final Evaluation ENTRY_TO_NEAREST_ENTRY_MODIFIED_ROGERS_SUBSET2 = SimpleEvaluation.WITH_VALUE(
+            MODIFIED_ROGERS_DISTANCES[1][2]
+    );
+    public static final Evaluation ENTRY_TO_NEAREST_ENTRY_CAVALLI_SFORZA_SUBSET2 = SimpleEvaluation.WITH_VALUE(
+            CAVALLI_SFORZA_EDWARDS_DISTANCES[1][2]
+    );
+    
+    public static final Evaluation ENTRY_TO_NEAREST_ENTRY_MODIFIED_ROGERS_SUBSET3 = SimpleEvaluation.WITH_VALUE(
+            (MODIFIED_ROGERS_DISTANCES[1][4] + MODIFIED_ROGERS_DISTANCES[2][4] + MODIFIED_ROGERS_DISTANCES[4][1]) / 3.0
+    );
+    public static final Evaluation ENTRY_TO_NEAREST_ENTRY_CAVALLI_SFORZA_SUBSET3 = SimpleEvaluation.WITH_VALUE(
+            (CAVALLI_SFORZA_EDWARDS_DISTANCES[1][4]
+           + CAVALLI_SFORZA_EDWARDS_DISTANCES[2][4]
+           + CAVALLI_SFORZA_EDWARDS_DISTANCES[4][1]) / 3.0
     );
     
 }
