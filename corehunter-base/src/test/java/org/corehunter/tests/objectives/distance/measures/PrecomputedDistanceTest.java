@@ -17,7 +17,7 @@
 /* under the License.                                           */
 /*--------------------------------------------------------------*/
 
-package org.corehunter.tests.objectives.distance;
+package org.corehunter.tests.objectives.distance.measures;
 
 import static org.corehunter.tests.TestData.MODIFIED_ROGERS_DISTANCES;
 import static org.corehunter.tests.TestData.CAVALLI_SFORZA_EDWARDS_DISTANCES;

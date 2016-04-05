@@ -17,7 +17,7 @@
 /* under the License.                                           */
 /*--------------------------------------------------------------*/
 
-package org.corehunter.tests.objectives.distance;
+package org.corehunter.tests.objectives.distance.measures;
 
 import static org.corehunter.tests.TestData.ALLELE_NAMES;
 import static org.corehunter.tests.TestData.MARKER_NAMES;

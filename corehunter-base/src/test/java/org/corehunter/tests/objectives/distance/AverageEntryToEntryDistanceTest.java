@@ -17,7 +17,7 @@
 /* under the License.                                           */
 /*--------------------------------------------------------------*/
 
-package org.corehunter.tests.objectives.distance.aggregation;
+package org.corehunter.tests.objectives.distance;
 
 import org.corehunter.data.DistanceMatrixData;
 import org.corehunter.data.CoreHunterData;
