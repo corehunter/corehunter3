@@ -30,15 +30,22 @@ import org.corehunter.objectives.distance.DistanceMeasure;
  * @author Herman De Beukelaer
  */
 public abstract class CachedDistanceMeasure implements DistanceMeasure {
-
+    
     private final Map<CoreHunterData, Double[][]> cache;
-
+    private final MissingDataPolicy missingDataPolicy;
+    
     public CachedDistanceMeasure() {
+        this(MissingDataPolicy.FLOOR);
+    }
+    
+    public CachedDistanceMeasure(MissingDataPolicy policy){
         cache = new HashMap<>();
+        missingDataPolicy = policy;
     }
     
     /**
-     * Retrieve a distance from the cache. If the distance is not found in the cache it is computed and stored.
+     * Retrieve a distance from the cache. If the distance is
+     * not found in the cache it is first computed and stored.
      * 
      * @param idX id of the first item
      * @param idY id of the second item
@@ -58,7 +65,7 @@ public abstract class CachedDistanceMeasure implements DistanceMeasure {
                 cache.put(data, distances);
             }
             // compute, store and return
-            double d = computeDistance(idX, idY, data);
+            double d = computeDistance(idX, idY, data, missingDataPolicy);
             distances[idX][idY] = d;
             distances[idY][idX] = d;
             return d;
@@ -71,8 +78,24 @@ public abstract class CachedDistanceMeasure implements DistanceMeasure {
      * @param idX id of the first item
      * @param idY id of the second item
      * @param data data from which the distance is computed
+     * @param missingDataPolicy determines the contribution of variables with missing values
      * @return distance between the two items with given id
      */
-    protected abstract double computeDistance(int idX, int idY, CoreHunterData data);
+    protected abstract double computeDistance(int idX, int idY,
+                                              CoreHunterData data,
+                                              MissingDataPolicy missingDataPolicy);
+    
+    protected double missingValueContribution(MissingDataPolicy policy, double ceilValue){
+        switch(policy){
+            case FLOOR:
+                return 0.0;
+            case CEIL:
+                return ceilValue;
+            default:
+                throw new RuntimeException(
+                        "This should not happen: unexpected missing data policy " + policy
+                );
+        }
+    }
     
 }

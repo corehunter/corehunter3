@@ -29,6 +29,9 @@ import org.corehunter.data.matrix.SymmetricMatrixFormat;
 import org.corehunter.data.CoreHunterData;
 import org.corehunter.data.simple.SimpleDistanceMatrixData;
 import org.corehunter.objectives.distance.measures.GowerDistance;
+import org.corehunter.objectives.distance.measures.MissingDataPolicy;
+import static org.corehunter.tests.TestData.GOWER_DISTANCES_MISSING_VALUES_CEIL;
+import static org.corehunter.tests.TestData.GOWER_DISTANCES_MISSING_VALUES_FLOOR;
 
 import uno.informatics.common.io.FileType;
 import uno.informatics.data.DataType;
@@ -49,6 +52,8 @@ public class GowerDistanceTest {
 
     private static final String DATA_FILE = "/phenotypes/phenotypic_data.csv";
     private static final String MATRIX_FILE = "/phenotypes/matrix.csv";
+    
+    private static final String DATA_FILE_MISSING_VALUES = "/phenotypes/missing-values.csv";
 
     private static final Object[][] DATA = {
         {"row1", 1, 1.0, "1", true},
@@ -123,4 +128,45 @@ public class GowerDistanceTest {
         }
 
     }
+    
+    @Test
+    public void testFromFileWithMissingValues() throws IOException, DatasetException {
+        
+        FeatureData pheno = ArrayFeatureData.readData(
+                Paths.get(GowerDistanceTest.class.getResource(DATA_FILE_MISSING_VALUES).getPath()),
+                FileType.CSV
+        );
+        CoreHunterData data = new CoreHunterData(pheno);
+        
+        GowerDistance distanceMetric;
+        int n = data.getSize();
+        
+        // test with missing data policy FLOOR
+        distanceMetric = new GowerDistance(MissingDataPolicy.FLOOR);
+        for (int x = 0; x < n; x++) {
+            for (int y = 0; y < n; y++) {
+                assertEquals(
+                        "x=" + x + " y=" + y,
+                        GOWER_DISTANCES_MISSING_VALUES_FLOOR[x][y],
+                        distanceMetric.getDistance(x, y, data),
+                        PRECISION
+                );
+            }
+        }
+        
+        // test with missing data policy CEIL
+        distanceMetric = new GowerDistance(MissingDataPolicy.CEIL);
+        for (int x = 0; x < n; x++) {
+            for (int y = 0; y < n; y++) {
+                assertEquals(
+                        "x=" + x + " y=" + y,
+                        GOWER_DISTANCES_MISSING_VALUES_CEIL[x][y],
+                        distanceMetric.getDistance(x, y, data),
+                        PRECISION
+                );
+            }
+        }
+
+    }
+    
 }

@@ -19,7 +19,7 @@
 
 package org.corehunter.objectives.distance.measures;
 
-import org.apache.commons.lang3.ObjectUtils;
+import java.util.Objects;
 import org.corehunter.data.CoreHunterData;
 import org.corehunter.exceptions.CoreHunterException;
 import uno.informatics.data.Feature;
@@ -34,11 +34,23 @@ public class GowerDistance extends CachedDistanceMeasure {
     private static final int BINARY_SCALE_TYPE = 0;
     private static final int DISCRETE_SCALE_TYPE = 1;
     private static final int RANGED_SCALE_TYPE = 2;
-    
-    // TODO cache (also scale types and ranges)
-    @Override
-    public double computeDistance(int idX, int idY, CoreHunterData data) {
 
+    public GowerDistance() {
+        super();
+    }
+
+    public GowerDistance(MissingDataPolicy policy) {
+        super(policy);
+    }
+    
+    // TODO cache scale types and ranges
+    @Override
+    public double computeDistance(int idX, int idY, CoreHunterData data, MissingDataPolicy missingDataPolicy) {
+
+        if(idX == idY){
+            return 0.0;
+        }
+        
         FeatureData phenotypes = data.getPhenotypicData();
                 
         if(phenotypes == null){
@@ -94,8 +106,8 @@ public class GowerDistance extends CachedDistanceMeasure {
                     throw new IllegalArgumentException("Illegal scale type: " + scale.getScaleType());
             }
             
-            double distance = distance(scaleType, range, values[idX][k], values[idY][k]);
-            double weight = weight(scaleType, range, values[idX][k], values[idY][k]);
+            double distance = distance(scaleType, range, values[idX][k], values[idY][k], missingDataPolicy);
+            double weight = weight(scaleType, values[idX][k], values[idY][k]);
             distSum += distance * weight;
             weightSum += weight;
             
@@ -105,8 +117,9 @@ public class GowerDistance extends CachedDistanceMeasure {
         
     }
     
-    // TODO review treatment of missing data
-    private double distance(int scaleType, double range, Object elementA, Object elementB) {
+    private double distance(int scaleType, double range,
+                            Object elementA, Object elementB,
+                            MissingDataPolicy missingDataPolicy) {
         if (elementA != null && elementB != null) {
             switch (scaleType) {
                 case BINARY_SCALE_TYPE:
@@ -116,7 +129,7 @@ public class GowerDistance extends CachedDistanceMeasure {
                         return 1.0;
                     }
                 case DISCRETE_SCALE_TYPE:
-                    if (ObjectUtils.equals(elementA, elementB)) {
+                    if (Objects.equals(elementA, elementB)) {
                         return 0.0;
                     } else {
                         return 1.0;
@@ -131,11 +144,10 @@ public class GowerDistance extends CachedDistanceMeasure {
                     );
             }
         }
-        return 0.0;
+        return missingValueContribution(missingDataPolicy, 1.0);
     }
 
-    // TODO review treatment of missing data
-    private double weight(int scaleType, double range, Object elementA, Object elementB) {
+    private double weight(int scaleType, Object elementA, Object elementB) {
         if (elementA != null && elementB != null) {
             switch (scaleType) {
                 case BINARY_SCALE_TYPE:
@@ -149,11 +161,11 @@ public class GowerDistance extends CachedDistanceMeasure {
                     return 1.0;
                 default:
                     throw new RuntimeException(
-                            "This should not happen: unexpected scale type in Gower distance matrix generator."
+                            "This should not happen: unexpected scale type " + scaleType + " in Gower distance."
                     );
             }
         }
-        return 0.0;
+        return 1.0;
     }
 
 }

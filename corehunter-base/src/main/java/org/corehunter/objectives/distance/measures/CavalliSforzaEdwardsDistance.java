@@ -30,7 +30,9 @@ public class CavalliSforzaEdwardsDistance extends CachedDistanceMeasure {
 
     // TODO review treatment of missing data
     @Override
-    public double computeDistance(int idX, int idY, CoreHunterData data) {
+    public double computeDistance(int idX, int idY,
+                                  CoreHunterData data,
+                                  MissingDataPolicy missingDataPolicy) {
         
         GenotypeVariantData genotypes = data.getGenotypicData();
         

@@ -27,11 +27,14 @@ import org.corehunter.objectives.distance.measures.CavalliSforzaEdwardsDistance;
 import org.corehunter.objectives.distance.measures.ModifiedRogersDistance;
 import org.corehunter.objectives.distance.measures.PrecomputedDistance;
 import org.corehunter.objectives.distance.AverageEntryToNearestEntryDistance;
+import org.corehunter.objectives.distance.measures.GowerDistance;
 
 import static org.corehunter.tests.TestData.ALLELE_FREQUENCIES;
 import static org.corehunter.tests.TestData.ALLELE_NAMES;
 import static org.corehunter.tests.TestData.ENTRY_TO_NEAREST_ENTRY_CAVALLI_SFORZA_SUBSET2;
 import static org.corehunter.tests.TestData.ENTRY_TO_NEAREST_ENTRY_CAVALLI_SFORZA_SUBSET3;
+import static org.corehunter.tests.TestData.ENTRY_TO_NEAREST_ENTRY_GOWER_SUBSET2;
+import static org.corehunter.tests.TestData.ENTRY_TO_NEAREST_ENTRY_GOWER_SUBSET3;
 import static org.corehunter.tests.TestData.ENTRY_TO_NEAREST_ENTRY_MODIFIED_ROGERS_SUBSET2;
 import static org.corehunter.tests.TestData.ENTRY_TO_NEAREST_ENTRY_MODIFIED_ROGERS_SUBSET3;
 import static org.corehunter.tests.TestData.HEADERS_NON_UNIQUE_NAMES;
@@ -39,6 +42,8 @@ import static org.corehunter.tests.TestData.HEADERS_UNIQUE_NAMES;
 import static org.corehunter.tests.TestData.MARKER_NAMES;
 import static org.corehunter.tests.TestData.MODIFIED_ROGERS_DISTANCES;
 import static org.corehunter.tests.TestData.NAME;
+import static org.corehunter.tests.TestData.PHENOTYPIC_TRAIT_FEATURES;
+import static org.corehunter.tests.TestData.PHENOTYPIC_TRAIT_VALUES_WITH_HEADERS;
 import static org.corehunter.tests.TestData.PRECISION;
 import static org.corehunter.tests.TestData.SUBSET2;
 import static org.corehunter.tests.TestData.SUBSET3;
@@ -49,6 +54,8 @@ import org.jamesframework.core.problems.objectives.evaluations.SimpleEvaluation;
 
 import org.jamesframework.core.subset.SubsetSolution;
 import org.junit.Test;
+import uno.informatics.data.dataset.FeatureData;
+import uno.informatics.data.feature.array.ArrayFeatureData;
 
 /**
  * @author Herman De Beukelaer
@@ -112,6 +119,41 @@ public class AverageEntryToNearestEntryDistanceTest extends EvaluationTest {
         assertEquals(
                 "Evaluation for subset 3 is not correct!",
                 ENTRY_TO_NEAREST_ENTRY_CAVALLI_SFORZA_SUBSET3,
+                objective.evaluate(new SubsetSolution(data.getIDs(), SUBSET3), data),
+                PRECISION
+        );
+        
+        assertEquals(
+                "Evaluation for empty subset is not correct!",
+                SimpleEvaluation.WITH_VALUE(0.0),
+                objective.evaluate(new SubsetSolution(data.getIDs(), SUBSET_EMPTY), data),
+                PRECISION
+        );
+        
+    }
+    
+    @Test
+    public void testGower() {
+        
+        FeatureData pheno = new ArrayFeatureData(
+                NAME, PHENOTYPIC_TRAIT_FEATURES, PHENOTYPIC_TRAIT_VALUES_WITH_HEADERS
+        );
+        CoreHunterData data = new CoreHunterData(pheno);
+        
+        AverageEntryToNearestEntryDistance objective = new AverageEntryToNearestEntryDistance(
+                new GowerDistance()
+        );
+
+        assertEquals(
+                "Evaluation for subset 2 is not correct!",
+                ENTRY_TO_NEAREST_ENTRY_GOWER_SUBSET2,
+                objective.evaluate(new SubsetSolution(data.getIDs(), SUBSET2), data),
+                PRECISION
+        );
+        
+        assertEquals(
+                "Evaluation for subset 3 is not correct!",
+                ENTRY_TO_NEAREST_ENTRY_GOWER_SUBSET3,
                 objective.evaluate(new SubsetSolution(data.getIDs(), SUBSET3), data),
                 PRECISION
         );

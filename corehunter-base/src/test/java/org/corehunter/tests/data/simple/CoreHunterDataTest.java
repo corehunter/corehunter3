@@ -50,7 +50,6 @@ public class CoreHunterDataTest {
     private static final String DISTANCES_UNIQUE_NAMES = "/distances/full-names.txt";
     private static final String DISTANCES_NON_UNIQUE_NAMES = "/distances/full-names-ids.txt";
     
-    private static final String PHENOTYPES_NO_HEADERS = "/phenotypes/no-names.txt";
     private static final String PHENOTYPES_UNIQUE_NAMES = "/phenotypes/names.csv";
     private static final String PHENOTYPES_NON_UNIQUE_NAMES = "/phenotypes/names-and-ids.csv";
     private static final String PHENOTYPES_SAME_IDS_DIFFERENT_NAMES = "/phenotypes/same-ids-different-names.csv";

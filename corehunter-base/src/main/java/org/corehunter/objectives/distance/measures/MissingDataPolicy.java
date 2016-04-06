@@ -17,17 +17,18 @@
 /* under the License.                                           */
 /*--------------------------------------------------------------*/
 
-package org.corehunter.objectives.distance.measures.biallelic;
+package org.corehunter.objectives.distance.measures;
 
-import org.corehunter.data.CoreHunterData;
-import org.corehunter.objectives.distance.measures.CachedDistanceMeasure;
-import org.corehunter.objectives.distance.measures.MissingDataPolicy;
-
-public class CavalliSforzaEdwardsDistanceBiAllelic extends CachedDistanceMeasure {
-
-    @Override
-    public double computeDistance(int idX, int idY, CoreHunterData data, MissingDataPolicy missingDataPolicy) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
+/**
+ * @author Herman De Beukelaer
+ */
+public enum MissingDataPolicy {
+    /**
+     * Sets the contribution of variables with missing values to zero.
+     */
+    FLOOR,
+    /**
+     * Sets the contribution of variables with missing values to the maximum attainable contribution.
+     */
+    CEIL;
 }

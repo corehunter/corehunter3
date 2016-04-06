@@ -25,9 +25,13 @@ import java.util.TreeSet;
 import org.corehunter.data.simple.SimpleDistanceMatrixData;
 import org.jamesframework.core.problems.objectives.evaluations.Evaluation;
 import org.jamesframework.core.problems.objectives.evaluations.SimpleEvaluation;
+import uno.informatics.data.DataType;
+import uno.informatics.data.Feature;
+import uno.informatics.data.ScaleType;
 
 import uno.informatics.data.SimpleEntity;
 import uno.informatics.data.pojo.SimpleEntityPojo;
+import uno.informatics.data.pojo.SimpleFeaturePojo;
 
 /**
  * @author Guy Davenport, Herman De Beukelaer
@@ -289,12 +293,36 @@ public class TestData {
         "trait 5"
     };
     
+    public static final Feature[] PHENOTYPIC_TRAIT_FEATURES = {
+        new SimpleFeaturePojo("trait 1", DataType.STRING, ScaleType.NOMINAL),
+        new SimpleFeaturePojo("trait 2", DataType.INTEGER, ScaleType.ORDINAL, 0, 3),
+        new SimpleFeaturePojo("trait 3", DataType.INTEGER, ScaleType.INTERVAL, 1, 9),
+        new SimpleFeaturePojo("trait 4", DataType.DOUBLE, ScaleType.RATIO, 0.5, 1.4),
+        new SimpleFeaturePojo("trait 5", DataType.BOOLEAN, ScaleType.NOMINAL)        
+    };
+    
     public static final Object[][] PHENOTYPIC_TRAIT_VALUES  = {
         {"A", 3, 4, 1.4, false},
         {"B", 1, 5, 0.5, true},
         {"A", 0, 6, 0.5, true},
         {"C", 2, 9, 0.5, false},
         {"B", 2, 1, 1.3, true}
+    };
+    
+    public static final Object[][] PHENOTYPIC_TRAIT_VALUES_WITH_HEADERS  = {
+        {"Alice", "A", 3, 4, 1.4, false},
+        {"Dave", "B", 1, 5, 0.5, true},
+        {"Bob", "A", 0, 6, 0.5, true},
+        {"Carol", "C", 2, 9, 0.5, false},
+        {"Eve", "B", 2, 1, 1.3, true}
+    };
+    
+    public static final Object[][] PHENOTYPIC_TRAIT_MISSING_VALUES  = {
+        {"A" , 3   , 4, 1.4 , false},
+        {"B" , 1   , 5, 0.5 , null},
+        {null, 0   , 6, null, true},
+        {"C" , 2   , 9, null, false},
+        {"B" , null, 1, 1.3 , true}
     };
     
     public static final Object[][] PHENOTYPIC_TRAIT_INFERRED_BOUNDS = {
@@ -326,6 +354,28 @@ public class TestData {
         {0.133630620956212, 0.611596272061889, 0, 0.318108247524105, 0.431227483884252},
         {0.267261241912424, 0.681385143869247, 0.318108247524105, 0, 0.462910049886276},
         {0.422577127364258, 0.288679258495851, 0.431227483884252, 0.462910049886276, 0}
+    };
+    
+    public static final double[][] GOWER_DISTANCES = {
+        {0, 0.758333333333333, 0.65, 0.739583333333333, 0.563888888888889},
+        {0.758333333333333, 0, 0.291666666666667, 0.566666666666667, 0.344444444444444},
+        {0.65, 0.291666666666667, 0, 0.608333333333333, 0.636111111111111},
+        {0.739583333333333, 0.566666666666667, 0.608333333333333, 0, 0.777777777777778},
+        {0.563888888888889, 0.344444444444444, 0.636111111111111, 0.777777777777778, 0}
+    };
+    public static final double[][] GOWER_DISTANCES_MISSING_VALUES_FLOOR = {
+        {0, 0.558333333333333, 0.45, 0.4895833333333333, 0.497222222222222},
+        {0.558333333333333, 0, 0.0916666666666667, 0.366666666666667, 0.277777777777778},
+        {0.45, 0.0916666666666667, 0, 0.408333333333333, 0.125},
+        {0.4895833333333333, 0.366666666666667, 0.408333333333333, 0, 0.6},
+        {0.497222222222222, 0.277777777777778, 0.125, 0.6, 0}
+    };
+    public static final double[][] GOWER_DISTANCES_MISSING_VALUES_CEIL = {
+        {0, 0.758333333333333, 0.85, 0.7395833333333333, 0.697222222222222},
+        {0.758333333333333, 0, 0.691666666666667, 0.766666666666667, 0.677777777777778},
+        {0.85, 0.691666666666667, 0, 0.808333333333333, 0.725},
+        {0.7395833333333333, 0.766666666666667, 0.808333333333333, 0, 1.0},
+        {0.697222222222222, 0.677777777777778, 0.725, 1.0, 0}
     };
 
     // subset with missing data
@@ -385,14 +435,24 @@ public class TestData {
     public static final Evaluation ENTRY_TO_ENTRY_CAVALLI_SFORZA_SUBSET2 = SimpleEvaluation.WITH_VALUE(
             CAVALLI_SFORZA_EDWARDS_DISTANCES[1][2]
     );
+    public static final Evaluation ENTRY_TO_ENTRY_GOWER_SUBSET2 = SimpleEvaluation.WITH_VALUE(
+            GOWER_DISTANCES[1][2]
+    );
     
     public static final Evaluation ENTRY_TO_ENTRY_MODIFIED_ROGERS_SUBSET3 = SimpleEvaluation.WITH_VALUE(
-            (MODIFIED_ROGERS_DISTANCES[1][2] + MODIFIED_ROGERS_DISTANCES[2][4] + MODIFIED_ROGERS_DISTANCES[1][4]) / 3.0
+            (MODIFIED_ROGERS_DISTANCES[1][2]
+           + MODIFIED_ROGERS_DISTANCES[2][4]
+           + MODIFIED_ROGERS_DISTANCES[1][4]) / 3.0
     );
     public static final Evaluation ENTRY_TO_ENTRY_CAVALLI_SFORZA_SUBSET3 = SimpleEvaluation.WITH_VALUE(
             (CAVALLI_SFORZA_EDWARDS_DISTANCES[1][2]
            + CAVALLI_SFORZA_EDWARDS_DISTANCES[2][4]
            + CAVALLI_SFORZA_EDWARDS_DISTANCES[1][4]) / 3.0
+    );
+    public static final Evaluation ENTRY_TO_ENTRY_GOWER_SUBSET3 = SimpleEvaluation.WITH_VALUE(
+            (GOWER_DISTANCES[1][2]
+           + GOWER_DISTANCES[2][4]
+           + GOWER_DISTANCES[1][4]) / 3.0
     );
     
     // E-NE distance
@@ -402,31 +462,54 @@ public class TestData {
     public static final Evaluation ENTRY_TO_NEAREST_ENTRY_CAVALLI_SFORZA_SUBSET2 = SimpleEvaluation.WITH_VALUE(
             CAVALLI_SFORZA_EDWARDS_DISTANCES[1][2]
     );
+    public static final Evaluation ENTRY_TO_NEAREST_ENTRY_GOWER_SUBSET2 = SimpleEvaluation.WITH_VALUE(
+            GOWER_DISTANCES[1][2]
+    );
     
     public static final Evaluation ENTRY_TO_NEAREST_ENTRY_MODIFIED_ROGERS_SUBSET3 = SimpleEvaluation.WITH_VALUE(
-            (MODIFIED_ROGERS_DISTANCES[1][4] + MODIFIED_ROGERS_DISTANCES[2][4] + MODIFIED_ROGERS_DISTANCES[4][1]) / 3.0
+            (MODIFIED_ROGERS_DISTANCES[1][4]
+           + MODIFIED_ROGERS_DISTANCES[2][4]
+           + MODIFIED_ROGERS_DISTANCES[4][1]) / 3.0
     );
     public static final Evaluation ENTRY_TO_NEAREST_ENTRY_CAVALLI_SFORZA_SUBSET3 = SimpleEvaluation.WITH_VALUE(
             (CAVALLI_SFORZA_EDWARDS_DISTANCES[1][4]
            + CAVALLI_SFORZA_EDWARDS_DISTANCES[2][4]
            + CAVALLI_SFORZA_EDWARDS_DISTANCES[4][1]) / 3.0
     );
+    public static final Evaluation ENTRY_TO_NEAREST_ENTRY_GOWER_SUBSET3 = SimpleEvaluation.WITH_VALUE(
+            (GOWER_DISTANCES[1][2]
+           + GOWER_DISTANCES[2][1]
+           + GOWER_DISTANCES[4][1]) / 3.0
+    );
     
     // A-NE distance
     public static final Evaluation ACCESSION_TO_NEAREST_ENTRY_MODIFIED_ROGERS_SUBSET2 = SimpleEvaluation.WITH_VALUE(
-        (MODIFIED_ROGERS_DISTANCES[0][2] + MODIFIED_ROGERS_DISTANCES[3][2] + MODIFIED_ROGERS_DISTANCES[4][1]) / 3.0
+        (MODIFIED_ROGERS_DISTANCES[0][2]
+       + MODIFIED_ROGERS_DISTANCES[3][2]
+       + MODIFIED_ROGERS_DISTANCES[4][1]) / 3.0
     );
     public static final Evaluation ACCESSION_TO_NEAREST_ENTRY_CAVALLI_SFORZA_SUBSET2 = SimpleEvaluation.WITH_VALUE(
             (CAVALLI_SFORZA_EDWARDS_DISTANCES[0][2]
            + CAVALLI_SFORZA_EDWARDS_DISTANCES[3][2]
            + CAVALLI_SFORZA_EDWARDS_DISTANCES[4][1]) / 3.0
     );
+    public static final Evaluation ACCESSION_TO_NEAREST_ENTRY_GOWER_SUBSET2 = SimpleEvaluation.WITH_VALUE(
+            (GOWER_DISTANCES[0][2]
+           + GOWER_DISTANCES[3][1]
+           + GOWER_DISTANCES[4][1]) / 3.0
+    );
     
     public static final Evaluation ACCESSION_TO_NEAREST_ENTRY_MODIFIED_ROGERS_SUBSET3 = SimpleEvaluation.WITH_VALUE(
-        (MODIFIED_ROGERS_DISTANCES[0][2] + MODIFIED_ROGERS_DISTANCES[3][2]) / 2.0
+        (MODIFIED_ROGERS_DISTANCES[0][2]
+       + MODIFIED_ROGERS_DISTANCES[3][2]) / 2.0
     );
     public static final Evaluation ACCESSION_TO_NEAREST_ENTRY_CAVALLI_SFORZA_SUBSET3 = SimpleEvaluation.WITH_VALUE(
-        (CAVALLI_SFORZA_EDWARDS_DISTANCES[0][2] + CAVALLI_SFORZA_EDWARDS_DISTANCES[3][2]) / 2.0
+        (CAVALLI_SFORZA_EDWARDS_DISTANCES[0][2]
+       + CAVALLI_SFORZA_EDWARDS_DISTANCES[3][2]) / 2.0
+    );
+    public static final Evaluation ACCESSION_TO_NEAREST_ENTRY_GOWER_SUBSET3 = SimpleEvaluation.WITH_VALUE(
+        (GOWER_DISTANCES[0][4]
+       + GOWER_DISTANCES[3][1]) / 2.0
     );
     
 }
