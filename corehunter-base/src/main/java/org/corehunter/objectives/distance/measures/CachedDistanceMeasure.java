@@ -32,13 +32,13 @@ import org.corehunter.objectives.distance.DistanceMeasure;
 public abstract class CachedDistanceMeasure implements DistanceMeasure {
     
     private final Map<CoreHunterData, Double[][]> cache;
-    private final MissingDataPolicy missingDataPolicy;
+    private final MissingValuesPolicy missingDataPolicy;
     
     public CachedDistanceMeasure() {
-        this(MissingDataPolicy.FLOOR);
+        this(MissingValuesPolicy.FLOOR);
     }
     
-    public CachedDistanceMeasure(MissingDataPolicy policy){
+    public CachedDistanceMeasure(MissingValuesPolicy policy){
         cache = new HashMap<>();
         missingDataPolicy = policy;
     }
@@ -83,9 +83,9 @@ public abstract class CachedDistanceMeasure implements DistanceMeasure {
      */
     protected abstract double computeDistance(int idX, int idY,
                                               CoreHunterData data,
-                                              MissingDataPolicy missingDataPolicy);
+                                              MissingValuesPolicy missingDataPolicy);
     
-    protected double missingValueContribution(MissingDataPolicy policy, double ceilValue){
+    protected double missingValueContribution(MissingValuesPolicy policy, double ceilValue){
         switch(policy){
             case FLOOR:
                 return 0.0;

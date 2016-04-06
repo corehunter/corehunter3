@@ -101,25 +101,27 @@ public interface GenotypeVariantData extends Data {
     public boolean hasMissingValues(int id, int markerIndex);
 
     /**
-     * Get the average frequency of an allele for the given entries (samples/accession).
+     * Get the average genotype for the given entries (samples/accessions).
      * The default implementation relies on {@link #getAlleleFrequency(int, int, int)} to access
      * individual frequencies and treats missing values as zero when computing the average.
      *
-     * @param itemIds   the IDs of the entry, must be a subset of the IDs returned by {@link #getIDs()}
-     * @param markerIndex the index of the marker within the range 0 to n-1, where n is the total number of markers as
-     *                    returned by {@link #getNumberOfMarkers()}
-     * @param alleleIndex allele index within the range 0 to a-1, where a is the number of alleles for the given marker
-     *                    as returned by {@link #getNumberOfAlleles(int)}
+     * @param itemIds the IDs of the entry, must be a subset of the IDs returned by {@link #getIDs()}
      * @return average allele frequency across the given entries
      */
-    public default double getAverageAlelleFrequency(Collection<Integer> itemIds, int markerIndex, int alleleIndex) {
-        return itemIds.stream()
-                      .mapToDouble(id -> {
-                          Double f = getAlleleFrequency(id, markerIndex, alleleIndex);
-                          return f == null ? 0.0 : f;
-                      })
-                      .average()
-                      .getAsDouble();
+    public default double[][] getAverageGenotype(Collection<Integer> itemIds) {
+        double[][] average = new double[getNumberOfMarkers()][];
+        for(int m = 0; m < average.length; m++){
+            average[m] = new double[getNumberOfAlleles(m)];
+            for(int a = 0; a < average[m].length; a++){
+                double freqSum = 0.0;
+                for(int id : itemIds){
+                    Double freq = getAlleleFrequency(id, m, a);
+                    freqSum += (freq == null ? 0.0 : freq);
+                }
+                average[m][a] = freqSum/itemIds.size();
+            }
+        }
+        return average;
     }
 
 }

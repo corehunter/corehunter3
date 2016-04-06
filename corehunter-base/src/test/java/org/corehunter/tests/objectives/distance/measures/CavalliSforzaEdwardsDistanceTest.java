@@ -24,7 +24,7 @@ import java.util.Iterator;
 import org.corehunter.data.CoreHunterData;
 import org.corehunter.data.simple.SimpleGenotypeVariantData;
 import org.corehunter.objectives.distance.measures.CavalliSforzaEdwardsDistance;
-import org.corehunter.objectives.distance.measures.MissingDataPolicy;
+import org.corehunter.objectives.distance.measures.MissingValuesPolicy;
 
 import static org.corehunter.tests.TestData.ALLELE_FREQUENCIES;
 import static org.corehunter.tests.TestData.ALLELE_NAMES;
@@ -80,7 +80,7 @@ public class CavalliSforzaEdwardsDistanceTest {
         );
         CoreHunterData data = new CoreHunterData(geno);
 
-        CavalliSforzaEdwardsDistance distanceMetric = new CavalliSforzaEdwardsDistance(MissingDataPolicy.CEIL);
+        CavalliSforzaEdwardsDistance distanceMetric = new CavalliSforzaEdwardsDistance(MissingValuesPolicy.CEIL);
 
         Iterator<Integer> iteratorX = data.getIDs().iterator();
         Iterator<Integer> iteratorY;

@@ -435,16 +435,14 @@ public class TestData {
     public static final Evaluation COVERAGE_SUBSET1 = SimpleEvaluation.WITH_VALUE(0.7894736842105263);
     
     // shannon
-    // TODO: determine values for subset 1 and 3 (with missing data)
-    public static final Evaluation SHANNONS_SUBSET1 = SimpleEvaluation.WITH_VALUE(-1.0);
+    public static final Evaluation SHANNONS_SUBSET1 = SimpleEvaluation.WITH_VALUE(2.47678876848977);
     public static final Evaluation SHANNONS_SUBSET2 = SimpleEvaluation.WITH_VALUE(2.71220568749008);
-    public static final Evaluation SHANNONS_SUBSET3 = SimpleEvaluation.WITH_VALUE(-1.0);
+    public static final Evaluation SHANNONS_SUBSET3 = SimpleEvaluation.WITH_VALUE(2.75353937807234);
     
     // heterozygous loci
-    // TODO: determine values for subset 1 and 3 (with missing data)
-    public static final Evaluation HETROZYGOUS_LOCI_SUBSET1 = SimpleEvaluation.WITH_VALUE(-1.0);
+    public static final Evaluation HETROZYGOUS_LOCI_SUBSET1 = SimpleEvaluation.WITH_VALUE(0.322975);
     public static final Evaluation HETROZYGOUS_LOCI_SUBSET2 = SimpleEvaluation.WITH_VALUE(0.5015464285714285);
-    public static final Evaluation HETROZYGOUS_LOCI_SUBSET3 = SimpleEvaluation.WITH_VALUE(-1.0);
+    public static final Evaluation HETROZYGOUS_LOCI_SUBSET3 = SimpleEvaluation.WITH_VALUE(0.519944444444444);
 
     // E-E distance
     public static final Evaluation ENTRY_TO_ENTRY_MODIFIED_ROGERS_SUBSET1 = SimpleEvaluation.WITH_VALUE(

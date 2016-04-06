@@ -32,45 +32,33 @@ import org.corehunter.exceptions.CoreHunterException;
  * 
  * @author Guy Davenport, Herman De Beukelaer
  */
-public class HeterozygousLoci implements Objective<SubsetSolution, CoreHunterData> {
+public class HeterozygousLoci extends AllelicDiversity
+                              implements Objective<SubsetSolution, CoreHunterData> {
 
-    // TODO: handle missing data
     @Override
     public Evaluation evaluate(SubsetSolution solution, CoreHunterData data) {
         
-        GenotypeVariantData genotypes = data.getGenotypicData();
+        GenotypeVariantData geno = data.getGenotypicData();
         
-        if(genotypes == null){
+        if(geno == null){
             throw new CoreHunterException(
                     "Genotypes are required for expected proportion of heterozygous loci objective."
             );
         }
         
-        double summedAverageAlleleFrequencySquared;
+        // get average genotype of selection (taking into account missing values)
+        double[][] avgGeno = getAverageGenotype(geno, solution.getSelectedIDs());
+        
+        // compute expected proportion of heterozygous loci in offspring
         double total = 0.0;
-
-        double averageAlleleFrequency, squared;
-
-        int numberOfMarkers = genotypes.getNumberOfMarkers();
-        int numberOfAlleles;
-
-        for (int markerIndex = 0; markerIndex < numberOfMarkers; ++markerIndex) {
-            numberOfAlleles = genotypes.getNumberOfAlleles(markerIndex);
-
-            summedAverageAlleleFrequencySquared = 0.0;
-
-            for (int alleleIndex = 0; alleleIndex < numberOfAlleles; ++alleleIndex) {
-                
-                averageAlleleFrequency = genotypes.getAverageAlelleFrequency(
-                                                solution.getSelectedIDs(),
-                                                markerIndex,
-                                                alleleIndex);
-                squared = averageAlleleFrequency * averageAlleleFrequency;
-                summedAverageAlleleFrequencySquared = summedAverageAlleleFrequencySquared + squared;
-                
+        int numberOfMarkers = geno.getNumberOfMarkers();
+        for (int m = 0; m < numberOfMarkers; m++) {
+            int numberOfAlleles = geno.getNumberOfAlleles(m);
+            double summedAverageAlleleFrequencySquared = 0.0;
+            for (int a = 0; a < numberOfAlleles; a++) {
+                summedAverageAlleleFrequencySquared += avgGeno[m][a] * avgGeno[m][a];
             }
-
-            total = total + (1.0 - summedAverageAlleleFrequencySquared);
+            total += (1.0 - summedAverageAlleleFrequencySquared);
         }
 
         return SimpleEvaluation.WITH_VALUE(total / (double) numberOfMarkers);

@@ -30,39 +30,36 @@ import org.corehunter.exceptions.CoreHunterException;
 /**
  * @author Guy Davenport, Herman De Beukelaer
  */
-public class Shannon implements Objective<SubsetSolution, CoreHunterData> {
+public class Shannon extends AllelicDiversity
+                     implements Objective<SubsetSolution, CoreHunterData> {
 
-    //TODO: handle missing data
     @Override
     public Evaluation evaluate(SubsetSolution solution, CoreHunterData data) {
         
-        GenotypeVariantData genotypes = data.getGenotypicData();
+        GenotypeVariantData geno = data.getGenotypicData();
         
-        if(genotypes == null){
+        if(geno == null){
             throw new CoreHunterException("Genotypes are required for Shannon's index.");
         }
         
-        int numberOfMarkers = genotypes.getNumberOfMarkers();
-        int numberOfAlleles;
-
-        double summedDiversity = 0;
-        double alleleFrequency;
-
-        for (int markerIndex = 0; markerIndex < numberOfMarkers; ++markerIndex) {
-            
-            numberOfAlleles = genotypes.getNumberOfAlleles(markerIndex);
-            for (int alleleIndex = 0; alleleIndex < numberOfAlleles; ++alleleIndex) {
-                alleleFrequency = genotypes.getAverageAlelleFrequency(solution.getSelectedIDs(), markerIndex,
-                        alleleIndex) / numberOfMarkers;
-
-                if (alleleFrequency > 0) {
-                    summedDiversity = summedDiversity + (alleleFrequency * Math.log(alleleFrequency));
+        // get average genotype of selection (taking into account missing values)
+        double[][] avgGeno = getAverageGenotype(geno, solution.getSelectedIDs());
+        
+        // compute Shannon's index
+        double sum = 0.0;
+        int numberOfMarkers = geno.getNumberOfMarkers();
+        for (int m = 0; m < numberOfMarkers; m++) {
+            int numberOfAlleles = geno.getNumberOfAlleles(m);
+            for (int a = 0; a < numberOfAlleles; a++) {
+                if (avgGeno[m][a] > 0.0) {
+                    double scaledFreq = avgGeno[m][a] / numberOfMarkers;
+                    sum += scaledFreq * Math.log(scaledFreq);
                 }
             }
             
         }
 
-        return SimpleEvaluation.WITH_VALUE(-summedDiversity);
+        return SimpleEvaluation.WITH_VALUE(-sum);
         
     }
 

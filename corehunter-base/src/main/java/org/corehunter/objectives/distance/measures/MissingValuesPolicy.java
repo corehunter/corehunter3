@@ -22,13 +22,15 @@ package org.corehunter.objectives.distance.measures;
 /**
  * @author Herman De Beukelaer
  */
-public enum MissingDataPolicy {
+public enum MissingValuesPolicy {
     /**
-     * Sets the contribution of variables with missing values to zero.
+     * Sets the contribution of variables (markers/features)
+     * with missing values to zero.
      */
     FLOOR,
     /**
-     * Sets the contribution of variables with missing values to the maximum attainable contribution.
+     * Sets the contribution of variables (markers/feature)
+     * with missing values to the maximum attainable contribution.
      */
     CEIL;
 }

@@ -33,7 +33,7 @@ import org.corehunter.objectives.distance.measures.ModifiedRogersDistance;
 import org.corehunter.data.CoreHunterData;
 
 import java.util.Iterator;
-import org.corehunter.objectives.distance.measures.MissingDataPolicy;
+import org.corehunter.objectives.distance.measures.MissingValuesPolicy;
 
 import org.junit.Test;
 
@@ -79,7 +79,7 @@ public class ModifiedRogersDistanceTest {
         );
         CoreHunterData data = new CoreHunterData(geno);
 
-        ModifiedRogersDistance distanceMetric = new ModifiedRogersDistance(MissingDataPolicy.CEIL);
+        ModifiedRogersDistance distanceMetric = new ModifiedRogersDistance(MissingValuesPolicy.CEIL);
 
         Iterator<Integer> iteratorX = data.getIDs().iterator();
         Iterator<Integer> iteratorY;

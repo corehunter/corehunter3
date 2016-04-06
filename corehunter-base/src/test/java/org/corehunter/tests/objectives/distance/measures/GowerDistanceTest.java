@@ -29,7 +29,7 @@ import org.corehunter.data.matrix.SymmetricMatrixFormat;
 import org.corehunter.data.CoreHunterData;
 import org.corehunter.data.simple.SimpleDistanceMatrixData;
 import org.corehunter.objectives.distance.measures.GowerDistance;
-import org.corehunter.objectives.distance.measures.MissingDataPolicy;
+import org.corehunter.objectives.distance.measures.MissingValuesPolicy;
 
 import static org.corehunter.tests.TestData.GOWER_DISTANCES_MISSING_VALUES_CEIL;
 import static org.corehunter.tests.TestData.GOWER_DISTANCES_MISSING_VALUES_FLOOR;
@@ -144,7 +144,7 @@ public class GowerDistanceTest {
         int n = data.getSize();
         
         // test with missing data policy FLOOR
-        distanceMetric = new GowerDistance(MissingDataPolicy.FLOOR);
+        distanceMetric = new GowerDistance(MissingValuesPolicy.FLOOR);
         for (int x = 0; x < n; x++) {
             for (int y = 0; y < n; y++) {
                 assertEquals(
@@ -157,7 +157,7 @@ public class GowerDistanceTest {
         }
         
         // test with missing data policy CEIL
-        distanceMetric = new GowerDistance(MissingDataPolicy.CEIL);
+        distanceMetric = new GowerDistance(MissingValuesPolicy.CEIL);
         for (int x = 0; x < n; x++) {
             for (int y = 0; y < n; y++) {
                 assertEquals(

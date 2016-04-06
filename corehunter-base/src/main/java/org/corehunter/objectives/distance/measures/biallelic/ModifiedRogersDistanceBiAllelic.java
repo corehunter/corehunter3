@@ -21,12 +21,12 @@ package org.corehunter.objectives.distance.measures.biallelic;
 
 import org.corehunter.data.CoreHunterData;
 import org.corehunter.objectives.distance.measures.CachedDistanceMeasure;
-import org.corehunter.objectives.distance.measures.MissingDataPolicy;
+import org.corehunter.objectives.distance.measures.MissingValuesPolicy;
 
 public class ModifiedRogersDistanceBiAllelic extends CachedDistanceMeasure {
 
     @Override
-    public double computeDistance(int idX, int idY, CoreHunterData data, MissingDataPolicy missingDataPolicy) {
+    public double computeDistance(int idX, int idY, CoreHunterData data, MissingValuesPolicy missingDataPolicy) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
     

@@ -31,14 +31,14 @@ public class CavalliSforzaEdwardsDistance extends CachedDistanceMeasure {
     public CavalliSforzaEdwardsDistance() {
     }
 
-    public CavalliSforzaEdwardsDistance(MissingDataPolicy policy) {
+    public CavalliSforzaEdwardsDistance(MissingValuesPolicy policy) {
         super(policy);
     }
     
     @Override
     public double computeDistance(int idX, int idY,
                                   CoreHunterData data,
-                                  MissingDataPolicy missingDataPolicy) {
+                                  MissingValuesPolicy missingDataPolicy) {
         
         if(idX == idY){
             return 0.0;

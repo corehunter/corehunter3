@@ -31,14 +31,14 @@ public class ModifiedRogersDistance extends CachedDistanceMeasure {
     public ModifiedRogersDistance() {
     }
 
-    public ModifiedRogersDistance(MissingDataPolicy policy) {
+    public ModifiedRogersDistance(MissingValuesPolicy policy) {
         super(policy);
     }
     
     @Override
     public double computeDistance(int idX, int idY,
                                   CoreHunterData data,
-                                  MissingDataPolicy missingDataPolicy) {
+                                  MissingValuesPolicy missingDataPolicy) {
         
         if(idX == idY){
             return 0.0;

@@ -39,13 +39,13 @@ public class GowerDistance extends CachedDistanceMeasure {
         super();
     }
 
-    public GowerDistance(MissingDataPolicy policy) {
+    public GowerDistance(MissingValuesPolicy policy) {
         super(policy);
     }
     
     // TODO cache scale types and ranges
     @Override
-    public double computeDistance(int idX, int idY, CoreHunterData data, MissingDataPolicy missingDataPolicy) {
+    public double computeDistance(int idX, int idY, CoreHunterData data, MissingValuesPolicy missingDataPolicy) {
 
         if(idX == idY){
             return 0.0;
@@ -119,7 +119,7 @@ public class GowerDistance extends CachedDistanceMeasure {
     
     private double distance(int scaleType, double range,
                             Object elementA, Object elementB,
-                            MissingDataPolicy missingDataPolicy) {
+                            MissingValuesPolicy missingDataPolicy) {
         if (elementA != null && elementB != null) {
             switch (scaleType) {
                 case BINARY_SCALE_TYPE:
