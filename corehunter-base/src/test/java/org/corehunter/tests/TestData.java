@@ -529,7 +529,7 @@ public class TestData {
     public static final Evaluation ACCESSION_TO_NEAREST_ENTRY_CAVALLI_SFORZA_SUBSET1 = SimpleEvaluation.WITH_VALUE(
             (CAVALLI_SFORZA_EDWARDS_DISTANCES[0][2]
            + CAVALLI_SFORZA_EDWARDS_DISTANCES[1][2]
-           + CAVALLI_SFORZA_EDWARDS_DISTANCES[4][2]) / 3.0
+           + CAVALLI_SFORZA_EDWARDS_DISTANCES[4][3]) / 3.0
     );
     public static final Evaluation ACCESSION_TO_NEAREST_ENTRY_GOWER_SUBSET1 = SimpleEvaluation.WITH_VALUE(
             (GOWER_DISTANCES[0][2]
