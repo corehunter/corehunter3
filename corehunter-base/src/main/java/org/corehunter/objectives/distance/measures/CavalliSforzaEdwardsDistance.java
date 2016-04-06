@@ -28,11 +28,21 @@ import org.corehunter.exceptions.CoreHunterException;
  */
 public class CavalliSforzaEdwardsDistance extends CachedDistanceMeasure {
 
-    // TODO review treatment of missing data
+    public CavalliSforzaEdwardsDistance() {
+    }
+
+    public CavalliSforzaEdwardsDistance(MissingDataPolicy policy) {
+        super(policy);
+    }
+    
     @Override
     public double computeDistance(int idX, int idY,
                                   CoreHunterData data,
                                   MissingDataPolicy missingDataPolicy) {
+        
+        if(idX == idY){
+            return 0.0;
+        }
         
         GenotypeVariantData genotypes = data.getGenotypicData();
         
@@ -45,16 +55,18 @@ public class CavalliSforzaEdwardsDistance extends CachedDistanceMeasure {
         
         for (int markerIndex = 0; markerIndex < numberOfMarkers; ++markerIndex) {
             
-            int numberOfAlleles = genotypes.getNumberOfAlleles(markerIndex);
-            for (int alleleIndex = 0; alleleIndex < numberOfAlleles; ++alleleIndex) {
-                
-                Double pxla = genotypes.getAlleleFrequency(idX, markerIndex, alleleIndex);
-                Double pyla = genotypes.getAlleleFrequency(idY, markerIndex, alleleIndex);
-                if (pxla != null && pyla != null) {
+            if(genotypes.hasMissingValues(idX, markerIndex) || genotypes.hasMissingValues(idY, markerIndex)){
+                // missing frequencies in at least one individual
+                sumSquareDiff += missingValueContribution(missingDataPolicy, 2.0);
+            } else {
+                // frequencies available for both individuals
+                int numberOfAlleles = genotypes.getNumberOfAlleles(markerIndex);
+                for (int alleleIndex = 0; alleleIndex < numberOfAlleles; ++alleleIndex) {
+                    double pxla = genotypes.getAlleleFrequency(idX, markerIndex, alleleIndex);
+                    double pyla = genotypes.getAlleleFrequency(idY, markerIndex, alleleIndex);
                     double diff = Math.sqrt(pxla) - Math.sqrt(pyla);
                     sumSquareDiff += diff * diff;
                 }
-                
             }
             
         }

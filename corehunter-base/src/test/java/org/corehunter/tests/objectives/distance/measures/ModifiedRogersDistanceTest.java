@@ -22,6 +22,7 @@ package org.corehunter.tests.objectives.distance.measures;
 import static org.corehunter.tests.TestData.ALLELE_NAMES;
 import static org.corehunter.tests.TestData.MARKER_NAMES;
 import static org.corehunter.tests.TestData.MODIFIED_ROGERS_DISTANCES;
+import static org.corehunter.tests.TestData.MODIFIED_ROGERS_DISTANCES_CEIL_MISSING;
 import static org.corehunter.tests.TestData.NAME;
 import static org.corehunter.tests.TestData.PRECISION;
 import static org.corehunter.tests.TestData.ALLELE_FREQUENCIES;
@@ -32,6 +33,7 @@ import org.corehunter.objectives.distance.measures.ModifiedRogersDistance;
 import org.corehunter.data.CoreHunterData;
 
 import java.util.Iterator;
+import org.corehunter.objectives.distance.measures.MissingDataPolicy;
 
 import org.junit.Test;
 
@@ -63,6 +65,33 @@ public class ModifiedRogersDistanceTest {
                 assertEquals(
                         "Distance[" + idX + "][" + idY + "] not correct!",
                         MODIFIED_ROGERS_DISTANCES[idX][idY],
+                        distanceMetric.getDistance(idX, idY, data),
+                        PRECISION);
+            }
+        }
+    }
+    
+    @Test
+    public void testCeilMissing() {
+        
+        SimpleGenotypeVariantData geno = new SimpleGenotypeVariantData(
+                NAME, HEADERS_NON_UNIQUE_NAMES, MARKER_NAMES, ALLELE_NAMES, ALLELE_FREQUENCIES
+        );
+        CoreHunterData data = new CoreHunterData(geno);
+
+        ModifiedRogersDistance distanceMetric = new ModifiedRogersDistance(MissingDataPolicy.CEIL);
+
+        Iterator<Integer> iteratorX = data.getIDs().iterator();
+        Iterator<Integer> iteratorY;
+
+        while (iteratorX.hasNext()) {
+            int idX = iteratorX.next();
+            iteratorY = data.getIDs().iterator();
+            while (iteratorY.hasNext()) {
+                int idY = iteratorY.next();
+                assertEquals(
+                        "Distance[" + idX + "][" + idY + "] not correct!",
+                        MODIFIED_ROGERS_DISTANCES_CEIL_MISSING[idX][idY],
                         distanceMetric.getDistance(idX, idY, data),
                         PRECISION);
             }

@@ -31,10 +31,13 @@ import org.corehunter.objectives.distance.measures.GowerDistance;
 
 import static org.corehunter.tests.TestData.ALLELE_FREQUENCIES;
 import static org.corehunter.tests.TestData.ALLELE_NAMES;
+import static org.corehunter.tests.TestData.ENTRY_TO_ENTRY_CAVALLI_SFORZA_SUBSET1;
 import static org.corehunter.tests.TestData.ENTRY_TO_ENTRY_CAVALLI_SFORZA_SUBSET2;
 import static org.corehunter.tests.TestData.ENTRY_TO_ENTRY_CAVALLI_SFORZA_SUBSET3;
+import static org.corehunter.tests.TestData.ENTRY_TO_ENTRY_GOWER_SUBSET1;
 import static org.corehunter.tests.TestData.ENTRY_TO_ENTRY_GOWER_SUBSET2;
 import static org.corehunter.tests.TestData.ENTRY_TO_ENTRY_GOWER_SUBSET3;
+import static org.corehunter.tests.TestData.ENTRY_TO_ENTRY_MODIFIED_ROGERS_SUBSET1;
 import static org.corehunter.tests.TestData.ENTRY_TO_ENTRY_MODIFIED_ROGERS_SUBSET2;
 import static org.corehunter.tests.TestData.ENTRY_TO_ENTRY_MODIFIED_ROGERS_SUBSET3;
 import static org.corehunter.tests.TestData.HEADERS_NON_UNIQUE_NAMES;
@@ -45,15 +48,18 @@ import static org.corehunter.tests.TestData.NAME;
 import static org.corehunter.tests.TestData.PHENOTYPIC_TRAIT_FEATURES;
 import static org.corehunter.tests.TestData.PHENOTYPIC_TRAIT_VALUES_WITH_HEADERS;
 import static org.corehunter.tests.TestData.PRECISION;
+import static org.corehunter.tests.TestData.SUBSET1;
 import static org.corehunter.tests.TestData.SUBSET2;
 import static org.corehunter.tests.TestData.SUBSET3;
 import static org.corehunter.tests.TestData.SUBSET_EMPTY;
 
 import org.corehunter.tests.objectives.EvaluationTest;
-import org.jamesframework.core.problems.objectives.evaluations.SimpleEvaluation;
 
+import org.jamesframework.core.problems.objectives.evaluations.SimpleEvaluation;
 import org.jamesframework.core.subset.SubsetSolution;
+
 import org.junit.Test;
+
 import uno.informatics.data.dataset.FeatureData;
 import uno.informatics.data.feature.array.ArrayFeatureData;
 
@@ -72,6 +78,13 @@ public class AverageEntryToEntryDistanceTest extends EvaluationTest {
         
         AverageEntryToEntryDistance objective = new AverageEntryToEntryDistance(new ModifiedRogersDistance());
 
+        assertEquals(
+                "Evaluation for subset 1 is not correct!",
+                ENTRY_TO_ENTRY_MODIFIED_ROGERS_SUBSET1,
+                objective.evaluate(new SubsetSolution(data.getIDs(), SUBSET1), data),
+                PRECISION
+        );
+        
         assertEquals(
                 "Evaluation for subset 2 is not correct!",
                 ENTRY_TO_ENTRY_MODIFIED_ROGERS_SUBSET2,
@@ -106,6 +119,13 @@ public class AverageEntryToEntryDistanceTest extends EvaluationTest {
         AverageEntryToEntryDistance objective = new AverageEntryToEntryDistance(new CavalliSforzaEdwardsDistance());
 
         assertEquals(
+                "Evaluation for subset 1 is not correct!",
+                ENTRY_TO_ENTRY_CAVALLI_SFORZA_SUBSET1,
+                objective.evaluate(new SubsetSolution(data.getIDs(), SUBSET1), data),
+                PRECISION
+        );
+        
+        assertEquals(
                 "Evaluation for subset 2 is not correct!",
                 ENTRY_TO_ENTRY_CAVALLI_SFORZA_SUBSET2,
                 objective.evaluate(new SubsetSolution(data.getIDs(), SUBSET2), data),
@@ -139,6 +159,13 @@ public class AverageEntryToEntryDistanceTest extends EvaluationTest {
         AverageEntryToEntryDistance objective = new AverageEntryToEntryDistance(new GowerDistance());
 
         assertEquals(
+                "Evaluation for subset 1 is not correct!",
+                ENTRY_TO_ENTRY_GOWER_SUBSET1,
+                objective.evaluate(new SubsetSolution(data.getIDs(), SUBSET1), data),
+                PRECISION
+        );
+        
+        assertEquals(
                 "Evaluation for subset 2 is not correct!",
                 ENTRY_TO_ENTRY_GOWER_SUBSET2,
                 objective.evaluate(new SubsetSolution(data.getIDs(), SUBSET2), data),
@@ -169,6 +196,13 @@ public class AverageEntryToEntryDistanceTest extends EvaluationTest {
         
         AverageEntryToEntryDistance objective = new AverageEntryToEntryDistance(new PrecomputedDistance());
 
+        assertEquals(
+                "Evaluation for subset 1 is not correct!",
+                ENTRY_TO_ENTRY_MODIFIED_ROGERS_SUBSET1,
+                objective.evaluate(new SubsetSolution(data.getIDs(), SUBSET1), data),
+                PRECISION
+        );
+        
         assertEquals(
                 "Evaluation for subset 2 is not correct!",
                 ENTRY_TO_ENTRY_MODIFIED_ROGERS_SUBSET2,

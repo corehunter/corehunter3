@@ -29,10 +29,13 @@ import org.corehunter.objectives.distance.measures.GowerDistance;
 import org.corehunter.objectives.distance.measures.ModifiedRogersDistance;
 import org.corehunter.objectives.distance.measures.PrecomputedDistance;
 
+import static org.corehunter.tests.TestData.ACCESSION_TO_NEAREST_ENTRY_CAVALLI_SFORZA_SUBSET1;
 import static org.corehunter.tests.TestData.ACCESSION_TO_NEAREST_ENTRY_CAVALLI_SFORZA_SUBSET2;
 import static org.corehunter.tests.TestData.ACCESSION_TO_NEAREST_ENTRY_CAVALLI_SFORZA_SUBSET3;
+import static org.corehunter.tests.TestData.ACCESSION_TO_NEAREST_ENTRY_GOWER_SUBSET1;
 import static org.corehunter.tests.TestData.ACCESSION_TO_NEAREST_ENTRY_GOWER_SUBSET2;
 import static org.corehunter.tests.TestData.ACCESSION_TO_NEAREST_ENTRY_GOWER_SUBSET3;
+import static org.corehunter.tests.TestData.ACCESSION_TO_NEAREST_ENTRY_MODIFIED_ROGERS_SUBSET1;
 import static org.corehunter.tests.TestData.ACCESSION_TO_NEAREST_ENTRY_MODIFIED_ROGERS_SUBSET2;
 import static org.corehunter.tests.TestData.ACCESSION_TO_NEAREST_ENTRY_MODIFIED_ROGERS_SUBSET3;
 import static org.corehunter.tests.TestData.ALLELE_FREQUENCIES;
@@ -45,6 +48,7 @@ import static org.corehunter.tests.TestData.NAME;
 import static org.corehunter.tests.TestData.PHENOTYPIC_TRAIT_FEATURES;
 import static org.corehunter.tests.TestData.PHENOTYPIC_TRAIT_VALUES_WITH_HEADERS;
 import static org.corehunter.tests.TestData.PRECISION;
+import static org.corehunter.tests.TestData.SUBSET1;
 import static org.corehunter.tests.TestData.SUBSET2;
 import static org.corehunter.tests.TestData.SUBSET3;
 import static org.corehunter.tests.TestData.SUBSET_EMPTY;
@@ -75,6 +79,13 @@ public class AverageAccessionToNearestEntryDistanceTest extends EvaluationTest {
                 new ModifiedRogersDistance()
         );
 
+        assertEquals(
+                "Evaluation for subset 1 is not correct!",
+                ACCESSION_TO_NEAREST_ENTRY_MODIFIED_ROGERS_SUBSET1,
+                objective.evaluate(new SubsetSolution(data.getIDs(), SUBSET1), data),
+                PRECISION
+        );
+        
         assertEquals(
                 "Evaluation for subset 2 is not correct!",
                 ACCESSION_TO_NEAREST_ENTRY_MODIFIED_ROGERS_SUBSET2,
@@ -118,6 +129,13 @@ public class AverageAccessionToNearestEntryDistanceTest extends EvaluationTest {
         );
 
         assertEquals(
+                "Evaluation for subset 1 is not correct!",
+                ACCESSION_TO_NEAREST_ENTRY_CAVALLI_SFORZA_SUBSET1,
+                objective.evaluate(new SubsetSolution(data.getIDs(), SUBSET1), data),
+                PRECISION
+        );
+        
+        assertEquals(
                 "Evaluation for subset 2 is not correct!",
                 ACCESSION_TO_NEAREST_ENTRY_CAVALLI_SFORZA_SUBSET2,
                 objective.evaluate(new SubsetSolution(data.getIDs(), SUBSET2), data),
@@ -160,6 +178,13 @@ public class AverageAccessionToNearestEntryDistanceTest extends EvaluationTest {
         );
 
         assertEquals(
+                "Evaluation for subset 1 is not correct!",
+                ACCESSION_TO_NEAREST_ENTRY_GOWER_SUBSET1,
+                objective.evaluate(new SubsetSolution(data.getIDs(), SUBSET1), data),
+                PRECISION
+        );
+        
+        assertEquals(
                 "Evaluation for subset 2 is not correct!",
                 ACCESSION_TO_NEAREST_ENTRY_GOWER_SUBSET2,
                 objective.evaluate(new SubsetSolution(data.getIDs(), SUBSET2), data),
@@ -199,6 +224,13 @@ public class AverageAccessionToNearestEntryDistanceTest extends EvaluationTest {
                 new PrecomputedDistance()
         );
 
+        assertEquals(
+                "Evaluation for subset 1 is not correct!",
+                ACCESSION_TO_NEAREST_ENTRY_MODIFIED_ROGERS_SUBSET1,
+                objective.evaluate(new SubsetSolution(data.getIDs(), SUBSET1), data),
+                PRECISION
+        );
+        
         assertEquals(
                 "Evaluation for subset 2 is not correct!",
                 ACCESSION_TO_NEAREST_ENTRY_MODIFIED_ROGERS_SUBSET2,

@@ -15,20 +15,30 @@ load.multiallelic.data <- function(){
 # MULTIALLELIC #
 ################
 
-modified.rogers <- function(freqs.1, freqs.2, num.markers){
-  sqrt(sum((freqs.1 - freqs.2)^2, na.rm = TRUE) / (2*num.markers))
+modified.rogers <- function(freqs.1, freqs.2, num.markers, allele.counts,
+                            missing.data.policy = c("floor", "ceil")){
+  missing.data.policy <- match.arg(missing.data.policy)
+  cum.allele.counts <- c(0, cumsum(allele.counts))
+  dist <- sqrt(sum(sapply(1:num.markers, function(m){
+    from <- cum.allele.counts[m]+1
+    to <- cum.allele.counts[m+1]
+    if(any(is.na(freqs.1[from:to]) | is.na(freqs.2[from:to]))){
+      ifelse(missing.data.policy == "floor", 0.0, 2.0)
+    } else {
+      sum((freqs.1[from:to] - freqs.2[from:to])^2)
+    }
+  })) / (2*num.markers))
+  return(dist)
 }
 
-cavalli.sforza.edwards <- function(freqs.1, freqs.2, num.markers){
-  modified.rogers(sqrt(freqs.1), sqrt(freqs.2), num.markers)
+cavalli.sforza.edwards <- function(freqs.1, freqs.2, num.markers, allele.counts,
+                                   missing.data.policy = c("floor", "ceil")){
+  modified.rogers(sqrt(freqs.1), sqrt(freqs.2), num.markers,
+                  allele.counts, missing.data.policy)
 }
 
 coverage <- function(freqs){
   sum(colSums(freqs, na.rm = TRUE) > 0.0) / ncol(freqs)
-}
-
-proportion.non.informative.alleles <- function(freqs){
-  1.0 - coverage(freqs)
 }
 
 # TODO: handle missing data
@@ -53,41 +63,32 @@ heterozygous.loci <- function(freqs, allele.counts){
   p.square <- p*p
   cum.allele.counts <- c(0, cumsum(allele.counts))
   p.square.sums <- sapply(1:num.markers, function(m){
-    start <- cum.allele.counts[m]+1
-    stop <- cum.allele.counts[m+1]
-    sum(p.square[start:stop])
+    from <- cum.allele.counts[m]+1
+    to <- cum.allele.counts[m+1]
+    sum(p.square[from:to])
   })
   he <- mean(1 - p.square.sums)
   return(he)
-}
-
-# TODO: handle missing data
-number.effective.alleles <- function(freqs, allele.counts){
-  num.markers <- length(allele.counts)
-  p <- colMeans(freqs)
-  p.square <- p*p
-  cum.allele.counts <- c(0, cumsum(allele.counts))
-  p.square.sums <- sapply(1:num.markers, function(m){
-    start <- cum.allele.counts[m]+1
-    stop <- cum.allele.counts[m+1]
-    sum(p.square[start:stop])
-  })
-  ne <- mean(1/p.square.sums)
-  return(ne)
 }
 
 ###########
 # GENERAL #
 ###########
 
-distance.matrix <- function(allele.frequencies, num.markers, distance.measure){
-  n <- nrow(allele.frequencies)
+distance.matrix <- function(data, distance.measure, missing.data.policy){
+  n <- nrow(data$freqs)
   dist <- matrix(NA, nrow = n, ncol = n)
   for(i in 1:n){
     for(j in 1:n){
-      dist[i,j] <- distance.measure(allele.frequencies[i,],
-                                    allele.frequencies[j,],
-                                    num.markers)
+      if(i == j){
+        dist[i,j] <- 0.0
+      } else {
+        dist[i,j] <- distance.measure(data$freqs[i,],
+                                      data$freqs[j,],
+                                      data$markers,
+                                      data$allele.counts,
+                                      missing.data.policy)
+      }
     }
   }
   return(dist)

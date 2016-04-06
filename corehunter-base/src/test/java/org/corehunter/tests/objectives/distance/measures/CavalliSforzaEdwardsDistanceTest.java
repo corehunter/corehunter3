@@ -24,10 +24,12 @@ import java.util.Iterator;
 import org.corehunter.data.CoreHunterData;
 import org.corehunter.data.simple.SimpleGenotypeVariantData;
 import org.corehunter.objectives.distance.measures.CavalliSforzaEdwardsDistance;
+import org.corehunter.objectives.distance.measures.MissingDataPolicy;
 
 import static org.corehunter.tests.TestData.ALLELE_FREQUENCIES;
 import static org.corehunter.tests.TestData.ALLELE_NAMES;
 import static org.corehunter.tests.TestData.CAVALLI_SFORZA_EDWARDS_DISTANCES;
+import static org.corehunter.tests.TestData.CAVALLI_SFORZA_EDWARDS_DISTANCES_CEIL_MISSING;
 import static org.corehunter.tests.TestData.HEADERS_NON_UNIQUE_NAMES;
 import static org.corehunter.tests.TestData.MARKER_NAMES;
 import static org.corehunter.tests.TestData.NAME;
@@ -63,6 +65,34 @@ public class CavalliSforzaEdwardsDistanceTest {
                 assertEquals(
                         "Distance[" + idX + "][" + idY + "] not correct!",
                         CAVALLI_SFORZA_EDWARDS_DISTANCES[idX][idY],
+                        distanceMetric.getDistance(idX, idY, data),
+                        PRECISION
+                );
+            }
+        }
+    }
+    
+    @Test
+    public void testCeilMissing() {
+        
+        SimpleGenotypeVariantData geno = new SimpleGenotypeVariantData(
+                NAME, HEADERS_NON_UNIQUE_NAMES, MARKER_NAMES, ALLELE_NAMES, ALLELE_FREQUENCIES
+        );
+        CoreHunterData data = new CoreHunterData(geno);
+
+        CavalliSforzaEdwardsDistance distanceMetric = new CavalliSforzaEdwardsDistance(MissingDataPolicy.CEIL);
+
+        Iterator<Integer> iteratorX = data.getIDs().iterator();
+        Iterator<Integer> iteratorY;
+
+        while (iteratorX.hasNext()) {
+            int idX = iteratorX.next();
+            iteratorY = data.getIDs().iterator();
+            while (iteratorY.hasNext()) {
+                int idY = iteratorY.next();
+                assertEquals(
+                        "Distance[" + idX + "][" + idY + "] not correct!",
+                        CAVALLI_SFORZA_EDWARDS_DISTANCES_CEIL_MISSING[idX][idY],
                         distanceMetric.getDistance(idX, idY, data),
                         PRECISION
                 );
