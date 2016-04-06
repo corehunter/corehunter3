@@ -19,7 +19,6 @@
 
 package org.corehunter.tests.data.simple;
 
-import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
 import java.nio.file.Paths;
@@ -39,6 +38,8 @@ import uno.informatics.common.io.FileType;
 import uno.informatics.data.SimpleEntity;
 import uno.informatics.data.dataset.FeatureData;
 import uno.informatics.data.feature.array.ArrayFeatureData;
+
+import static org.junit.Assert.assertEquals;
 
 
 /**

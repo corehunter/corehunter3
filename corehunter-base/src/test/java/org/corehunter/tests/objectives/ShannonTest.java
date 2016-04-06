@@ -25,8 +25,6 @@ import static org.corehunter.tests.TestData.HEADERS_NON_UNIQUE_NAMES;
 import static org.corehunter.tests.TestData.MARKER_NAMES;
 import static org.corehunter.tests.TestData.NAME;
 import static org.corehunter.tests.TestData.PRECISION;
-import static org.corehunter.tests.TestData.SHANNONS_DIVERSITY_SUBSET1;
-import static org.corehunter.tests.TestData.SHANNONS_DIVERSITY_SUBSET2;
 import static org.corehunter.tests.TestData.SUBSET1;
 import static org.corehunter.tests.TestData.SUBSET2;
 
@@ -35,6 +33,9 @@ import org.corehunter.data.simple.SimpleGenotypeVariantData;
 import org.corehunter.objectives.Shannon;
 import org.jamesframework.core.subset.SubsetSolution;
 import org.junit.Test;
+
+import static org.corehunter.tests.TestData.SHANNONS_SUBSET1;
+import static org.corehunter.tests.TestData.SHANNONS_SUBSET2;
 
 /**
  * @author Guy Davenport, Herman De Beukelaer
@@ -52,7 +53,7 @@ public class ShannonTest extends EvaluationTest {
 
         Shannon objective = new Shannon();
 
-        assertEquals("Evaluation for subset 1 is not correct!", SHANNONS_DIVERSITY_SUBSET1,
+        assertEquals("Evaluation for subset 1 is not correct!", SHANNONS_SUBSET1,
                 objective.evaluate(new SubsetSolution(data.getIDs(), SUBSET1), data), PRECISION);
     }
     
@@ -66,7 +67,7 @@ public class ShannonTest extends EvaluationTest {
         
         Shannon objective = new Shannon();
 
-        assertEquals("Evaluation for subset 2 is not correct!", SHANNONS_DIVERSITY_SUBSET2,
+        assertEquals("Evaluation for subset 2 is not correct!", SHANNONS_SUBSET2,
                 objective.evaluate(new SubsetSolution(data.getIDs(), SUBSET2), data), PRECISION);
     }
     

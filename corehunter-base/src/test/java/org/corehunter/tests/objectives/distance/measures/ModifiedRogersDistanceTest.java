@@ -33,9 +33,9 @@ import org.corehunter.data.CoreHunterData;
 
 import java.util.Iterator;
 
-import static org.junit.Assert.assertEquals;
-
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Guy Davenport, Herman De Beukelaer

@@ -30,9 +30,6 @@ import static org.corehunter.tests.TestData.SET;
 import static org.corehunter.tests.TestData.PHENOTYPIC_TRAIT_MISSING_VALUES;
 
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
@@ -49,6 +46,10 @@ import uno.informatics.data.SimpleEntity;
 import uno.informatics.data.dataset.FeatureData;
 import uno.informatics.data.dataset.FeatureDataRow;
 import uno.informatics.data.feature.array.ArrayFeatureData;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 
 /**

@@ -30,6 +30,7 @@ import org.corehunter.data.CoreHunterData;
 import org.corehunter.data.simple.SimpleDistanceMatrixData;
 import org.corehunter.objectives.distance.measures.GowerDistance;
 import org.corehunter.objectives.distance.measures.MissingDataPolicy;
+
 import static org.corehunter.tests.TestData.GOWER_DISTANCES_MISSING_VALUES_CEIL;
 import static org.corehunter.tests.TestData.GOWER_DISTANCES_MISSING_VALUES_FLOOR;
 
@@ -45,6 +46,7 @@ import uno.informatics.data.pojo.SimpleFeaturePojo;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+
 /**
  * @author Guy Davenport, Herman De Beukelaer
  */
