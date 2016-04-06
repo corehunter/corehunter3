@@ -80,17 +80,17 @@
             <dependency>
                 <groupId>uno.informatics.common</groupId>
                 <artifactId>informatics-utils</artifactId>
-                <version>1.0.0-SNAPSHOT</version>
+                <version>1.0.2</version>
             </dependency>
             <dependency>
                 <groupId>uno.informatics.common</groupId>
                 <artifactId>informatics-data-api</artifactId>
-                <version>1.0.0-SNAPSHOT</version>
+                <version>1.0.2</version>
             </dependency>
             <dependency>
                 <groupId>uno.informatics.common</groupId>
                 <artifactId>informatics-data-impl</artifactId>
-                <version>1.0.0-SNAPSHOT</version>
+                <version>1.0.2</version>
             </dependency>
             <dependency>
               <groupId>joda-time</groupId>
