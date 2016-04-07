@@ -20,18 +20,19 @@
 package org.corehunter.objectives.distance;
 
 
+import java.util.Collection;
 import java.util.Set;
 import org.corehunter.data.CoreHunterData;
+import org.corehunter.objectives.distance.eval.NearestEntry;
+import org.corehunter.objectives.distance.eval.NearestEntryEvaluation;
 
 import org.jamesframework.core.problems.objectives.Objective;
-import org.jamesframework.core.problems.objectives.evaluations.Evaluation;
-import org.jamesframework.core.problems.objectives.evaluations.SimpleEvaluation;
 import org.jamesframework.core.subset.SubsetSolution;
 
 /**
- * Evaluates a core set by computing the average distance between each unselected item and the closest selected item.
- * This value is to be minimized. If all items are selected, the value is set to 0.0. If no items are selected, the
- * value is set to {@link Double#POSITIVE_INFINITY}.
+ * Evaluates a core set by computing the average distance between each item (selected or unselected)
+ * and the closest selected item. This value is to be minimized.  If no items are selected, the value
+ * is set to {@link Double#POSITIVE_INFINITY}.
  * 
  * @author Herman De Beukelaer
  */
@@ -43,32 +44,45 @@ public class AverageAccessionToNearestEntryDistance implements Objective<SubsetS
         this.distanceMeasure = distanceMeasure;
     }
     
-    // TODO efficient delta evaluation
     @Override
-    public Evaluation evaluate(SubsetSolution solution, CoreHunterData data) {
-        double value;
-        if (solution.getNumUnselectedIDs() == 0){
-            // all items selected
-            value = 0.0;
-        } else if (solution.getNumSelectedIDs() == 0){
-            // no items selected
-            value = Double.POSITIVE_INFINITY;
-        } else {
-            // at least one selected, at least one unselected
-            Set<Integer> unselected = solution.getUnselectedIDs();
-            Set<Integer> selected = solution.getSelectedIDs();
-            value = unselected.stream().mapToDouble(unsel -> {
-                double minDist = Double.POSITIVE_INFINITY;
-                for(int sel : selected){
-                    double dist = distanceMeasure.getDistance(unsel, sel, data);
-                    if(sel != unsel && dist < minDist){
-                        minDist = dist;
-                    }
-                }
-                return minDist;
-            }).average().getAsDouble();
+    public NearestEntryEvaluation evaluate(SubsetSolution solution, CoreHunterData data) {
+        // initialize evaluation object (evaluate to infinity if no items are selected)
+        NearestEntryEvaluation eval = new NearestEntryEvaluation(Double.POSITIVE_INFINITY);
+        // find closest selected item for each accession
+        Set<Integer> selected = solution.getSelectedIDs();
+        Set<Integer> all = solution.getAllIDs();
+        for(int item : all){
+            // find and register closest selected item (if any)
+            NearestEntry closest = findClosest(item, selected, data);
+            if(closest != null){
+                eval.add(item, closest);
+            }
         }
-        return SimpleEvaluation.WITH_VALUE(value);
+        return eval;
+    }
+    
+    /**
+     * Find the item in the given group that is closest to the given item.
+     * The closest item is allowed to be the same as the given item.
+     * 
+     * @param itemId ID of an item
+     * @param group IDs of group of items
+     * @param data Core Hunter data
+     * @return id of and distance to the item from the group that is closest to the given item;
+     *         <code>null</code> if the group is empty
+     */
+    private NearestEntry findClosest(int itemId, Collection<Integer> group, CoreHunterData data){
+        double dist;
+        Double minDist = Double.POSITIVE_INFINITY;
+        Integer closest = null;
+        for(int groupMember : group){
+            dist = distanceMeasure.getDistance(itemId, groupMember, data);
+            if(dist < minDist){
+                minDist = dist;
+                closest = groupMember;
+            }
+        }
+        return closest != null ? new NearestEntry(closest, minDist) : null;
     }
 
     @Override

@@ -93,7 +93,7 @@ public abstract class CachedDistanceMeasure implements DistanceMeasure {
                 return ceilValue;
             default:
                 throw new RuntimeException(
-                        "This should not happen: unexpected missing data policy " + policy
+                        "This should not happen: unexpected missing values policy " + policy
                 );
         }
     }

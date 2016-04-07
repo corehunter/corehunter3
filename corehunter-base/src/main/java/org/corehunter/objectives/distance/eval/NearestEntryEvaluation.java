@@ -35,13 +35,15 @@ public class NearestEntryEvaluation implements Evaluation {
     
     // maps items to closest entries (IDs) and the corresponding distance
     private final Map<Integer, NearestEntry> nearestEntryMap;
-
     // sum of distances from items to respective closest entries
     private double minDistSum;
+    // value when no distances have been registered
+    private final double emptyValue;
 
-    public NearestEntryEvaluation() {
+    public NearestEntryEvaluation(double emptyValue) {
         nearestEntryMap = new HashMap<>();
         minDistSum = 0.0;
+        this.emptyValue = emptyValue;
     }
 
     /**
@@ -52,6 +54,7 @@ public class NearestEntryEvaluation implements Evaluation {
     public NearestEntryEvaluation(NearestEntryEvaluation toCopy){
         nearestEntryMap = new HashMap<>(toCopy.nearestEntryMap);
         minDistSum = toCopy.minDistSum;
+        emptyValue = toCopy.emptyValue;
     }
 
     /**
@@ -117,12 +120,13 @@ public class NearestEntryEvaluation implements Evaluation {
     /**
      * Compute average distance from each registered item to closest selected item.
      * 
-     * @return average distance; 0.0 if no items have been registered
+     * @return average distance; if no distances have been registered the value
+     *         specified at construction is returned
      */
     @Override
     public double getValue() {
         int n = nearestEntryMap.size();
-        return n > 0 ? minDistSum/n : 0.0;
+        return n > 0 ? minDistSum/n : emptyValue;
     }
     
 }

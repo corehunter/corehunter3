@@ -522,46 +522,67 @@ public class TestData {
     public static final Evaluation ACCESSION_TO_NEAREST_ENTRY_MODIFIED_ROGERS_SUBSET1 = SimpleEvaluation.WITH_VALUE(
             (MODIFIED_ROGERS_DISTANCES[0][2]
            + MODIFIED_ROGERS_DISTANCES[1][2]
-           + MODIFIED_ROGERS_DISTANCES[4][2]) / 3.0
+           + MODIFIED_ROGERS_DISTANCES[2][2]
+           + MODIFIED_ROGERS_DISTANCES[3][3]
+           + MODIFIED_ROGERS_DISTANCES[4][2]) / 5.0
     );
     public static final Evaluation ACCESSION_TO_NEAREST_ENTRY_CAVALLI_SFORZA_SUBSET1 = SimpleEvaluation.WITH_VALUE(
             (CAVALLI_SFORZA_EDWARDS_DISTANCES[0][2]
            + CAVALLI_SFORZA_EDWARDS_DISTANCES[1][2]
-           + CAVALLI_SFORZA_EDWARDS_DISTANCES[4][3]) / 3.0
+           + CAVALLI_SFORZA_EDWARDS_DISTANCES[2][2]
+           + CAVALLI_SFORZA_EDWARDS_DISTANCES[3][3]
+           + CAVALLI_SFORZA_EDWARDS_DISTANCES[4][3]) / 5.0
     );
     public static final Evaluation ACCESSION_TO_NEAREST_ENTRY_GOWER_SUBSET1 = SimpleEvaluation.WITH_VALUE(
             (GOWER_DISTANCES[0][2]
            + GOWER_DISTANCES[1][2]
-           + GOWER_DISTANCES[4][2]) / 3.0
+           + GOWER_DISTANCES[2][2]
+           + GOWER_DISTANCES[3][3]
+           + GOWER_DISTANCES[4][2]) / 5.0
     );
     
     public static final Evaluation ACCESSION_TO_NEAREST_ENTRY_MODIFIED_ROGERS_SUBSET2 = SimpleEvaluation.WITH_VALUE(
             (MODIFIED_ROGERS_DISTANCES[0][2]
+           + MODIFIED_ROGERS_DISTANCES[1][1]
+           + MODIFIED_ROGERS_DISTANCES[2][2]
            + MODIFIED_ROGERS_DISTANCES[3][2]
-           + MODIFIED_ROGERS_DISTANCES[4][1]) / 3.0
+           + MODIFIED_ROGERS_DISTANCES[4][1]) / 5.0
     );
     public static final Evaluation ACCESSION_TO_NEAREST_ENTRY_CAVALLI_SFORZA_SUBSET2 = SimpleEvaluation.WITH_VALUE(
             (CAVALLI_SFORZA_EDWARDS_DISTANCES[0][2]
+           + CAVALLI_SFORZA_EDWARDS_DISTANCES[1][1]
+           + CAVALLI_SFORZA_EDWARDS_DISTANCES[2][2]
            + CAVALLI_SFORZA_EDWARDS_DISTANCES[3][2]
-           + CAVALLI_SFORZA_EDWARDS_DISTANCES[4][1]) / 3.0
+           + CAVALLI_SFORZA_EDWARDS_DISTANCES[4][1]) / 5.0
     );
     public static final Evaluation ACCESSION_TO_NEAREST_ENTRY_GOWER_SUBSET2 = SimpleEvaluation.WITH_VALUE(
             (GOWER_DISTANCES[0][2]
+           + GOWER_DISTANCES[1][1]
+           + GOWER_DISTANCES[2][2]
            + GOWER_DISTANCES[3][1]
-           + GOWER_DISTANCES[4][1]) / 3.0
+           + GOWER_DISTANCES[4][1]) / 5.0
     );
     
     public static final Evaluation ACCESSION_TO_NEAREST_ENTRY_MODIFIED_ROGERS_SUBSET3 = SimpleEvaluation.WITH_VALUE(
             (MODIFIED_ROGERS_DISTANCES[0][2]
-           + MODIFIED_ROGERS_DISTANCES[3][2]) / 2.0
+           + MODIFIED_ROGERS_DISTANCES[1][1]
+           + MODIFIED_ROGERS_DISTANCES[2][2]
+           + MODIFIED_ROGERS_DISTANCES[3][2]
+           + MODIFIED_ROGERS_DISTANCES[4][4]) / 5.0
     );
     public static final Evaluation ACCESSION_TO_NEAREST_ENTRY_CAVALLI_SFORZA_SUBSET3 = SimpleEvaluation.WITH_VALUE(
             (CAVALLI_SFORZA_EDWARDS_DISTANCES[0][2]
-           + CAVALLI_SFORZA_EDWARDS_DISTANCES[3][2]) / 2.0
+           + CAVALLI_SFORZA_EDWARDS_DISTANCES[1][1]
+           + CAVALLI_SFORZA_EDWARDS_DISTANCES[2][2]
+           + CAVALLI_SFORZA_EDWARDS_DISTANCES[3][2]
+           + CAVALLI_SFORZA_EDWARDS_DISTANCES[4][4]) / 5.0
     );
     public static final Evaluation ACCESSION_TO_NEAREST_ENTRY_GOWER_SUBSET3 = SimpleEvaluation.WITH_VALUE(
             (GOWER_DISTANCES[0][4]
-           + GOWER_DISTANCES[3][1]) / 2.0
+           + GOWER_DISTANCES[1][1]
+           + GOWER_DISTANCES[2][2]
+           + GOWER_DISTANCES[3][1]
+           + GOWER_DISTANCES[4][4]) / 5.0
     );
     
 }

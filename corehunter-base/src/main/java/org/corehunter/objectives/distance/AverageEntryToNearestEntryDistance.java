@@ -52,8 +52,8 @@ public class AverageEntryToNearestEntryDistance implements Objective<SubsetSolut
     
     @Override
     public NearestEntryEvaluation evaluate(SubsetSolution solution, CoreHunterData data) {
-        // initialize evaluation object
-        NearestEntryEvaluation eval = new NearestEntryEvaluation();
+        // initialize evaluation object (evaluate to zero if less than two items are selected)
+        NearestEntryEvaluation eval = new NearestEntryEvaluation(0.0);
         // find closest neighbour of each selected item
         Set<Integer> selected = solution.getSelectedIDs();
         for(int sel : selected){
@@ -140,7 +140,7 @@ public class AverageEntryToNearestEntryDistance implements Objective<SubsetSolut
     }
     
     /**
-     * Find the closest item in the given group to the given item.
+     * Find the item in the given group that is closest to and different from the given item.
      * 
      * @param itemId ID of the item
      * @param group IDs of other items
