@@ -127,8 +127,7 @@ public class AverageEntryToNearestEntryDistance implements Objective<SubsetSolut
                     // case 2B: current closest item retained; only check if any newly
                     //          added item is closer
                     NearestEntry closestAddedItem = findClosest(item, added, data);
-                    if(closestAddedItem != null
-                        && closestAddedItem.getDistance() < curClosest.getDistance()){
+                    if(closestAddedItem != null && closestAddedItem.getDistance() < curClosest.getDistance()){
                         // update closest item
                         newEval.update(item, closestAddedItem);
                     }

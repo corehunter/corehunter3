@@ -65,7 +65,7 @@ public abstract class CachedDistanceMeasure implements DistanceMeasure {
                 cache.put(data, distances);
             }
             // compute, store and return
-            double d = computeDistance(idX, idY, data, missingDataPolicy);
+            double d = (idX != idY ? computeDistance(idX, idY, data, missingDataPolicy) : 0.0);
             distances[idX][idY] = d;
             distances[idY][idX] = d;
             return d;
