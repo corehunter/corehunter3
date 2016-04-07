@@ -57,8 +57,8 @@ public class NearestEntryEvaluation implements Evaluation {
     /**
      * Register the closest entry of a given item.
      * 
+     * @param itemId id of the item
      * @param nearestEntry id of and distance to the closest (other) selected item
-     * @param distance distance between both items
      */
     public void add(int itemId, NearestEntry nearestEntry){
         // update minimum distance sum
@@ -87,8 +87,8 @@ public class NearestEntryEvaluation implements Evaluation {
     /**
      * Update the closest entry of a previously registered item.
      * 
+     * @param itemId id of the item
      * @param nearestEntry id of and distance to the closest (other) selected item
-     * @param distance distance between both items
      * @return <code>true</code> if the item had been registered and is now updated
      */
     public boolean update(int itemId, NearestEntry nearestEntry){
