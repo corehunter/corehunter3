@@ -235,7 +235,7 @@ public class AverageEntryToEntryDistanceTest extends EvaluationTest {
     @Test
     public void testDeltaEvaluation() {
         
-        Random rng = new Random(26081989);
+        Random rng = new Random();
         
         SimpleGenotypeVariantData geno = new SimpleGenotypeVariantData(
                 NAME, HEADERS_NON_UNIQUE_NAMES, MARKER_NAMES, ALLELE_NAMES, ALLELE_FREQUENCIES
@@ -248,7 +248,7 @@ public class AverageEntryToEntryDistanceTest extends EvaluationTest {
         Neighbourhood<SubsetSolution> neigh = new SinglePerturbationNeighbourhood();
         SubsetSolution sol = problem.createRandomSolution(rng);
         Evaluation curEval = objective.evaluate(sol, data);
-        int numMoves = 1000;
+        int numMoves = 10000;
         for(int m = 0; m < numMoves; m++){
             Move<? super SubsetSolution> move = neigh.getRandomMove(sol, rng);
             Evaluation deltaEval = objective.evaluate(move, sol, curEval, data);
