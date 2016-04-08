@@ -80,7 +80,8 @@ public class CavalliSforzaEdwardsDistanceTest {
         );
         CoreHunterData data = new CoreHunterData(geno);
 
-        CavalliSforzaEdwardsDistance distanceMetric = new CavalliSforzaEdwardsDistance(MissingValuesPolicy.CEIL);
+        CavalliSforzaEdwardsDistance distanceMetric = new CavalliSforzaEdwardsDistance();
+        distanceMetric.setMissingValuesPolicy(MissingValuesPolicy.CEIL);
 
         Iterator<Integer> iteratorX = data.getIDs().iterator();
         Iterator<Integer> iteratorY;

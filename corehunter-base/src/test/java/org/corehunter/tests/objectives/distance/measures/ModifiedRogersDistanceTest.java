@@ -79,7 +79,8 @@ public class ModifiedRogersDistanceTest {
         );
         CoreHunterData data = new CoreHunterData(geno);
 
-        ModifiedRogersDistance distanceMetric = new ModifiedRogersDistance(MissingValuesPolicy.CEIL);
+        ModifiedRogersDistance distanceMetric = new ModifiedRogersDistance();
+        distanceMetric.setMissingValuesPolicy(MissingValuesPolicy.CEIL);
 
         Iterator<Integer> iteratorX = data.getIDs().iterator();
         Iterator<Integer> iteratorY;

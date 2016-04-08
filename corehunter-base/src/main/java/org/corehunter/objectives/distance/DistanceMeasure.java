@@ -21,6 +21,7 @@ package org.corehunter.objectives.distance;
 
 import org.corehunter.data.CoreHunterData;
 import org.corehunter.exceptions.CoreHunterException;
+import org.corehunter.objectives.distance.measures.MissingValuesPolicy;
 
 /**
  * @author Herman De Beukelaer
@@ -37,5 +38,13 @@ public interface DistanceMeasure {
      * @throws CoreHunterException if the data needed for the applied distance measure is not available
      */
     public double getDistance(int idX, int idY, CoreHunterData data);
+    
+    /**
+     * Determines the contribution of variables (markers/features)
+     * with missing values to the distance between two items.
+     * 
+     * @param policy missing values policy
+     */
+    public void setMissingValuesPolicy(MissingValuesPolicy policy);
     
 }

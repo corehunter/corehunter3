@@ -33,14 +33,14 @@ import uno.informatics.data.dataset.FeatureDataRow;
 /**
  * @author Herman De Beukelaer, Guy Davenport
  */
-public class GowerDistance extends CachedDistanceMeasure {
+public class GowerDistance extends AbstractDistanceMeasure {
 
     private static final int BINARY_SCALE_TYPE = 0;
     private static final int DISCRETE_SCALE_TYPE = 1;
     private static final int RANGED_SCALE_TYPE = 2;
 
     // scale type and range cache
-    private final Map<FeatureData, FeatureMetadata> cache;
+    private final Map<FeatureData, FeatureMetadata> cache = new HashMap<>();
     
     private class FeatureMetadata {
         
@@ -68,17 +68,8 @@ public class GowerDistance extends CachedDistanceMeasure {
         
     }
     
-    public GowerDistance() {
-        this(MissingValuesPolicy.FLOOR);
-    }
-
-    public GowerDistance(MissingValuesPolicy policy) {
-        super(policy);
-        cache = new HashMap<>();
-    }
-    
     @Override
-    public double computeDistance(int idX, int idY, CoreHunterData data, MissingValuesPolicy missingValuesPolicy) {
+    public double computeDistance(int idX, int idY, CoreHunterData data) {
 
         if(idX == idY){
             return 0.0;
@@ -103,9 +94,7 @@ public class GowerDistance extends CachedDistanceMeasure {
         double weightSum = 0.0;
         for (int k = 0; k < featureMetadata.getNumFeatures(); k++) {
             
-            double distance = distance(scaleTypes[k], ranges[k],
-                                       rowX.getValue(k), rowY.getValue(k),
-                                       missingValuesPolicy);
+            double distance = distance(scaleTypes[k], ranges[k], rowX.getValue(k), rowY.getValue(k));
             double weight = weight(scaleTypes[k], rowX.getValue(k), rowY.getValue(k));
             distSum += distance * weight;
             weightSum += weight;
@@ -173,9 +162,7 @@ public class GowerDistance extends CachedDistanceMeasure {
         return metadata;
     }
     
-    private double distance(int scaleType, double range,
-                            Object elementA, Object elementB,
-                            MissingValuesPolicy missingValuesPolicy) {
+    private double distance(int scaleType, double range, Object elementA, Object elementB) {
         if (elementA != null && elementB != null) {
             switch (scaleType) {
                 case BINARY_SCALE_TYPE:
@@ -200,7 +187,7 @@ public class GowerDistance extends CachedDistanceMeasure {
                     );
             }
         }
-        return missingValueContribution(missingValuesPolicy, 1.0);
+        return missingValueContribution(1.0);
     }
 
     private double weight(int scaleType, Object elementA, Object elementB) {

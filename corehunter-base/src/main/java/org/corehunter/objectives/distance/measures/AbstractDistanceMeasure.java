@@ -29,18 +29,18 @@ import org.corehunter.objectives.distance.DistanceMeasure;
  * 
  * @author Herman De Beukelaer
  */
-public abstract class CachedDistanceMeasure implements DistanceMeasure {
+public abstract class AbstractDistanceMeasure implements DistanceMeasure {
     
     private final Map<CoreHunterData, Double[][]> cache;
-    private final MissingValuesPolicy missingDataPolicy;
+    private MissingValuesPolicy missingValuesPolicy;
     
-    public CachedDistanceMeasure() {
+    public AbstractDistanceMeasure() {
         this(MissingValuesPolicy.FLOOR);
     }
     
-    public CachedDistanceMeasure(MissingValuesPolicy policy){
+    public AbstractDistanceMeasure(MissingValuesPolicy policy){
         cache = new HashMap<>();
-        missingDataPolicy = policy;
+        setMissingValuesPolicy(policy);
     }
     
     /**
@@ -65,7 +65,7 @@ public abstract class CachedDistanceMeasure implements DistanceMeasure {
                 cache.put(data, distances);
             }
             // compute, store and return
-            double d = (idX != idY ? computeDistance(idX, idY, data, missingDataPolicy) : 0.0);
+            double d = (idX != idY ? computeDistance(idX, idY, data) : 0.0);
             distances[idX][idY] = d;
             distances[idY][idX] = d;
             return d;
@@ -78,22 +78,28 @@ public abstract class CachedDistanceMeasure implements DistanceMeasure {
      * @param idX id of the first item
      * @param idY id of the second item
      * @param data data from which the distance is computed
-     * @param missingDataPolicy determines the contribution of variables with missing values
      * @return distance between the two items with given id
      */
-    protected abstract double computeDistance(int idX, int idY,
-                                              CoreHunterData data,
-                                              MissingValuesPolicy missingDataPolicy);
+    protected abstract double computeDistance(int idX, int idY, CoreHunterData data);
     
-    protected double missingValueContribution(MissingValuesPolicy policy, double ceilValue){
-        switch(policy){
+    @Override
+    public final void setMissingValuesPolicy(MissingValuesPolicy policy) {
+        if(missingValuesPolicy != policy){
+            // update policy and clear cache
+            missingValuesPolicy = policy;
+            cache.clear();
+        }
+    }
+    
+    protected double missingValueContribution(double ceilValue){
+        switch(missingValuesPolicy){
             case FLOOR:
                 return 0.0;
             case CEIL:
                 return ceilValue;
             default:
                 throw new RuntimeException(
-                        "This should not happen: unexpected missing values policy " + policy
+                        "This should not happen: unexpected missing values policy " + missingValuesPolicy
                 );
         }
     }

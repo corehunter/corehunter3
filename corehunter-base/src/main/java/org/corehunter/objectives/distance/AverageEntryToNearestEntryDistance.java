@@ -28,6 +28,7 @@ import java.util.Set;
 import org.corehunter.data.CoreHunterData;
 import org.corehunter.objectives.distance.eval.NearestEntry;
 import org.corehunter.objectives.distance.eval.NearestEntryEvaluation;
+import org.corehunter.objectives.distance.measures.MissingValuesPolicy;
 
 import org.jamesframework.core.exceptions.IncompatibleDeltaEvaluationException;
 import org.jamesframework.core.problems.objectives.Objective;
@@ -48,6 +49,8 @@ public class AverageEntryToNearestEntryDistance implements Objective<SubsetSolut
 
     public AverageEntryToNearestEntryDistance(DistanceMeasure distanceMeasure) {
         this.distanceMeasure = distanceMeasure;
+        // floor missing values contribution (worst case when maximizing distances)
+        distanceMeasure.setMissingValuesPolicy(MissingValuesPolicy.FLOOR);
     }
     
     @Override

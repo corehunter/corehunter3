@@ -42,4 +42,11 @@ public class PrecomputedDistance implements DistanceMeasure {
         
     }
 
+    @Override
+    public void setMissingValuesPolicy(MissingValuesPolicy policy) {
+        // ignored (distances have already been computed)
+    }
+    
+    
+
 }

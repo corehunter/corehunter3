@@ -26,19 +26,10 @@ import org.corehunter.exceptions.CoreHunterException;
 /**
  * @author Guy Davenport, Herman De Beukelaer
  */
-public class CavalliSforzaEdwardsDistance extends CachedDistanceMeasure {
-
-    public CavalliSforzaEdwardsDistance() {
-    }
-
-    public CavalliSforzaEdwardsDistance(MissingValuesPolicy policy) {
-        super(policy);
-    }
+public class CavalliSforzaEdwardsDistance extends AbstractDistanceMeasure {
     
     @Override
-    public double computeDistance(int idX, int idY,
-                                  CoreHunterData data,
-                                  MissingValuesPolicy missingDataPolicy) {
+    public double computeDistance(int idX, int idY, CoreHunterData data) {
         
         if(idX == idY){
             return 0.0;
@@ -57,7 +48,7 @@ public class CavalliSforzaEdwardsDistance extends CachedDistanceMeasure {
             
             if(genotypes.hasMissingValues(idX, markerIndex) || genotypes.hasMissingValues(idY, markerIndex)){
                 // missing frequencies in at least one individual
-                sumSquareDiff += missingValueContribution(missingDataPolicy, 2.0);
+                sumSquareDiff += missingValueContribution(2.0);
             } else {
                 // frequencies available for both individuals
                 int numberOfAlleles = genotypes.getNumberOfAlleles(markerIndex);

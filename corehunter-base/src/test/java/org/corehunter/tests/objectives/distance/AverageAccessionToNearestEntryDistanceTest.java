@@ -44,7 +44,7 @@ import static org.corehunter.tests.TestData.ALLELE_NAMES;
 import static org.corehunter.tests.TestData.HEADERS_NON_UNIQUE_NAMES;
 import static org.corehunter.tests.TestData.HEADERS_UNIQUE_NAMES;
 import static org.corehunter.tests.TestData.MARKER_NAMES;
-import static org.corehunter.tests.TestData.MODIFIED_ROGERS_DISTANCES;
+import static org.corehunter.tests.TestData.MODIFIED_ROGERS_DISTANCES_CEIL_MISSING;
 import static org.corehunter.tests.TestData.NAME;
 import static org.corehunter.tests.TestData.PHENOTYPIC_TRAIT_FEATURES;
 import static org.corehunter.tests.TestData.PHENOTYPIC_TRAIT_VALUES_WITH_HEADERS;
@@ -223,7 +223,9 @@ public class AverageAccessionToNearestEntryDistanceTest extends EvaluationTest {
     @Test
     public void testPrecomputedModifiedRogers() {
 
-        DistanceMatrixData dist = new SimpleDistanceMatrixData(HEADERS_UNIQUE_NAMES, MODIFIED_ROGERS_DISTANCES);
+        DistanceMatrixData dist = new SimpleDistanceMatrixData(
+                HEADERS_UNIQUE_NAMES, MODIFIED_ROGERS_DISTANCES_CEIL_MISSING
+        );
         CoreHunterData data = new CoreHunterData(dist);
         
         AverageAccessionToNearestEntryDistance objective = new AverageAccessionToNearestEntryDistance(

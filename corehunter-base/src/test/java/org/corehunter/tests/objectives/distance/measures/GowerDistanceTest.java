@@ -144,7 +144,8 @@ public class GowerDistanceTest {
         int n = data.getSize();
         
         // test with missing data policy FLOOR
-        distanceMetric = new GowerDistance(MissingValuesPolicy.FLOOR);
+        distanceMetric = new GowerDistance();
+        distanceMetric.setMissingValuesPolicy(MissingValuesPolicy.FLOOR);
         for (int x = 0; x < n; x++) {
             for (int y = 0; y < n; y++) {
                 assertEquals(
@@ -157,7 +158,8 @@ public class GowerDistanceTest {
         }
         
         // test with missing data policy CEIL
-        distanceMetric = new GowerDistance(MissingValuesPolicy.CEIL);
+        distanceMetric = new GowerDistance();
+        distanceMetric.setMissingValuesPolicy(MissingValuesPolicy.CEIL);
         for (int x = 0; x < n; x++) {
             for (int y = 0; y < n; y++) {
                 assertEquals(

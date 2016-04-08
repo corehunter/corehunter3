@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.corehunter.data.CoreHunterData;
+import org.corehunter.objectives.distance.measures.MissingValuesPolicy;
 
 import org.jamesframework.core.exceptions.IncompatibleDeltaEvaluationException;
 import org.jamesframework.core.problems.objectives.Objective;
@@ -45,6 +46,8 @@ public class AverageEntryToEntryDistance implements Objective<SubsetSolution, Co
 
     public AverageEntryToEntryDistance(DistanceMeasure distanceMeasure) {
         this.distanceMeasure = distanceMeasure;
+        // floor missing values contribution (worst case when maximizing distances)
+        distanceMeasure.setMissingValuesPolicy(MissingValuesPolicy.FLOOR);
     }
     
     @Override
