@@ -19,13 +19,18 @@
 
 package org.corehunter.objectives;
 
+import java.util.Set;
 import org.corehunter.data.GenotypeVariantData;
 import org.jamesframework.core.problems.objectives.Objective;
 import org.jamesframework.core.problems.objectives.evaluations.Evaluation;
 import org.jamesframework.core.subset.SubsetSolution;
 import org.corehunter.data.CoreHunterData;
 import org.corehunter.exceptions.CoreHunterException;
+import org.corehunter.objectives.eval.HeterozygousLociEvaluation;
 import org.corehunter.objectives.eval.ShannonEvaluation;
+import org.jamesframework.core.exceptions.IncompatibleDeltaEvaluationException;
+import org.jamesframework.core.search.neigh.Move;
+import org.jamesframework.core.subset.neigh.moves.SubsetMove;
 
 /**
  * @author Guy Davenport, Herman De Beukelaer
@@ -33,7 +38,7 @@ import org.corehunter.objectives.eval.ShannonEvaluation;
 public class Shannon implements Objective<SubsetSolution, CoreHunterData> {
 
     @Override
-    public Evaluation evaluate(SubsetSolution solution, CoreHunterData data) {
+    public ShannonEvaluation evaluate(SubsetSolution solution, CoreHunterData data) {
         
         GenotypeVariantData geno = data.getGenotypicData();
         
@@ -43,6 +48,31 @@ public class Shannon implements Objective<SubsetSolution, CoreHunterData> {
         
         return new ShannonEvaluation(solution.getSelectedIDs(), geno);
         
+    }
+    
+    @Override
+    public ShannonEvaluation evaluate(Move move, SubsetSolution curSolution,
+                                      Evaluation curEvaluation, CoreHunterData data) {
+
+        // check move type
+        if (!(move instanceof SubsetMove)) {
+            throw new IncompatibleDeltaEvaluationException(
+                    "Heterozygous loci objective should be used in combination "
+                  + "with neighbourhoods that generate moves of type SubsetMove."
+            );
+        }
+        // cast move
+        SubsetMove subsetMove = (SubsetMove) move;
+        // cast evaluation (cannot fail as both evaluate methods return such evaluation object)
+        ShannonEvaluation eval = (ShannonEvaluation) curEvaluation;
+        
+        // get set of added and deleted IDs
+        Set<Integer> added = subsetMove.getAddedIDs();
+        Set<Integer> deleted = subsetMove.getDeletedIDs();
+        
+        // return updated evaluation
+        return new ShannonEvaluation(eval, added, deleted, data.getGenotypicData());
+
     }
 
     @Override

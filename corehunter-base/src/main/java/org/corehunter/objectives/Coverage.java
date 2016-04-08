@@ -20,6 +20,7 @@
 package org.corehunter.objectives;
 
 
+import java.util.Set;
 import org.jamesframework.core.problems.objectives.Objective;
 import org.jamesframework.core.problems.objectives.evaluations.Evaluation;
 import org.jamesframework.core.subset.SubsetSolution;
@@ -28,6 +29,9 @@ import org.corehunter.data.GenotypeVariantData;
 import org.corehunter.data.CoreHunterData;
 import org.corehunter.exceptions.CoreHunterException;
 import org.corehunter.objectives.eval.CoverageEvaluation;
+import org.jamesframework.core.exceptions.IncompatibleDeltaEvaluationException;
+import org.jamesframework.core.search.neigh.Move;
+import org.jamesframework.core.subset.neigh.moves.SubsetMove;
 
 /**
  * @author Guy Davenport, Herman De Beukelaer
@@ -35,7 +39,7 @@ import org.corehunter.objectives.eval.CoverageEvaluation;
 public class Coverage implements Objective<SubsetSolution, CoreHunterData> {
     
     @Override
-    public Evaluation evaluate(SubsetSolution solution, CoreHunterData data) {
+    public CoverageEvaluation evaluate(SubsetSolution solution, CoreHunterData data) {
         
         GenotypeVariantData genotypes = data.getGenotypicData();
         
@@ -47,6 +51,31 @@ public class Coverage implements Objective<SubsetSolution, CoreHunterData> {
         
     }
 
+    @Override
+    public CoverageEvaluation evaluate(Move move, SubsetSolution curSolution,
+                                       Evaluation curEvaluation, CoreHunterData data) {
+
+        // check move type
+        if (!(move instanceof SubsetMove)) {
+            throw new IncompatibleDeltaEvaluationException(
+                    "Coveage objective should be used in combination "
+                  + "with neighbourhoods that generate moves of type SubsetMove."
+            );
+        }
+        // cast move
+        SubsetMove subsetMove = (SubsetMove) move;
+        // cast evaluation (cannot fail as both evaluate methods return such evaluation object)
+        CoverageEvaluation eval = (CoverageEvaluation) curEvaluation;
+        
+        // get set of added and deleted IDs
+        Set<Integer> added = subsetMove.getAddedIDs();
+        Set<Integer> deleted = subsetMove.getDeletedIDs();
+        
+        // return updated evaluation
+        return new CoverageEvaluation(eval, added, deleted, data.getGenotypicData());
+
+    }
+    
     @Override
     public boolean isMinimizing() {
         return false;

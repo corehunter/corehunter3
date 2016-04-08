@@ -19,6 +19,8 @@
 
 package org.corehunter.tests.objectives;
 
+import java.util.Random;
+
 import static org.corehunter.tests.TestData.ALLELE_FREQUENCIES;
 import static org.corehunter.tests.TestData.ALLELE_NAMES;
 import static org.corehunter.tests.TestData.HEADERS_NON_UNIQUE_NAMES;
@@ -36,8 +38,13 @@ import static org.corehunter.tests.TestData.SUBSET_EMPTY;
 import org.corehunter.data.CoreHunterData;
 import org.corehunter.data.simple.SimpleGenotypeVariantData;
 import org.corehunter.objectives.HeterozygousLoci;
+import org.jamesframework.core.problems.objectives.evaluations.Evaluation;
 import org.jamesframework.core.problems.objectives.evaluations.SimpleEvaluation;
+import org.jamesframework.core.search.neigh.Move;
+import org.jamesframework.core.search.neigh.Neighbourhood;
+import org.jamesframework.core.subset.SubsetProblem;
 import org.jamesframework.core.subset.SubsetSolution;
+import org.jamesframework.core.subset.neigh.SinglePerturbationNeighbourhood;
 import org.junit.Test;
 
 /**
@@ -82,6 +89,36 @@ public class HeterozygousLociTest extends EvaluationTest {
                 objective.evaluate(new SubsetSolution(data.getIDs(), SUBSET3), data),
                 PRECISION
         );
+        
+    }
+    
+    @Test
+    public void testDeltaEvaluation() {
+        
+        Random rng = new Random();
+        
+        SimpleGenotypeVariantData geno = new SimpleGenotypeVariantData(
+                NAME, HEADERS_NON_UNIQUE_NAMES, MARKER_NAMES, ALLELE_NAMES, ALLELE_FREQUENCIES
+        );
+        CoreHunterData data = new CoreHunterData(geno);
+        
+        HeterozygousLoci objective = new HeterozygousLoci();
+
+        SubsetProblem<CoreHunterData> problem = new SubsetProblem<>(data, objective);
+        
+        Neighbourhood<SubsetSolution> neigh = new SinglePerturbationNeighbourhood();
+        SubsetSolution sol = problem.createRandomSolution(rng);
+        Evaluation curEval = objective.evaluate(sol, data);
+        int numMoves = 10000;
+        for(int m = 0; m < numMoves; m++){
+            Move<? super SubsetSolution> move = neigh.getRandomMove(sol, rng);
+            Evaluation deltaEval = objective.evaluate(move, sol, curEval, data);
+            move.apply(sol);
+            Evaluation fullEval = objective.evaluate(sol, data);
+            assertEquals("Delta evaluation and full neighbour evaluation differ!",
+                         fullEval, deltaEval, PRECISION);
+            curEval = fullEval;
+        }
         
     }
 

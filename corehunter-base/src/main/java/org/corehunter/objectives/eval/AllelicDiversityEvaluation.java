@@ -58,8 +58,7 @@ public abstract class AllelicDiversityEvaluation implements Evaluation {
                 for(int a = 0; a < numAlleles; a++){
                     double freqSum = 0.0;
                     for(int id : ids){
-                        Double freq = data.getAlleleFrequency(id, m, a);
-                        freqSum += (freq == null ? 0.0 : freq);
+                        freqSum += frequency(data, id, m, a);
                     }
                     double avgFreq = freqSum/numSelected;
                     origAverageGenotype[m][a] = avgFreq;
@@ -107,11 +106,11 @@ public abstract class AllelicDiversityEvaluation implements Evaluation {
                     }
                     // add
                     for(int id : add){
-                        origAverageGenotype[m][a] += data.getAlleleFrequency(id, m, a);
+                        origAverageGenotype[m][a] += frequency(data, id, m, a);
                     }
                     // remove
                     for(int id : remove){
-                        origAverageGenotype[m][a] -= data.getAlleleFrequency(id, m, a);
+                        origAverageGenotype[m][a] -= frequency(data, id, m, a);
                     }
                     // redo average
                     origAverageGenotype[m][a] /= numSelected;
@@ -123,6 +122,11 @@ public abstract class AllelicDiversityEvaluation implements Evaluation {
         // modify average genotype to take into account missing values
         resolveMissingValues();
         
+    }
+    
+    private double frequency(GenotypeVariantData data, int id, int m, int a){
+        Double freq = data.getAlleleFrequency(id, m, a);
+        return freq == null ? 0.0 : freq;
     }
     
     private void resolveMissingValues(){

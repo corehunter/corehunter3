@@ -19,13 +19,18 @@
 
 package org.corehunter.objectives;
 
+import java.util.Set;
 import org.corehunter.data.GenotypeVariantData;
 import org.jamesframework.core.problems.objectives.Objective;
 import org.jamesframework.core.problems.objectives.evaluations.Evaluation;
 import org.jamesframework.core.subset.SubsetSolution;
 import org.corehunter.data.CoreHunterData;
 import org.corehunter.exceptions.CoreHunterException;
+import org.corehunter.objectives.eval.CoverageEvaluation;
 import org.corehunter.objectives.eval.HeterozygousLociEvaluation;
+import org.jamesframework.core.exceptions.IncompatibleDeltaEvaluationException;
+import org.jamesframework.core.search.neigh.Move;
+import org.jamesframework.core.subset.neigh.moves.SubsetMove;
 
 /**
  * Expected proportion of heterozygous loci in offspring.
@@ -35,7 +40,7 @@ import org.corehunter.objectives.eval.HeterozygousLociEvaluation;
 public class HeterozygousLoci implements Objective<SubsetSolution, CoreHunterData> {
 
     @Override
-    public Evaluation evaluate(SubsetSolution solution, CoreHunterData data) {
+    public HeterozygousLociEvaluation evaluate(SubsetSolution solution, CoreHunterData data) {
         
         GenotypeVariantData geno = data.getGenotypicData();
         
@@ -47,6 +52,31 @@ public class HeterozygousLoci implements Objective<SubsetSolution, CoreHunterDat
         
         return new HeterozygousLociEvaluation(solution.getSelectedIDs(), geno);
         
+    }
+    
+    @Override
+    public HeterozygousLociEvaluation evaluate(Move move, SubsetSolution curSolution,
+                                               Evaluation curEvaluation, CoreHunterData data) {
+
+        // check move type
+        if (!(move instanceof SubsetMove)) {
+            throw new IncompatibleDeltaEvaluationException(
+                    "Heterozygous loci objective should be used in combination "
+                  + "with neighbourhoods that generate moves of type SubsetMove."
+            );
+        }
+        // cast move
+        SubsetMove subsetMove = (SubsetMove) move;
+        // cast evaluation (cannot fail as both evaluate methods return such evaluation object)
+        HeterozygousLociEvaluation eval = (HeterozygousLociEvaluation) curEvaluation;
+        
+        // get set of added and deleted IDs
+        Set<Integer> added = subsetMove.getAddedIDs();
+        Set<Integer> deleted = subsetMove.getDeletedIDs();
+        
+        // return updated evaluation
+        return new HeterozygousLociEvaluation(eval, added, deleted, data.getGenotypicData());
+
     }
     
     @Override
