@@ -17,41 +17,47 @@
 /* under the License.                                           */
 /*--------------------------------------------------------------*/
 
-package org.corehunter.objectives;
+package org.corehunter.objectives.eval;
 
+import java.util.Collection;
+import java.util.Set;
 import org.corehunter.data.GenotypeVariantData;
-import org.jamesframework.core.problems.objectives.Objective;
-import org.jamesframework.core.problems.objectives.evaluations.Evaluation;
-import org.jamesframework.core.subset.SubsetSolution;
-import org.corehunter.data.CoreHunterData;
-import org.corehunter.exceptions.CoreHunterException;
-import org.corehunter.objectives.eval.HeterozygousLociEvaluation;
 
 /**
- * Expected proportion of heterozygous loci in offspring.
- * 
- * @author Guy Davenport, Herman De Beukelaer
+ * @author Herman De Beukelaer
  */
-public class HeterozygousLoci implements Objective<SubsetSolution, CoreHunterData> {
+public class CoverageEvaluation extends AllelicDiversityEvaluation {
 
+    private static final double TOL = 1e-10;
+    
+    public CoverageEvaluation(Collection<Integer> ids, GenotypeVariantData data) {
+        super(ids, data);
+    }
+
+    public CoverageEvaluation(AllelicDiversityEvaluation curEval,
+                              Set<Integer> add, Set<Integer> remove,
+                              GenotypeVariantData data) {
+        super(curEval, add, remove, data);
+    }
+    
     @Override
-    public Evaluation evaluate(SubsetSolution solution, CoreHunterData data) {
+    public double getValue() {
+        double[][] avgGeno = getAverageGenotype();
         
-        GenotypeVariantData geno = data.getGenotypicData();
-        
-        if(geno == null){
-            throw new CoreHunterException(
-                    "Genotypes are required for expected proportion of heterozygous loci objective."
-            );
+        int numberOfMarkers = avgGeno.length;
+        int totalNumberOfAlleles = 0;
+        int alleleCount = 0;
+        for(int m = 0; m < numberOfMarkers; m++){
+            int numberOfAlleles = avgGeno[m].length;
+            totalNumberOfAlleles += numberOfAlleles;
+            for(int a = 0; a < numberOfAlleles; a++){
+                if(avgGeno[m][a] > TOL){
+                    alleleCount++;
+                }
+            }
         }
-        
-        return new HeterozygousLociEvaluation(solution.getSelectedIDs(), geno);
-        
+
+        return ((double) alleleCount) / totalNumberOfAlleles;
     }
-    
-    @Override
-    public boolean isMinimizing() {
-        return false;
-    }
-    
+
 }

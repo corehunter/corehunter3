@@ -17,41 +17,44 @@
 /* under the License.                                           */
 /*--------------------------------------------------------------*/
 
-package org.corehunter.objectives;
+package org.corehunter.objectives.eval;
 
+import java.util.Collection;
+import java.util.Set;
 import org.corehunter.data.GenotypeVariantData;
-import org.jamesframework.core.problems.objectives.Objective;
-import org.jamesframework.core.problems.objectives.evaluations.Evaluation;
-import org.jamesframework.core.subset.SubsetSolution;
-import org.corehunter.data.CoreHunterData;
-import org.corehunter.exceptions.CoreHunterException;
-import org.corehunter.objectives.eval.HeterozygousLociEvaluation;
 
 /**
- * Expected proportion of heterozygous loci in offspring.
- * 
- * @author Guy Davenport, Herman De Beukelaer
+ * @author Herman De Beukelaer
  */
-public class HeterozygousLoci implements Objective<SubsetSolution, CoreHunterData> {
+public class ShannonEvaluation extends AllelicDiversityEvaluation {
+    
+    public ShannonEvaluation(Collection<Integer> ids, GenotypeVariantData data) {
+        super(ids, data);
+    }
 
+    public ShannonEvaluation(AllelicDiversityEvaluation curEval,
+                              Set<Integer> add, Set<Integer> remove,
+                              GenotypeVariantData data) {
+        super(curEval, add, remove, data);
+    }
+    
     @Override
-    public Evaluation evaluate(SubsetSolution solution, CoreHunterData data) {
-        
-        GenotypeVariantData geno = data.getGenotypicData();
-        
-        if(geno == null){
-            throw new CoreHunterException(
-                    "Genotypes are required for expected proportion of heterozygous loci objective."
-            );
+    public double getValue() {
+        double[][] avgGeno = getAverageGenotype();
+        // compute Shannon's index
+        double sum = 0.0;
+        int numberOfMarkers = avgGeno.length;
+        for (int m = 0; m < numberOfMarkers; m++) {
+            int numberOfAlleles = avgGeno[m].length;
+            for (int a = 0; a < numberOfAlleles; a++) {
+                if (avgGeno[m][a] > 0.0) {
+                    double scaledFreq = avgGeno[m][a] / numberOfMarkers;
+                    sum += scaledFreq * Math.log(scaledFreq);
+                }
+            }
+            
         }
-        
-        return new HeterozygousLociEvaluation(solution.getSelectedIDs(), geno);
-        
+        return -sum;
     }
-    
-    @Override
-    public boolean isMinimizing() {
-        return false;
-    }
-    
+
 }

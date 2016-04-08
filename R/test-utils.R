@@ -5,10 +5,27 @@ data.dir <- "corehunter-base/src/test/resources"
 #############
 
 load.multiallelic.data <- function(){
+  # read
   freqs <- read.csv(paste(data.dir, "multiallelic/names-and-ids.csv", sep="/"), header = F, skip = 2)
   freqs <- freqs[,3:ncol(freqs)]
   colnames(freqs) <- 1:ncol(freqs)
-  list(freqs = freqs, markers = 7, allele.counts = c(3,2,3,4,3,2,2))
+  # set marker and allele counts
+  markers <- 7
+  alleles <- c(3,2,3,4,3,2,2)
+  cum.alleles <- c(0, cumsum(alleles))
+  # normalize
+  for(i in 1:nrow(freqs)){
+    for(m in 1:markers){
+      from <- cum.alleles[m]+1
+      to <- cum.alleles[m+1]
+      marker.freqs <- freqs[i, from:to]
+      if(!any(is.na(marker.freqs))){
+        freqs[i, from:to] <- marker.freqs / sum(marker.freqs)
+      }
+    }
+  }
+  # combine
+  list(freqs = freqs, markers = markers, allele.counts = alleles)
 }
 
 ################
@@ -44,7 +61,6 @@ coverage <- function(freqs){
 
 shannon <- function(freqs, allele.counts){
   num.markers <- length(allele.counts)
-  missing <- apply(is.na(freqs), 2, any)
   freqs[is.na(freqs)] <- 0
   p <- colMeans(freqs)
   cum.allele.counts <- c(0, cumsum(allele.counts))
@@ -53,10 +69,8 @@ shannon <- function(freqs, allele.counts){
     to <- cum.allele.counts[m+1]
     p.marker <- p[from:to]
     # handle missing data
-    if(any(missing[from:to])){
-      a <- which.max(p.marker)
-      p.marker[a] <- 1.0 - sum(p.marker[-a])
-    }
+    a <- which.max(p.marker)
+    p.marker[a] <- 1.0 - sum(p.marker[-a])
     p.marker <- p.marker/num.markers
     p.marker <- p.marker[p.marker > 0.0]
     sum(sapply(p.marker, function(f){
@@ -68,7 +82,6 @@ shannon <- function(freqs, allele.counts){
 
 heterozygous.loci <- function(freqs, allele.counts){
   num.markers <- length(allele.counts)
-  missing <- apply(is.na(freqs), 2, any)
   freqs[is.na(freqs)] <- 0
   p <- colMeans(freqs)
   cum.allele.counts <- c(0, cumsum(allele.counts))
@@ -77,10 +90,8 @@ heterozygous.loci <- function(freqs, allele.counts){
     to <- cum.allele.counts[m+1]
     p.marker <- p[from:to]
     # handle missing data
-    if(any(missing[from:to])){
-      a <- which.max(p.marker)
-      p.marker[a] <- 1.0 - sum(p.marker[-a])
-    }
+    a <- which.max(p.marker)
+    p.marker[a] <- 1.0 - sum(p.marker[-a])
     sum(p.marker^2)
   })
   he <- mean(1 - p.square.sums)

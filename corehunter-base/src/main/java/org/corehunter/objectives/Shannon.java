@@ -22,16 +22,15 @@ package org.corehunter.objectives;
 import org.corehunter.data.GenotypeVariantData;
 import org.jamesframework.core.problems.objectives.Objective;
 import org.jamesframework.core.problems.objectives.evaluations.Evaluation;
-import org.jamesframework.core.problems.objectives.evaluations.SimpleEvaluation;
 import org.jamesframework.core.subset.SubsetSolution;
 import org.corehunter.data.CoreHunterData;
 import org.corehunter.exceptions.CoreHunterException;
+import org.corehunter.objectives.eval.ShannonEvaluation;
 
 /**
  * @author Guy Davenport, Herman De Beukelaer
  */
-public class Shannon extends AllelicDiversity
-                     implements Objective<SubsetSolution, CoreHunterData> {
+public class Shannon implements Objective<SubsetSolution, CoreHunterData> {
 
     @Override
     public Evaluation evaluate(SubsetSolution solution, CoreHunterData data) {
@@ -42,24 +41,7 @@ public class Shannon extends AllelicDiversity
             throw new CoreHunterException("Genotypes are required for Shannon's index.");
         }
         
-        // get average genotype of selection (taking into account missing values)
-        double[][] avgGeno = getAverageGenotype(geno, solution.getSelectedIDs());
-        
-        // compute Shannon's index
-        double sum = 0.0;
-        int numberOfMarkers = geno.getNumberOfMarkers();
-        for (int m = 0; m < numberOfMarkers; m++) {
-            int numberOfAlleles = geno.getNumberOfAlleles(m);
-            for (int a = 0; a < numberOfAlleles; a++) {
-                if (avgGeno[m][a] > 0.0) {
-                    double scaledFreq = avgGeno[m][a] / numberOfMarkers;
-                    sum += scaledFreq * Math.log(scaledFreq);
-                }
-            }
-            
-        }
-
-        return SimpleEvaluation.WITH_VALUE(-sum);
+        return new ShannonEvaluation(solution.getSelectedIDs(), geno);
         
     }
 

@@ -173,6 +173,10 @@ public class SimpleGenotypeVariantData extends DataPojo implements GenotypeVaria
                     if(1.0 - sum > SUM_TO_ONE_PRECISION){
                         throw new IllegalArgumentException("Allele frequencies for marker should sum to one.");
                     }
+                    // normalize to avoid numerical imprecisions
+                    for(int k = 0; k  < alleleFreqs.length; k++){
+                        alleleFreqs[k] /= sum;
+                    }
                 }
             }
         }

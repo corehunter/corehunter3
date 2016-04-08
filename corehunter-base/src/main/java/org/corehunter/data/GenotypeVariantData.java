@@ -100,28 +100,4 @@ public interface GenotypeVariantData extends Data {
      */
     public boolean hasMissingValues(int id, int markerIndex);
 
-    /**
-     * Get the average genotype for the given entries (samples/accessions).
-     * The default implementation relies on {@link #getAlleleFrequency(int, int, int)} to access
-     * individual frequencies and treats missing values as zero when computing the average.
-     *
-     * @param itemIds the IDs of the entry, must be a subset of the IDs returned by {@link #getIDs()}
-     * @return average allele frequency across the given entries
-     */
-    public default double[][] getAverageGenotype(Collection<Integer> itemIds) {
-        double[][] average = new double[getNumberOfMarkers()][];
-        for(int m = 0; m < average.length; m++){
-            average[m] = new double[getNumberOfAlleles(m)];
-            for(int a = 0; a < average[m].length; a++){
-                double freqSum = 0.0;
-                for(int id : itemIds){
-                    Double freq = getAlleleFrequency(id, m, a);
-                    freqSum += (freq == null ? 0.0 : freq);
-                }
-                average[m][a] = freqSum/itemIds.size();
-            }
-        }
-        return average;
-    }
-
 }

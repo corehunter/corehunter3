@@ -27,11 +27,19 @@ import static org.corehunter.tests.TestData.MARKER_NAMES;
 import static org.corehunter.tests.TestData.NAME;
 import static org.corehunter.tests.TestData.PRECISION;
 import static org.corehunter.tests.TestData.SUBSET1;
+import static org.corehunter.tests.TestData.COVERAGE_SUBSET2;
+import static org.corehunter.tests.TestData.COVERAGE_SUBSET3;
+import static org.corehunter.tests.TestData.SUBSET2;
+import static org.corehunter.tests.TestData.SUBSET3;
+import static org.corehunter.tests.TestData.SUBSET_EMPTY;
 
 import org.corehunter.data.simple.SimpleGenotypeVariantData;
 import org.corehunter.data.CoreHunterData;
 import org.corehunter.objectives.Coverage;
+import org.jamesframework.core.problems.objectives.evaluations.SimpleEvaluation;
+
 import org.jamesframework.core.subset.SubsetSolution;
+
 import org.junit.Test;
 
 /**
@@ -50,9 +58,30 @@ public class CoverageTest extends EvaluationTest {
         Coverage objective = new Coverage();
 
         assertEquals(
+                "Evaluation for empty subset is not correct!",
+                SimpleEvaluation.WITH_VALUE(0.0),
+                objective.evaluate(new SubsetSolution(data.getIDs(), SUBSET_EMPTY), data),
+                PRECISION
+        );
+        
+        assertEquals(
                 "Evaluation for subset 1 is not correct!",
                 COVERAGE_SUBSET1,
                 objective.evaluate(new SubsetSolution(data.getIDs(), SUBSET1), data),
+                PRECISION
+        );
+        
+        assertEquals(
+                "Evaluation for subset 2 is not correct!",
+                COVERAGE_SUBSET2,
+                objective.evaluate(new SubsetSolution(data.getIDs(), SUBSET2), data),
+                PRECISION
+        );
+        
+        assertEquals(
+                "Evaluation for subset 3 is not correct!",
+                COVERAGE_SUBSET3,
+                objective.evaluate(new SubsetSolution(data.getIDs(), SUBSET3), data),
                 PRECISION
         );
 
