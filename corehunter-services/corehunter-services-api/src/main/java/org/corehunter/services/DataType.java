@@ -23,7 +23,7 @@ public enum DataType {
     PHENOTYPIC("Phenotypic"), 
     BI_ALLELIC_GENOTYPIC("Bi-allelic Genotypic"), 
     GENOTYPIC("Genotypic"), 
-    DISTANCE("Distance");
+    DISTANCES("Distances");
 
     private String name;
 

@@ -554,6 +554,8 @@ public class SimpleGenotypeVariantData extends DataPojo implements GenotypeVaria
             
             writer.writeCell(ALLELE_NAMES_HEADER);
             
+            writer.newColumn() ;
+            
             for (int i = 0 ; i < alleleNames.length ; ++i) {
                 writer.newColumn() ;
                 writer.writeRowCellsAsArray(alleleNames[i]);  
