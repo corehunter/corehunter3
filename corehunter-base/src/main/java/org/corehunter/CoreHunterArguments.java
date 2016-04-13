@@ -20,6 +20,8 @@
 package org.corehunter;
 
 import org.corehunter.data.CoreHunterData;
+import org.jamesframework.core.problems.objectives.Objective;
+import org.jamesframework.core.subset.SubsetSolution;
 
 public class CoreHunterArguments {
 
@@ -27,20 +29,22 @@ public class CoreHunterArguments {
 
     private int maximumSubsetSize;
 
-    private CoreHunterObjective objective;
+    private Objective<SubsetSolution, CoreHunterData> objective;
 
     private CoreHunterData data;
 
-    public CoreHunterArguments(CoreHunterData data, int subsetSize) {
-        this(data, subsetSize, subsetSize);
+    public CoreHunterArguments(CoreHunterData data, Objective<SubsetSolution,
+                               CoreHunterData> objective,
+                               int subsetSize) {
+        this(data, objective, subsetSize, subsetSize);
     }
 
-    public CoreHunterArguments(CoreHunterData data, int minimumSubsetSize, int maximumSubsetSize) {
-        super();
+    public CoreHunterArguments(CoreHunterData data, Objective<SubsetSolution, CoreHunterData> objective,
+                               int minimumSubsetSize, int maximumSubsetSize) {
+        this.data = data;
+        this.objective = objective;
         this.minimumSubsetSize = minimumSubsetSize;
         this.maximumSubsetSize = maximumSubsetSize;
-        
-        setData(data) ;
     }
 
     public final int getMinimumSubsetSize() {
@@ -67,11 +71,11 @@ public class CoreHunterArguments {
         this.data = data;
     }
 
-    public final CoreHunterObjective getObjective() {
+    public final Objective<SubsetSolution, CoreHunterData> getObjective() {
         return objective;
     }
 
-    public final void setObjective(CoreHunterObjective objective) {
+    public final void setObjective(Objective<SubsetSolution, CoreHunterData> objective) {
         this.objective = objective;
     }
 }

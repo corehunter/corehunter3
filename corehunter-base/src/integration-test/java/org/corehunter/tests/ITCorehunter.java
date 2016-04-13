@@ -23,10 +23,10 @@ import java.util.Set;
 
 import org.corehunter.CoreHunter;
 import org.corehunter.CoreHunterArguments;
-import org.corehunter.CoreHunterObjective;
 import org.corehunter.data.CoreHunterData;
 import org.corehunter.objectives.distance.measures.PrecomputedDistance;
 import org.corehunter.objectives.distance.AverageEntryToEntryDistance;
+import org.jamesframework.core.problems.objectives.Objective;
 import org.jamesframework.core.search.Search;
 import org.jamesframework.core.search.algo.exh.ExhaustiveSearch;
 import org.jamesframework.core.subset.SubsetProblem;
@@ -49,20 +49,16 @@ public class ITCorehunter extends TestData {
 
         int size = 2;
         int time = 2;
+        Objective<SubsetSolution, CoreHunterData> obj = new AverageEntryToEntryDistance(new PrecomputedDistance());
 
         // determine optimal solution through exhaustive search
-        SubsetProblem problem = new SubsetProblem<>(
-                new CoreHunterData(DATA),
-                new AverageEntryToEntryDistance(new PrecomputedDistance()),
-                size
-        );
+        SubsetProblem problem = new SubsetProblem<>(new CoreHunterData(DATA), obj, size);
         Search<SubsetSolution> exh = new ExhaustiveSearch<>(problem, new SubsetSolutionIterator(SET, size));
         exh.run();
         Set<Integer> opt = exh.getBestSolution().getSelectedIDs();
 
         // run Core Hunter
-        CoreHunterArguments arguments = new CoreHunterArguments(new CoreHunterData(DATA), size);
-        arguments.setObjective(CoreHunterObjective.PD);
+        CoreHunterArguments arguments = new CoreHunterArguments(new CoreHunterData(DATA), obj, size);
         CoreHunter corehunter = new CoreHunter(arguments);
         corehunter.setTimeLimit(time);
         SubsetSolution result = corehunter.execute();

@@ -21,14 +21,6 @@ package org.corehunter;
 
 import java.util.concurrent.TimeUnit;
 
-import org.corehunter.objectives.distance.AverageEntryToEntryDistance;
-import org.corehunter.objectives.distance.measures.CavalliSforzaEdwardsDistance;
-import org.corehunter.objectives.distance.measures.ModifiedRogersDistance;
-import org.corehunter.objectives.Coverage;
-import org.corehunter.objectives.HeterozygousLoci;
-import org.corehunter.objectives.Shannon;
-
-import org.jamesframework.core.problems.objectives.Objective;
 import org.jamesframework.core.subset.SubsetProblem;
 import org.jamesframework.core.subset.SubsetSolution;
 import org.jamesframework.core.search.Search;
@@ -37,8 +29,8 @@ import org.jamesframework.core.search.stopcriteria.MaxRuntime;
 import org.jamesframework.core.subset.neigh.SinglePerturbationNeighbourhood;
 
 import org.corehunter.data.CoreHunterData;
-import org.corehunter.objectives.distance.measures.GowerDistance;
-import org.corehunter.objectives.distance.measures.PrecomputedDistance;
+import org.jamesframework.core.search.neigh.Neighbourhood;
+import org.jamesframework.core.subset.neigh.SingleSwapNeighbourhood;
 
 /**
  * Provides support for executing pre-defined core subset searches. Can be re-used.
@@ -82,40 +74,19 @@ public class CoreHunter {
 
     protected Search<SubsetSolution> createSearch(CoreHunterArguments arguments) {
         
-        Objective<SubsetSolution, CoreHunterData> objective;
-        switch (arguments.getObjective()) {
-            case MR:
-                objective = new AverageEntryToEntryDistance(new ModifiedRogersDistance());
-                break;
-            case CE:
-                objective = new AverageEntryToEntryDistance(new CavalliSforzaEdwardsDistance());
-                break;
-            case PD:
-                objective = new AverageEntryToEntryDistance(new PrecomputedDistance());
-                break;
-            case CV:
-                objective = new Coverage();
-                break;
-            case HE:
-                objective = new HeterozygousLoci();
-                break;
-            case SH:
-                objective = new Shannon();
-                break;
-            case GD:
-                objective = new AverageEntryToEntryDistance(new GowerDistance());
-                break;
-            default:
-                throw new IllegalArgumentException("Unknown objective : " + arguments.getObjective());
-        }
-        
-        CoreHunterData dataset = arguments.getData();
-
+        int minSize = arguments.getMinimumSubsetSize();
+        int maxSize = arguments.getMaximumSubsetSize();
         SubsetProblem<CoreHunterData> problem = new SubsetProblem<>(
-                dataset, objective, arguments.getMinimumSubsetSize(), arguments.getMaximumSubsetSize()
+                arguments.getData(),
+                arguments.getObjective(),
+                minSize, maxSize
         );
 
-        RandomDescent<SubsetSolution> search = new RandomDescent<>(problem, new SinglePerturbationNeighbourhood());
+        Neighbourhood<SubsetSolution> neigh = new SingleSwapNeighbourhood();
+        if(minSize != maxSize){
+            neigh = new SinglePerturbationNeighbourhood(minSize, maxSize);
+        }
+        RandomDescent<SubsetSolution> search = new RandomDescent<>(problem, neigh);
 
         return search;
         

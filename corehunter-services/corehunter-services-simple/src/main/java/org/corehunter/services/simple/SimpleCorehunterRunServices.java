@@ -33,7 +33,6 @@ import java.util.concurrent.Executors;
 
 import org.corehunter.CoreHunter;
 import org.corehunter.CoreHunterArguments;
-import org.corehunter.CoreHunterObjective;
 import org.corehunter.listener.SimpleCorehunterListener;
 import org.corehunter.services.CorehunterRun;
 import org.corehunter.services.CorehunterRunArguments;
@@ -228,10 +227,8 @@ public class SimpleCorehunterRunServices implements CorehunterRunServices {
 
                 CoreHunterArguments arguments = new CoreHunterArguments(
                         datasetServices.getData(corehunterRunArguments.getDatasetId()),
+                        corehunterRunArguments.getObjective(),
                         corehunterRunArguments.getSubsetSize());
-
-                // TODO get from arugments
-                arguments.setObjective(CoreHunterObjective.GD);
 
                 corehunter = new CoreHunter(arguments);
 
