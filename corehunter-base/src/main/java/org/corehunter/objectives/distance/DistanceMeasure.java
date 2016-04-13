@@ -17,25 +17,34 @@
 /* under the License.                                           */
 /*--------------------------------------------------------------*/
 
-package org.corehunter.objectives.biallelic;
+package org.corehunter.objectives.distance;
 
 import org.corehunter.data.CoreHunterData;
-import org.jamesframework.core.problems.objectives.Objective;
-import org.jamesframework.core.problems.objectives.evaluations.Evaluation;
-import org.jamesframework.core.subset.SubsetSolution;
+import org.corehunter.exceptions.CoreHunterException;
+import org.corehunter.objectives.distance.measures.MissingValuesPolicy;
 
-public class CoverageBiAllelic implements Objective<SubsetSolution, CoreHunterData> {
+/**
+ * @author Herman De Beukelaer
+ */
+public interface DistanceMeasure {
 
-    @Override
-    public Evaluation evaluate(SubsetSolution solution, CoreHunterData data) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public boolean isMinimizing() {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
+    /**
+     * Calculates the distance between two items with given ID.
+     * 
+     * @param idX id of first item
+     * @param idY id of second item
+     * @param data Core Hunter data
+     * @return distance
+     * @throws CoreHunterException if the data needed for the applied distance measure is not available
+     */
+    public double getDistance(int idX, int idY, CoreHunterData data);
+    
+    /**
+     * Determines the contribution of variables (markers/features)
+     * with missing values to the distance between two items.
+     * 
+     * @param policy missing values policy
+     */
+    public void setMissingValuesPolicy(MissingValuesPolicy policy);
+    
 }

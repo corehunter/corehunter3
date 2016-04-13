@@ -17,25 +17,26 @@
 /* under the License.                                           */
 /*--------------------------------------------------------------*/
 
-package org.corehunter.objectives.biallelic;
+package org.corehunter.exceptions;
 
-import org.corehunter.data.CoreHunterData;
-import org.jamesframework.core.problems.objectives.Objective;
-import org.jamesframework.core.problems.objectives.evaluations.Evaluation;
-import org.jamesframework.core.subset.SubsetSolution;
+/**
+ * @author Herman De Beukelaer
+ */
+public class CoreHunterException extends RuntimeException {
 
-public class CoverageBiAllelic implements Objective<SubsetSolution, CoreHunterData> {
-
-    @Override
-    public Evaluation evaluate(SubsetSolution solution, CoreHunterData data) {
-        // TODO Auto-generated method stub
-        return null;
+    public CoreHunterException() {
     }
 
-    @Override
-    public boolean isMinimizing() {
-        // TODO Auto-generated method stub
-        return false;
+    public CoreHunterException(String message) {
+        super(message);
     }
 
+    public CoreHunterException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    public CoreHunterException(Throwable cause) {
+        super(cause);
+    }
+    
 }

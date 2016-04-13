@@ -17,45 +17,65 @@
 /* under the License.                                           */
 /*--------------------------------------------------------------*/
 
-package org.corehunter.services.simple;
-
-import java.util.UUID;
+package org.corehunter;
 
 import org.corehunter.data.CoreHunterData;
-import org.corehunter.services.CorehunterRunArguments;
 import org.jamesframework.core.problems.objectives.Objective;
 import org.jamesframework.core.subset.SubsetSolution;
 
-import uno.informatics.data.pojo.SimpleEntityPojo;
+public class CoreHunterArguments {
 
-public class CorehunterRunArgumentsPojo extends SimpleEntityPojo implements CorehunterRunArguments {
-    private int subsetSize;
-    private String datasetId;
+    private int minimumSubsetSize;
+
+    private int maximumSubsetSize;
+
     private Objective<SubsetSolution, CoreHunterData> objective;
 
-    public CorehunterRunArgumentsPojo(String name, int subsetSize, String datasetId,
-            Objective<SubsetSolution, CoreHunterData> objective) {
-        super(UUID.randomUUID().toString(), name);
-        this.subsetSize = subsetSize;
-        this.datasetId = datasetId;
+    private CoreHunterData data;
+
+    public CoreHunterArguments(CoreHunterData data, Objective<SubsetSolution,
+                               CoreHunterData> objective,
+                               int subsetSize) {
+        this(data, objective, subsetSize, subsetSize);
+    }
+
+    public CoreHunterArguments(CoreHunterData data, Objective<SubsetSolution, CoreHunterData> objective,
+                               int minimumSubsetSize, int maximumSubsetSize) {
+        this.data = data;
         this.objective = objective;
+        this.minimumSubsetSize = minimumSubsetSize;
+        this.maximumSubsetSize = maximumSubsetSize;
     }
 
-    @Override
-    public int getSubsetSize() {
-        return subsetSize;
+    public final int getMinimumSubsetSize() {
+        return minimumSubsetSize;
     }
 
-    @Override
-    public String getDatasetId() {
-        return datasetId;
+    public final void setMinimumSubsetSize(int minimumSubsetSize) {
+        this.minimumSubsetSize = minimumSubsetSize;
     }
 
-    @Override
-    public Objective<SubsetSolution, CoreHunterData> getObjective() {
+    public final int getMaximumSubsetSize() {
+        return maximumSubsetSize;
+    }
+
+    public final void setMaximumSubsetSize(int maximumSubsetSize) {
+        this.maximumSubsetSize = maximumSubsetSize;
+    }
+
+    public final CoreHunterData getData() {
+        return data;
+    }
+
+    public final void setData(CoreHunterData data) {
+        this.data = data;
+    }
+
+    public final Objective<SubsetSolution, CoreHunterData> getObjective() {
         return objective;
     }
-    
-    
 
+    public final void setObjective(Objective<SubsetSolution, CoreHunterData> objective) {
+        this.objective = objective;
+    }
 }

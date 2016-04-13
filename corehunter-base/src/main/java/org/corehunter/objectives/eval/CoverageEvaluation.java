@@ -17,45 +17,47 @@
 /* under the License.                                           */
 /*--------------------------------------------------------------*/
 
-package org.corehunter.services.simple;
+package org.corehunter.objectives.eval;
 
-import java.util.UUID;
+import java.util.Collection;
+import java.util.Set;
+import org.corehunter.data.GenotypeVariantData;
 
-import org.corehunter.data.CoreHunterData;
-import org.corehunter.services.CorehunterRunArguments;
-import org.jamesframework.core.problems.objectives.Objective;
-import org.jamesframework.core.subset.SubsetSolution;
+/**
+ * @author Herman De Beukelaer
+ */
+public class CoverageEvaluation extends AllelicDiversityEvaluation {
 
-import uno.informatics.data.pojo.SimpleEntityPojo;
-
-public class CorehunterRunArgumentsPojo extends SimpleEntityPojo implements CorehunterRunArguments {
-    private int subsetSize;
-    private String datasetId;
-    private Objective<SubsetSolution, CoreHunterData> objective;
-
-    public CorehunterRunArgumentsPojo(String name, int subsetSize, String datasetId,
-            Objective<SubsetSolution, CoreHunterData> objective) {
-        super(UUID.randomUUID().toString(), name);
-        this.subsetSize = subsetSize;
-        this.datasetId = datasetId;
-        this.objective = objective;
+    private static final double TOL = 1e-10;
+    
+    public CoverageEvaluation(Collection<Integer> ids, GenotypeVariantData data) {
+        super(ids, data);
     }
 
-    @Override
-    public int getSubsetSize() {
-        return subsetSize;
-    }
-
-    @Override
-    public String getDatasetId() {
-        return datasetId;
-    }
-
-    @Override
-    public Objective<SubsetSolution, CoreHunterData> getObjective() {
-        return objective;
+    public CoverageEvaluation(AllelicDiversityEvaluation curEval,
+                              Set<Integer> add, Set<Integer> remove,
+                              GenotypeVariantData data) {
+        super(curEval, add, remove, data);
     }
     
-    
+    @Override
+    public double getValue() {
+        double[][] avgGeno = getAverageGenotype();
+        
+        int numberOfMarkers = avgGeno.length;
+        int totalNumberOfAlleles = 0;
+        int alleleCount = 0;
+        for(int m = 0; m < numberOfMarkers; m++){
+            int numberOfAlleles = avgGeno[m].length;
+            totalNumberOfAlleles += numberOfAlleles;
+            for(int a = 0; a < numberOfAlleles; a++){
+                if(avgGeno[m][a] > TOL){
+                    alleleCount++;
+                }
+            }
+        }
+
+        return ((double) alleleCount) / totalNumberOfAlleles;
+    }
 
 }

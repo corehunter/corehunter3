@@ -17,25 +17,36 @@
 /* under the License.                                           */
 /*--------------------------------------------------------------*/
 
-package org.corehunter.objectives.biallelic;
+package org.corehunter.objectives.distance.measures;
 
+import org.corehunter.objectives.distance.DistanceMeasure;
+import org.corehunter.data.DistanceMatrixData;
 import org.corehunter.data.CoreHunterData;
-import org.jamesframework.core.problems.objectives.Objective;
-import org.jamesframework.core.problems.objectives.evaluations.Evaluation;
-import org.jamesframework.core.subset.SubsetSolution;
+import org.corehunter.exceptions.CoreHunterException;
 
-public class CoverageBiAllelic implements Objective<SubsetSolution, CoreHunterData> {
+/**
+ * @author Herman De Beukelaer
+ */
+public class PrecomputedDistance implements DistanceMeasure {
 
     @Override
-    public Evaluation evaluate(SubsetSolution solution, CoreHunterData data) {
-        // TODO Auto-generated method stub
-        return null;
+    public double getDistance(int idX, int idY, CoreHunterData data) {
+        
+        DistanceMatrixData dist = data.getDistancesData();
+        
+        if(dist == null){
+            throw new CoreHunterException("No precomputed distance matrix has been defined.");
+        }
+        
+        return dist.getDistance(idX, idY);
+        
     }
 
     @Override
-    public boolean isMinimizing() {
-        // TODO Auto-generated method stub
-        return false;
+    public void setMissingValuesPolicy(MissingValuesPolicy policy) {
+        // ignored (distances have already been computed)
     }
+    
+    
 
 }

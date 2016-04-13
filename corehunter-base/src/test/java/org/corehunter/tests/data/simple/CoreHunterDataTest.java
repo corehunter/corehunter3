@@ -19,7 +19,6 @@
 
 package org.corehunter.tests.data.simple;
 
-import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
 import java.nio.file.Paths;
@@ -40,6 +39,8 @@ import uno.informatics.data.SimpleEntity;
 import uno.informatics.data.dataset.FeatureData;
 import uno.informatics.data.feature.array.ArrayFeatureData;
 
+import static org.junit.Assert.assertEquals;
+
 
 /**
  * @author Herman De Beukelaer
@@ -50,7 +51,6 @@ public class CoreHunterDataTest {
     private static final String DISTANCES_UNIQUE_NAMES = "/distances/full-names.txt";
     private static final String DISTANCES_NON_UNIQUE_NAMES = "/distances/full-names-ids.txt";
     
-    private static final String PHENOTYPES_NO_HEADERS = "/phenotypes/no-names.txt";
     private static final String PHENOTYPES_UNIQUE_NAMES = "/phenotypes/names.csv";
     private static final String PHENOTYPES_NON_UNIQUE_NAMES = "/phenotypes/names-and-ids.csv";
     private static final String PHENOTYPES_SAME_IDS_DIFFERENT_NAMES = "/phenotypes/same-ids-different-names.csv";

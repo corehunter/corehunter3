@@ -31,10 +31,8 @@ import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import org.corehunter.Corehunter;
-import org.corehunter.CorehunterArguments;
-import org.corehunter.CorehunterObjective;
-import org.corehunter.data.CoreHunterData;
+import org.corehunter.CoreHunter;
+import org.corehunter.CoreHunterArguments;
 import org.corehunter.listener.SimpleCorehunterListener;
 import org.corehunter.services.CorehunterRun;
 import org.corehunter.services.CorehunterRunArguments;
@@ -59,7 +57,7 @@ public class SimpleCorehunterRunServices implements CorehunterRunServices {
 
         executor = createExecutorService();
 
-        corehunterRunnableMap = new HashMap<String, CorehunterRunnable>();
+        corehunterRunnableMap = new HashMap<>();
     }
 
     @Override
@@ -97,7 +95,7 @@ public class SimpleCorehunterRunServices implements CorehunterRunServices {
 
         Iterator<CorehunterRunnable> iterator = corehunterRunnableMap.values().iterator();
 
-        corehunterRuns = new ArrayList<CorehunterRun>(corehunterRunnableMap.size());
+        corehunterRuns = new ArrayList<>(corehunterRunnableMap.size());
 
         while (iterator.hasNext()) {
             corehunterRuns.add(createCorehunterRunFromRunnable(iterator.next()));
@@ -169,7 +167,7 @@ public class SimpleCorehunterRunServices implements CorehunterRunServices {
 
     private class CorehunterRunnable extends SimpleEntityPojo implements Runnable {
         private CorehunterRunArguments corehunterRunArguments;
-        private Corehunter corehunter;
+        private CoreHunter corehunter;
         private ByteArrayOutputStream outputStream;
         private ByteArrayOutputStream errorStream;
         private String errorMessage;
@@ -227,14 +225,12 @@ public class SimpleCorehunterRunServices implements CorehunterRunServices {
             try {
                 startDate = new DateTime();
 
-                CorehunterArguments arguments = new CorehunterArguments(
+                CoreHunterArguments arguments = new CoreHunterArguments(
                         datasetServices.getData(corehunterRunArguments.getDatasetId()),
+                        corehunterRunArguments.getObjective(),
                         corehunterRunArguments.getSubsetSize());
 
-                // TODO get from arugments
-                arguments.setObjective(CorehunterObjective.GD);
-
-                corehunter = new Corehunter(arguments);
+                corehunter = new CoreHunter(arguments);
 
                 outputStream = new ByteArrayOutputStream();
                 PrintStream printStream = new PrintStream(outputStream);

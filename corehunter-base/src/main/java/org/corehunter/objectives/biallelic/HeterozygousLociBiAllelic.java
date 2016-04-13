@@ -24,7 +24,7 @@ import org.jamesframework.core.problems.objectives.Objective;
 import org.jamesframework.core.problems.objectives.evaluations.Evaluation;
 import org.jamesframework.core.subset.SubsetSolution;
 
-public class CoverageBiAllelic implements Objective<SubsetSolution, CoreHunterData> {
+public class HeterozygousLociBiAllelic implements Objective<SubsetSolution, CoreHunterData> {
 
     @Override
     public Evaluation evaluate(SubsetSolution solution, CoreHunterData data) {

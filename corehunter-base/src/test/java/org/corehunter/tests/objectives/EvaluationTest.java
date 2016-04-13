@@ -17,25 +17,14 @@
 /* under the License.                                           */
 /*--------------------------------------------------------------*/
 
-package org.corehunter.objectives.biallelic;
+package org.corehunter.tests.objectives;
 
-import org.corehunter.data.CoreHunterData;
-import org.jamesframework.core.problems.objectives.Objective;
 import org.jamesframework.core.problems.objectives.evaluations.Evaluation;
-import org.jamesframework.core.subset.SubsetSolution;
+import org.junit.Assert;
 
-public class CoverageBiAllelic implements Objective<SubsetSolution, CoreHunterData> {
+public class EvaluationTest {
 
-    @Override
-    public Evaluation evaluate(SubsetSolution solution, CoreHunterData data) {
-        // TODO Auto-generated method stub
-        return null;
+    protected void assertEquals(String message, Evaluation expected, Evaluation actual, double precision) {
+        Assert.assertEquals(message, expected.getValue(), actual.getValue(), precision);
     }
-
-    @Override
-    public boolean isMinimizing() {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
 }

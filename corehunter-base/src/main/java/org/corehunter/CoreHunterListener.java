@@ -17,25 +17,30 @@
 /* under the License.                                           */
 /*--------------------------------------------------------------*/
 
-package org.corehunter.objectives.biallelic;
+package org.corehunter;
 
-import org.corehunter.data.CoreHunterData;
-import org.jamesframework.core.problems.objectives.Objective;
-import org.jamesframework.core.problems.objectives.evaluations.Evaluation;
+import org.jamesframework.core.search.listeners.SearchListener;
 import org.jamesframework.core.subset.SubsetSolution;
 
-public class CoverageBiAllelic implements Objective<SubsetSolution, CoreHunterData> {
+/**
+ * Extends SearchListener with CoreHunter specific steps.
+ *
+ * @author Guy Davenport
+ */
+public interface CoreHunterListener extends SearchListener<SubsetSolution> {
 
-    @Override
-    public Evaluation evaluate(SubsetSolution solution, CoreHunterData data) {
-        // TODO Auto-generated method stub
-        return null;
-    }
+    /**
+     * Fired when the pre-processing has started. Called only once prior to the search run.
+     *
+     * @param message the message to be sent to the listener
+     */
+    default public void preprocessingStarted(String message) {}
 
-    @Override
-    public boolean isMinimizing() {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
+    /**
+     * Fired when the pre-processing has stopped. Called only once prior to the search run
+     *
+     * @param message the message to be sent to the listener
+     */
+    default public void preprocessingStopped(String message) {}
+    
 }

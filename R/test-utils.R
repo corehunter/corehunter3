@@ -5,89 +5,116 @@ data.dir <- "corehunter-base/src/test/resources"
 #############
 
 load.multiallelic.data <- function(){
+  # read
   freqs <- read.csv(paste(data.dir, "multiallelic/names-and-ids.csv", sep="/"), header = F, skip = 2)
   freqs <- freqs[,3:ncol(freqs)]
   colnames(freqs) <- 1:ncol(freqs)
-  list(freqs = freqs, markers = 7, allele.counts = c(3,2,3,4,3,2,2))
+  # set marker and allele counts
+  markers <- 7
+  alleles <- c(3,2,3,4,3,2,2)
+  cum.alleles <- c(0, cumsum(alleles))
+  # normalize
+  for(i in 1:nrow(freqs)){
+    for(m in 1:markers){
+      from <- cum.alleles[m]+1
+      to <- cum.alleles[m+1]
+      marker.freqs <- freqs[i, from:to]
+      if(!any(is.na(marker.freqs))){
+        freqs[i, from:to] <- marker.freqs / sum(marker.freqs)
+      }
+    }
+  }
+  # combine
+  list(freqs = freqs, markers = markers, allele.counts = alleles)
 }
 
 ################
 # MULTIALLELIC #
 ################
 
-modified.rogers <- function(freqs.1, freqs.2, num.markers){
-  sqrt(sum((freqs.1 - freqs.2)^2, na.rm = TRUE) / (2*num.markers))
+modified.rogers <- function(freqs.1, freqs.2, allele.counts,
+                            missing.data.policy = c("floor", "ceil")){
+  missing.data.policy <- match.arg(missing.data.policy)
+  num.markers <- length(allele.counts)
+  cum.allele.counts <- c(0, cumsum(allele.counts))
+  dist <- sqrt(sum(sapply(1:num.markers, function(m){
+    from <- cum.allele.counts[m]+1
+    to <- cum.allele.counts[m+1]
+    if(any(is.na(freqs.1[from:to]) | is.na(freqs.2[from:to]))){
+      ifelse(missing.data.policy == "floor", 0.0, 2.0)
+    } else {
+      sum((freqs.1[from:to] - freqs.2[from:to])^2)
+    }
+  })) / (2*num.markers))
+  return(dist)
 }
 
-cavalli.sforza.edwards <- function(freqs.1, freqs.2, num.markers){
-  modified.rogers(sqrt(freqs.1), sqrt(freqs.2), num.markers)
+cavalli.sforza.edwards <- function(freqs.1, freqs.2, allele.counts,
+                                   missing.data.policy = c("floor", "ceil")){
+  modified.rogers(sqrt(freqs.1), sqrt(freqs.2),
+                  allele.counts, missing.data.policy)
 }
 
 coverage <- function(freqs){
   sum(colSums(freqs, na.rm = TRUE) > 0.0) / ncol(freqs)
 }
 
-proportion.non.informative.alleles <- function(freqs){
-  1.0 - coverage(freqs)
-}
-
-# TODO: handle missing data
-shannon <- function(freqs, num.markers){
+shannon <- function(freqs, allele.counts){
+  num.markers <- length(allele.counts)
+  freqs[is.na(freqs)] <- 0
   p <- colMeans(freqs)
-  p <- p/num.markers
-  if(!isTRUE(all.equal(sum(p), 1.0, tol = 0.001))){
-    stop(sprintf(
-      "Something is wrong: normalized frequencies should sum to one. Got: %.5f.",
-      sum(p)
-    ))
-  }
-  p <- p[p > 0.0]
-  sh <- -sum(p*log(p))
+  cum.allele.counts <- c(0, cumsum(allele.counts))
+  sh <- -sum(sapply(1:num.markers, function(m){
+    from <- cum.allele.counts[m]+1
+    to <- cum.allele.counts[m+1]
+    p.marker <- p[from:to]
+    # handle missing data
+    a <- which.max(p.marker)
+    p.marker[a] <- 1.0 - sum(p.marker[-a])
+    p.marker <- p.marker/num.markers
+    p.marker <- p.marker[p.marker > 0.0]
+    sum(sapply(p.marker, function(f){
+      f * log(f)
+    }))
+  }))
   return(sh)
 }
 
-# TODO: handle missing data
 heterozygous.loci <- function(freqs, allele.counts){
   num.markers <- length(allele.counts)
+  freqs[is.na(freqs)] <- 0
   p <- colMeans(freqs)
-  p.square <- p*p
   cum.allele.counts <- c(0, cumsum(allele.counts))
   p.square.sums <- sapply(1:num.markers, function(m){
-    start <- cum.allele.counts[m]+1
-    stop <- cum.allele.counts[m+1]
-    sum(p.square[start:stop])
+    from <- cum.allele.counts[m]+1
+    to <- cum.allele.counts[m+1]
+    p.marker <- p[from:to]
+    # handle missing data
+    a <- which.max(p.marker)
+    p.marker[a] <- 1.0 - sum(p.marker[-a])
+    sum(p.marker^2)
   })
   he <- mean(1 - p.square.sums)
   return(he)
-}
-
-# TODO: handle missing data
-number.effective.alleles <- function(freqs, allele.counts){
-  num.markers <- length(allele.counts)
-  p <- colMeans(freqs)
-  p.square <- p*p
-  cum.allele.counts <- c(0, cumsum(allele.counts))
-  p.square.sums <- sapply(1:num.markers, function(m){
-    start <- cum.allele.counts[m]+1
-    stop <- cum.allele.counts[m+1]
-    sum(p.square[start:stop])
-  })
-  ne <- mean(1/p.square.sums)
-  return(ne)
 }
 
 ###########
 # GENERAL #
 ###########
 
-distance.matrix <- function(allele.frequencies, num.markers, distance.measure){
-  n <- nrow(allele.frequencies)
+distance.matrix <- function(data, distance.measure, missing.data.policy){
+  n <- nrow(data$freqs)
   dist <- matrix(NA, nrow = n, ncol = n)
   for(i in 1:n){
     for(j in 1:n){
-      dist[i,j] <- distance.measure(allele.frequencies[i,],
-                                    allele.frequencies[j,],
-                                    num.markers)
+      if(i == j){
+        dist[i,j] <- 0.0
+      } else {
+        dist[i,j] <- distance.measure(data$freqs[i,],
+                                      data$freqs[j,],
+                                      data$allele.counts,
+                                      missing.data.policy)
+      }
     }
   }
   return(dist)
