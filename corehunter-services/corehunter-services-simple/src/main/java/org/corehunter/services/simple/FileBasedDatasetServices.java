@@ -227,9 +227,9 @@ public class FileBasedDatasetServices implements DatasetServices {
                             coreHunterData.getPhenotypicData(), coreHunterData.getDistancesData());
                 } else {
                     coreHunterData = new CoreHunterData(biAllelicGenotypeVariantData, null, null);
-
-                    dataCache.put(datasetId, coreHunterData);
                 }
+                
+                dataCache.put(datasetId, coreHunterData);
 
                 newPath = Paths.get(getPath().toString(), BI_ALLELIC_GENOTYPIC_PATH, datasetId + TXT_SUFFIX);
 
@@ -253,10 +253,10 @@ public class FileBasedDatasetServices implements DatasetServices {
                     coreHunterData = new CoreHunterData(genotypeData, coreHunterData.getPhenotypicData(),
                             coreHunterData.getDistancesData());
                 } else {
-                    coreHunterData = new CoreHunterData(genotypeData, null, null);
-
-                    dataCache.put(datasetId, coreHunterData);
+                    coreHunterData = new CoreHunterData(genotypeData, null, null);    
                 }
+                
+                dataCache.put(datasetId, coreHunterData);
 
                 newPath = Paths.get(getPath().toString(), GENOTYPIC_PATH, datasetId + TXT_SUFFIX);
 
@@ -280,10 +280,10 @@ public class FileBasedDatasetServices implements DatasetServices {
                             coreHunterData.getDistancesData());
                 } else {
                     coreHunterData = new CoreHunterData(null, arrayFeatureData, null);
-
-                    dataCache.put(datasetId, coreHunterData);
                 }
-
+                
+                dataCache.put(datasetId, coreHunterData);
+                
                 newPath = Paths.get(getPath().toString(), PHENOTYPIC_PATH, datasetId + TXT_SUFFIX);
 
                 Files.createDirectories(newPath.getParent());
@@ -308,10 +308,10 @@ public class FileBasedDatasetServices implements DatasetServices {
                             coreHunterData.getPhenotypicData(), distanceData);
                 } else {
                     coreHunterData = new CoreHunterData(null, null, distanceData);
-
-                    dataCache.put(datasetId, coreHunterData);
                 }
 
+                dataCache.put(datasetId, coreHunterData);
+                
                 newPath = Paths.get(getPath().toString(), DISTANCES_PATH, datasetId + TXT_SUFFIX);
 
                 Files.createDirectories(newPath.getParent());
