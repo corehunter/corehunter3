@@ -27,9 +27,9 @@ import static org.corehunter.tests.TestData.PHENOTYPIC_TRAIT_INFERRED_BOUNDS;
 import static org.corehunter.tests.TestData.PHENOTYPIC_TRAIT_NAMES;
 import static org.corehunter.tests.TestData.PHENOTYPIC_TRAIT_VALUES;
 import static org.corehunter.tests.TestData.SET;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.corehunter.tests.TestData.PHENOTYPIC_TRAIT_MISSING_VALUES;
+
+
 
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
@@ -47,6 +47,10 @@ import uno.informatics.data.dataset.FeatureData;
 import uno.informatics.data.dataset.FeatureDataRow;
 import uno.informatics.data.feature.array.ArrayFeatureData;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 
 /**
  * @author Herman De Beukelaer
@@ -56,11 +60,13 @@ public class SimplePhenotypicTraitDataTest {
     private static final String CSV_NAMES = "/phenotypes/names.csv";
     private static final String CSV_NAMES_IDS = "/phenotypes/names-and-ids.csv";
     private static final String CSV_NAMES_MIN_MAX = "/phenotypes/names-min-max.csv";
+    private static final String CSV_NAMES_MISSING_VALUES = "/phenotypes/missing-values.csv";
 
     private static final String ERRONEOUS_FILES_DIR = "/phenotypes/err/";
     
     private SimpleEntity[] expectedHeaders;
     private Object[][] expectedBounds;
+    private Object[][] expectedValues;
     private String datasetName;
     
     @BeforeClass
@@ -78,6 +84,7 @@ public class SimplePhenotypicTraitDataTest {
         datasetName = "names.csv";
         expectedHeaders = HEADERS_UNIQUE_NAMES;
         expectedBounds = PHENOTYPIC_TRAIT_INFERRED_BOUNDS;
+        expectedValues = PHENOTYPIC_TRAIT_VALUES;
         System.out.println(" |- File " + datasetName);
         testData(ArrayFeatureData.readData(
             Paths.get(SimplePhenotypicTraitDataTest.class.getResource(CSV_NAMES).getPath()),
@@ -90,6 +97,7 @@ public class SimplePhenotypicTraitDataTest {
         datasetName = "names-and-ids.csv";
         expectedHeaders = HEADERS_NON_UNIQUE_NAMES;
         expectedBounds = PHENOTYPIC_TRAIT_INFERRED_BOUNDS;
+        expectedValues = PHENOTYPIC_TRAIT_VALUES;
         System.out.println(" |- File " + datasetName);
         testData(ArrayFeatureData.readData(
             Paths.get(SimplePhenotypicTraitDataTest.class.getResource(CSV_NAMES_IDS).getPath()),
@@ -102,9 +110,23 @@ public class SimplePhenotypicTraitDataTest {
         datasetName = "names-min-max.csv";
         expectedHeaders = HEADERS_UNIQUE_NAMES;
         expectedBounds = PHENOTYPIC_TRAIT_EXPLICIT_BOUNDS;
+        expectedValues = PHENOTYPIC_TRAIT_VALUES;
         System.out.println(" |- File " + datasetName);
         testData(ArrayFeatureData.readData(
             Paths.get(SimplePhenotypicTraitDataTest.class.getResource(CSV_NAMES_MIN_MAX).getPath()),
+            FileType.CSV
+        ));
+    }
+    
+    @Test
+    public void fromCsvFileWithMissingValues() throws IOException {
+        datasetName = "missing-values.csv";
+        expectedHeaders = HEADERS_UNIQUE_NAMES;
+        expectedBounds = PHENOTYPIC_TRAIT_INFERRED_BOUNDS;
+        expectedValues = PHENOTYPIC_TRAIT_MISSING_VALUES;
+        System.out.println(" |- File " + datasetName);
+        testData(ArrayFeatureData.readData(
+            Paths.get(SimplePhenotypicTraitDataTest.class.getResource(CSV_NAMES_MISSING_VALUES).getPath()),
             FileType.CSV
         ));
     }
@@ -178,7 +200,7 @@ public class SimplePhenotypicTraitDataTest {
             for(int t = 0; t < row.getColumnCount(); t++){
                 assertEquals(
                     "Incorrect value for trait " + t + " in individual " + i + ".",
-                    PHENOTYPIC_TRAIT_VALUES[i][t],
+                    expectedValues[i][t],
                     row.getValue(t)
                 );
             }

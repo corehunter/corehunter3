@@ -17,25 +17,16 @@
 /* under the License.                                           */
 /*--------------------------------------------------------------*/
 
-package org.corehunter.objectives.biallelic;
+package org.corehunter.objectives.distance.measures.biallelic;
 
 import org.corehunter.data.CoreHunterData;
-import org.jamesframework.core.problems.objectives.Objective;
-import org.jamesframework.core.problems.objectives.evaluations.Evaluation;
-import org.jamesframework.core.subset.SubsetSolution;
+import org.corehunter.objectives.distance.measures.AbstractDistanceMeasure;
 
-public class CoverageBiAllelic implements Objective<SubsetSolution, CoreHunterData> {
+public class ModifiedRogersDistanceBiAllelic extends AbstractDistanceMeasure {
 
     @Override
-    public Evaluation evaluate(SubsetSolution solution, CoreHunterData data) {
-        // TODO Auto-generated method stub
-        return null;
+    public double computeDistance(int idX, int idY, CoreHunterData data) {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
-
-    @Override
-    public boolean isMinimizing() {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
+    
 }

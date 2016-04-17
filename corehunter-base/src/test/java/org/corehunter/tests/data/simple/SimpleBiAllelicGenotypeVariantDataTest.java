@@ -29,13 +29,8 @@ import static org.corehunter.tests.TestData.NAME;
 import static org.corehunter.tests.TestData.PRECISION;
 import static org.corehunter.tests.TestData.SET;
 import static org.corehunter.tests.TestData.UNDEFINED_MARKER_NAMES;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
-import java.net.URI;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -49,17 +44,22 @@ import org.junit.Test;
 import uno.informatics.common.io.FileType;
 import uno.informatics.data.SimpleEntity;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 /**
  * @author Guy Davenport, Herman De Beukelaer
  */
 public class SimpleBiAllelicGenotypeVariantDataTest {
 
-    private static final String TXT_NAMES = "/biallelic/names.txt";
-    private static final String CSV_NAMES = "/biallelic/names.csv";
-    private static final String CSV_NAMES_IDS = "/biallelic/names-and-ids.csv";
-    private static final String CSV_NO_MARKER_NAMES = "/biallelic/no-marker-names.csv";
+    private static final String TXT_NAMES = "/biallelic_genotypes/names.txt";
+    private static final String CSV_NAMES = "/biallelic_genotypes/names.csv";
+    private static final String CSV_NAMES_IDS = "/biallelic_genotypes/names-and-ids.csv";
+    private static final String CSV_NO_MARKER_NAMES = "/biallelic_genotypes/no-marker-names.csv";
 
-    private static final String ERRONEOUS_FILES_DIR = "/biallelic/err/";
+    private static final String ERRONEOUS_FILES_DIR = "/biallelic_genotypes/err/";
     private static final String TEST_OUTPUT = "target/testoutput";
     
     private SimpleEntity[] expectedHeaders;

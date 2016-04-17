@@ -17,25 +17,27 @@
 /* under the License.                                           */
 /*--------------------------------------------------------------*/
 
-package org.corehunter.objectives.biallelic;
+package org.corehunter.objectives.distance.eval;
 
-import org.corehunter.data.CoreHunterData;
-import org.jamesframework.core.problems.objectives.Objective;
-import org.jamesframework.core.problems.objectives.evaluations.Evaluation;
-import org.jamesframework.core.subset.SubsetSolution;
+/**
+ * @author Herman De Beukelaer
+ */
+public class NearestEntry {
+        
+    private final int id;
+    private final double distance;
 
-public class CoverageBiAllelic implements Objective<SubsetSolution, CoreHunterData> {
-
-    @Override
-    public Evaluation evaluate(SubsetSolution solution, CoreHunterData data) {
-        // TODO Auto-generated method stub
-        return null;
+    public NearestEntry(int id, double distance) {
+        this.id = id;
+        this.distance = distance;
     }
 
-    @Override
-    public boolean isMinimizing() {
-        // TODO Auto-generated method stub
-        return false;
+    public int getId() {
+        return id;
+    }
+
+    public double getDistance() {
+        return distance;
     }
 
 }

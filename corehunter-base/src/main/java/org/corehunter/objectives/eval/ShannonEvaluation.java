@@ -17,25 +17,44 @@
 /* under the License.                                           */
 /*--------------------------------------------------------------*/
 
-package org.corehunter.objectives.biallelic;
+package org.corehunter.objectives.eval;
 
-import org.corehunter.data.CoreHunterData;
-import org.jamesframework.core.problems.objectives.Objective;
-import org.jamesframework.core.problems.objectives.evaluations.Evaluation;
-import org.jamesframework.core.subset.SubsetSolution;
+import java.util.Collection;
+import java.util.Set;
+import org.corehunter.data.GenotypeVariantData;
 
-public class CoverageBiAllelic implements Objective<SubsetSolution, CoreHunterData> {
-
-    @Override
-    public Evaluation evaluate(SubsetSolution solution, CoreHunterData data) {
-        // TODO Auto-generated method stub
-        return null;
+/**
+ * @author Herman De Beukelaer
+ */
+public class ShannonEvaluation extends AllelicDiversityEvaluation {
+    
+    public ShannonEvaluation(Collection<Integer> ids, GenotypeVariantData data) {
+        super(ids, data);
     }
 
+    public ShannonEvaluation(AllelicDiversityEvaluation curEval,
+                              Set<Integer> add, Set<Integer> remove,
+                              GenotypeVariantData data) {
+        super(curEval, add, remove, data);
+    }
+    
     @Override
-    public boolean isMinimizing() {
-        // TODO Auto-generated method stub
-        return false;
+    public double getValue() {
+        double[][] avgGeno = getAverageGenotype();
+        // compute Shannon's index
+        double sum = 0.0;
+        int numberOfMarkers = avgGeno.length;
+        for (int m = 0; m < numberOfMarkers; m++) {
+            int numberOfAlleles = avgGeno[m].length;
+            for (int a = 0; a < numberOfAlleles; a++) {
+                if (avgGeno[m][a] > 0.0) {
+                    double scaledFreq = avgGeno[m][a] / numberOfMarkers;
+                    sum += scaledFreq * Math.log(scaledFreq);
+                }
+            }
+            
+        }
+        return -sum;
     }
 
 }

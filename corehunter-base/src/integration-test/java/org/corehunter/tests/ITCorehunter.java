@@ -21,16 +21,20 @@ package org.corehunter.tests;
 
 import java.util.Set;
 
-import org.corehunter.Corehunter;
-import org.corehunter.CorehunterArguments;
+import org.corehunter.CoreHunter;
+import org.corehunter.CoreHunterArguments;
 import org.corehunter.data.CoreHunterData;
-import org.corehunter.objectives.distance.AverageDistanceObjective;
+import org.corehunter.objectives.distance.measures.PrecomputedDistance;
+import org.corehunter.objectives.distance.AverageEntryToEntryDistance;
+import org.jamesframework.core.problems.objectives.Objective;
 import org.jamesframework.core.search.Search;
 import org.jamesframework.core.search.algo.exh.ExhaustiveSearch;
 import org.jamesframework.core.subset.SubsetProblem;
 import org.jamesframework.core.subset.SubsetSolution;
 import org.jamesframework.core.subset.algo.exh.SubsetSolutionIterator;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Guy Davenport, Herman De Beukelaer
@@ -45,22 +49,22 @@ public class ITCorehunter extends TestData {
 
         int size = 2;
         int time = 2;
+        Objective<SubsetSolution, CoreHunterData> obj = new AverageEntryToEntryDistance(new PrecomputedDistance());
 
         // determine optimal solution through exhaustive search
-        SubsetProblem problem = new SubsetProblem<CoreHunterData>(new CoreHunterData(DATA),
-                new AverageDistanceObjective(), size);
+        SubsetProblem problem = new SubsetProblem<>(new CoreHunterData(DATA), obj, size);
         Search<SubsetSolution> exh = new ExhaustiveSearch<>(problem, new SubsetSolutionIterator(SET, size));
         exh.run();
         Set<Integer> opt = exh.getBestSolution().getSelectedIDs();
 
         // run Core Hunter
-        CorehunterArguments arguments = new CorehunterArguments(new CoreHunterData(DATA), size);
-        Corehunter corehunter = new Corehunter(arguments);
+        CoreHunterArguments arguments = new CoreHunterArguments(new CoreHunterData(DATA), obj, size);
+        CoreHunter corehunter = new CoreHunter(arguments);
         corehunter.setTimeLimit(time);
         SubsetSolution result = corehunter.execute();
 
         // compare
-        // assertEquals(opt, result.getSelectedIDs());
+        assertEquals(opt, result.getSelectedIDs());
 
     }
 

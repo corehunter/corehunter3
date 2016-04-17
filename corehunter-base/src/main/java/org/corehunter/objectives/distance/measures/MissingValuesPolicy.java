@@ -17,25 +17,20 @@
 /* under the License.                                           */
 /*--------------------------------------------------------------*/
 
-package org.corehunter.objectives.biallelic;
+package org.corehunter.objectives.distance.measures;
 
-import org.corehunter.data.CoreHunterData;
-import org.jamesframework.core.problems.objectives.Objective;
-import org.jamesframework.core.problems.objectives.evaluations.Evaluation;
-import org.jamesframework.core.subset.SubsetSolution;
-
-public class CoverageBiAllelic implements Objective<SubsetSolution, CoreHunterData> {
-
-    @Override
-    public Evaluation evaluate(SubsetSolution solution, CoreHunterData data) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public boolean isMinimizing() {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
+/**
+ * @author Herman De Beukelaer
+ */
+public enum MissingValuesPolicy {
+    /**
+     * Sets the contribution of variables (markers/features)
+     * with missing values to zero.
+     */
+    FLOOR,
+    /**
+     * Sets the contribution of variables (markers/feature)
+     * with missing values to the maximum attainable contribution.
+     */
+    CEIL;
 }

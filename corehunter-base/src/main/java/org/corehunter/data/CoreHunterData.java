@@ -60,8 +60,9 @@ public class CoreHunterData extends DataPojo implements IntegerIdentifiedData {
      * @param distancesData
      *            precomputed distance matrix
      */
-    public CoreHunterData(GenotypeVariantData genotypicData, FeatureData phenotypicData,
-            DistanceMatrixData distancesData) {
+    public CoreHunterData(GenotypeVariantData genotypicData,
+                          FeatureData phenotypicData, 
+                          DistanceMatrixData distancesData) {
         super("Core Hunter data", mergeHeaders(genotypicData, phenotypicData, distancesData));
         // store data
         this.genotypicData = genotypicData;

@@ -251,6 +251,11 @@ public class SimpleBiAllelicGenotypeVariantData extends DataPojo implements BiAl
         return alleleIndex == 1 ? f : 1.0 - f;
 
     }
+    
+    @Override
+    public boolean hasMissingValues(int id, int markerIndex) {
+        return alleleScores[id][markerIndex] == null;
+    }
 
     private void validateMarkerIndex(int markerIndex) {
         if (markerIndex < 0 || markerIndex >= getNumberOfMarkers()) {
