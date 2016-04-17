@@ -285,7 +285,7 @@ public class SimpleGenotypeVariantData extends DataPojo implements GenotypeVaria
      * @return genotype variant data
      * @throws IOException if the file can not be read or is not correctly formatted
      */
-    public final static SimpleGenotypeVariantData readData(Path filePath, FileType type) throws IOException {
+    public final static GenotypeVariantData readData(Path filePath, FileType type) throws IOException {
         return readData(filePath, type, GenotypeDataFormat.FREQUENCY) ;
     }
 
@@ -343,7 +343,7 @@ public class SimpleGenotypeVariantData extends DataPojo implements GenotypeVaria
      * @return genotype variant data
      * @throws IOException if the file can not be read or is not correctly formatted
      */
-    public final static SimpleGenotypeVariantData readData(Path filePath, FileType type, 
+    public final static GenotypeVariantData readData(Path filePath, FileType type, 
             GenotypeDataFormat format) throws IOException {
         
         if (format == null) {
@@ -355,6 +355,8 @@ public class SimpleGenotypeVariantData extends DataPojo implements GenotypeVaria
                 return readDiploidData(filePath, type);
             case FREQUENCY:
                 return readFrequencyData(filePath, type);
+            case BIALLELIC:
+                return SimpleBiAllelicGenotypeVariantData.readData(filePath, type) ;
             default:
                 throw new IllegalArgumentException("Unsupported format : " + format);
 
@@ -363,7 +365,7 @@ public class SimpleGenotypeVariantData extends DataPojo implements GenotypeVaria
     
     /**
      * Write genotype variant data to file in frequency format. See 
-     * {@link #writeData(Path, SimpleGenotypeVariantData, FileType, GenotypeDataFormat)}
+     * {@link #writeData(Path, GenotypeVariantData, FileType, GenotypeDataFormat)}
      * for details. Only file types {@link FileType#TXT} and {@link FileType#CSV} are allowed.
      * 
      * @param filePath path to file where the data will be written
@@ -390,7 +392,7 @@ public class SimpleGenotypeVariantData extends DataPojo implements GenotypeVaria
      * @throws IOException if the file can not be written
      */
     public final static void writeData(Path filePath, 
-            SimpleGenotypeVariantData genotypicData, FileType type, 
+            GenotypeVariantData genotypicData, FileType type, 
             GenotypeDataFormat format) throws IOException {
         
         if (format == null) {
@@ -399,11 +401,27 @@ public class SimpleGenotypeVariantData extends DataPojo implements GenotypeVaria
         
         switch (format) {
             case DIPLOID:
-                writeDiploidData(filePath, genotypicData, type);
-                break ;
+                if (genotypicData instanceof GenotypeVariantData) {
+                    writeDiploidData(filePath, (SimpleGenotypeVariantData) genotypicData, type);
+                } else {
+                    throw new IllegalArgumentException("Unsupported GenotypeVariantData type : " + genotypicData);
+                }
+                break;
             case FREQUENCY:
-                writeFrequencyData(filePath, genotypicData, type);
-                break ;
+                if (genotypicData instanceof GenotypeVariantData) {
+                    writeFrequencyData(filePath, (SimpleGenotypeVariantData) genotypicData, type);
+                } else {
+                    throw new IllegalArgumentException("Unsupported GenotypeVariantData type : " + genotypicData);
+                }
+                break;
+            case BIALLELIC:
+                if (genotypicData instanceof SimpleBiAllelicGenotypeVariantData) {
+                    SimpleBiAllelicGenotypeVariantData.writeData(filePath,
+                            (SimpleBiAllelicGenotypeVariantData) genotypicData, type);
+                } else {
+                    throw new IllegalArgumentException("Unsupported GenotypeVariantData type : " + genotypicData);
+                }
+                break;
             default:
                 throw new IllegalArgumentException("Unsupported format : " + format);
 
