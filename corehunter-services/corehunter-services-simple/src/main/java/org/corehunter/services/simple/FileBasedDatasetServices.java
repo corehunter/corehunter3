@@ -235,7 +235,8 @@ public class FileBasedDatasetServices implements DatasetServices {
                             "Genotypic Data is already associated for this dataset : " + dataset.getName());
                 }
 
-                SimpleGenotypeVariantData genotypeData = SimpleGenotypeVariantData.readData(path, fileType);
+                SimpleGenotypeVariantData genotypeData = 
+                        (SimpleGenotypeVariantData)SimpleGenotypeVariantData.readData(path, fileType);
 
                 if (coreHunterData != null) {
                     coreHunterData = new CoreHunterData(genotypeData, coreHunterData.getPhenotypicData(),
