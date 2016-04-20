@@ -288,7 +288,7 @@ public class FileBasedDatasetServicesTest {
 
             Path dataPath = Paths.get(ClassLoader.getSystemResource(BI_ALLELIC_GENOTYPIC_FILE).toURI());
 
-            fileBasedDatasetServices.loadData(addedDataset, dataPath, FileType.CSV, DataType.BI_ALLELIC_GENOTYPIC);
+            fileBasedDatasetServices.loadData(addedDataset, dataPath, FileType.CSV, DataType.GENOTYPIC);
 
             CoreHunterData addedData = fileBasedDatasetServices.getData(dataset.getUniqueIdentifier());
 
@@ -326,7 +326,7 @@ public class FileBasedDatasetServicesTest {
 
             Path dataPath = Paths.get(ClassLoader.getSystemResource(BI_ALLELIC_GENOTYPIC_FILE).toURI());
 
-            fileBasedDatasetServices.loadData(addedDataset, dataPath, FileType.CSV, DataType.BI_ALLELIC_GENOTYPIC);
+            fileBasedDatasetServices.loadData(addedDataset, dataPath, FileType.CSV, DataType.GENOTYPIC);
 
             fileBasedDatasetServices = new FileBasedDatasetServices(path);
 

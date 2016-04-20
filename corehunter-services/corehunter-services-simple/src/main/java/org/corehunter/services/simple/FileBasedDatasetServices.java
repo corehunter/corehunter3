@@ -54,8 +54,6 @@ public class FileBasedDatasetServices implements DatasetServices {
     private static final String DATASETS = "datasets.xml";
     private static final String DATA = "data.xml";
 
-    private static final String BI_ALLELIC_GENOTYPIC_PATH = "BI_ALLELIC_GENOTYPIC_PATH";
-
     private static final String GENOTYPIC_PATH = "GENOTYPIC_PATH";
 
     private static final String PHENOTYPIC_PATH = "PHENOTYPIC_PATH";
@@ -183,7 +181,7 @@ public class FileBasedDatasetServices implements DatasetServices {
     }
 
     @Override
-    public void loadData(Dataset dataset, Path path, FileType fileType, DataType dataType)
+    public void loadData(Dataset dataset, Path path, FileType fileType, DataType dataType, Object... options)
             throws IOException, DatasetException {
 
         if (dataset == null) {
@@ -210,7 +208,7 @@ public class FileBasedDatasetServices implements DatasetServices {
         CoreHunterData coreHunterData = getData(internalDataset.getUniqueIdentifier());
 
         switch (dataType) {
-            case BI_ALLELIC_GENOTYPIC:
+            case GENOTYPIC:
                 if (coreHunterData != null && coreHunterData.getGenotypicData() != null) {
                     throw new DatasetException(
                             "Genotypic Data is already associated for this dataset : " + dataset.getName());
@@ -231,14 +229,13 @@ public class FileBasedDatasetServices implements DatasetServices {
                 
                 dataCache.put(datasetId, coreHunterData);
 
-                newPath = Paths.get(getPath().toString(), BI_ALLELIC_GENOTYPIC_PATH, datasetId + TXT_SUFFIX);
+                newPath = Paths.get(getPath().toString(), GENOTYPIC_PATH, datasetId + TXT_SUFFIX);
 
                 Files.createDirectories(newPath.getParent());
 
                 SimpleBiAllelicGenotypeVariantData.writeData(newPath, biAllelicGenotypeVariantData, FileType.TXT);
 
-                break;
-            case GENOTYPIC:
+
                 if (coreHunterData != null && coreHunterData.getGenotypicData() != null) {
                     throw new DatasetException(
                             "Genotypic Data is already associated for this dataset : " + dataset.getName());
@@ -377,7 +374,7 @@ public class FileBasedDatasetServices implements DatasetServices {
         ArrayFeatureData phenotypicData = null;
         SimpleDistanceMatrixData distance = null;
 
-        Path path = Paths.get(getPath().toString(), BI_ALLELIC_GENOTYPIC_PATH, datasetId + TXT_SUFFIX);
+        Path path = Paths.get(getPath().toString(), GENOTYPIC_PATH, datasetId + TXT_SUFFIX);
 
         if (Files.exists(path)) {
             genotypicData = SimpleBiAllelicGenotypeVariantData.readData(path, FileType.TXT);
@@ -445,8 +442,6 @@ public class FileBasedDatasetServices implements DatasetServices {
         dataCache.remove(datasetId);
 
         try {
-            Files.deleteIfExists(getDataPath(datasetId, DataType.BI_ALLELIC_GENOTYPIC));
-
             Files.deleteIfExists(getDataPath(datasetId, DataType.GENOTYPIC));
 
             Files.deleteIfExists(getDataPath(datasetId, DataType.PHENOTYPIC));
@@ -459,8 +454,6 @@ public class FileBasedDatasetServices implements DatasetServices {
 
     private Path getDataPath(String datasetId, DataType dataType) {
         switch (dataType) {
-            case BI_ALLELIC_GENOTYPIC:
-                return Paths.get(getPath().toString(), BI_ALLELIC_GENOTYPIC_PATH, datasetId + TXT_SUFFIX);
             case GENOTYPIC:
                 return Paths.get(getPath().toString(), GENOTYPIC_PATH, datasetId + TXT_SUFFIX);
             case PHENOTYPIC:
