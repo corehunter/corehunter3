@@ -314,7 +314,7 @@ public class SimpleGenotypeVariantData extends DataPojo implements GenotypeVaria
      * two (heterozygous) of all possible alleles of a certain marker. This means that all inferred frequencies
      * are either 0.0, 0.5 or 1.0. Missing values are encoding as empty cells.
      * <p>
-     * An required first header row and optional header column are included to specify individual and marker names,
+     * A required first header row and optional header column are included to specify individual and marker names,
      * respectively, identified with column/row header "NAME". If item names are not unique or defined for some but
      * not all items, a second header column "ID" should be included to provide unique identifiers for at least those
      * items whose name is undefined or not unique.
@@ -361,58 +361,9 @@ public class SimpleGenotypeVariantData extends DataPojo implements GenotypeVaria
         }
     }
     
-    /**
-     * Write genotype variant data to file in frequency format. See 
-     * {@link #writeData(Path, SimpleGenotypeVariantData, FileType, GenotypeDataFormat)}
-     * for details. Only file types {@link FileType#TXT} and {@link FileType#CSV} are allowed.
-     * 
-     * @param filePath path to file where the data will be written
-     * @param genotypicData the data to be written
-     * @param type the type of data file
-     * @throws IOException if the file can not be written
-     */
-    public final static void writeData(Path filePath, 
-            SimpleGenotypeVariantData genotypicData, FileType type) throws IOException {
+    private static SimpleGenotypeVariantData readFrequencyData(Path filePath, FileType type) throws IOException {
         
-        writeData(filePath, genotypicData, type, GenotypeDataFormat.FREQUENCY);
-    }
-    
-    /**
-     * Write genotype variant data to file to supported formats. See 
-     * {@link #readData(Path, FileType, GenotypeDataFormat)}
-     * for a description of the supported formats. 
-     * Only file types {@link FileType#TXT} and {@link FileType#CSV} are allowed.
-     * 
-     * @param filePath path to file where the data will be written
-     * @param genotypicData the data to be written
-     * @param type the type of data file
-     * @param format the format of the data file
-     * @throws IOException if the file can not be written
-     */
-    public final static void writeData(Path filePath, 
-            SimpleGenotypeVariantData genotypicData, FileType type, 
-            GenotypeDataFormat format) throws IOException {
-        
-        if (format == null) {
-            throw new IllegalArgumentException("Format not defined.");
-        }
-        
-        switch (format) {
-            case DIPLOID:
-                writeDiploidData(filePath, genotypicData, type);
-                break ;
-            case FREQUENCY:
-                writeFrequencyData(filePath, genotypicData, type);
-                break ;
-            default:
-                throw new IllegalArgumentException("Unsupported format : " + format);
-
-        }
-    }
-    
-    private final static SimpleGenotypeVariantData readFrequencyData(Path filePath, FileType type) throws IOException {
         // validate arguments
-        
         if (filePath == null) {
             throw new IllegalArgumentException("File path not defined.");
         }
@@ -621,11 +572,9 @@ public class SimpleGenotypeVariantData extends DataPojo implements GenotypeVaria
         }
     }
 
-    private final static SimpleGenotypeVariantData readDiploidData(Path filePath, FileType type)
-                                                                  throws IOException {
+    private static SimpleGenotypeVariantData readDiploidData(Path filePath, FileType type) throws IOException {
         
         // validate arguments
-        
         if (filePath == null) {
             throw new IllegalArgumentException("File path not defined.");
         }
@@ -859,93 +808,18 @@ public class SimpleGenotypeVariantData extends DataPojo implements GenotypeVaria
         }
                 
     }
-
-    private static void writeFrequencyData(Path filePath, SimpleGenotypeVariantData genotypicData, 
-            FileType fileType) throws IOException {
-
-        if (filePath == null) {
-            throw new IllegalArgumentException("File path not defined.");
-        }
-
-        if (filePath.toFile().exists()) {
-            throw new IOException("File already exists : " + filePath + ".");
-        }
-
-        if (fileType == null) {
-            throw new IllegalArgumentException("File type not defined.");
-        }
-
-        if (fileType != FileType.TXT && fileType != FileType.CSV) {
-            throw new IllegalArgumentException(
-                    String.format("Only file types TXT and CSV are supported. Got: %s.", fileType));
-        }
-
-        Files.createDirectories(filePath.getParent());
-
-        // read data from file
-        try (RowWriter writer = IOUtilities.createRowWriter(filePath.toFile(), fileType,
-                TextFileRowReader.REMOVE_WHITE_SPACE)) {
-
-            if (writer == null || !writer.ready()) {
-                throw new IOException("Can not create writer for file " + filePath + ".");
-            }
-
-            String[] markerNames = genotypicData.markerNames;
-
-            writer.writeCell(NAMES_HEADER);
-            
-            writer.newColumn() ;
-
-            writer.writeCell(IDENTIFIERS_HEADER);
-
-            String[][] alleleNames = genotypicData.alleleNames ;
-            
-            for (int i = 0 ; i < alleleNames.length ; ++i) {
-                for (int j = 0 ; j < alleleNames[i].length ; ++j) {
-                    writer.newColumn() ;
-                    writer.writeCell(markerNames[i]);  
-                }
-            }
-            
-            writer.newRow() ;
-            
-            writer.writeCell(ALLELE_NAMES_HEADER);
-            
-            for (int i = 0 ; i < alleleNames.length ; ++i) {
-                writer.newColumn() ;
-                writer.writeRowCellsAsArray(alleleNames[i]);  
-            }
-
-            Double[][][] alleleFrequencies = genotypicData.alleleFrequencies ;
-
-            SimpleEntity header;
-
-            for (int i = 0; i < alleleFrequencies.length; ++i) {
-
-                writer.newRow();
-                
-                header = genotypicData.getHeader(i);
-                writer.writeCell(header.getName());
-                
-                writer.newColumn() ;
-                
-                writer.writeCell(header.getUniqueIdentifier());
-
-                for (int j = 0; j < alleleFrequencies[i].length; ++j) {
-                    writer.newColumn() ;
-                    
-                    writer.writeRowCellsAsArray(alleleFrequencies[i][j]);
-                }
-            }
-
-            writer.close();
-        }
-    }
     
-
-    private static void writeDiploidData(Path filePath, SimpleGenotypeVariantData genotypicData, 
-            FileType fileType) throws IOException {
-
+    /**
+     * Write genotype variant data to file in frequency format.
+     * Only file types {@link FileType#TXT} and {@link FileType#CSV} are allowed.
+     * 
+     * @param filePath path to file where the data will be written
+     * @param fileType the type of data file
+     * @throws IOException if the file can not be written
+     */
+    public void writeData(Path filePath, FileType fileType) throws IOException {
+        
+        // validate arguments
         if (filePath == null) {
             throw new IllegalArgumentException("File path not defined.");
         }
@@ -962,21 +836,10 @@ public class SimpleGenotypeVariantData extends DataPojo implements GenotypeVaria
             throw new IllegalArgumentException(
                     String.format("Only file types TXT and CSV are supported. Got: %s.", fileType));
         }
-        
-        String[][] alleleNames = genotypicData.alleleNames ;
-        
-        String[] markerNames = genotypicData.markerNames;
-        
-        for (int i = 0 ; i < alleleNames.length ; ++i) {
-            if (alleleNames[i].length != 2) {
-                throw new IllegalArgumentException("Marker : " + markerNames[i]
-                        + " does not have 2 alleles : " + alleleNames.length);
-            }
-        }
 
         Files.createDirectories(filePath.getParent());
 
-        // read data from file
+        // write data to file
         try (RowWriter writer = IOUtilities.createRowWriter(filePath.toFile(), fileType,
                 TextFileRowReader.REMOVE_WHITE_SPACE)) {
 
@@ -1001,12 +864,11 @@ public class SimpleGenotypeVariantData extends DataPojo implements GenotypeVaria
             
             writer.writeCell(ALLELE_NAMES_HEADER);
             
+            writer.newColumn();
             for (int i = 0 ; i < alleleNames.length ; ++i) {
                 writer.newColumn() ;
                 writer.writeRowCellsAsArray(alleleNames[i]);  
             }
-
-            Double[][][] alleleFrequencies = genotypicData.alleleFrequencies ;
 
             SimpleEntity header;
 
@@ -1014,7 +876,7 @@ public class SimpleGenotypeVariantData extends DataPojo implements GenotypeVaria
 
                 writer.newRow();
                 
-                header = genotypicData.getHeader(i);
+                header = getHeader(i);
                 writer.writeCell(header.getName());
                 
                 writer.newColumn() ;
@@ -1029,8 +891,9 @@ public class SimpleGenotypeVariantData extends DataPojo implements GenotypeVaria
             }
 
             writer.close();
-        }  
-    }  
+        }
+        
+    }
     
     private static String longestSharedPrefix(String str1, String str2){
         int end = 1;

@@ -160,17 +160,43 @@ public class SimpleBiAllelicGenotypeVariantDataTest {
         
         Files.createDirectories(path) ;
         
-        path = Files.createTempDirectory(path, "TxtFileWithNames") ;
+        path = Files.createTempDirectory(path, "GenoBiallelic-TxtFileWithNames") ;
         
         path = Paths.get(path.toString(), datasetName) ;
         
         Files.deleteIfExists(path) ;
         
         System.out.println(" |- Write File " + datasetName);
-        SimpleBiAllelicGenotypeVariantData.writeData(path, genotypicData, FileType.TXT);
+        genotypicData.writeData(path, FileType.TXT);
         
         System.out.println(" |- Read written File " + datasetName);
         testData(SimpleBiAllelicGenotypeVariantData.readData(path, FileType.TXT));
+    }
+    
+    @Test
+    public void toCsvFileWithNamesAndIDs() throws IOException {
+        datasetName = "names-and-ids.csv";
+        expectedHeaders = HEADERS_NON_UNIQUE_NAMES;
+        expectedMarkerNames = MARKER_NAMES;
+        
+        SimpleBiAllelicGenotypeVariantData genotypicData = 
+                new SimpleBiAllelicGenotypeVariantData(expectedHeaders, expectedMarkerNames, ALLELE_SCORES_BIALLELIC) ;
+        
+        Path path = Paths.get(TEST_OUTPUT) ;
+        
+        Files.createDirectories(path) ;
+        
+        path = Files.createTempDirectory(path, "GenoBiallelic-CsvFileWithNamesAndIDs") ;
+        
+        path = Paths.get(path.toString(), datasetName) ;
+        
+        Files.deleteIfExists(path) ;
+        
+        System.out.println(" |- Write File " + datasetName);
+        genotypicData.writeData(path, FileType.CSV);
+        
+        System.out.println(" |- Read written File " + datasetName);
+        testData(SimpleBiAllelicGenotypeVariantData.readData(path, FileType.CSV));
     }
     
     @Test
@@ -193,7 +219,7 @@ public class SimpleBiAllelicGenotypeVariantDataTest {
         Files.deleteIfExists(path) ;
         
         System.out.println(" |- Write File " + datasetName);
-        SimpleBiAllelicGenotypeVariantData.writeData(path, genotypicData, FileType.CSV);
+        genotypicData.writeData(path, FileType.CSV);
         
         System.out.println(" |- Read written File " + datasetName);
         testData(SimpleBiAllelicGenotypeVariantData.readData(path, FileType.CSV));

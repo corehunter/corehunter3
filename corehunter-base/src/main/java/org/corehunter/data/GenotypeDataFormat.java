@@ -5,6 +5,6 @@ public enum GenotypeDataFormat {
     //HOMOZYGOUS,
     DIPLOID,
     //TRIPLOID,
-    //TETAPLOID 
+    //TETRAPLOID 
     ;
 }

@@ -159,7 +159,7 @@ public class SimpleDistanceMatrixDataTest {
     }
     
     @Test
-    public void toFileWithNamesAndIdentifiers() throws IOException {
+    public void toFileWithNames() throws IOException {
         dataName = "full-names.txt";
         expectedHeaders = HEADERS_UNIQUE_NAMES;
        
@@ -169,14 +169,14 @@ public class SimpleDistanceMatrixDataTest {
         
         Files.createDirectories(path) ;
         
-        path = Files.createTempDirectory(path, "TxtFileWithNames") ;
+        path = Files.createTempDirectory(path, "DistanceMatrix-TxtFileWithNames") ;
         
         path = Paths.get(path.toString(), dataName) ;
         
         Files.deleteIfExists(path) ;
         
         System.out.println(" |- Write distance File " + dataName);
-        SimpleDistanceMatrixData.writeData(path, distanceData, FileType.CSV);        
+        distanceData.writeData(path, FileType.CSV);        
    
         testData(SimpleDistanceMatrixData.readData(path,
                 FileType.CSV, SymmetricMatrixFormat.FULL

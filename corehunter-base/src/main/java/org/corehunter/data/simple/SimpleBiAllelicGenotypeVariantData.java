@@ -447,10 +447,9 @@ public class SimpleBiAllelicGenotypeVariantData extends DataPojo implements BiAl
 
     }
 
-    public static void writeData(Path filePath, SimpleBiAllelicGenotypeVariantData genotypicData, FileType fileType)
-            throws IOException {
-        // validate arguments
+    public void writeData(Path filePath, FileType fileType) throws IOException {
 
+        // validate arguments
         if (filePath == null) {
             throw new IllegalArgumentException("File path not defined.");
         }
@@ -478,8 +477,6 @@ public class SimpleBiAllelicGenotypeVariantData extends DataPojo implements BiAl
                 throw new IOException("Can not create writer for file " + filePath + ".");
             }
 
-            String[] markerNames = genotypicData.markerNames;
-
             writer.writeCell(NAMES_HEADER);
             
             writer.newColumn() ;
@@ -490,15 +487,13 @@ public class SimpleBiAllelicGenotypeVariantData extends DataPojo implements BiAl
 
             writer.writeRowCellsAsArray(markerNames);
 
-            Integer[][] alleleScores = genotypicData.alleleScores;
-
             SimpleEntity header;
 
             for (int r = 0; r < alleleScores.length; ++r) {
 
                 writer.newRow();
                 
-                header = genotypicData.getHeader(r);
+                header = getHeader(r);
                 writer.writeCell(header.getName());
                 
                 writer.newColumn() ;

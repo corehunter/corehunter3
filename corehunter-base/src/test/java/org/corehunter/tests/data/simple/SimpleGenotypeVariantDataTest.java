@@ -183,25 +183,25 @@ public class SimpleGenotypeVariantDataTest {
         
         Files.createDirectories(path) ;
         
-        path = Files.createTempDirectory(path, "TxtFileWithNames") ;
+        path = Files.createTempDirectory(path, "GenoFreqs-TxtFileWithNames") ;
         
         path = Paths.get(path.toString(), dataName) ;
         
         Files.deleteIfExists(path) ;
         
         System.out.println(" |- Write File " + dataName);
-        SimpleGenotypeVariantData.writeData(path, genotypicData, FileType.TXT);
+        genotypicData.writeData(path, FileType.TXT);
         
         System.out.println(" |- Read written File " + dataName);
         testData(SimpleGenotypeVariantData.readData(path, FileType.TXT), ALLELE_FREQUENCIES);
     }
     
     @Test
-    public void toCsvFileWithNames() throws IOException {
-        dataName = "names.csv";
+    public void toCsvFileWithNamesAndAlleleNames() throws IOException {
+        dataName = "allele-names.csv";
         expectedHeaders = HEADERS_UNIQUE_NAMES;
         expectedMarkerNames = MARKER_NAMES;
-        expectedAlleleNames = UNDEFINED_ALLELE_NAMES;
+        expectedAlleleNames = ALLELE_NAMES;
         
         SimpleGenotypeVariantData genotypicData = new SimpleGenotypeVariantData(expectedHeaders, 
                 expectedMarkerNames, expectedAlleleNames, ALLELE_FREQUENCIES) ;
@@ -210,14 +210,14 @@ public class SimpleGenotypeVariantDataTest {
         
         Files.createDirectories(path) ;
         
-        path = Files.createTempDirectory(path, "TxtFileWithNames") ;
+        path = Files.createTempDirectory(path, "GenoFreqs-CsvFileWithNamesAndAlleleNames") ;
         
         path = Paths.get(path.toString(), dataName) ;
         
         Files.deleteIfExists(path) ;
         
         System.out.println(" |- Write File " + dataName);
-        SimpleGenotypeVariantData.writeData(path, genotypicData, FileType.CSV);
+        genotypicData.writeData(path, FileType.CSV);
         
         System.out.println(" |- Read written File " + dataName);
         testData(SimpleGenotypeVariantData.readData(path, FileType.CSV), ALLELE_FREQUENCIES);
@@ -312,32 +312,33 @@ public class SimpleGenotypeVariantDataTest {
         ));
     }
     
-    //@Test
+    @Test
     public void diploidToCsvFileWithNamesAndIDs() throws IOException {
-        dataName = "names.csv";
+        dataName = "names-and-ids.csv";
         expectedHeaders = HEADERS_NON_UNIQUE_NAMES;
         expectedMarkerNames = MARKER_NAMES_DIPLOID;
         expectedAlleleNames = ALLELE_NAMES_DIPLOID;
         
-        SimpleGenotypeVariantData genotypicData = new SimpleGenotypeVariantData(expectedHeaders, 
-                expectedMarkerNames, expectedAlleleNames, ALLELE_FREQUENCIES) ;
+        SimpleGenotypeVariantData genotypicData = new SimpleGenotypeVariantData(
+                expectedHeaders, expectedMarkerNames, expectedAlleleNames, ALLELE_FREQUENCIES_DIPLOID
+        );
         
-        Path path = Paths.get(TEST_OUTPUT) ;
+        Path path = Paths.get(TEST_OUTPUT);
         
-        Files.createDirectories(path) ;
+        Files.createDirectories(path);
         
-        path = Files.createTempDirectory(path, "TxtFileWithNames") ;
+        path = Files.createTempDirectory(path, "GenoDiploid-CsvFileWithNamesAndIDs");
         
-        path = Paths.get(path.toString(), dataName) ;
+        path = Paths.get(path.toString(), dataName);
         
-        Files.deleteIfExists(path) ;
+        Files.deleteIfExists(path);
         
         System.out.println(" |- Write diploid File " + dataName);
-        SimpleGenotypeVariantData.writeData(path, genotypicData, FileType.CSV, GenotypeDataFormat.DIPLOID);
+        genotypicData.writeData(path, FileType.CSV);
         
-        System.out.println(" |- Read written diploid File " + dataName);
-        testData(SimpleGenotypeVariantData.readData(path, FileType.CSV, GenotypeDataFormat.DIPLOID), 
-                ALLELE_FREQUENCIES);
+        System.out.println(" |- Read written File " + dataName);
+        testData(SimpleGenotypeVariantData.readData(path, FileType.CSV, GenotypeDataFormat.FREQUENCY), 
+                ALLELE_FREQUENCIES_DIPLOID);
     }
     
     @Test
