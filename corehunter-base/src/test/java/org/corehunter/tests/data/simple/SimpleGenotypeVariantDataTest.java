@@ -41,6 +41,7 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 
 import org.corehunter.data.GenotypeDataFormat;
+import org.corehunter.data.GenotypeVariantData;
 import org.corehunter.data.simple.SimpleGenotypeVariantData;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -367,7 +368,7 @@ public class SimpleGenotypeVariantDataTest {
     /* CHECK */
     /*********/
     
-    private void testData(SimpleGenotypeVariantData data, Double[][][] freqs) {
+    private void testData(GenotypeVariantData data, Double[][][] freqs) {
         
         // check dataset name, if set
         String expectedDatasetName = dataName != null ? dataName : "Multiallelic marker data";
@@ -440,11 +441,11 @@ public class SimpleGenotypeVariantDataTest {
         
     }
     
-    private void testDataGeneral(SimpleGenotypeVariantData data) {
+    private void testDataGeneral(GenotypeVariantData data) {
         testData(data, ALLELE_FREQUENCIES);
     }
     
-    private void testDataDiploid(SimpleGenotypeVariantData data) {
+    private void testDataDiploid(GenotypeVariantData data) {
         testData(data, ALLELE_FREQUENCIES_DIPLOID);
     }
     

@@ -285,18 +285,17 @@ public class SimpleGenotypeVariantData extends DataPojo implements GenotypeVaria
      * @return genotype variant data
      * @throws IOException if the file can not be read or is not correctly formatted
      */
-    public final static SimpleGenotypeVariantData readData(Path filePath, FileType type) throws IOException {
+    public final static GenotypeVariantData readData(Path filePath, FileType type) throws IOException {
         return readData(filePath, type, GenotypeDataFormat.FREQUENCY) ;
     }
 
     /**
      * Read genotype variant data from file. Only file types {@link FileType#TXT} and {@link FileType#CSV} are allowed.
      * Values are separated with a single tab (txt) or comma (csv) character. 
-     * 
      * <p>
      * Several formats are supported.  
      * 
-     * <p>For {@link GenotypeDataFormat#FREQUENCY} format allele frequencies should follow the
+     * <p>For {@link GenotypeDataFormat#FREQUENCY} the file should contain allele frequencies following the
      * requirements as described in the constructor {@link #SimpleGenotypeVariantData(String, SimpleEntity[], String[],
      * String[][], Double[][][])}. Missing frequencies are encoding as empty cells.
      * The file starts with a compulsory header row from which (unique) marker names and allele counts are inferred.
@@ -308,7 +307,7 @@ public class SimpleGenotypeVariantData extends DataPojo implements GenotypeVaria
      * header "ALLELE". Allele names need not be unique and can be undefined for some alleles by leaving the
      * corresponding cells empty.
      * 
-     * <p>For {@link GenotypeDataFormat#DIPLOID} Diploid data the file contains two consecutive columns per marker in 
+     * <p>For {@link GenotypeDataFormat#DIPLOID} the file contains two consecutive columns per marker in 
      * which the two observed alleles are specified (by number/name/id) for each individual. The number of alleles may
      * be larger than two and different per marker, but each diploid genotype contains only one (homozygous) or
      * two (heterozygous) of all possible alleles of a certain marker. This means that all inferred frequencies
@@ -327,6 +326,9 @@ public class SimpleGenotypeVariantData extends DataPojo implements GenotypeVaria
      * some column names are undefined but a name should either be provided or not for both columns corresponding
      * to the same marker.
      * 
+     * <p>For {@link GenotypeDataFormat#BIALLELIC} the file contains allele scores for biallelic markers and is
+     * read with {@link SimpleBiAllelicGenotypeVariantData#readData(Path, FileType)}.
+     * 
      * <p>
      * In all formats the leading and trailing whitespace is removed from names and unique identifiers and they are 
      * unquoted if wrapped in single or double quotes after whitespace removal. If it is intended to start or end a 
@@ -343,8 +345,8 @@ public class SimpleGenotypeVariantData extends DataPojo implements GenotypeVaria
      * @return genotype variant data
      * @throws IOException if the file can not be read or is not correctly formatted
      */
-    public final static SimpleGenotypeVariantData readData(Path filePath, FileType type, 
-            GenotypeDataFormat format) throws IOException {
+    public final static GenotypeVariantData readData(Path filePath, FileType type,
+                                                     GenotypeDataFormat format) throws IOException {
         
         if (format == null) {
             throw new IllegalArgumentException("Format not defined.");
@@ -355,6 +357,8 @@ public class SimpleGenotypeVariantData extends DataPojo implements GenotypeVaria
                 return readDiploidData(filePath, type);
             case FREQUENCY:
                 return readFrequencyData(filePath, type);
+            case BIALLELIC:
+                return SimpleBiAllelicGenotypeVariantData.readData(filePath, type) ;
             default:
                 throw new IllegalArgumentException("Unsupported format : " + format);
 
@@ -362,7 +366,7 @@ public class SimpleGenotypeVariantData extends DataPojo implements GenotypeVaria
     }
     
     private static SimpleGenotypeVariantData readFrequencyData(Path filePath, FileType type) throws IOException {
-        
+
         // validate arguments
         if (filePath == null) {
             throw new IllegalArgumentException("File path not defined.");
