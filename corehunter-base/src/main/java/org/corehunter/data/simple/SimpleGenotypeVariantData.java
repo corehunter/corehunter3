@@ -27,6 +27,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -56,6 +58,8 @@ public class SimpleGenotypeVariantData extends DataPojo implements GenotypeVaria
     private static final String NAMES_HEADER = "NAME";
     private static final String ALLELE_NAMES_HEADER = "ALLELE";
     private static final String IDENTIFIERS_HEADER = "ID";
+    private static final Collection<GenotypeDataFormat> SUPPORTED_OUTPUT_FORMATS
+            = Collections.singleton(GenotypeDataFormat.FREQUENCY);
     
     private final Double[][][] alleleFrequencies;   // null element means missing value
     private final boolean[][] hasMissingValues;     // which individuals have missing values for which markers
@@ -285,7 +289,7 @@ public class SimpleGenotypeVariantData extends DataPojo implements GenotypeVaria
      * @return genotype variant data
      * @throws IOException if the file can not be read or is not correctly formatted
      */
-    public final static GenotypeVariantData readData(Path filePath, FileType type) throws IOException {
+    public static GenotypeVariantData readData(Path filePath, FileType type) throws IOException {
         return readData(filePath, type, GenotypeDataFormat.FREQUENCY) ;
     }
 
@@ -345,7 +349,7 @@ public class SimpleGenotypeVariantData extends DataPojo implements GenotypeVaria
      * @return genotype variant data
      * @throws IOException if the file can not be read or is not correctly formatted
      */
-    public final static GenotypeVariantData readData(Path filePath, FileType type,
+    public static GenotypeVariantData readData(Path filePath, FileType type,
                                                      GenotypeDataFormat format) throws IOException {
         
         if (format == null) {
@@ -814,6 +818,15 @@ public class SimpleGenotypeVariantData extends DataPojo implements GenotypeVaria
     }
     
     /**
+     * Get a collection of supported output formats that may be used in {@link #writeData(Path, FileType)}.
+     * 
+     * @return singleton containing only {@link GenotypeDataFormat#FREQUENCY}
+     */
+    public Collection<GenotypeDataFormat> getSupportedOutputFormats(){
+        return SUPPORTED_OUTPUT_FORMATS;
+    }
+    
+    /**
      * Write genotype variant data to file in frequency format.
      * Only file types {@link FileType#TXT} and {@link FileType#CSV} are allowed.
      * 
@@ -822,6 +835,21 @@ public class SimpleGenotypeVariantData extends DataPojo implements GenotypeVaria
      * @throws IOException if the file can not be written
      */
     public void writeData(Path filePath, FileType fileType) throws IOException {
+        writeData(filePath, fileType, GenotypeDataFormat.FREQUENCY);
+    }
+    
+    /**
+     * Write genotype variant data to file in the chosen format.
+     * By default the only supported format is {@link GenotypeDataFormat#FREQUENCY} but the
+     * method may be overridden in subclasses to support other formats.
+     * Only file types {@link FileType#TXT} and {@link FileType#CSV} are allowed.
+     * 
+     * @param filePath path to file where the data will be written
+     * @param fileType the type of data file
+     * @param format output format
+     * @throws IOException if the file can not be written
+     */
+    public void writeData(Path filePath, FileType fileType, GenotypeDataFormat format) throws IOException {
         
         // validate arguments
         if (filePath == null) {
@@ -839,6 +867,10 @@ public class SimpleGenotypeVariantData extends DataPojo implements GenotypeVaria
         if (fileType != FileType.TXT && fileType != FileType.CSV) {
             throw new IllegalArgumentException(
                     String.format("Only file types TXT and CSV are supported. Got: %s.", fileType));
+        }
+        
+        if(format != GenotypeDataFormat.FREQUENCY){
+            throw new IllegalArgumentException("Unsupported output format: " + format);
         }
 
         Files.createDirectories(filePath.getParent());

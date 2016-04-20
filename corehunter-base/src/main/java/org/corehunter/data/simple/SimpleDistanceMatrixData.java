@@ -169,7 +169,7 @@ public class SimpleDistanceMatrixData extends DataPojo implements DistanceMatrix
      * @return distance matrix data
      * @throws IOException if the file can not be read or is not correctly formatted
      */
-    public static final SimpleDistanceMatrixData readData(Path filePath, FileType type,
+    public static SimpleDistanceMatrixData readData(Path filePath, FileType type,
                                                           SymmetricMatrixFormat format) throws IOException {
         
         // validate arguments
