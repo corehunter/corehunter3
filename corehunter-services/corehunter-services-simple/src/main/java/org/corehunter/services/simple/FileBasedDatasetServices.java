@@ -34,7 +34,7 @@ import java.util.Map;
 import org.corehunter.data.BiAllelicGenotypeVariantData;
 import org.corehunter.data.CoreHunterData;
 import org.corehunter.data.GenotypeVariantData;
-import org.corehunter.data.matrix.SymmetricMatrixFormat;
+import org.corehunter.data.SymmetricMatrixFormat;
 import org.corehunter.data.simple.SimpleBiAllelicGenotypeVariantData;
 import org.corehunter.data.simple.SimpleDistanceMatrixData;
 import org.corehunter.data.simple.SimpleGenotypeVariantData;

@@ -28,7 +28,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.corehunter.data.DistanceMatrixData;
-import org.corehunter.data.matrix.SymmetricMatrixFormat;
+import org.corehunter.data.SymmetricMatrixFormat;
 import org.corehunter.util.StringUtils;
 
 import uno.informatics.common.Constants;
