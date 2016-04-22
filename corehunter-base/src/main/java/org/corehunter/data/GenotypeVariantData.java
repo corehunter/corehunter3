@@ -19,8 +19,6 @@
 
 package org.corehunter.data;
 
-import java.util.Collection;
-
 import uno.informatics.data.Data;
 
 /**

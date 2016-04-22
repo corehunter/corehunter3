@@ -34,7 +34,7 @@ import java.util.Map;
 import org.corehunter.data.BiAllelicGenotypeVariantData;
 import org.corehunter.data.CoreHunterData;
 import org.corehunter.data.GenotypeVariantData;
-import org.corehunter.data.matrix.SymmetricMatrixFormat;
+import org.corehunter.data.SymmetricMatrixFormat;
 import org.corehunter.data.simple.SimpleBiAllelicGenotypeVariantData;
 import org.corehunter.data.simple.SimpleDistanceMatrixData;
 import org.corehunter.data.simple.SimpleGenotypeVariantData;
@@ -226,7 +226,7 @@ public class FileBasedDatasetServices implements DatasetServices {
 
                 newPath = Paths.get(getPath().toString(), BI_ALLELIC_GENOTYPIC_PATH, datasetId + TXT_SUFFIX);
 
-                SimpleBiAllelicGenotypeVariantData.writeData(newPath, biAllelicenotypeData, fileType);
+                biAllelicenotypeData.writeData(newPath, fileType);
 
                 break;
             case GENOTYPIC:
@@ -249,7 +249,7 @@ public class FileBasedDatasetServices implements DatasetServices {
 
                 newPath = Paths.get(getPath().toString(), GENOTYPIC_PATH, datasetId + TXT_SUFFIX);
 
-                SimpleGenotypeVariantData.writeData(newPath, genotypeData, fileType);
+                genotypeData.writeData(newPath, fileType);
                 break;
             case PHENOTYPIC:
                 if (coreHunterData != null && coreHunterData.getGenotypicData() != null) {
@@ -292,7 +292,7 @@ public class FileBasedDatasetServices implements DatasetServices {
 
                 newPath = Paths.get(getPath().toString(), GENOTYPIC_PATH, datasetId + TXT_SUFFIX);
 
-                SimpleDistanceMatrixData.writeData(newPath, distance, fileType);
+                distance.writeData(newPath, fileType);
                 
                 break;
             default:

@@ -35,8 +35,11 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import org.corehunter.data.GenotypeDataFormat;
+import org.corehunter.data.GenotypeVariantData;
 
 import org.corehunter.data.simple.SimpleBiAllelicGenotypeVariantData;
+import org.corehunter.data.simple.SimpleGenotypeVariantData;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -160,23 +163,23 @@ public class SimpleBiAllelicGenotypeVariantDataTest {
         
         Files.createDirectories(path) ;
         
-        path = Files.createTempDirectory(path, "TxtFileWithNames") ;
+        path = Files.createTempDirectory(path, "GenoBiallelic-TxtFileWithNames") ;
         
         path = Paths.get(path.toString(), datasetName) ;
         
         Files.deleteIfExists(path) ;
         
         System.out.println(" |- Write File " + datasetName);
-        SimpleBiAllelicGenotypeVariantData.writeData(path, genotypicData, FileType.TXT);
+        genotypicData.writeData(path, FileType.TXT);
         
         System.out.println(" |- Read written File " + datasetName);
         testData(SimpleBiAllelicGenotypeVariantData.readData(path, FileType.TXT));
     }
     
     @Test
-    public void toCsvFileWithNames() throws IOException {
-        datasetName = "names.csv";
-        expectedHeaders = HEADERS_UNIQUE_NAMES;
+    public void toCsvFileWithNamesAndIDs() throws IOException {
+        datasetName = "names-and-ids.csv";
+        expectedHeaders = HEADERS_NON_UNIQUE_NAMES;
         expectedMarkerNames = MARKER_NAMES;
         
         SimpleBiAllelicGenotypeVariantData genotypicData = 
@@ -186,17 +189,66 @@ public class SimpleBiAllelicGenotypeVariantDataTest {
         
         Files.createDirectories(path) ;
         
-        path = Files.createTempDirectory(path, "TxtFileWithNames") ;
+        path = Files.createTempDirectory(path, "GenoBiallelic-CsvFileWithNamesAndIDs") ;
         
         path = Paths.get(path.toString(), datasetName) ;
         
         Files.deleteIfExists(path) ;
         
         System.out.println(" |- Write File " + datasetName);
-        SimpleBiAllelicGenotypeVariantData.writeData(path, genotypicData, FileType.CSV);
+        genotypicData.writeData(path, FileType.CSV);
         
         System.out.println(" |- Read written File " + datasetName);
         testData(SimpleBiAllelicGenotypeVariantData.readData(path, FileType.CSV));
+    }
+    
+    @Test
+    public void toCsvFileFrequencies() throws IOException {
+        datasetName = "freqs.csv";
+        expectedHeaders = HEADERS_NON_UNIQUE_NAMES;
+        expectedMarkerNames = MARKER_NAMES;
+        
+        SimpleBiAllelicGenotypeVariantData genotypicData = 
+                new SimpleBiAllelicGenotypeVariantData(expectedHeaders, expectedMarkerNames, ALLELE_SCORES_BIALLELIC) ;
+        
+        Path path = Paths.get(TEST_OUTPUT) ;
+        
+        Files.createDirectories(path) ;
+        
+        path = Files.createTempDirectory(path, "GenoBiallelic-CsvFileFrequencies") ;
+        
+        path = Paths.get(path.toString(), datasetName) ;
+        
+        Files.deleteIfExists(path) ;
+        
+        System.out.println(" |- Write File " + datasetName);
+        genotypicData.writeData(path, FileType.CSV, GenotypeDataFormat.FREQUENCY);
+        
+        System.out.println(" |- Read written File " + datasetName);
+        GenotypeVariantData data = SimpleGenotypeVariantData.readData(path, FileType.CSV);
+        
+        for (int i = 0; i < data.getSize(); i++) {
+            for (int m = 0; m < data.getNumberOfMarkers(); m++) {
+                for (int a = 0; a < data.getNumberOfAlleles(m); a++) {
+                    if(ALLELE_SCORES_BIALLELIC[i][m] == null){
+                        assertNull("Frequency should be missing for allele " + a
+                                 + " of marker " + m + " in individual " + i + ".",
+                                data.getAlleleFrequency(i, m, a));
+                    } else {
+                        assertNotNull("Frequency should not be missing for allele " + a
+                                    + " of marker " + m + " in individual " + i + ".",
+                                   data.getAlleleFrequency(i, m, a));
+                        assertEquals("Incorrect frequency for allele " + a
+                                   + " of marker " + m + " in individual " + i + ".",
+                                   ALLELE_FREQUENCIES_BIALLELIC[i][m][a],
+                                   data.getAlleleFrequency(i, m, a),
+                                   PRECISION);
+                    }
+                }
+
+            }
+        }
+        
     }
     
     @Test

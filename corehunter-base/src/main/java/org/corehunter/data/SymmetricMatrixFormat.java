@@ -17,7 +17,7 @@
 /* under the License.                                           */
 /*--------------------------------------------------------------*/
 
-package org.corehunter.data.matrix;
+package org.corehunter.data;
 
 /**
  * Specifies the format in which a symmetric matrix is encoded in a file.

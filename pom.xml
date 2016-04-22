@@ -47,21 +47,21 @@
         <module>corehunter-base</module>
         <module>corehunter-extended</module>
         <module>build-tools</module>
-    <module>corehunter-services</module>
-  </modules>
+        <module>corehunter-services</module>
+    </modules>
 
     <dependencyManagement>
         <dependencies>
             <dependency>
-              <groupId>org.corehunter</groupId>
-              <artifactId>corehunter-base</artifactId>
-              <version>3.0.0-SNAPSHOT</version>
+                <groupId>org.corehunter</groupId>
+                <artifactId>corehunter-base</artifactId>
+                <version>3.0.0-SNAPSHOT</version>
             </dependency>
-						<dependency>
-							<groupId>org.corehunter</groupId>
-						  <artifactId>corehunter-services-api</artifactId>
-							<version>3.0.0-SNAPSHOT</version>
-						</dependency>
+            <dependency>
+                <groupId>org.corehunter</groupId>
+                <artifactId>corehunter-services-api</artifactId>
+                <version>3.0.0-SNAPSHOT</version>
+            </dependency>
             <dependency>
                 <groupId>org.jamesframework</groupId>
                 <artifactId>james-core</artifactId>
@@ -93,9 +93,9 @@
                 <version>1.0.2</version>
             </dependency>
             <dependency>
-              <groupId>joda-time</groupId>
-              <artifactId>joda-time</artifactId>
-              <version>2.9.2</version>
+                <groupId>joda-time</groupId>
+                <artifactId>joda-time</artifactId>
+                <version>2.9.2</version>
             </dependency>
             <dependency>
                 <groupId>junit</groupId>

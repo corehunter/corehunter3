@@ -28,7 +28,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.corehunter.data.DistanceMatrixData;
-import org.corehunter.data.matrix.SymmetricMatrixFormat;
+import org.corehunter.data.SymmetricMatrixFormat;
 import org.corehunter.util.StringUtils;
 
 import uno.informatics.common.Constants;
@@ -169,7 +169,7 @@ public class SimpleDistanceMatrixData extends DataPojo implements DistanceMatrix
      * @return distance matrix data
      * @throws IOException if the file can not be read or is not correctly formatted
      */
-    public static final SimpleDistanceMatrixData readData(Path filePath, FileType type,
+    public static SimpleDistanceMatrixData readData(Path filePath, FileType type,
                                                           SymmetricMatrixFormat format) throws IOException {
         
         // validate arguments
@@ -364,10 +364,16 @@ public class SimpleDistanceMatrixData extends DataPojo implements DistanceMatrix
         }
     }
     
-    public static void writeData(Path filePath, SimpleDistanceMatrixData distanceData, 
-            FileType fileType) throws IOException {
+    /**
+     * Write distance matrix to file.
+     * 
+     * @param filePath path to file
+     * @param fileType {@link FileType#TXT} or {@link FileType#CSV}
+     * @throws IOException if the file can not be written
+     */
+    public void writeData(Path filePath, FileType fileType) throws IOException {
+        
         // validate arguments
-
         if (filePath == null) {
             throw new IllegalArgumentException("File path not defined.");
         }
@@ -387,7 +393,7 @@ public class SimpleDistanceMatrixData extends DataPojo implements DistanceMatrix
 
         Files.createDirectories(filePath.getParent());
 
-        // read data from file
+        // write data to file
         try (RowWriter writer = IOUtilities.createRowWriter(filePath.toFile(), fileType,
                 TextFileRowReader.REMOVE_WHITE_SPACE)) {
 
@@ -397,30 +403,28 @@ public class SimpleDistanceMatrixData extends DataPojo implements DistanceMatrix
 
             writer.writeCell(NAMES_HEADER);
             
-            Iterator<Integer> iterator = distanceData.getIDs().iterator() ;
+            Iterator<Integer> iterator = getIDs().iterator() ;
             
             while (iterator.hasNext()) {
                 
                 writer.newColumn() ;
                 
-                writer.writeCell(distanceData.getHeader(iterator.next()).getName()) ;
+                writer.writeCell(getHeader(iterator.next()).getName()) ;
             }
             
             writer.newRow() ;
             
             writer.writeCell(IDENTIFIERS_HEADER);
                 
-            iterator = distanceData.getIDs().iterator() ;
+            iterator = getIDs().iterator() ;
             
             while (iterator.hasNext()) {
                 
                 writer.newColumn() ;
                 
-                writer.writeCell(distanceData.getHeader(iterator.next()).getUniqueIdentifier()) ;
+                writer.writeCell(getHeader(iterator.next()).getUniqueIdentifier()) ;
             }
                         
-            double[][] distances = distanceData.distances;
-
             for (int i = 0; i < distances.length; ++i) {
                 writer.newRow() ;
                 writer.writeCell(distances[i][0]);

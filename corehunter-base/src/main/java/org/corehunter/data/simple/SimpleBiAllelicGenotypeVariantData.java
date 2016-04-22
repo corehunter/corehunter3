@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Objects;
 
 import org.corehunter.data.BiAllelicGenotypeVariantData;
+import org.corehunter.data.GenotypeDataFormat;
 import org.corehunter.util.StringUtils;
 
 import uno.informatics.common.io.FileType;
@@ -36,19 +37,18 @@ import uno.informatics.common.io.RowReader;
 import uno.informatics.common.io.RowWriter;
 import uno.informatics.common.io.text.TextFileRowReader;
 import uno.informatics.data.SimpleEntity;
-import uno.informatics.data.pojo.DataPojo;
 import uno.informatics.data.pojo.SimpleEntityPojo;
 
 /**
  * @author Guy Davenport, Herman De Beukelaer
  */
-public class SimpleBiAllelicGenotypeVariantData extends DataPojo implements BiAllelicGenotypeVariantData {
+public class SimpleBiAllelicGenotypeVariantData extends SimpleGenotypeVariantData
+                                                implements BiAllelicGenotypeVariantData {
 
     private static final String NAMES_HEADER = "NAME";
     private static final String IDENTIFIERS_HEADER = "ID";
 
     private final Integer[][] alleleScores; // null element means missing value
-    private final String[] markerNames; // null element means no marker name assigned
 
     /**
      * Create data with name "Biallelic marker data". For details of the
@@ -106,7 +106,8 @@ public class SimpleBiAllelicGenotypeVariantData extends DataPojo implements BiAl
             Integer[][] alleleScores) {
 
         // pass dataset name, size and item headers to parent
-        super(datasetName, itemHeaders);
+        super(datasetName, itemHeaders, markerNames,
+              inferAlleleNames(alleleScores), inferAlleleFrequencies(alleleScores));
 
         // check allele scores and infer number of items/markers
         int n = alleleScores.length;
@@ -145,128 +146,38 @@ public class SimpleBiAllelicGenotypeVariantData extends DataPojo implements BiAl
             this.alleleScores[i] = Arrays.copyOf(alleleScores[i], m);
         }
 
-        // check and copy marker names
-        if (markerNames == null) {
-            this.markerNames = new String[m];
-        } else {
-            if (markerNames.length != m) {
-                throw new IllegalArgumentException(String.format(
-                        "Incorrect number of marker names provided. Expected: %d, actual: %d.", m, markerNames.length));
-            }
-            this.markerNames = Arrays.copyOf(markerNames, m);
+    }
+    
+    private static String[][] inferAlleleNames(Integer[][] alleleScores){
+        int numMarkers = alleleScores[0].length;
+        String[][] alleleNames = new String[numMarkers][2];
+        for(int m = 0; m < numMarkers; m++){
+            alleleNames[m][0] = "0";
+            alleleNames[m][1] = "1";
         }
-
+        return alleleNames;
     }
-
-    @Override
-    public int getNumberOfMarkers() {
-        return alleleScores[0].length;
-    }
-
-    @Override
-    public String getMarkerName(int markerIndex) {
-        return markerNames[markerIndex];
+ 
+    private static Double[][][] inferAlleleFrequencies(Integer[][] alleleScores){
+        int numGenotypes = alleleScores.length;
+        int numMarkers = alleleScores[0].length;
+        Double[][][] freqs = new Double[numGenotypes][numMarkers][2];
+        for(int i = 0; i < numGenotypes; i++){
+            for (int m = 0; m < numMarkers; m++) {
+                if(alleleScores[i][m] == null){
+                    freqs[i][m][0] = freqs[i][m][1] = null;
+                } else {
+                    freqs[i][m][1] = ((double) alleleScores[i][m])/2.0;
+                    freqs[i][m][0] = 1.0 - freqs[i][m][1];
+                }
+            }
+        }
+        return freqs;
     }
 
     @Override
     public Integer getAlleleScore(int id, int markerIndex) {
         return alleleScores[id][markerIndex];
-    }
-
-    /**
-     * Returns 2 for each marker.
-     * 
-     * @param markerIndex
-     *            marker index; ignored unless it falls outside the valid range
-     * @return 2
-     * @throws ArrayIndexOutOfBoundsException
-     *             if <code>markerIndex</code> falls outsize the valid range
-     *             0..m-1 with m the number of markers
-     */
-    @Override
-    public int getNumberOfAlleles(int markerIndex) {
-        validateMarkerIndex(markerIndex);
-        return 2;
-    }
-
-    /**
-     * Since each marker has two alleles this method returns twice the number of
-     * markers.
-     * 
-     * @return twice the number of markers
-     */
-    @Override
-    public int getTotalNumberOfAlleles() {
-        return 2 * getNumberOfMarkers();
-    }
-
-    /**
-     * The name of each allele is simply a string version of the allele index (0/1).
-     * 
-     * @param markerIndex
-     *            marker index; ignored unless it falls outside the valid range
-     * @param alleleIndex
-     *            allele index; 0 or 1
-     * @return "0" or "1" depending on the allele index
-     * @throws ArrayIndexOutOfBoundsException
-     *             if <code>markerIndex</code> falls outsize the valid range
-     *             0..m-1 with m the number of markers, or if
-     *             <code>alleleIndex</code> is not 0 or 1
-     */
-    @Override
-    public String getAlleleName(int markerIndex, int alleleIndex) {
-        validateMarkerIndex(markerIndex);
-        validateAlleleIndex(alleleIndex);
-        return "" + alleleIndex;
-    }
-
-    /**
-     * Computes the the allele frequency at a certain marker in a certain
-     * individual. For allele 1, the frequency <code>f</code> is defined as the
-     * allele score divided by two. The frequency of allele 0 equals
-     * <code>1.0 - f</code>.
-     * 
-     * @param id
-     *            item id within 0..n-1 with n the number of items
-     * @param markerIndex
-     *            marker index within 0..m-1 with m the number of markers
-     * @param alleleIndex
-     *            allele index; 0 or 1
-     * @return allele frequency; 0.0, 0.5 or 1.0 (or <code>null</code> if allele
-     *         score is missing)
-     * @throws ArrayIndexOutOfBoundsException
-     *             if the id or marker/allele index is out of range
-     */
-    @Override
-    public Double getAlleleFrequency(int id, int markerIndex, int alleleIndex) {
-
-        validateAlleleIndex(alleleIndex);
-        Integer a = alleleScores[id][markerIndex];
-
-        if (a == null) {
-            return null;
-        }
-
-        double f = ((double) a) / 2.0;
-        return alleleIndex == 1 ? f : 1.0 - f;
-
-    }
-    
-    @Override
-    public boolean hasMissingValues(int id, int markerIndex) {
-        return alleleScores[id][markerIndex] == null;
-    }
-
-    private void validateMarkerIndex(int markerIndex) {
-        if (markerIndex < 0 || markerIndex >= getNumberOfMarkers()) {
-            throw new ArrayIndexOutOfBoundsException("Invalid marker index: " + markerIndex + ".");
-        }
-    }
-
-    private void validateAlleleIndex(int alleleIndex) {
-        if (alleleIndex < 0 || alleleIndex >= 2) {
-            throw new ArrayIndexOutOfBoundsException("Invalid allele index: " + alleleIndex + ".");
-        }
     }
 
     /**
@@ -304,7 +215,7 @@ public class SimpleBiAllelicGenotypeVariantData extends DataPojo implements BiAl
      * @throws IOException
      *             if the file can not be read or is not correctly formatted
      */
-    public static final SimpleBiAllelicGenotypeVariantData readData(Path filePath, FileType type) throws IOException {
+    public static SimpleBiAllelicGenotypeVariantData readData(Path filePath, FileType type) throws IOException {
 
         // validate arguments
 
@@ -447,10 +358,56 @@ public class SimpleBiAllelicGenotypeVariantData extends DataPojo implements BiAl
 
     }
 
-    public static void writeData(Path filePath, SimpleBiAllelicGenotypeVariantData genotypicData, FileType fileType)
-            throws IOException {
-        // validate arguments
+    /**
+     * Get list of supported output formats that may be used in {@link #writeData(Path, FileType)}.
+     * 
+     * @return list containing {@link GenotypeDataFormat#FREQUENCY} and {@link GenotypeDataFormat#BIALLELIC}
+     */
+    @Override
+    public List<GenotypeDataFormat> getSupportedOutputFormats() {
+        return Arrays.asList(GenotypeDataFormat.FREQUENCY, GenotypeDataFormat.BIALLELIC);
+    }
+    
+    /**
+     * Write data in biallelic format.
+     * 
+     * @param filePath file path
+     * @param fileType {@link FileType#TXT} or {@link FileType#CSV}
+     * @throws IOException if the data can not be written to the file
+     */
+    @Override
+    public void writeData(Path filePath, FileType fileType) throws IOException {
+        writeData(filePath, fileType, GenotypeDataFormat.BIALLELIC);
+    }
 
+    /**
+     * Write file to the given format (frequency or biallelic).
+     * 
+     * @param filePath file path
+     * @param fileType {@link FileType#TXT} or {@link FileType#CSV}
+     * @param format chosen output format
+     * @throws IOException if the data can not be written to the file
+     */
+    @Override
+    public void writeData(Path filePath, FileType fileType, GenotypeDataFormat format) throws IOException {
+        
+        if(format == null){
+            throw new IllegalArgumentException("Output format not defined.");
+        }
+        
+        switch(format){
+            case BIALLELIC:
+                writeBiallelicData(filePath, fileType);
+                break;
+            default:
+                super.writeData(filePath, fileType, format);
+        }
+        
+    }
+    
+    private void writeBiallelicData(Path filePath, FileType fileType) throws IOException {
+
+        // validate arguments
         if (filePath == null) {
             throw new IllegalArgumentException("File path not defined.");
         }
@@ -478,19 +435,16 @@ public class SimpleBiAllelicGenotypeVariantData extends DataPojo implements BiAl
                 throw new IOException("Can not create writer for file " + filePath + ".");
             }
 
-            String[] markerNames = genotypicData.markerNames;
-
             writer.writeCell(NAMES_HEADER);
             
             writer.newColumn() ;
 
             writer.writeCell(IDENTIFIERS_HEADER);
             
-            writer.newColumn() ;
-
-            writer.writeRowCellsAsArray(markerNames);
-
-            Integer[][] alleleScores = genotypicData.alleleScores;
+            for(int m = 0; m < getNumberOfMarkers(); m++){
+                writer.newColumn();
+                writer.writeCell(getMarkerName(m));
+            }
 
             SimpleEntity header;
 
@@ -498,7 +452,7 @@ public class SimpleBiAllelicGenotypeVariantData extends DataPojo implements BiAl
 
                 writer.newRow();
                 
-                header = genotypicData.getHeader(r);
+                header = getHeader(r);
                 writer.writeCell(header.getName());
                 
                 writer.newColumn() ;
