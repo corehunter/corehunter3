@@ -31,7 +31,6 @@ import static org.corehunter.tests.TestData.NAME;
 import static org.corehunter.tests.TestData.PRECISION;
 import static org.corehunter.tests.TestData.SET;
 import static org.corehunter.tests.TestData.UNDEFINED_ALLELE_NAMES;
-import static org.corehunter.tests.TestData.UNDEFINED_MARKER_NAMES_DIPLOID;
 
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
@@ -68,7 +67,6 @@ public class SimpleGenotypeVariantDataTest {
     private static final String DIPLOID_TXT_NAMES = "/diploid_genotypes/names.txt";
     private static final String DIPLOID_CSV_NAMES = "/diploid_genotypes/names.csv";
     private static final String DIPLOID_CSV_NAMES_IDS = "/diploid_genotypes/names-and-ids.csv";
-    private static final String DIPLOID_TXT_NO_MARKER_NAMES = "/diploid_genotypes/no-marker-names.txt";
 
     private static final String ERRONEOUS_FILES_DIR = "/frequency_genotypes/err/";
     private static final String DIPLOID_ERRONEOUS_FILES_DIR = "/diploid_genotypes/err/";
@@ -270,7 +268,7 @@ public class SimpleGenotypeVariantDataTest {
         System.out.println(" |- File diploid/" + dataName);
         testDataDiploid(SimpleGenotypeVariantData.readData(
             Paths.get(SimpleGenotypeVariantDataTest.class.getResource(DIPLOID_TXT_NAMES).getPath()),
-            FileType.TXT, GenotypeDataFormat.DIPLOID
+            FileType.TXT, GenotypeDataFormat.PHASED
         ));
     }
     
@@ -283,7 +281,7 @@ public class SimpleGenotypeVariantDataTest {
         System.out.println(" |- File diploid/" + dataName);
         testDataDiploid(SimpleGenotypeVariantData.readData(
             Paths.get(SimpleGenotypeVariantDataTest.class.getResource(DIPLOID_CSV_NAMES).getPath()),
-            FileType.CSV, GenotypeDataFormat.DIPLOID
+            FileType.CSV, GenotypeDataFormat.PHASED
         ));
     }
     
@@ -296,20 +294,7 @@ public class SimpleGenotypeVariantDataTest {
         System.out.println(" |- File diploid/" + dataName);
         testDataDiploid(SimpleGenotypeVariantData.readData(
             Paths.get(SimpleGenotypeVariantDataTest.class.getResource(DIPLOID_CSV_NAMES_IDS).getPath()),
-            FileType.CSV, GenotypeDataFormat.DIPLOID
-        ));
-    }
-    
-    @Test
-    public void diploidFromTxtFileWithoutMarkerNames() throws IOException {
-        dataName = "no-marker-names.txt";
-        expectedHeaders = HEADERS_UNIQUE_NAMES;
-        expectedMarkerNames = UNDEFINED_MARKER_NAMES_DIPLOID;
-        expectedAlleleNames = ALLELE_NAMES_DIPLOID;
-        System.out.println(" |- File diploid/" + dataName);
-        testDataDiploid(SimpleGenotypeVariantData.readData(
-            Paths.get(SimpleGenotypeVariantDataTest.class.getResource(DIPLOID_TXT_NO_MARKER_NAMES).getPath()),
-            FileType.TXT, GenotypeDataFormat.DIPLOID
+            FileType.CSV, GenotypeDataFormat.PHASED
         ));
     }
     
@@ -352,7 +337,7 @@ public class SimpleGenotypeVariantDataTest {
                 FileType type = file.toString().endsWith(".txt") ? FileType.TXT : FileType.CSV;
                 boolean thrown = false;
                 try {
-                    SimpleGenotypeVariantData.readData(file, type, GenotypeDataFormat.DIPLOID);
+                    SimpleGenotypeVariantData.readData(file, type, GenotypeDataFormat.PHASED);
                 } catch (IOException ex){
                     thrown = true;
                     System.out.print(ex.getMessage());

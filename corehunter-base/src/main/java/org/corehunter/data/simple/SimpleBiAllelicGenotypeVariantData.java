@@ -24,9 +24,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 
@@ -50,10 +47,6 @@ public class SimpleBiAllelicGenotypeVariantData extends SimpleGenotypeVariantDat
 
     private static final String NAMES_HEADER = "NAME";
     private static final String IDENTIFIERS_HEADER = "ID";
-    private static final Collection<GenotypeDataFormat> SUPPORTED_OUTPUT_FORMATS
-            = Collections.unmodifiableSet(new HashSet<>(Arrays.asList(
-                    GenotypeDataFormat.FREQUENCY, GenotypeDataFormat.BIALLELIC
-            )));
 
     private final Integer[][] alleleScores; // null element means missing value
 
@@ -365,16 +358,36 @@ public class SimpleBiAllelicGenotypeVariantData extends SimpleGenotypeVariantDat
 
     }
 
+    /**
+     * Get list of supported output formats that may be used in {@link #writeData(Path, FileType)}.
+     * 
+     * @return list containing {@link GenotypeDataFormat#FREQUENCY} and {@link GenotypeDataFormat#BIALLELIC}
+     */
     @Override
-    public Collection<GenotypeDataFormat> getSupportedOutputFormats() {
-        return SUPPORTED_OUTPUT_FORMATS;
+    public List<GenotypeDataFormat> getSupportedOutputFormats() {
+        return Arrays.asList(GenotypeDataFormat.FREQUENCY, GenotypeDataFormat.BIALLELIC);
     }
     
+    /**
+     * Write data in biallelic format.
+     * 
+     * @param filePath file path
+     * @param fileType {@link FileType#TXT} or {@link FileType#CSV}
+     * @throws IOException if the data can not be written to the file
+     */
     @Override
     public void writeData(Path filePath, FileType fileType) throws IOException {
         writeData(filePath, fileType, GenotypeDataFormat.BIALLELIC);
     }
 
+    /**
+     * Write file to the given format (frequency or biallelic).
+     * 
+     * @param filePath file path
+     * @param fileType {@link FileType#TXT} or {@link FileType#CSV}
+     * @param format chosen output format
+     * @throws IOException if the data can not be written to the file
+     */
     @Override
     public void writeData(Path filePath, FileType fileType, GenotypeDataFormat format) throws IOException {
         
@@ -392,7 +405,7 @@ public class SimpleBiAllelicGenotypeVariantData extends SimpleGenotypeVariantDat
         
     }
     
-    public void writeBiallelicData(Path filePath, FileType fileType) throws IOException {
+    private void writeBiallelicData(Path filePath, FileType fileType) throws IOException {
 
         // validate arguments
         if (filePath == null) {

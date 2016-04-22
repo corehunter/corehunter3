@@ -114,13 +114,7 @@ public class TestData {
         "mk3",
         "mk4"
     };
-    public static final String[] UNDEFINED_MARKER_NAMES_DIPLOID = {
-        null,
-        null,
-        null,
-        null
-    };
-
+    
     public static final Double[][][] ALLELE_FREQUENCIES = {
         {
             {null, null, null},

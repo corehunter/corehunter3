@@ -2,9 +2,6 @@ package org.corehunter.data;
 
 public enum GenotypeDataFormat {
     FREQUENCY,
-    //HOMOZYGOUS,
-    DIPLOID,
-    //TRIPLOID,
-    //TETRAPLOID,
+    PHASED,
     BIALLELIC
 }
