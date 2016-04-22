@@ -21,12 +21,14 @@ package org.corehunter.tests.data.simple;
 
 import static org.corehunter.tests.TestData.ALLELE_FREQUENCIES;
 import static org.corehunter.tests.TestData.ALLELE_FREQUENCIES_DIPLOID;
+import static org.corehunter.tests.TestData.ALLELE_FREQUENCIES_HOMOZYGOUS;
 import static org.corehunter.tests.TestData.ALLELE_NAMES;
 import static org.corehunter.tests.TestData.ALLELE_NAMES_DIPLOID;
+import static org.corehunter.tests.TestData.ALLELE_NAMES_HOMOZYGOUS;
 import static org.corehunter.tests.TestData.HEADERS_NON_UNIQUE_NAMES;
 import static org.corehunter.tests.TestData.HEADERS_UNIQUE_NAMES;
 import static org.corehunter.tests.TestData.MARKER_NAMES;
-import static org.corehunter.tests.TestData.MARKER_NAMES_DIPLOID;
+import static org.corehunter.tests.TestData.MARKER_NAMES_PHASED;
 import static org.corehunter.tests.TestData.NAME;
 import static org.corehunter.tests.TestData.PRECISION;
 import static org.corehunter.tests.TestData.SET;
@@ -68,6 +70,10 @@ public class SimpleGenotypeVariantDataTest {
     private static final String DIPLOID_CSV_NAMES = "/diploid_genotypes/names.csv";
     private static final String DIPLOID_CSV_NAMES_IDS = "/diploid_genotypes/names-and-ids.csv";
 
+    private static final String HOMOZYGOUS_TXT_NAMES = "/homozygous_genotypes/names.txt";
+    private static final String HOMOZYGOUS_CSV_NAMES = "/homozygous_genotypes/names.csv";
+    private static final String HOMOZYGOUS_CSV_NAMES_IDS = "/homozygous_genotypes/names-and-ids.csv";
+
     private static final String ERRONEOUS_FILES_DIR = "/frequency_genotypes/err/";
     private static final String DIPLOID_ERRONEOUS_FILES_DIR = "/diploid_genotypes/err/";
     private static final String TEST_OUTPUT = "target/testoutput";
@@ -98,7 +104,7 @@ public class SimpleGenotypeVariantDataTest {
         expectedHeaders = HEADERS_NON_UNIQUE_NAMES;
         expectedMarkerNames = MARKER_NAMES;
         expectedAlleleNames = ALLELE_NAMES;
-        testDataGeneral(new SimpleGenotypeVariantData(
+        testDataFrequencies(new SimpleGenotypeVariantData(
                 HEADERS_NON_UNIQUE_NAMES, MARKER_NAMES, ALLELE_NAMES, ALLELE_FREQUENCIES
         ));
     }
@@ -110,7 +116,7 @@ public class SimpleGenotypeVariantDataTest {
         expectedHeaders = HEADERS_NON_UNIQUE_NAMES;
         expectedMarkerNames = MARKER_NAMES;
         expectedAlleleNames = ALLELE_NAMES;
-        testDataGeneral(new SimpleGenotypeVariantData(
+        testDataFrequencies(new SimpleGenotypeVariantData(
                 NAME, HEADERS_NON_UNIQUE_NAMES, MARKER_NAMES, ALLELE_NAMES, ALLELE_FREQUENCIES
         ));
     }
@@ -122,7 +128,7 @@ public class SimpleGenotypeVariantDataTest {
         expectedMarkerNames = MARKER_NAMES;
         expectedAlleleNames = ALLELE_NAMES;
         System.out.println(" |- File " + dataName);
-        testDataGeneral(SimpleGenotypeVariantData.readData(
+        testDataFrequencies(SimpleGenotypeVariantData.readData(
             Paths.get(SimpleGenotypeVariantDataTest.class.getResource(TXT_NAMES).getPath()),
             FileType.TXT
         ));
@@ -135,7 +141,7 @@ public class SimpleGenotypeVariantDataTest {
         expectedMarkerNames = MARKER_NAMES;
         expectedAlleleNames = ALLELE_NAMES;
         System.out.println(" |- File " + dataName);
-        testDataGeneral(SimpleGenotypeVariantData.readData(
+        testDataFrequencies(SimpleGenotypeVariantData.readData(
             Paths.get(SimpleGenotypeVariantDataTest.class.getResource(CSV_NAMES).getPath()),
             FileType.CSV
         ));
@@ -148,7 +154,7 @@ public class SimpleGenotypeVariantDataTest {
         expectedMarkerNames = MARKER_NAMES;
         expectedAlleleNames = ALLELE_NAMES;
         System.out.println(" |- File " + dataName);
-        testDataGeneral(SimpleGenotypeVariantData.readData(
+        testDataFrequencies(SimpleGenotypeVariantData.readData(
             Paths.get(SimpleGenotypeVariantDataTest.class.getResource(CSV_NAMES_IDS).getPath()),
             FileType.CSV
         ));
@@ -162,7 +168,7 @@ public class SimpleGenotypeVariantDataTest {
         expectedMarkerNames = MARKER_NAMES;
         expectedAlleleNames = UNDEFINED_ALLELE_NAMES;
         System.out.println(" |- File " + dataName);
-        testDataGeneral(SimpleGenotypeVariantData.readData(
+        testDataFrequencies(SimpleGenotypeVariantData.readData(
             Paths.get(SimpleGenotypeVariantDataTest.class.getResource(CSV_NO_ALLELE_NAMES).getPath()),
             FileType.CSV
         ));
@@ -219,7 +225,7 @@ public class SimpleGenotypeVariantDataTest {
         genotypicData.writeData(path, FileType.CSV);
         
         System.out.println(" |- Read written File " + dataName);
-        testData(SimpleGenotypeVariantData.readData(path, FileType.CSV), ALLELE_FREQUENCIES);
+        testDataFrequencies(SimpleGenotypeVariantData.readData(path, FileType.CSV));
     }
     
     @Test
@@ -244,6 +250,88 @@ public class SimpleGenotypeVariantDataTest {
         }
     }
     
+    /**************/
+    /* HOMOZYGOUS */
+    /**************/
+    
+    @Test
+    public void homozygousInMemory() {
+        System.out.println(" |- In memory test (homozygous)");
+        dataName = NAME;
+        expectedHeaders = HEADERS_NON_UNIQUE_NAMES;
+        expectedMarkerNames = MARKER_NAMES_PHASED;
+        expectedAlleleNames = ALLELE_NAMES_HOMOZYGOUS;
+        testDataHomozygous(new SimpleGenotypeVariantData(NAME, HEADERS_NON_UNIQUE_NAMES, MARKER_NAMES_PHASED,
+                                                         ALLELE_NAMES_HOMOZYGOUS, ALLELE_FREQUENCIES_HOMOZYGOUS));
+    }
+    
+    @Test
+    public void homozygousFromCsvFileWithNamesAndIDs() throws IOException {
+        dataName = "names-and-ids.csv";
+        expectedHeaders = HEADERS_NON_UNIQUE_NAMES;
+        expectedMarkerNames = MARKER_NAMES_PHASED;
+        expectedAlleleNames = ALLELE_NAMES_HOMOZYGOUS;
+        System.out.println(" |- File homozygous/" + dataName);
+        testDataHomozygous(SimpleGenotypeVariantData.readData(
+            Paths.get(SimpleGenotypeVariantDataTest.class.getResource(HOMOZYGOUS_CSV_NAMES_IDS).getPath()),
+            FileType.CSV, GenotypeDataFormat.PHASED
+        ));
+    }
+    
+    @Test
+    public void homozygousFromTxtFileWithNames() throws IOException {
+        dataName = "names.txt";
+        expectedHeaders = HEADERS_UNIQUE_NAMES;
+        expectedMarkerNames = MARKER_NAMES_PHASED;
+        expectedAlleleNames = ALLELE_NAMES_HOMOZYGOUS;
+        System.out.println(" |- File homozygous/" + dataName);
+        testDataHomozygous(SimpleGenotypeVariantData.readData(
+            Paths.get(SimpleGenotypeVariantDataTest.class.getResource(HOMOZYGOUS_TXT_NAMES).getPath()),
+            FileType.TXT, GenotypeDataFormat.PHASED
+        ));
+    }
+    
+    @Test
+    public void homozygousFromCsvFileWithNames() throws IOException {
+        dataName = "names.csv";
+        expectedHeaders = HEADERS_UNIQUE_NAMES;
+        expectedMarkerNames = MARKER_NAMES_PHASED;
+        expectedAlleleNames = ALLELE_NAMES_HOMOZYGOUS;
+        System.out.println(" |- File homozygous/" + dataName);
+        testDataHomozygous(SimpleGenotypeVariantData.readData(
+            Paths.get(SimpleGenotypeVariantDataTest.class.getResource(HOMOZYGOUS_CSV_NAMES).getPath()),
+            FileType.CSV, GenotypeDataFormat.PHASED
+        ));
+    }
+    
+    @Test
+    public void homozygousToCsvFileWithNamesAndIDs() throws IOException {
+        dataName = "names-and-ids.csv";
+        expectedHeaders = HEADERS_NON_UNIQUE_NAMES;
+        expectedMarkerNames = MARKER_NAMES_PHASED;
+        expectedAlleleNames = ALLELE_NAMES_HOMOZYGOUS;
+        
+        SimpleGenotypeVariantData genotypicData = new SimpleGenotypeVariantData(
+                expectedHeaders, expectedMarkerNames, expectedAlleleNames, ALLELE_FREQUENCIES_HOMOZYGOUS
+        );
+        
+        Path path = Paths.get(TEST_OUTPUT);
+        
+        Files.createDirectories(path);
+        
+        path = Files.createTempDirectory(path, "GenoHomozygous-CsvFileWithNamesAndIDs");
+        
+        path = Paths.get(path.toString(), dataName);
+        
+        Files.deleteIfExists(path);
+        
+        System.out.println(" |- Write homozygous File " + dataName);
+        genotypicData.writeData(path, FileType.CSV);
+        
+        System.out.println(" |- Read written File " + dataName);
+        testDataHomozygous(SimpleGenotypeVariantData.readData(path, FileType.CSV, GenotypeDataFormat.FREQUENCY));
+    }
+    
     /***********/
     /* DIPLOID */
     /***********/
@@ -253,9 +341,9 @@ public class SimpleGenotypeVariantDataTest {
         System.out.println(" |- In memory test (diploid)");
         dataName = NAME;
         expectedHeaders = HEADERS_NON_UNIQUE_NAMES;
-        expectedMarkerNames = MARKER_NAMES_DIPLOID;
+        expectedMarkerNames = MARKER_NAMES_PHASED;
         expectedAlleleNames = ALLELE_NAMES_DIPLOID;
-        testDataDiploid(new SimpleGenotypeVariantData(NAME, HEADERS_NON_UNIQUE_NAMES, MARKER_NAMES_DIPLOID,
+        testDataDiploid(new SimpleGenotypeVariantData(NAME, HEADERS_NON_UNIQUE_NAMES, MARKER_NAMES_PHASED,
                                                       ALLELE_NAMES_DIPLOID, ALLELE_FREQUENCIES_DIPLOID));
     }
     
@@ -263,7 +351,7 @@ public class SimpleGenotypeVariantDataTest {
     public void diploidFromTxtFileWithNames() throws IOException {
         dataName = "names.txt";
         expectedHeaders = HEADERS_UNIQUE_NAMES;
-        expectedMarkerNames = MARKER_NAMES_DIPLOID;
+        expectedMarkerNames = MARKER_NAMES_PHASED;
         expectedAlleleNames = ALLELE_NAMES_DIPLOID;
         System.out.println(" |- File diploid/" + dataName);
         testDataDiploid(SimpleGenotypeVariantData.readData(
@@ -276,7 +364,7 @@ public class SimpleGenotypeVariantDataTest {
     public void diploidFromCsvFileWithNames() throws IOException {
         dataName = "names.csv";
         expectedHeaders = HEADERS_UNIQUE_NAMES;
-        expectedMarkerNames = MARKER_NAMES_DIPLOID;
+        expectedMarkerNames = MARKER_NAMES_PHASED;
         expectedAlleleNames = ALLELE_NAMES_DIPLOID;
         System.out.println(" |- File diploid/" + dataName);
         testDataDiploid(SimpleGenotypeVariantData.readData(
@@ -289,7 +377,7 @@ public class SimpleGenotypeVariantDataTest {
     public void diploidFromCsvFileWithNamesAndIDs() throws IOException {
         dataName = "names-and-ids.csv";
         expectedHeaders = HEADERS_NON_UNIQUE_NAMES;
-        expectedMarkerNames = MARKER_NAMES_DIPLOID;
+        expectedMarkerNames = MARKER_NAMES_PHASED;
         expectedAlleleNames = ALLELE_NAMES_DIPLOID;
         System.out.println(" |- File diploid/" + dataName);
         testDataDiploid(SimpleGenotypeVariantData.readData(
@@ -302,7 +390,7 @@ public class SimpleGenotypeVariantDataTest {
     public void diploidToCsvFileWithNamesAndIDs() throws IOException {
         dataName = "names-and-ids.csv";
         expectedHeaders = HEADERS_NON_UNIQUE_NAMES;
-        expectedMarkerNames = MARKER_NAMES_DIPLOID;
+        expectedMarkerNames = MARKER_NAMES_PHASED;
         expectedAlleleNames = ALLELE_NAMES_DIPLOID;
         
         SimpleGenotypeVariantData genotypicData = new SimpleGenotypeVariantData(
@@ -323,8 +411,7 @@ public class SimpleGenotypeVariantDataTest {
         genotypicData.writeData(path, FileType.CSV);
         
         System.out.println(" |- Read written File " + dataName);
-        testData(SimpleGenotypeVariantData.readData(path, FileType.CSV, GenotypeDataFormat.FREQUENCY), 
-                ALLELE_FREQUENCIES_DIPLOID);
+        testDataDiploid(SimpleGenotypeVariantData.readData(path, FileType.CSV, GenotypeDataFormat.FREQUENCY));
     }
     
     @Test
@@ -426,12 +513,16 @@ public class SimpleGenotypeVariantDataTest {
         
     }
     
-    private void testDataGeneral(GenotypeVariantData data) {
+    private void testDataFrequencies(GenotypeVariantData data) {
         testData(data, ALLELE_FREQUENCIES);
     }
     
     private void testDataDiploid(GenotypeVariantData data) {
         testData(data, ALLELE_FREQUENCIES_DIPLOID);
+    }
+    
+    private void testDataHomozygous(GenotypeVariantData data) {
+        testData(data, ALLELE_FREQUENCIES_HOMOZYGOUS);
     }
     
 }

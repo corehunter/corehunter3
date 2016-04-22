@@ -108,7 +108,7 @@ public class TestData {
         null
     };
     
-    public static final String[] MARKER_NAMES_DIPLOID = {
+    public static final String[] MARKER_NAMES_PHASED = {
         "mk1",
         "mk2",
         "mk3",
@@ -195,6 +195,39 @@ public class TestData {
             {0.0, 1.0}
         }
     };
+    
+    public static final Double[][][] ALLELE_FREQUENCIES_HOMOZYGOUS = {
+        {
+            {1.0, 0.0},
+            {1.0, 0.0, 0.0},
+            {1.0, 0.0},
+            {null, null}
+        },
+        {
+            {0.0, 1.0},
+            {0.0, 1.0, 0.0},
+            {1.0, 0.0},
+            {1.0, 0.0}
+        },
+        {
+            {1.0, 0.0},
+            {0.0, 0.0, 1.0},
+            {0.0, 1.0},
+            {1.0, 0.0}
+        },
+        {
+            {0.0, 1.0},
+            {1.0, 0.0, 0.0},
+            {0.0, 1.0},
+            {1.0, 0.0}
+        },
+        {
+            {1.0, 0.0},
+            {null, null, null},
+            {1.0, 0.0},
+            {0.0, 1.0}
+        }
+    };
 
     public static final String[][] ALLELE_NAMES = {
         {"mk1-1", "mk1-2", "mk1-3"},
@@ -218,6 +251,13 @@ public class TestData {
     public static final String[][] ALLELE_NAMES_DIPLOID = {
         {"1", "2", "3"},
         {"A", "B", "C", "D"},
+        {"a1", "a2"},
+        {"+", "-"}
+    };
+    
+    public static final String[][] ALLELE_NAMES_HOMOZYGOUS = {
+        {"1", "2"},
+        {"B", "C", "D"},
         {"a1", "a2"},
         {"+", "-"}
     };
@@ -334,7 +374,7 @@ public class TestData {
         {null, null}
     };
     
-    // computed from multi-allelic frequency data
+    // all genotypic evaluations are computed from the data in frequency format
     public static final double[][] MODIFIED_ROGERS_DISTANCES = {
         {0, 0.626783170528009, 0.133630620956212, 0.267261241912424, 0.422577127364258},
         {0.626783170528009, 0, 0.611594325552174, 0.681385143869247, 0.288675134594813},
