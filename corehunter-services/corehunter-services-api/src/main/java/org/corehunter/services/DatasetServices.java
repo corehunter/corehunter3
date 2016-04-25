@@ -86,8 +86,8 @@ public interface DatasetServices {
      * dataset merging with existing data. 
      * 
      * <p>Data loading options can include the Genotype Data Format
-     * )see {@link GenotypeDataFormat}) for {@link DataType#GENOTYPIC} or 
-     * the Symmetric Matrix Format (see {@link SymmetricMatrixFormat})
+     * (see {@link org.corehunter.data.GenotypeDataFormat}) for {@link DataType#GENOTYPIC} or 
+     * the Symmetric Matrix Format (see {@link org.corehunter.data.SymmetricMatrixFormat})
      * for {@link DataType#DISTANCES}
      * 
      * @param dataset
