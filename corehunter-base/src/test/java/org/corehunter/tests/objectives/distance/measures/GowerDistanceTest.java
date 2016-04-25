@@ -25,7 +25,7 @@ import java.io.IOException;
 import java.nio.file.Paths;
 
 import org.corehunter.data.DistanceMatrixData;
-import org.corehunter.data.matrix.SymmetricMatrixFormat;
+import org.corehunter.data.SymmetricMatrixFormat;
 import org.corehunter.data.CoreHunterData;
 import org.corehunter.data.simple.SimpleDistanceMatrixData;
 import org.corehunter.objectives.distance.measures.GowerDistance;

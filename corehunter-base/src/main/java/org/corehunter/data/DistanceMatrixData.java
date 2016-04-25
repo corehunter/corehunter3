@@ -38,5 +38,5 @@ public interface DistanceMatrixData extends Data {
      * @return the distance between two entries
      */
     public double getDistance(int idX, int idY);
-
+    
 }

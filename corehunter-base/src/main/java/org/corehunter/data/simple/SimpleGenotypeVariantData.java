@@ -27,12 +27,14 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
+import java.util.Collections;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.stream.Stream;
 
 import org.corehunter.data.GenotypeDataFormat;
 import org.corehunter.data.GenotypeVariantData;
@@ -285,18 +287,17 @@ public class SimpleGenotypeVariantData extends DataPojo implements GenotypeVaria
      * @return genotype variant data
      * @throws IOException if the file can not be read or is not correctly formatted
      */
-    public final static SimpleGenotypeVariantData readData(Path filePath, FileType type) throws IOException {
+    public static GenotypeVariantData readData(Path filePath, FileType type) throws IOException {
         return readData(filePath, type, GenotypeDataFormat.FREQUENCY) ;
     }
 
     /**
      * Read genotype variant data from file. Only file types {@link FileType#TXT} and {@link FileType#CSV} are allowed.
      * Values are separated with a single tab (txt) or comma (csv) character. 
-     * 
      * <p>
      * Several formats are supported.  
      * 
-     * <p>For {@link GenotypeDataFormat#FREQUENCY} format allele frequencies should follow the
+     * <p>For {@link GenotypeDataFormat#FREQUENCY} the file should contain allele frequencies following the
      * requirements as described in the constructor {@link #SimpleGenotypeVariantData(String, SimpleEntity[], String[],
      * String[][], Double[][][])}. Missing frequencies are encoding as empty cells.
      * The file starts with a compulsory header row from which (unique) marker names and allele counts are inferred.
@@ -308,24 +309,27 @@ public class SimpleGenotypeVariantData extends DataPojo implements GenotypeVaria
      * header "ALLELE". Allele names need not be unique and can be undefined for some alleles by leaving the
      * corresponding cells empty.
      * 
-     * <p>For {@link GenotypeDataFormat#DIPLOID} Diploid data the file contains two consecutive columns per marker in 
-     * which the two observed alleles are specified (by number/name/id) for each individual. The number of alleles may
-     * be larger than two and different per marker, but each diploid genotype contains only one (homozygous) or
-     * two (heterozygous) of all possible alleles of a certain marker. This means that all inferred frequencies
-     * are either 0.0, 0.5 or 1.0. Missing values are encoding as empty cells.
+     * <p>For {@link GenotypeDataFormat#PHASED} the file contains one or more consecutive columns per marker in 
+     * which the observed alleles are specified (by name/id/number). Common cases are those with one or two columns
+     * per marker, used for haploid and diploid organisms, respectively. For fully homozygous data it is always
+     * sufficient to specify one column per marker, regardless of the ploidy. Higher ploidy (triploid, tetraploid, ...)
+     * is also supported as well ass a varying ploidy (number of columns) per marker.
      * <p>
-     * An required first header row and optional header column are included to specify individual and marker names,
-     * respectively, identified with column/row header "NAME". If item names are not unique or defined for some but
-     * not all items, a second header column "ID" should be included to provide unique identifiers for at least those
-     * items whose name is undefined or not unique.
+     * Missing values are encoding as empty cells.
      * <p>
-     * Each pair of two consecutive columns corresponds to a single marker and the headers of these two columns,
-     * if provided, should share a unique prefix. The longest shared prefix of both column names is used as the marker
-     * name. A single trailing dash, underscore or dot character is removed from the inferred marker name, but only
-     * if this modification does not introduce duplicate names. The latter allows to use column names such as
-     * "M1-1" and "M1-2", "M1.a" and "M1.b" or "M1_1" and "M1_2" for a marker named "M1". It is allowed that
-     * some column names are undefined but a name should either be provided or not for both columns corresponding
-     * to the same marker.
+     * A required first header row and column are included to specify individual and marker names, respectively,
+     * identified with column/row header "NAME". If item names are not unique or defined for some but not all items,
+     * a second header column "ID" should be included to provide unique identifiers for at least those items whose
+     * name is undefined or not unique.
+     * <p>
+     * Consecutive columns corresponding to the same marker should be tagged with the name of that marker, optionally
+     * followed by an arbitrary suffix starting with a dash, underscore or dot character. The latter allows to use
+     * column names such as "M1-1" and "M1-2", "M1.a" and "M1.b" or "M1_1" and "M1_2" for a marker named "M1" (in case
+     * of diploid data). The marker name itself can not contain any dash, underscore or dot characters, otherwise
+     * part of the name will be lost when loading the data. Marker names should be unique.
+     * 
+     * <p>For {@link GenotypeDataFormat#BIALLELIC} the file contains allele scores for biallelic markers and is
+     * read with {@link SimpleBiAllelicGenotypeVariantData#readData(Path, FileType)}.
      * 
      * <p>
      * In all formats the leading and trailing whitespace is removed from names and unique identifiers and they are 
@@ -343,76 +347,29 @@ public class SimpleGenotypeVariantData extends DataPojo implements GenotypeVaria
      * @return genotype variant data
      * @throws IOException if the file can not be read or is not correctly formatted
      */
-    public final static SimpleGenotypeVariantData readData(Path filePath, FileType type, 
-            GenotypeDataFormat format) throws IOException {
+    public static GenotypeVariantData readData(Path filePath, FileType type,
+                                               GenotypeDataFormat format) throws IOException {
         
         if (format == null) {
             throw new IllegalArgumentException("Format not defined.");
         }
         
         switch (format) {
-            case DIPLOID:
-                return readDiploidData(filePath, type);
             case FREQUENCY:
                 return readFrequencyData(filePath, type);
+            case PHASED:
+                return readPhasedData(filePath, type);
+            case BIALLELIC:
+                return SimpleBiAllelicGenotypeVariantData.readData(filePath, type) ;
             default:
                 throw new IllegalArgumentException("Unsupported format : " + format);
 
         }
     }
     
-    /**
-     * Write genotype variant data to file in frequency format. See 
-     * {@link #writeData(Path, SimpleGenotypeVariantData, FileType, GenotypeDataFormat)}
-     * for details. Only file types {@link FileType#TXT} and {@link FileType#CSV} are allowed.
-     * 
-     * @param filePath path to file where the data will be written
-     * @param genotypicData the data to be written
-     * @param type the type of data file
-     * @throws IOException if the file can not be written
-     */
-    public final static void writeData(Path filePath, 
-            SimpleGenotypeVariantData genotypicData, FileType type) throws IOException {
-        
-        writeData(filePath, genotypicData, type, GenotypeDataFormat.FREQUENCY);
-    }
-    
-    /**
-     * Write genotype variant data to file to supported formats. See 
-     * {@link #readData(Path, FileType, GenotypeDataFormat)}
-     * for a description of the supported formats. 
-     * Only file types {@link FileType#TXT} and {@link FileType#CSV} are allowed.
-     * 
-     * @param filePath path to file where the data will be written
-     * @param genotypicData the data to be written
-     * @param type the type of data file
-     * @param format the format of the data file
-     * @throws IOException if the file can not be written
-     */
-    public final static void writeData(Path filePath, 
-            SimpleGenotypeVariantData genotypicData, FileType type, 
-            GenotypeDataFormat format) throws IOException {
-        
-        if (format == null) {
-            throw new IllegalArgumentException("Format not defined.");
-        }
-        
-        switch (format) {
-            case DIPLOID:
-                writeDiploidData(filePath, genotypicData, type);
-                break ;
-            case FREQUENCY:
-                writeFrequencyData(filePath, genotypicData, type);
-                break ;
-            default:
-                throw new IllegalArgumentException("Unsupported format : " + format);
+    private static SimpleGenotypeVariantData readFrequencyData(Path filePath, FileType type) throws IOException {
 
-        }
-    }
-    
-    private final static SimpleGenotypeVariantData readFrequencyData(Path filePath, FileType type) throws IOException {
         // validate arguments
-        
         if (filePath == null) {
             throw new IllegalArgumentException("File path not defined.");
         }
@@ -621,11 +578,9 @@ public class SimpleGenotypeVariantData extends DataPojo implements GenotypeVaria
         }
     }
 
-    private final static SimpleGenotypeVariantData readDiploidData(Path filePath, FileType type)
-                                                                  throws IOException {
+    private static SimpleGenotypeVariantData readPhasedData(Path filePath, FileType type) throws IOException {
         
         // validate arguments
-        
         if (filePath == null) {
             throw new IllegalArgumentException("File path not defined.");
         }
@@ -684,6 +639,8 @@ public class SimpleGenotypeVariantData extends DataPojo implements GenotypeVaria
             int numHeaderCols = 0;
             if(withNames){
                 numHeaderCols++;
+            } else {
+                throw new IOException("Individual and marker names are required.");
             }
             if(withIds){
                 numHeaderCols++;
@@ -696,67 +653,32 @@ public class SimpleGenotypeVariantData extends DataPojo implements GenotypeVaria
                 throw new IOException("No data rows.");
             }
             
-            // infer number of markers
+            // 1: infer marker names and number of columns per marker
+            
             int numDataCols = numCols - numHeaderCols;
             if(numDataCols == 0){
                 throw new IOException("No data columns.");
             }
-            if(numDataCols % 2 != 0){
-                throw new IOException("Number of data columns is not a multiple of two. Got: " + numDataCols + ".");
-            }
-            int numMarkers = numDataCols/2;
             
-            // 1: infer marker names (if column names provided)
-
-            String[] markerNames = null;
-            if(withNames){
-                String[] headerRow = rows.get(0);
-                markerNames = new String[numMarkers];
-                for(int m = 0; m < numMarkers; m++){
-                    int c1 = numHeaderCols + 2*m;
-                    int c2 = c1 + 1;
-                    String colName1 = headerRow[c1];
-                    String colName2 = headerRow[c2];
-                    String markerName;
-                    if(colName1 == null && colName2 == null){
-                        markerName = null;
-                    } else if (colName1 != null && colName2 != null){
-                        // infer longest shared prefix
-                        markerName = longestSharedPrefix(colName1, colName2);
-                        // check not empty
-                        if(markerName.equals("")){
-                            throw new IOException(String.format(
-                                    "Marker column names %s and %s do not share a prefix.",
-                                    colName1, colName2
-                            ));
-                        }
-                    } else {
-                        throw new IOException(String.format(
-                                "Marker column name should either be set for both or none of the two columns "
-                              + "corresponding to the same marker. Found name %s for column %d but none for column %d.",
-                                colName1 != null ? colName1 : colName2,
-                                colName1 != null ? c1 : c2,
-                                colName1 == null ? c1 : c2
-                        ));
+            LinkedList<String> markerNames = new LinkedList<>();
+            LinkedList<Integer> markerNumCols = new LinkedList<>();
+            String[] headerRow = rows.get(0);
+            for(int c = numHeaderCols; c < numCols; c++){
+                String markerName = inferMarkerName(headerRow, c);
+                if(markerNames.isEmpty() || !markerName.equals(markerNames.getLast())){
+                    // first column for new marker
+                    if(markerNames.contains(markerName)){
+                        throw new IOException("Duplicate marker name: " + markerName + ". "
+                                + "Columns corresponding to same marker should occur consecutively in the file.");
                     }
-                    markerNames[m] = markerName;
+                    markerNumCols.add(1);
+                    markerNames.add(markerName);
+                } else {
+                    // additional column for current marker
+                    markerNumCols.add(markerNumCols.removeLast() + 1);
                 }
-                // check uniqueness
-                uniqueMarkerNames(markerNames, true);
-                // remove trailing dots, underscores and dashes from
-                // inferred marker names if this does not compromise uniqueness
-                String[] trimmedMarkerNames = Arrays.stream(markerNames)
-                                                    .map(str -> 
-                                                         str != null
-                                                           && (str.endsWith(".")
-                                                               || str.endsWith("-")
-                                                               || str.endsWith("_"))
-                                                         ? str.substring(0, str.length()-1)
-                                                         : str
-                                                    )
-                                                    .toArray(k -> new String[k]);
-                markerNames = uniqueMarkerNames(trimmedMarkerNames, false) ? trimmedMarkerNames : markerNames;
             }
+            int numMarkers = markerNames.size();
             
             // 2: extract item names/identifiers
 
@@ -775,55 +697,62 @@ public class SimpleGenotypeVariantData extends DataPojo implements GenotypeVaria
                 }
             }
             
-            // 3: extract alleles
+            // 3: split observed alleles per marker
+            String[][][] observedAlleles = new String[n][numMarkers][];
+            for(int i = 0; i < n; i++){
+                String[] row = rows.get(numHeaderRows+i);
+                int c = numHeaderCols;
+                for(int m = 0; m < numMarkers; m++){
+                    int nCol = markerNumCols.get(m);
+                    observedAlleles[i][m] = new String[nCol];
+                    for(int mc = 0; mc < nCol; mc++){
+                        observedAlleles[i][m][mc] = row[c++];
+                    }
+                }
+            }
             
-            // infer allele names per marker
+            // 4: infer and sort allele names per marker
             String[][] alleleNames = new String[numMarkers][];
             for(int m = 0; m < numMarkers; m++){
-                // infer set of observed alleles (sort lexicographically)
+                // infer set of observed alleles for marker m (sort)
                 Set<String> alleles = new TreeSet<>();
                 for(int i = 0; i < n; i++){
-                    String[] row = rows.get(numHeaderRows + i);
-                    for(int a = 0; a < 2; a++){
-                        String allele = row[numHeaderCols + 2*m + a];
-                        if(allele != null){
-                            alleles.add(allele);
+                    for(String observed : observedAlleles[i][m]){
+                        if(observed != null){
+                            alleles.add(observed);
                         }
                     }
                 }
                 // check: at least one allele
                 if(alleles.isEmpty()){
                     throw new IOException(String.format(
-                            "No data for marker %d (columns %d and %d).",
-                            m, numHeaderCols + 2*m, numHeaderCols + 2*m+1
+                            "No data for marker %d.", m
                     ));
                 }
                 // convert to array and store
                 alleleNames[m] = alleles.toArray(new String[alleles.size()]);
             }
             
-            // infer allele frequencies
+            // 5: infer frequencies
             Double[][][] alleleFreqs = new Double[n][numMarkers][];
             for(int i = 0; i < n; i++){
                 for(int m = 0; m < numMarkers; m++){
-                    int numAlleles = alleleNames[m].length;
-                    Double[] freqs = new Double[numAlleles];
-                    String[] row = rows.get(numHeaderRows + i);
-                    String allele1 = row[numHeaderCols + 2*m];
-                    String allele2 = row[numHeaderCols + 2*m+1];
-                    if(allele1 != null && allele2 != null){
+                    String[] markerAlleleNames = alleleNames[m];
+                    int totalNumAlleles = markerAlleleNames.length;
+                    String[] observed = observedAlleles[i][m];
+                    Double[] freqs = new Double[totalNumAlleles];
+                    // check for missing values
+                    if(Arrays.stream(observed).noneMatch(Objects::isNull)){
                         // no missing values
                         Arrays.fill(freqs, 0.0);
                     }
-                    // check which alleles are present
-                    for(int a = 0; a < numAlleles; a++){
-                        // note: increased twice (to 1.0) if allele1 == allele2 == checkAllele
-                        String checkAllele = alleleNames[m][a];
-                        if(checkAllele.equals(allele1)){
-                            increaseFrequency(freqs, a, 0.5);
-                        }
-                        if(checkAllele.equals(allele2)){
-                            increaseFrequency(freqs, a, 0.5);
+                    // increase frequencies according to the observed alleles
+                    double incr = 1.0 / observed.length;
+                    for(int possibleAllele = 0; possibleAllele < totalNumAlleles; possibleAllele++){
+                        for(int observedAllele = 0; observedAllele < observed.length; observedAllele++){
+                            if(markerAlleleNames[possibleAllele].equals(observed[observedAllele])){
+                                increaseFrequency(freqs, possibleAllele, incr);
+                            }
                         }
                     }
                     alleleFreqs[i][m] = freqs;
@@ -850,7 +779,8 @@ public class SimpleGenotypeVariantData extends DataPojo implements GenotypeVaria
             try{
                 // create data
                 return new SimpleGenotypeVariantData(filePath.getFileName().toString(),
-                                                     headers, markerNames, alleleNames, alleleFreqs);
+                                                     headers, markerNames.toArray(new String[0]),
+                                                     alleleNames, alleleFreqs);
             } catch(IllegalArgumentException ex){
                 // convert to IO exception
                 throw new IOException(ex.getMessage());
@@ -859,208 +789,140 @@ public class SimpleGenotypeVariantData extends DataPojo implements GenotypeVaria
         }
                 
     }
-
-    private static void writeFrequencyData(Path filePath, SimpleGenotypeVariantData genotypicData, 
-            FileType fileType) throws IOException {
-
-        if (filePath == null) {
-            throw new IllegalArgumentException("File path not defined.");
-        }
-
-        if (filePath.toFile().exists()) {
-            throw new IOException("File already exists : " + filePath + ".");
-        }
-
-        if (fileType == null) {
-            throw new IllegalArgumentException("File type not defined.");
-        }
-
-        if (fileType != FileType.TXT && fileType != FileType.CSV) {
-            throw new IllegalArgumentException(
-                    String.format("Only file types TXT and CSV are supported. Got: %s.", fileType));
-        }
-
-        Files.createDirectories(filePath.getParent());
-
-        // read data from file
-        try (RowWriter writer = IOUtilities.createRowWriter(filePath.toFile(), fileType,
-                TextFileRowReader.REMOVE_WHITE_SPACE)) {
-
-            if (writer == null || !writer.ready()) {
-                throw new IOException("Can not create writer for file " + filePath + ".");
-            }
-
-            String[] markerNames = genotypicData.markerNames;
-
-            writer.writeCell(NAMES_HEADER);
-            
-            writer.newColumn() ;
-
-            writer.writeCell(IDENTIFIERS_HEADER);
-
-            String[][] alleleNames = genotypicData.alleleNames ;
-            
-            for (int i = 0 ; i < alleleNames.length ; ++i) {
-                for (int j = 0 ; j < alleleNames[i].length ; ++j) {
-                    writer.newColumn() ;
-                    writer.writeCell(markerNames[i]);  
-                }
-            }
-            
-            writer.newRow() ;
-            
-            writer.writeCell(ALLELE_NAMES_HEADER);
-            
-            for (int i = 0 ; i < alleleNames.length ; ++i) {
-                writer.newColumn() ;
-                writer.writeRowCellsAsArray(alleleNames[i]);  
-            }
-
-            Double[][][] alleleFrequencies = genotypicData.alleleFrequencies ;
-
-            SimpleEntity header;
-
-            for (int i = 0; i < alleleFrequencies.length; ++i) {
-
-                writer.newRow();
-                
-                header = genotypicData.getHeader(i);
-                writer.writeCell(header.getName());
-                
-                writer.newColumn() ;
-                
-                writer.writeCell(header.getUniqueIdentifier());
-
-                for (int j = 0; j < alleleFrequencies[i].length; ++j) {
-                    writer.newColumn() ;
-                    
-                    writer.writeRowCellsAsArray(alleleFrequencies[i][j]);
-                }
-            }
-
-            writer.close();
-        }
-    }
     
-
-    private static void writeDiploidData(Path filePath, SimpleGenotypeVariantData genotypicData, 
-            FileType fileType) throws IOException {
-
-        if (filePath == null) {
-            throw new IllegalArgumentException("File path not defined.");
+    private static String inferMarkerName(String[] header, int c) throws IOException {
+        String columnName = header[c];
+        if(columnName == null){
+            throw new IOException("Missing column name for column " + c + ".");
         }
-
-        if (filePath.toFile().exists()) {
-            throw new IOException("File already exists : " + filePath + ".");
+        int i = Stream.of('-', '_', '.').mapToInt(suf -> columnName.indexOf(suf))
+                                        .filter(j -> j >= 0)
+                                        .min().orElse(-1);
+        String markerName = (i >= 0 ? columnName.substring(0, i) : columnName);
+        if(markerName.equals("")){
+            throw new IOException(String.format(
+                    "Empty marker name at column %d (%s).", c, columnName
+            ));
         }
-
-        if (fileType == null) {
-            throw new IllegalArgumentException("File type not defined.");
-        }
-
-        if (fileType != FileType.TXT && fileType != FileType.CSV) {
-            throw new IllegalArgumentException(
-                    String.format("Only file types TXT and CSV are supported. Got: %s.", fileType));
-        }
-        
-        String[][] alleleNames = genotypicData.alleleNames ;
-        
-        String[] markerNames = genotypicData.markerNames;
-        
-        for (int i = 0 ; i < alleleNames.length ; ++i) {
-            if (alleleNames[i].length != 2) {
-                throw new IllegalArgumentException("Marker : " + markerNames[i]
-                        + " does not have 2 alleles : " + alleleNames.length);
-            }
-        }
-
-        Files.createDirectories(filePath.getParent());
-
-        // read data from file
-        try (RowWriter writer = IOUtilities.createRowWriter(filePath.toFile(), fileType,
-                TextFileRowReader.REMOVE_WHITE_SPACE)) {
-
-            if (writer == null || !writer.ready()) {
-                throw new IOException("Can not create writer for file " + filePath + ".");
-            }
-
-            writer.writeCell(NAMES_HEADER);
-            
-            writer.newColumn() ;
-
-            writer.writeCell(IDENTIFIERS_HEADER);
-            
-            for (int i = 0 ; i < alleleNames.length ; ++i) {
-                for (int j = 0 ; j < alleleNames[i].length ; ++j) {
-                    writer.newColumn() ;
-                    writer.writeCell(markerNames[i]);  
-                }
-            }
-            
-            writer.newRow() ;
-            
-            writer.writeCell(ALLELE_NAMES_HEADER);
-            
-            for (int i = 0 ; i < alleleNames.length ; ++i) {
-                writer.newColumn() ;
-                writer.writeRowCellsAsArray(alleleNames[i]);  
-            }
-
-            Double[][][] alleleFrequencies = genotypicData.alleleFrequencies ;
-
-            SimpleEntity header;
-
-            for (int i = 0; i < alleleFrequencies.length; ++i) {
-
-                writer.newRow();
-                
-                header = genotypicData.getHeader(i);
-                writer.writeCell(header.getName());
-                
-                writer.newColumn() ;
-                
-                writer.writeCell(header.getUniqueIdentifier());
-
-                for (int j = 0; j < alleleFrequencies[i].length; ++j) {
-                    writer.newColumn() ;
-                    
-                    writer.writeRowCellsAsArray(alleleFrequencies[i][j]);
-                }
-            }
-
-            writer.close();
-        }  
-    }  
-    
-    private static String longestSharedPrefix(String str1, String str2){
-        int end = 1;
-        int l = Math.min(str1.length(), str2.length());
-        while(end <= l && str1.substring(0, end).equals(str2.substring(0, end))){
-            end++;
-        }
-        return str1.substring(0, end-1);
-    }
-    
-    private static boolean uniqueMarkerNames(String[] names, boolean throwException) throws IOException{
-        if(names == null){
-            return true;
-        }
-        Set<String> checked = new HashSet<>();
-        for(String name : names){
-            if(name != null && !checked.add(name)){
-                if(throwException){
-                    throw new IOException(String.format(
-                            "Duplicate marker name %s (longest shared prefix of both marker column names).", name
-                    ));
-                } else {
-                    return false;
-                }
-            }
-        }
-        return true;
+        return markerName;
     }
     
     private static void increaseFrequency(Double[] freqs, int a, double incr){
         freqs[a] = freqs[a] == null ? incr : freqs[a] + incr;
+    }
+    
+    /**
+     * Get a list of supported output formats that may be used in {@link #writeData(Path, FileType)}.
+     * 
+     * @return singleton list containing only {@link GenotypeDataFormat#FREQUENCY}
+     */
+    public List<GenotypeDataFormat> getSupportedOutputFormats(){
+        return Collections.singletonList(GenotypeDataFormat.FREQUENCY);
+    }
+    
+    /**
+     * Write genotype variant data to file in frequency format.
+     * Only file types {@link FileType#TXT} and {@link FileType#CSV} are allowed.
+     * 
+     * @param filePath path to file where the data will be written
+     * @param fileType the type of data file
+     * @throws IOException if the file can not be written
+     */
+    public void writeData(Path filePath, FileType fileType) throws IOException {
+        writeData(filePath, fileType, GenotypeDataFormat.FREQUENCY);
+    }
+    
+    /**
+     * Write genotype variant data to file in the chosen format.
+     * By default the only supported format is {@link GenotypeDataFormat#FREQUENCY} but the
+     * method may be overridden in subclasses to support other formats.
+     * Only file types {@link FileType#TXT} and {@link FileType#CSV} are allowed.
+     * 
+     * @param filePath path to file where the data will be written
+     * @param fileType the type of data file
+     * @param format output format
+     * @throws IOException if the file can not be written
+     */
+    public void writeData(Path filePath, FileType fileType, GenotypeDataFormat format) throws IOException {
+        
+        // validate arguments
+        if (filePath == null) {
+            throw new IllegalArgumentException("File path not defined.");
+        }
+
+        if (filePath.toFile().exists()) {
+            throw new IOException("File already exists : " + filePath + ".");
+        }
+
+        if (fileType == null) {
+            throw new IllegalArgumentException("File type not defined.");
+        }
+
+        if (fileType != FileType.TXT && fileType != FileType.CSV) {
+            throw new IllegalArgumentException(
+                    String.format("Only file types TXT and CSV are supported. Got: %s.", fileType));
+        }
+        
+        if(format != GenotypeDataFormat.FREQUENCY){
+            throw new IllegalArgumentException("Unsupported output format: " + format);
+        }
+
+        Files.createDirectories(filePath.getParent());
+
+        // write data to file
+        try (RowWriter writer = IOUtilities.createRowWriter(filePath.toFile(), fileType,
+                TextFileRowReader.REMOVE_WHITE_SPACE)) {
+
+            if (writer == null || !writer.ready()) {
+                throw new IOException("Can not create writer for file " + filePath + ".");
+            }
+
+            writer.writeCell(NAMES_HEADER);
+            
+            writer.newColumn() ;
+
+            writer.writeCell(IDENTIFIERS_HEADER);
+            
+            for (int i = 0 ; i < alleleNames.length ; ++i) {
+                for (int j = 0 ; j < alleleNames[i].length ; ++j) {
+                    writer.newColumn() ;
+                    writer.writeCell(markerNames[i]);  
+                }
+            }
+            
+            writer.newRow() ;
+            
+            writer.writeCell(ALLELE_NAMES_HEADER);
+            
+            writer.newColumn();
+            for (int i = 0 ; i < alleleNames.length ; ++i) {
+                writer.newColumn() ;
+                writer.writeRowCellsAsArray(alleleNames[i]);  
+            }
+
+            SimpleEntity header;
+
+            for (int i = 0; i < alleleFrequencies.length; ++i) {
+
+                writer.newRow();
+                
+                header = getHeader(i);
+                writer.writeCell(header.getName());
+                
+                writer.newColumn() ;
+                
+                writer.writeCell(header.getUniqueIdentifier());
+
+                for (int j = 0; j < alleleFrequencies[i].length; ++j) {
+                    writer.newColumn() ;
+                    
+                    writer.writeRowCellsAsArray(alleleFrequencies[i][j]);
+                }
+            }
+
+            writer.close();
+        }
+        
     }  
+    
 }

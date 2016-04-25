@@ -34,7 +34,7 @@ import java.util.Map;
 import org.corehunter.data.CoreHunterData;
 import org.corehunter.data.GenotypeDataFormat;
 import org.corehunter.data.GenotypeVariantData;
-import org.corehunter.data.matrix.SymmetricMatrixFormat;
+import org.corehunter.data.SymmetricMatrixFormat;
 import org.corehunter.data.simple.SimpleBiAllelicGenotypeVariantData;
 import org.corehunter.data.simple.SimpleDistanceMatrixData;
 import org.corehunter.data.simple.SimpleGenotypeVariantData;
@@ -234,7 +234,7 @@ public class FileBasedDatasetServices implements DatasetServices {
                     throw new DatasetException(e);
                 }
      
-                SimpleGenotypeVariantData genotypeVariantData = 
+                SimpleGenotypeVariantData genotypeVariantData = (SimpleGenotypeVariantData)
                         SimpleGenotypeVariantData.readData(orginalDataPath, fileType, genotypeDataFormat);
 
                 genotypeVariantData.setUniqueIdentifier(dataId);
@@ -253,7 +253,7 @@ public class FileBasedDatasetServices implements DatasetServices {
 
                 Files.createDirectories(newPath.getParent());
                 
-                SimpleGenotypeVariantData.writeData(newPath, genotypeVariantData, FileType.TXT);
+                // SimpleGenotypeVariantData.writeData(newPath, genotypeVariantData, FileType.TXT);
 
                 try {
                     writeToXml(Paths.get(newPath.getParent().toString(), FORMAT), genotypeDataFormat) ;
@@ -328,7 +328,7 @@ public class FileBasedDatasetServices implements DatasetServices {
 
                 Files.createDirectories(newPath.getParent());
 
-                SimpleDistanceMatrixData.writeData(newPath, distanceData, FileType.TXT);
+                //SimpleDistanceMatrixData.writeData(newPath, distanceData, FileType.TXT);
                 
                 try {
                     writeToXml(Paths.get(getPath().toString(), FORMAT), SymmetricMatrixFormat.FULL) ;
