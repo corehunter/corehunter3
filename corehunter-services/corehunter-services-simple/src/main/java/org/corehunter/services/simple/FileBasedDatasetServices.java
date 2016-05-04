@@ -31,13 +31,13 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.corehunter.data.BiAllelicGenotypeVariantData;
+import org.corehunter.data.BiAllelicGenotypeData;
 import org.corehunter.data.CoreHunterData;
-import org.corehunter.data.GenotypeVariantData;
+import org.corehunter.data.GenotypeData;
 import org.corehunter.data.SymmetricMatrixFormat;
-import org.corehunter.data.simple.SimpleBiAllelicGenotypeVariantData;
+import org.corehunter.data.simple.SimpleBiAllelicGenotypeData;
 import org.corehunter.data.simple.SimpleDistanceMatrixData;
-import org.corehunter.data.simple.SimpleGenotypeVariantData;
+import org.corehunter.data.simple.SimpleGenotypeData;
 import org.corehunter.services.DatasetServices;
 import org.corehunter.services.DataType;
 
@@ -212,7 +212,7 @@ public class FileBasedDatasetServices implements DatasetServices {
                             "Genotypic Data is already associated for this dataset : " + dataset.getName());
                 }
 
-                SimpleBiAllelicGenotypeVariantData biAllelicenotypeData = SimpleBiAllelicGenotypeVariantData
+                SimpleBiAllelicGenotypeData biAllelicenotypeData = SimpleBiAllelicGenotypeData
                         .readData(path, fileType);
 
                 if (coreHunterData != null) {
@@ -235,8 +235,8 @@ public class FileBasedDatasetServices implements DatasetServices {
                             "Genotypic Data is already associated for this dataset : " + dataset.getName());
                 }
 
-                SimpleGenotypeVariantData genotypeData = 
-                        (SimpleGenotypeVariantData)SimpleGenotypeVariantData.readData(path, fileType);
+                SimpleGenotypeData genotypeData = 
+                        (SimpleGenotypeData)SimpleGenotypeData.readData(path, fileType);
 
                 if (coreHunterData != null) {
                     coreHunterData = new CoreHunterData(genotypeData, coreHunterData.getPhenotypicData(),
@@ -350,20 +350,20 @@ public class FileBasedDatasetServices implements DatasetServices {
 
     private CoreHunterData readDataInternal(String datasetId) throws IOException {
 
-        GenotypeVariantData genotypicData = null;
+        GenotypeData genotypicData = null;
         ArrayFeatureData phenotypicData = null;
         SimpleDistanceMatrixData distance = null;
 
         Path path = Paths.get(getPath().toString(), BI_ALLELIC_GENOTYPIC_PATH, datasetId + TXT_SUFFIX);
 
         if (Files.exists(path)) {
-            genotypicData = SimpleBiAllelicGenotypeVariantData.readData(path, FileType.TXT);
+            genotypicData = SimpleBiAllelicGenotypeData.readData(path, FileType.TXT);
         }
 
         path = Paths.get(getPath().toString(), BI_ALLELIC_GENOTYPIC_PATH, datasetId + TXT_SUFFIX);
 
         if (Files.exists(path)) {
-            genotypicData = SimpleGenotypeVariantData.readData(path, FileType.TXT);
+            genotypicData = SimpleGenotypeData.readData(path, FileType.TXT);
         }
 
         path = Paths.get(getPath().toString(), PHENOTYPIC_PATH, datasetId + TXT_SUFFIX);

@@ -37,7 +37,7 @@ import uno.informatics.data.pojo.DataPojo;
  */
 public class CoreHunterData extends DataPojo implements IntegerIdentifiedData {
 
-    private final GenotypeVariantData genotypicData; 
+    private final GenotypeData genotypicData; 
     private final FeatureData phenotypicData;
     private final DistanceMatrixData distancesData;
     
@@ -55,7 +55,7 @@ public class CoreHunterData extends DataPojo implements IntegerIdentifiedData {
      * @param phenotypicData phenotypic traits
      * @param distancesData precomputed distance matrix
      */
-    public CoreHunterData(GenotypeVariantData genotypicData,
+    public CoreHunterData(GenotypeData genotypicData,
                           FeatureData phenotypicData, 
                           DistanceMatrixData distancesData) {
         super("Core Hunter data", mergeHeaders(genotypicData, phenotypicData, distancesData));
@@ -73,7 +73,7 @@ public class CoreHunterData extends DataPojo implements IntegerIdentifiedData {
      * 
      * @param genotypicData genotypic data (bi- or multiallelic)
      */
-    public CoreHunterData(GenotypeVariantData genotypicData){
+    public CoreHunterData(GenotypeData genotypicData){
         this(genotypicData, null, null);
     }
     
@@ -101,7 +101,7 @@ public class CoreHunterData extends DataPojo implements IntegerIdentifiedData {
         this(null, null, distancesData);
     }
     
-    public GenotypeVariantData getGenotypicData() {
+    public GenotypeData getGenotypicData() {
         return genotypicData;
     }
 
@@ -113,7 +113,7 @@ public class CoreHunterData extends DataPojo implements IntegerIdentifiedData {
         return distancesData;
     }
 
-    private static int inferSize(GenotypeVariantData genotypicData,
+    private static int inferSize(GenotypeData genotypicData,
             FeatureData phenotypicData, DistanceMatrixData distancesData){
         
         // check not all undefined
@@ -139,7 +139,7 @@ public class CoreHunterData extends DataPojo implements IntegerIdentifiedData {
     }
     
     // assumes that sizes have already been checked
-    private static SimpleEntity[] mergeHeaders(GenotypeVariantData genotypicData,
+    private static SimpleEntity[] mergeHeaders(GenotypeData genotypicData,
             FeatureData phenotypicData, DistanceMatrixData distancesData){
         
         int size = inferSize(genotypicData, phenotypicData, distancesData) ;

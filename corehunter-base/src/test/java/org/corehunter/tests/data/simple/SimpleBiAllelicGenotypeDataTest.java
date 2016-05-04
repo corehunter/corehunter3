@@ -36,16 +36,17 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import org.corehunter.data.GenotypeDataFormat;
-import org.corehunter.data.GenotypeVariantData;
 
-import org.corehunter.data.simple.SimpleBiAllelicGenotypeVariantData;
-import org.corehunter.data.simple.SimpleGenotypeVariantData;
+import org.corehunter.data.simple.SimpleBiAllelicGenotypeData;
+import org.corehunter.data.simple.SimpleGenotypeData;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import uno.informatics.common.io.FileType;
 import uno.informatics.data.SimpleEntity;
+
+import org.corehunter.data.GenotypeData;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -55,7 +56,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author Guy Davenport, Herman De Beukelaer
  */
-public class SimpleBiAllelicGenotypeVariantDataTest {
+public class SimpleBiAllelicGenotypeDataTest {
 
     private static final String TXT_NAMES = "/biallelic_genotypes/names.txt";
     private static final String CSV_NAMES = "/biallelic_genotypes/names.csv";
@@ -85,7 +86,7 @@ public class SimpleBiAllelicGenotypeVariantDataTest {
         datasetName = null;
         expectedHeaders = HEADERS_NON_UNIQUE_NAMES;
         expectedMarkerNames = MARKER_NAMES;
-        testData(new SimpleBiAllelicGenotypeVariantData(
+        testData(new SimpleBiAllelicGenotypeData(
                 HEADERS_NON_UNIQUE_NAMES, MARKER_NAMES, ALLELE_SCORES_BIALLELIC
         ));
     }
@@ -96,7 +97,7 @@ public class SimpleBiAllelicGenotypeVariantDataTest {
         datasetName = NAME;
         expectedHeaders = HEADERS_NON_UNIQUE_NAMES;
         expectedMarkerNames = MARKER_NAMES;
-        testData(new SimpleBiAllelicGenotypeVariantData(
+        testData(new SimpleBiAllelicGenotypeData(
                 NAME, HEADERS_NON_UNIQUE_NAMES, MARKER_NAMES, ALLELE_SCORES_BIALLELIC
         ));
     }
@@ -107,9 +108,8 @@ public class SimpleBiAllelicGenotypeVariantDataTest {
         expectedHeaders = HEADERS_UNIQUE_NAMES;
         expectedMarkerNames = MARKER_NAMES;
         System.out.println(" |- Read File " + datasetName);
-        testData(SimpleBiAllelicGenotypeVariantData.readData(
-            Paths.get(SimpleBiAllelicGenotypeVariantDataTest.class.getResource(TXT_NAMES).getPath()),
-            FileType.TXT
+        testData(SimpleBiAllelicGenotypeData.readData(
+            Paths.get(SimpleBiAllelicGenotypeDataTest.class.getResource(TXT_NAMES).getPath()), FileType.TXT
         ));
     }
     
@@ -119,9 +119,8 @@ public class SimpleBiAllelicGenotypeVariantDataTest {
         expectedHeaders = HEADERS_UNIQUE_NAMES;
         expectedMarkerNames = MARKER_NAMES;
         System.out.println(" |- Read File " + datasetName);
-        testData(SimpleBiAllelicGenotypeVariantData.readData(
-            Paths.get(SimpleBiAllelicGenotypeVariantDataTest.class.getResource(CSV_NAMES).getPath()),
-            FileType.CSV
+        testData(SimpleBiAllelicGenotypeData.readData(
+            Paths.get(SimpleBiAllelicGenotypeDataTest.class.getResource(CSV_NAMES).getPath()), FileType.CSV
         ));
     }
     
@@ -131,9 +130,8 @@ public class SimpleBiAllelicGenotypeVariantDataTest {
         expectedHeaders = HEADERS_NON_UNIQUE_NAMES;
         expectedMarkerNames = MARKER_NAMES;
         System.out.println(" |- Read File " + datasetName);
-        testData(SimpleBiAllelicGenotypeVariantData.readData(
-            Paths.get(SimpleBiAllelicGenotypeVariantDataTest.class.getResource(CSV_NAMES_IDS).getPath()),
-            FileType.CSV
+        testData(SimpleBiAllelicGenotypeData.readData(
+            Paths.get(SimpleBiAllelicGenotypeDataTest.class.getResource(CSV_NAMES_IDS).getPath()), FileType.CSV
         ));
     }
     
@@ -144,9 +142,8 @@ public class SimpleBiAllelicGenotypeVariantDataTest {
         expectedHeaders = HEADERS_UNIQUE_NAMES;
         expectedMarkerNames = UNDEFINED_MARKER_NAMES;
         System.out.println(" |- Read File " + datasetName);
-        testData(SimpleBiAllelicGenotypeVariantData.readData(
-            Paths.get(SimpleBiAllelicGenotypeVariantDataTest.class.getResource(CSV_NO_MARKER_NAMES).getPath()),
-            FileType.CSV
+        testData(SimpleBiAllelicGenotypeData.readData(
+            Paths.get(SimpleBiAllelicGenotypeDataTest.class.getResource(CSV_NO_MARKER_NAMES).getPath()), FileType.CSV
         ));
     }
     
@@ -156,8 +153,8 @@ public class SimpleBiAllelicGenotypeVariantDataTest {
         expectedHeaders = HEADERS_UNIQUE_NAMES;
         expectedMarkerNames = MARKER_NAMES;
         
-        SimpleBiAllelicGenotypeVariantData genotypicData = 
-                new SimpleBiAllelicGenotypeVariantData(expectedHeaders, expectedMarkerNames, ALLELE_SCORES_BIALLELIC) ;
+        SimpleBiAllelicGenotypeData genotypicData = 
+                new SimpleBiAllelicGenotypeData(expectedHeaders, expectedMarkerNames, ALLELE_SCORES_BIALLELIC) ;
         
         Path path = Paths.get(TEST_OUTPUT) ;
         
@@ -173,7 +170,7 @@ public class SimpleBiAllelicGenotypeVariantDataTest {
         genotypicData.writeData(path, FileType.TXT);
         
         System.out.println(" |- Read written File " + datasetName);
-        testData(SimpleBiAllelicGenotypeVariantData.readData(path, FileType.TXT));
+        testData(SimpleBiAllelicGenotypeData.readData(path, FileType.TXT));
     }
     
     @Test
@@ -182,8 +179,8 @@ public class SimpleBiAllelicGenotypeVariantDataTest {
         expectedHeaders = HEADERS_NON_UNIQUE_NAMES;
         expectedMarkerNames = MARKER_NAMES;
         
-        SimpleBiAllelicGenotypeVariantData genotypicData = 
-                new SimpleBiAllelicGenotypeVariantData(expectedHeaders, expectedMarkerNames, ALLELE_SCORES_BIALLELIC) ;
+        SimpleBiAllelicGenotypeData genotypicData = 
+                new SimpleBiAllelicGenotypeData(expectedHeaders, expectedMarkerNames, ALLELE_SCORES_BIALLELIC) ;
         
         Path path = Paths.get(TEST_OUTPUT) ;
         
@@ -199,7 +196,7 @@ public class SimpleBiAllelicGenotypeVariantDataTest {
         genotypicData.writeData(path, FileType.CSV);
         
         System.out.println(" |- Read written File " + datasetName);
-        testData(SimpleBiAllelicGenotypeVariantData.readData(path, FileType.CSV));
+        testData(SimpleBiAllelicGenotypeData.readData(path, FileType.CSV));
     }
     
     @Test
@@ -208,8 +205,8 @@ public class SimpleBiAllelicGenotypeVariantDataTest {
         expectedHeaders = HEADERS_NON_UNIQUE_NAMES;
         expectedMarkerNames = MARKER_NAMES;
         
-        SimpleBiAllelicGenotypeVariantData genotypicData = 
-                new SimpleBiAllelicGenotypeVariantData(expectedHeaders, expectedMarkerNames, ALLELE_SCORES_BIALLELIC) ;
+        SimpleBiAllelicGenotypeData genotypicData = 
+                new SimpleBiAllelicGenotypeData(expectedHeaders, expectedMarkerNames, ALLELE_SCORES_BIALLELIC) ;
         
         Path path = Paths.get(TEST_OUTPUT) ;
         
@@ -225,7 +222,7 @@ public class SimpleBiAllelicGenotypeVariantDataTest {
         genotypicData.writeData(path, FileType.CSV, GenotypeDataFormat.FREQUENCY);
         
         System.out.println(" |- Read written File " + datasetName);
-        GenotypeVariantData data = SimpleGenotypeVariantData.readData(path, FileType.CSV);
+        GenotypeData data = SimpleGenotypeData.readData(path, FileType.CSV);
         
         for (int i = 0; i < data.getSize(); i++) {
             for (int m = 0; m < data.getNumberOfMarkers(); m++) {
@@ -254,14 +251,14 @@ public class SimpleBiAllelicGenotypeVariantDataTest {
     @Test
     public void erroneousFiles() throws IOException {
         System.out.println(" |- Test erroneous files:");
-        Path dir = Paths.get(SimpleBiAllelicGenotypeVariantDataTest.class.getResource(ERRONEOUS_FILES_DIR).getPath());
+        Path dir = Paths.get(SimpleBiAllelicGenotypeDataTest.class.getResource(ERRONEOUS_FILES_DIR).getPath());
         try(DirectoryStream<Path> directory = Files.newDirectoryStream(dir)){
             for(Path file : directory){
                 System.out.print("  |- " + file.getFileName().toString() + ": ");
                 FileType type = file.toString().endsWith(".txt") ? FileType.TXT : FileType.CSV;
                 boolean thrown = false;
                 try {
-                    SimpleBiAllelicGenotypeVariantData.readData(file, type);
+                    SimpleBiAllelicGenotypeData.readData(file, type);
                 } catch (IOException ex){
                     thrown = true;
                     System.out.print(ex.getMessage());
@@ -273,7 +270,7 @@ public class SimpleBiAllelicGenotypeVariantDataTest {
         }
     }
 
-    private void testData(SimpleBiAllelicGenotypeVariantData data) {
+    private void testData(SimpleBiAllelicGenotypeData data) {
         
         // check dataset name, if set
         String expectedDatasetName = datasetName != null ? datasetName : "Biallelic marker data";

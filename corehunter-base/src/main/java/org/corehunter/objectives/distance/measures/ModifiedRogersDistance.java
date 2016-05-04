@@ -19,9 +19,9 @@
 
 package org.corehunter.objectives.distance.measures;
 
-import org.corehunter.data.GenotypeVariantData;
 import org.corehunter.data.CoreHunterData;
 import org.corehunter.exceptions.CoreHunterException;
+import org.corehunter.data.GenotypeData;
 
 /**
  * @author Guy Davenport, Herman De Beukelaer
@@ -35,7 +35,7 @@ public class ModifiedRogersDistance extends AbstractDistanceMeasure {
             return 0.0;
         }
         
-        GenotypeVariantData genotypes = data.getGenotypicData();
+        GenotypeData genotypes = data.getGenotypicData();
         
         if(genotypes == null){
             throw new CoreHunterException("Genotypes are required for Modified Rogers distance.");
