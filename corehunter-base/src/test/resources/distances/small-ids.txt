@@ -1,0 +1,4 @@
+ID  	Alice	Dave	Bob
+Alice	0.0 	0.2 	0.4
+Dave	0.2 	0.0 	0.2
+Bob 	0.4 	0.2 	0.0

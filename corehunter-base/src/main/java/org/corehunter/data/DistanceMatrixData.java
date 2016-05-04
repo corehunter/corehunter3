@@ -23,8 +23,8 @@ import uno.informatics.data.Data;
 
 /**
  * A distance matrix that indicates how different each pair of entries is.
- * All values are between 0.0 and 1.0 where the former means that the specific
- * measure used to evaluate the distance can not differentiate between two entries.
+ * A value of 0.0 means that the specific measure used to evaluate the distance
+ * can not differentiate between two entries.
  *
  * @author Guy Davenport, Herman De Beukelaer
  */

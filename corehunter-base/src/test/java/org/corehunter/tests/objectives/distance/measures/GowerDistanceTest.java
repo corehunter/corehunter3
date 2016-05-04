@@ -25,7 +25,6 @@ import java.io.IOException;
 import java.nio.file.Paths;
 
 import org.corehunter.data.DistanceMatrixData;
-import org.corehunter.data.SymmetricMatrixFormat;
 import org.corehunter.data.CoreHunterData;
 import org.corehunter.data.simple.SimpleDistanceMatrixData;
 import org.corehunter.objectives.distance.measures.GowerDistance;
@@ -112,7 +111,7 @@ public class GowerDistanceTest {
 
         DistanceMatrixData expected = SimpleDistanceMatrixData.readData(
                 Paths.get(GowerDistanceTest.class.getResource(MATRIX_FILE).getPath()),
-                FileType.CSV, SymmetricMatrixFormat.FULL
+                FileType.CSV
         );
         
         GowerDistance distanceMetric = new GowerDistance();
