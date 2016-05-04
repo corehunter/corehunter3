@@ -37,7 +37,6 @@ import java.util.TreeSet;
 import java.util.stream.Stream;
 
 import org.corehunter.data.GenotypeDataFormat;
-import org.corehunter.data.GenotypeVariantData;
 import org.corehunter.util.StringUtils;
 
 import uno.informatics.common.io.FileType;
@@ -48,11 +47,12 @@ import uno.informatics.common.io.text.TextFileRowReader;
 import uno.informatics.data.SimpleEntity;
 import uno.informatics.data.pojo.DataPojo;
 import uno.informatics.data.pojo.SimpleEntityPojo;
+import org.corehunter.data.GenotypeData;
 
 /**
  * @author Guy Davenport, Herman De Beukelaer
  */
-public class SimpleGenotypeVariantData extends DataPojo implements GenotypeVariantData {
+public class SimpleGenotypeData extends DataPojo implements GenotypeData {
 
     private static final double SUM_TO_ONE_PRECISION = 0.01 + 1e-8;
     private static final String NAMES_HEADER = "NAME";
@@ -69,14 +69,14 @@ public class SimpleGenotypeVariantData extends DataPojo implements GenotypeVaria
 
     /**
      * Create data with name "Multiallelic marker data". For details of the arguments see 
-     * {@link #SimpleGenotypeVariantData(String, SimpleEntity[], String[], String[][], Double[][][])}.
+     * {@link #SimpleGenotypeData(String, SimpleEntity[], String[], String[][], Double[][][])}.
      * 
      * @param itemHeaders item headers, specifying name and/or unique identifier
      * @param markerNames marker names
      * @param alleleNames allele names per marker
      * @param alleleFrequencies allele frequencies
      */
-    public SimpleGenotypeVariantData(SimpleEntity[] itemHeaders, String[] markerNames, String[][] alleleNames,
+    public SimpleGenotypeData(SimpleEntity[] itemHeaders, String[] markerNames, String[][] alleleNames,
                                      Double[][][] alleleFrequencies) {
         this("Multiallelic marker data", itemHeaders, markerNames, alleleNames, alleleFrequencies);
     }
@@ -121,7 +121,7 @@ public class SimpleGenotypeVariantData extends DataPojo implements GenotypeVaria
      *                          values (missing); dimensions indicate number of individuals, markers and alleles
      *                          per marker
      */
-    public SimpleGenotypeVariantData(String datasetName, SimpleEntity[] itemHeaders, String[] markerNames,
+    public SimpleGenotypeData(String datasetName, SimpleEntity[] itemHeaders, String[] markerNames,
                                      String[][] alleleNames, Double[][][] alleleFrequencies) {
         
         // pass dataset name, size and item headers to parent
@@ -279,41 +279,29 @@ public class SimpleGenotypeVariantData extends DataPojo implements GenotypeVaria
     }
     
     /**
-     * Read genotype variant data from file in frequency format. See 
+     * Read genotype data from file in frequency format. See 
      * {@link #readData(Path, FileType, GenotypeDataFormat)} for details.
      * 
      * @param filePath path to file that contains the data
      * @param type {@link FileType#TXT} or {@link FileType#CSV}
-     * @return genotype variant data
+     * @return genotype data
      * @throws IOException if the file can not be read or is not correctly formatted
      */
-    public static GenotypeVariantData readData(Path filePath, FileType type) throws IOException {
+    public static GenotypeData readData(Path filePath, FileType type) throws IOException {
         return readData(filePath, type, GenotypeDataFormat.FREQUENCY) ;
     }
 
     /**
-     * Read genotype variant data from file. Only file types {@link FileType#TXT} and {@link FileType#CSV} are allowed.
+     * Read genotype data from file. Only file types {@link FileType#TXT} and {@link FileType#CSV} are allowed.
      * Values are separated with a single tab (txt) or comma (csv) character. 
      * <p>
      * Several formats are supported.  
      * 
-     * <p>For {@link GenotypeDataFormat#FREQUENCY} the file should contain allele frequencies following the
-     * requirements as described in the constructor {@link #SimpleGenotypeVariantData(String, SimpleEntity[], String[],
-     * String[][], Double[][][])}. Missing frequencies are encoding as empty cells.
-     * The file starts with a compulsory header row from which (unique) marker names and allele counts are inferred.
-     * All columns corresponding to the same marker occur consecutively in the file and are named after that marker.
-     * There is one required header column with item names, which is identified with column header "NAME".
-     * If the provided item names are not unique or defined for some but not all items, a second header column "ID"
-     * should be included to provide unique identifiers for at least those items whose name is undefined or not unique.
-     * Finally, an optional second header row can be included to define allele names per marker, identified with row
-     * header "ALLELE". Allele names need not be unique and can be undefined for some alleles by leaving the
-     * corresponding cells empty.
-     * 
-     * <p>For {@link GenotypeDataFormat#PHASED} the file contains one or more consecutive columns per marker in 
-     * which the observed alleles are specified (by name/id/number). Common cases are those with one or two columns
-     * per marker, used for haploid and diploid organisms, respectively. For fully homozygous data it is always
-     * sufficient to specify one column per marker, regardless of the ploidy. Higher ploidy (triploid, tetraploid, ...)
-     * is also supported as well ass a varying ploidy (number of columns) per marker.
+     * <p>For {@link GenotypeDataFormat#DEFAULT} the file contains one or more consecutive columns per marker in 
+     * which the observed alleles are specified (by name/id/number). This format is suited for datasets with a fixed
+     * number of allele observations per combination of individual and marker. Common cases are those with one
+     * or two columns per marker, e.g. suited for fully homozygous and diploid datasets, respectively. Any
+     * (possibly varying) number of columns per marker is supported.
      * <p>
      * Missing values are encoding as empty cells.
      * <p>
@@ -325,14 +313,27 @@ public class SimpleGenotypeVariantData extends DataPojo implements GenotypeVaria
      * Consecutive columns corresponding to the same marker should be tagged with the name of that marker, optionally
      * followed by an arbitrary suffix starting with a dash, underscore or dot character. The latter allows to use
      * column names such as "M1-1" and "M1-2", "M1.a" and "M1.b" or "M1_1" and "M1_2" for a marker named "M1" (in case
-     * of diploid data). The marker name itself can not contain any dash, underscore or dot characters, otherwise
-     * part of the name will be lost when loading the data. Marker names should be unique.
+     * of two columns per marker). The marker name itself can not contain any dash, underscore or dot characters,
+     * otherwise part of the name will be lost when loading the data. Marker names should be unique.
      * 
-     * <p>For {@link GenotypeDataFormat#BIALLELIC} the file contains allele scores for biallelic markers and is
-     * read with {@link SimpleBiAllelicGenotypeVariantData#readData(Path, FileType)}.
+     * <p>For {@link GenotypeDataFormat#FREQUENCY} the file contains allele frequencies following the
+     * requirements as described in the constructor {@link #SimpleGenotypeData(String, SimpleEntity[], String[],
+     * String[][], Double[][][])}. Missing frequencies are encoding as empty cells.
+     * The file starts with a compulsory header row from which (unique) marker names and allele counts are inferred.
+     * All columns corresponding to the same marker occur consecutively in the file and are named after that marker.
+     * There is one required header column with item names, which is identified with column header "NAME".
+     * If the provided item names are not unique or defined for some but not all items, a second header column "ID"
+     * should be included to provide unique identifiers for at least those items whose name is undefined or not unique.
+     * Finally, an optional second header row can be included to define allele names per marker, identified with row
+     * header "ALLELE". Allele names need not be unique and can be undefined for some alleles by leaving the
+     * corresponding cells empty.
+     * 
+     * <p>For {@link GenotypeDataFormat#BIPARENTAL} the file contains 0/1/2 allele scores for homozygous (parent 1),
+     * heterozygous and homozygous (parent 2), respectively. In this case the file is read with
+     * {@link SimpleBiAllelicGenotypeData#readData(Path, FileType)}.
      * 
      * <p>
-     * In all formats the leading and trailing whitespace is removed from names and unique identifiers and they are 
+     * In all formats leading and trailing whitespace is removed from names and unique identifiers and they are 
      * unquoted if wrapped in single or double quotes after whitespace removal. If it is intended to start or end a 
      * name/identifier with whitespace this whitespace should be contained within the quotes, as it will then not be 
      * removed.
@@ -344,10 +345,10 @@ public class SimpleGenotypeVariantData extends DataPojo implements GenotypeVaria
      * @param filePath path to file that contains the data
      * @param type {@link FileType#TXT} or {@link FileType#CSV}
      * @param format the format of the data file
-     * @return genotype variant data
+     * @return genotype data
      * @throws IOException if the file can not be read or is not correctly formatted
      */
-    public static GenotypeVariantData readData(Path filePath, FileType type,
+    public static GenotypeData readData(Path filePath, FileType type,
                                                GenotypeDataFormat format) throws IOException {
         
         if (format == null) {
@@ -355,19 +356,19 @@ public class SimpleGenotypeVariantData extends DataPojo implements GenotypeVaria
         }
         
         switch (format) {
+            case DEFAULT:
+                return readDefaultData(filePath, type);
             case FREQUENCY:
                 return readFrequencyData(filePath, type);
-            case PHASED:
-                return readPhasedData(filePath, type);
-            case BIALLELIC:
-                return SimpleBiAllelicGenotypeVariantData.readData(filePath, type) ;
+            case BIPARENTAL:
+                return SimpleBiAllelicGenotypeData.readData(filePath, type) ;
             default:
                 throw new IllegalArgumentException("Unsupported format : " + format);
 
         }
     }
     
-    private static SimpleGenotypeVariantData readFrequencyData(Path filePath, FileType type) throws IOException {
+    private static SimpleGenotypeData readFrequencyData(Path filePath, FileType type) throws IOException {
 
         // validate arguments
         if (filePath == null) {
@@ -568,7 +569,7 @@ public class SimpleGenotypeVariantData extends DataPojo implements GenotypeVaria
             
             try{
                 // create data
-                return new SimpleGenotypeVariantData(filePath.getFileName().toString(),
+                return new SimpleGenotypeData(filePath.getFileName().toString(),
                                                      headers, markerNamesArray, alleleNames, alleleFreqsArray);
             } catch(IllegalArgumentException ex){
                 // convert to IO exception
@@ -578,7 +579,7 @@ public class SimpleGenotypeVariantData extends DataPojo implements GenotypeVaria
         }
     }
 
-    private static SimpleGenotypeVariantData readPhasedData(Path filePath, FileType type) throws IOException {
+    private static SimpleGenotypeData readDefaultData(Path filePath, FileType type) throws IOException {
         
         // validate arguments
         if (filePath == null) {
@@ -778,7 +779,7 @@ public class SimpleGenotypeVariantData extends DataPojo implements GenotypeVaria
             
             try{
                 // create data
-                return new SimpleGenotypeVariantData(filePath.getFileName().toString(),
+                return new SimpleGenotypeData(filePath.getFileName().toString(),
                                                      headers, markerNames.toArray(new String[0]),
                                                      alleleNames, alleleFreqs);
             } catch(IllegalArgumentException ex){
@@ -821,7 +822,7 @@ public class SimpleGenotypeVariantData extends DataPojo implements GenotypeVaria
     }
     
     /**
-     * Write genotype variant data to file in frequency format.
+     * Write genotype data to file in frequency format.
      * Only file types {@link FileType#TXT} and {@link FileType#CSV} are allowed.
      * 
      * @param filePath path to file where the data will be written
@@ -833,7 +834,7 @@ public class SimpleGenotypeVariantData extends DataPojo implements GenotypeVaria
     }
     
     /**
-     * Write genotype variant data to file in the chosen format.
+     * Write genotype data to file in the chosen format.
      * By default the only supported format is {@link GenotypeDataFormat#FREQUENCY} but the
      * method may be overridden in subclasses to support other formats.
      * Only file types {@link FileType#TXT} and {@link FileType#CSV} are allowed.

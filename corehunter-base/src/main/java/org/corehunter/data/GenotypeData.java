@@ -22,13 +22,13 @@ package org.corehunter.data;
 import uno.informatics.data.Data;
 
 /**
- * Genotype variant data contains relative frequencies of markers that have two or more alleles.
+ * Genotype data contains relative frequencies of markers that have two or more alleles.
  * If all the markers used in these data have two and only two alleles, such as SNP data, then it
- * is more efficient to use the subclass {@link BiAllelicGenotypeVariantData}.
+ * is more efficient to use the subclass {@link BiAllelicGenotypeData}.
  *
  * @author Guy Davenport, Herman De Beukelaer
  */
-public interface GenotypeVariantData extends Data {
+public interface GenotypeData extends Data {
 
     /**
      * Get the total number of markers used in this dataset.

@@ -55,7 +55,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author Herman De Beukelaer
  */
-public class SimplePhenotypicTraitDataTest {
+public class PhenotypeDataTest {
 
     private static final String CSV_NAMES = "/phenotypes/names.csv";
     private static final String CSV_NAMES_IDS = "/phenotypes/names-and-ids.csv";
@@ -86,8 +86,7 @@ public class SimplePhenotypicTraitDataTest {
         expectedBounds = PHENOTYPIC_TRAIT_INFERRED_BOUNDS;
         expectedValues = PHENOTYPIC_TRAIT_VALUES;
         System.out.println(" |- File " + datasetName);
-        testData(ArrayFeatureData.readData(
-            Paths.get(SimplePhenotypicTraitDataTest.class.getResource(CSV_NAMES).getPath()),
+        testData(ArrayFeatureData.readData(Paths.get(PhenotypeDataTest.class.getResource(CSV_NAMES).getPath()),
             FileType.CSV
         ));
     }
@@ -99,8 +98,7 @@ public class SimplePhenotypicTraitDataTest {
         expectedBounds = PHENOTYPIC_TRAIT_INFERRED_BOUNDS;
         expectedValues = PHENOTYPIC_TRAIT_VALUES;
         System.out.println(" |- File " + datasetName);
-        testData(ArrayFeatureData.readData(
-            Paths.get(SimplePhenotypicTraitDataTest.class.getResource(CSV_NAMES_IDS).getPath()),
+        testData(ArrayFeatureData.readData(Paths.get(PhenotypeDataTest.class.getResource(CSV_NAMES_IDS).getPath()),
             FileType.CSV
         ));
     }
@@ -112,8 +110,7 @@ public class SimplePhenotypicTraitDataTest {
         expectedBounds = PHENOTYPIC_TRAIT_EXPLICIT_BOUNDS;
         expectedValues = PHENOTYPIC_TRAIT_VALUES;
         System.out.println(" |- File " + datasetName);
-        testData(ArrayFeatureData.readData(
-            Paths.get(SimplePhenotypicTraitDataTest.class.getResource(CSV_NAMES_MIN_MAX).getPath()),
+        testData(ArrayFeatureData.readData(Paths.get(PhenotypeDataTest.class.getResource(CSV_NAMES_MIN_MAX).getPath()),
             FileType.CSV
         ));
     }
@@ -126,15 +123,15 @@ public class SimplePhenotypicTraitDataTest {
         expectedValues = PHENOTYPIC_TRAIT_MISSING_VALUES;
         System.out.println(" |- File " + datasetName);
         testData(ArrayFeatureData.readData(
-            Paths.get(SimplePhenotypicTraitDataTest.class.getResource(CSV_NAMES_MISSING_VALUES).getPath()),
-            FileType.CSV
+                Paths.get(PhenotypeDataTest.class.getResource(CSV_NAMES_MISSING_VALUES).getPath()
+            ), FileType.CSV
         ));
     }
     
     @Test
     public void erroneousFiles() throws IOException {
         System.out.println(" |- Test erroneous files:");
-        Path dir = Paths.get(SimplePhenotypicTraitDataTest.class.getResource(ERRONEOUS_FILES_DIR).getPath());
+        Path dir = Paths.get(PhenotypeDataTest.class.getResource(ERRONEOUS_FILES_DIR).getPath());
         try(DirectoryStream<Path> directory = Files.newDirectoryStream(dir)){
             for(Path file : directory){
                 System.out.print("  |- " + file.getFileName().toString() + ": ");

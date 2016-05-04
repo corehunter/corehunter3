@@ -35,7 +35,7 @@ import static org.corehunter.tests.TestData.SUBSET2;
 import static org.corehunter.tests.TestData.SUBSET3;
 import static org.corehunter.tests.TestData.SUBSET_EMPTY;
 
-import org.corehunter.data.simple.SimpleGenotypeVariantData;
+import org.corehunter.data.simple.SimpleGenotypeData;
 import org.corehunter.data.CoreHunterData;
 import org.corehunter.objectives.Coverage;
 import org.jamesframework.core.problems.objectives.evaluations.Evaluation;
@@ -57,7 +57,7 @@ public class CoverageTest extends EvaluationTest {
     @Test
     public void test() {
         
-        SimpleGenotypeVariantData geno = new SimpleGenotypeVariantData(
+        SimpleGenotypeData geno = new SimpleGenotypeData(
                 NAME, HEADERS_NON_UNIQUE_NAMES, MARKER_NAMES, ALLELE_NAMES, ALLELE_FREQUENCIES
         );
         CoreHunterData data = new CoreHunterData(geno);
@@ -99,7 +99,7 @@ public class CoverageTest extends EvaluationTest {
         
         Random rng = new Random();
         
-        SimpleGenotypeVariantData geno = new SimpleGenotypeVariantData(
+        SimpleGenotypeData geno = new SimpleGenotypeData(
                 NAME, HEADERS_NON_UNIQUE_NAMES, MARKER_NAMES, ALLELE_NAMES, ALLELE_FREQUENCIES
         );
         CoreHunterData data = new CoreHunterData(geno);

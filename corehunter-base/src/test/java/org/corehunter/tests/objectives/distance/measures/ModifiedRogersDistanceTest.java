@@ -28,7 +28,7 @@ import static org.corehunter.tests.TestData.PRECISION;
 import static org.corehunter.tests.TestData.ALLELE_FREQUENCIES;
 import static org.corehunter.tests.TestData.HEADERS_NON_UNIQUE_NAMES;
 
-import org.corehunter.data.simple.SimpleGenotypeVariantData;
+import org.corehunter.data.simple.SimpleGenotypeData;
 import org.corehunter.objectives.distance.measures.ModifiedRogersDistance;
 import org.corehunter.data.CoreHunterData;
 
@@ -47,7 +47,7 @@ public class ModifiedRogersDistanceTest {
     @Test
     public void test() {
         
-        SimpleGenotypeVariantData geno = new SimpleGenotypeVariantData(
+        SimpleGenotypeData geno = new SimpleGenotypeData(
                 NAME, HEADERS_NON_UNIQUE_NAMES, MARKER_NAMES, ALLELE_NAMES, ALLELE_FREQUENCIES
         );
         CoreHunterData data = new CoreHunterData(geno);
@@ -74,7 +74,7 @@ public class ModifiedRogersDistanceTest {
     @Test
     public void testCeilMissing() {
         
-        SimpleGenotypeVariantData geno = new SimpleGenotypeVariantData(
+        SimpleGenotypeData geno = new SimpleGenotypeData(
                 NAME, HEADERS_NON_UNIQUE_NAMES, MARKER_NAMES, ALLELE_NAMES, ALLELE_FREQUENCIES
         );
         CoreHunterData data = new CoreHunterData(geno);
