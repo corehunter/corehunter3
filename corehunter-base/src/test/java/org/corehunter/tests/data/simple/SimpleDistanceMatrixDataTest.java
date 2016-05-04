@@ -26,7 +26,6 @@ import static org.corehunter.tests.TestData.NAME;
 import static org.corehunter.tests.TestData.PRECISION;
 import static org.corehunter.tests.TestData.SET;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
@@ -112,8 +111,8 @@ public class SimpleDistanceMatrixDataTest {
     }
     
     @Test
-    public void toFileWithIds() throws IOException {
-        dataName = "full-ids.csv";
+    public void toCsvFile() throws IOException {
+        dataName = "out.csv";
         expectedHeaders = HEADERS_UNIQUE_NAMES;
        
         SimpleDistanceMatrixData distanceData = new SimpleDistanceMatrixData(expectedHeaders, DISTANCES) ;
@@ -122,7 +121,7 @@ public class SimpleDistanceMatrixDataTest {
         
         Files.createDirectories(path) ;
         
-        path = Files.createTempDirectory(path, "DistanceMatrix-CsvFileWithIds") ;
+        path = Files.createTempDirectory(path, "DistanceMatrix-Csv") ;
         
         path = Paths.get(path.toString(), dataName) ;
         

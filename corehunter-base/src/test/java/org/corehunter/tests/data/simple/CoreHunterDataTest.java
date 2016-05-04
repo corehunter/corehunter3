@@ -54,8 +54,8 @@ public class CoreHunterDataTest {
     private static final String PHENOTYPES_NON_UNIQUE_NAMES = "/phenotypes/names-and-ids.csv";
     private static final String PHENOTYPES_SAME_IDS_DIFFERENT_NAMES = "/phenotypes/same-ids-different-names.csv";
     
-    private static final String MARKERS_UNIQUE_NAMES = "/biallelic_genotypes/names.csv";
-    private static final String MARKERS_NON_UNIQUE_NAMES = "/biallelic_genotypes/names-and-ids.csv";
+    private static final String MARKERS_UNIQUE_NAMES = "/biallelic_genotypes/ids.csv";
+    private static final String MARKERS_NON_UNIQUE_NAMES = "/biallelic_genotypes/ids-and-names.csv";
     private static final String MARKERS_IDS_SOME_NAMES = "/biallelic_genotypes/ids-with-some-names.csv";
 
     private SimpleEntity[] expectedHeaders;

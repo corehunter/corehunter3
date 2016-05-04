@@ -188,32 +188,26 @@ public class SimpleBiAllelicGenotypeData extends SimpleGenotypeData
      * column per marker. Only values 0, 1 and 2 are valid. Empty cells are also
      * allowed in case of missing data.
      * <p>
-     * A header row and column are included to specify
-     * individual and marker names, identified with column/row header "NAME".
-     * Some or all marker names may be undefined by leaving the corresponding
-     * cells blank and marker names need not be unique. If item names are not
-     * unique or defined for some but not all items, a second header column "ID"
-     * should be included to provide unique identifiers for at least those items
-     * whose name is undefined or not unique.
+     * The file contains one required header row and column ("ID") specifying item
+     * identifiers (row headers) and marker names (colum headers). Item identifiers
+     * should be unique and defined for all items. Marker names may be undefined for some or all
+     * markers and need not be unique. An optional second header column ("NAME") can also be included, specifying
+     * (not necessarily unique) item names. If no explicit item names are provided the unique identifiers are used
+     * as names as well.
      * <p>
-     * Leading and trailing whitespace is removed from names and unique
-     * identifiers and they are unquoted if wrapped in single or double quotes
-     * after whitespace removal. If it is intended to start or end a
+     * Leading and trailing whitespace is removed from names and unique identifiers and they are unquoted
+     * if wrapped in single or double quotes after whitespace removal. If it is intended to start or end a
      * name/identifier with whitespace this whitespace should be contained
      * within the quotes, as it will then not be removed.
      * <p>
      * Trailing empty cells can be omitted at any row in the file.
      * <p>
-     * The dataset name is set to the name of the file to which
-     * <code>filePath</code> points.
+     * The dataset name is set to the name of the file to which <code>filePath</code> points.
      * 
-     * @param filePath
-     *            path to file that contains the data
-     * @param type
-     *            {@link FileType#TXT} or {@link FileType#CSV}
+     * @param filePath path to file that contains the data
+     * @param type {@link FileType#TXT} or {@link FileType#CSV}
      * @return biallelic genotype data
-     * @throws IOException
-     *             if the file can not be read or is not correctly formatted
+     * @throws IOException if the file can not be read or is not correctly formatted
      */
     public static SimpleBiAllelicGenotypeData readData(Path filePath, FileType type) throws IOException {
 
@@ -268,17 +262,17 @@ public class SimpleBiAllelicGenotypeData extends SimpleGenotypeData
                 rows.set(r, row);
             }
 
-            // check for presence of names and ids
-            boolean withNames = numCols >= 1 && Objects.equals(rows.get(0)[0], NAMES_HEADER);
-            boolean withIds = numCols >= 2 && Objects.equals(rows.get(0)[1], IDENTIFIERS_HEADER);
-            int numHeaderCols = 0;
+            // check for presence of ids and names
+            String[] firstRow = rows.get(0);
+            if(firstRow.length == 0 || !Objects.equals(firstRow[0], IDENTIFIERS_HEADER)){
+                throw new IOException("Missing header column ID.");
+            }
+            boolean withNames = firstRow.length >= 2 && Objects.equals(firstRow[1], NAMES_HEADER);
+            int numHeaderCols = 1;
             if (withNames) {
                 numHeaderCols++;
             }
-            if (withIds) {
-                numHeaderCols++;
-            }
-            int numHeaderRows = (withNames ? 1 : 0);
+            int numHeaderRows = 1;
 
             // infer number of individuals
             int n = rows.size() - numHeaderRows;
@@ -294,7 +288,10 @@ public class SimpleBiAllelicGenotypeData extends SimpleGenotypeData
 
             // 1: extract marker names (if provided)
 
-            String[] markerNames = (withNames ? Arrays.copyOfRange(rows.get(0), numHeaderCols, numCols) : null);
+            String[] markerNames = new String[m];
+            for(int c = numHeaderCols; c < firstRow.length; c++){
+                markerNames[c-numHeaderCols] = firstRow[c];
+            }
 
             // 2: extract item names, identifiers and alelle scores
 
@@ -306,12 +303,8 @@ public class SimpleBiAllelicGenotypeData extends SimpleGenotypeData
                 String[] row = rows.get(numHeaderRows + i);
 
                 // extract item name and identifier
-                if (withNames) {
-                    itemNames[i] = row[0];
-                }
-                if (withIds) {
-                    itemIdentifiers[i] = row[1];
-                }
+                itemIdentifiers[i] = row[0];
+                itemNames[i] = withNames ? row[1] : itemIdentifiers[i];
 
                 // extract allele scores
                 for (int j = 0; j < m; j++) {
@@ -331,18 +324,7 @@ public class SimpleBiAllelicGenotypeData extends SimpleGenotypeData
             // combine names and identifiers in headers
             SimpleEntity[] headers = new SimpleEntity[n];
             for (int i = 0; i < n; i++) {
-                String name = itemNames[i];
-                String identifier = itemIdentifiers[i];
-                if (name != null || identifier != null) {
-                    if (identifier == null) {
-                        headers[i] = new SimpleEntityPojo(name, name);
-                    } else {
-                        headers[i] = new SimpleEntityPojo(identifier, name);
-                    }
-                }
-            }
-            if (Arrays.stream(headers).allMatch(Objects::isNull)) {
-                headers = null;
+                headers[i] = new SimpleEntityPojo(itemIdentifiers[i], itemNames[i]);
             }
 
             try {
@@ -435,32 +417,24 @@ public class SimpleBiAllelicGenotypeData extends SimpleGenotypeData
                 throw new IOException("Can not create writer for file " + filePath + ".");
             }
 
-            writer.writeCell(NAMES_HEADER);
-            
-            writer.newColumn() ;
-
+            // write header row
             writer.writeCell(IDENTIFIERS_HEADER);
-            
+            writer.newColumn() ;
+            writer.writeCell(NAMES_HEADER);
             for(int m = 0; m < getNumberOfMarkers(); m++){
                 writer.newColumn();
                 writer.writeCell(getMarkerName(m));
             }
 
+            // write data rows
             SimpleEntity header;
-
-            for (int r = 0; r < alleleScores.length; ++r) {
-
+            for (int r = 0; r < alleleScores.length; r++) {
                 writer.newRow();
-                
                 header = getHeader(r);
-                writer.writeCell(header.getName());
-                
-                writer.newColumn() ;
-                
                 writer.writeCell(header.getUniqueIdentifier());
-                
                 writer.newColumn() ;
-                
+                writer.writeCell(header.getName());
+                writer.newColumn() ;
                 writer.writeRowCellsAsArray(alleleScores[r]);
             }
 

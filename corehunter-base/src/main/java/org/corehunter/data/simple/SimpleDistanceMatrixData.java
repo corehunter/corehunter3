@@ -23,7 +23,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 
@@ -149,8 +148,8 @@ public class SimpleDistanceMatrixData extends DataPojo implements DistanceMatrix
      * compulsory lower triangular part, verifying that the distance matrix is symmetric.
      * <p>
      * The file includes one required and one optional header column specifying unique identifiers and item names,
-     * respectively. The first, required header column is identified with column header ID. The second, optional
-     * header column is identified with column header NAME, when included. If no explicit names are provided, the
+     * respectively. The first, required header column is identified with column header "ID". The second, optional
+     * header column is identified with column header "NAME", when included. If no explicit names are provided, the
      * unique identifiers are used as names as well. Optionally, the same item identifiers from the first header
      * column may also be included on the first row (in the same order).
      * <p>

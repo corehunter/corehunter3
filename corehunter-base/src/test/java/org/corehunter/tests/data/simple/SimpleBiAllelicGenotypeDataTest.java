@@ -58,9 +58,9 @@ import static org.junit.Assert.assertTrue;
  */
 public class SimpleBiAllelicGenotypeDataTest {
 
-    private static final String TXT_NAMES = "/biallelic_genotypes/names.txt";
-    private static final String CSV_NAMES = "/biallelic_genotypes/names.csv";
-    private static final String CSV_NAMES_IDS = "/biallelic_genotypes/names-and-ids.csv";
+    private static final String TXT_IDS = "/biallelic_genotypes/ids.txt";
+    private static final String CSV_IDS = "/biallelic_genotypes/ids.csv";
+    private static final String CSV_IDS_NAMES = "/biallelic_genotypes/ids-and-names.csv";
     private static final String CSV_NO_MARKER_NAMES = "/biallelic_genotypes/no-marker-names.csv";
 
     private static final String ERRONEOUS_FILES_DIR = "/biallelic_genotypes/err/";
@@ -103,39 +103,38 @@ public class SimpleBiAllelicGenotypeDataTest {
     }
     
     @Test
-    public void fromTxtFileWithNames() throws IOException {
-        datasetName = "names.txt";
+    public void fromTxtFileWithIds() throws IOException {
+        datasetName = "ids.txt";
         expectedHeaders = HEADERS_UNIQUE_NAMES;
         expectedMarkerNames = MARKER_NAMES;
         System.out.println(" |- Read File " + datasetName);
         testData(SimpleBiAllelicGenotypeData.readData(
-            Paths.get(SimpleBiAllelicGenotypeDataTest.class.getResource(TXT_NAMES).getPath()), FileType.TXT
+            Paths.get(SimpleBiAllelicGenotypeDataTest.class.getResource(TXT_IDS).getPath()), FileType.TXT
         ));
     }
     
     @Test
-    public void fromCsvFileWithNames() throws IOException {
-        datasetName = "names.csv";
+    public void fromCsvFileWithIds() throws IOException {
+        datasetName = "ids.csv";
         expectedHeaders = HEADERS_UNIQUE_NAMES;
         expectedMarkerNames = MARKER_NAMES;
         System.out.println(" |- Read File " + datasetName);
         testData(SimpleBiAllelicGenotypeData.readData(
-            Paths.get(SimpleBiAllelicGenotypeDataTest.class.getResource(CSV_NAMES).getPath()), FileType.CSV
+            Paths.get(SimpleBiAllelicGenotypeDataTest.class.getResource(CSV_IDS).getPath()), FileType.CSV
         ));
     }
     
     @Test
-    public void fromCsvFileWithNamesAndIds() throws IOException {
-        datasetName = "names-and-ids.csv";
+    public void fromCsvFileWithIdsAndNames() throws IOException {
+        datasetName = "ids-and-names.csv";
         expectedHeaders = HEADERS_NON_UNIQUE_NAMES;
         expectedMarkerNames = MARKER_NAMES;
         System.out.println(" |- Read File " + datasetName);
         testData(SimpleBiAllelicGenotypeData.readData(
-            Paths.get(SimpleBiAllelicGenotypeDataTest.class.getResource(CSV_NAMES_IDS).getPath()), FileType.CSV
+            Paths.get(SimpleBiAllelicGenotypeDataTest.class.getResource(CSV_IDS_NAMES).getPath()), FileType.CSV
         ));
     }
     
-    // TODO should not marker names be compulsory?
     @Test
     public void fromCsvFileWithoutMarkerNames() throws IOException {
         datasetName = "no-marker-names.csv";
@@ -148,8 +147,8 @@ public class SimpleBiAllelicGenotypeDataTest {
     }
     
     @Test
-    public void toTxtFileWithNames() throws IOException {
-        datasetName = "names.txt";
+    public void toTxtFile() throws IOException {
+        datasetName = "out.txt";
         expectedHeaders = HEADERS_UNIQUE_NAMES;
         expectedMarkerNames = MARKER_NAMES;
         
@@ -160,7 +159,7 @@ public class SimpleBiAllelicGenotypeDataTest {
         
         Files.createDirectories(path) ;
         
-        path = Files.createTempDirectory(path, "GenoBiallelic-TxtFileWithNames") ;
+        path = Files.createTempDirectory(path, "GenoBiallelic-Txt") ;
         
         path = Paths.get(path.toString(), datasetName) ;
         
@@ -174,8 +173,8 @@ public class SimpleBiAllelicGenotypeDataTest {
     }
     
     @Test
-    public void toCsvFileWithNamesAndIDs() throws IOException {
-        datasetName = "names-and-ids.csv";
+    public void toCsvFile() throws IOException {
+        datasetName = "out.csv";
         expectedHeaders = HEADERS_NON_UNIQUE_NAMES;
         expectedMarkerNames = MARKER_NAMES;
         
@@ -186,7 +185,7 @@ public class SimpleBiAllelicGenotypeDataTest {
         
         Files.createDirectories(path) ;
         
-        path = Files.createTempDirectory(path, "GenoBiallelic-CsvFileWithNamesAndIDs") ;
+        path = Files.createTempDirectory(path, "GenoBiallelic-Csv") ;
         
         path = Paths.get(path.toString(), datasetName) ;
         
@@ -212,7 +211,7 @@ public class SimpleBiAllelicGenotypeDataTest {
         
         Files.createDirectories(path) ;
         
-        path = Files.createTempDirectory(path, "GenoBiallelic-CsvFileFrequencies") ;
+        path = Files.createTempDirectory(path, "GenoBiallelic-CsvFrequencies") ;
         
         path = Paths.get(path.toString(), datasetName) ;
         
