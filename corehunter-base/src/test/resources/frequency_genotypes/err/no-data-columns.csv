@@ -1,6 +1,6 @@
-NAME    , ID      
-Alice   , acc-1     
-        , acc-2   
-Bob     , 'acc-3' 
-"Bob"   , acc-4    
-        , "acc-5"
+ID      
+acc-1     
+acc-2   
+'acc-3' 
+acc-4    
+"acc-5"

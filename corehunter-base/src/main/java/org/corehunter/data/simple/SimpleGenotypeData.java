@@ -299,31 +299,31 @@ public class SimpleGenotypeData extends DataPojo implements GenotypeData {
      * 
      * <p>For {@link GenotypeDataFormat#DEFAULT} the file contains one or more consecutive columns per marker in 
      * which the observed alleles are specified (by name/id/number). This format is suited for datasets with a fixed
-     * number of allele observations per combination of individual and marker. Common cases are those with one
-     * or two columns per marker, e.g. suited for fully homozygous and diploid datasets, respectively. Any
-     * (possibly varying) number of columns per marker is supported.
+     * number of allele observations per marker in each individual. Common cases are those with one
+     * or two columns per marker, e.g. suited for fully homozygous and diploid datasets, respectively.
+     * Any (possibly varying) number of columns per marker is supported.
      * <p>
      * Missing values are encoding as empty cells.
      * <p>
-     * A required first header row and column are included to specify individual and marker names, respectively,
-     * identified with column/row header "NAME". If item names are not unique or defined for some but not all items,
-     * a second header column "ID" should be included to provide unique identifiers for at least those items whose
-     * name is undefined or not unique.
+     * A required first header row and column are included to specify unique item identifiers and marker names,
+     * respectively, identified with column/row header "ID". Optionally a second header column "NAME" can be
+     * included to provide (not necessarily unique) item names in addition to the unique identifiers.
      * <p>
      * Consecutive columns corresponding to the same marker should be tagged with the name of that marker, optionally
      * followed by an arbitrary suffix starting with a dash, underscore or dot character. The latter allows to use
      * column names such as "M1-1" and "M1-2", "M1.a" and "M1.b" or "M1_1" and "M1_2" for a marker named "M1" (in case
      * of two columns per marker). The marker name itself can not contain any dash, underscore or dot characters,
-     * otherwise part of the name will be lost when loading the data. Marker names should be unique.
+     * otherwise part of the name will be lost when loading the data.
      * 
      * <p>For {@link GenotypeDataFormat#FREQUENCY} the file contains allele frequencies following the
      * requirements as described in the constructor {@link #SimpleGenotypeData(String, SimpleEntity[], String[],
      * String[][], Double[][][])}. Missing frequencies are encoding as empty cells.
-     * The file starts with a compulsory header row from which (unique) marker names and allele counts are inferred.
+     * The file starts with a compulsory header row from which marker names and allele counts are inferred.
      * All columns corresponding to the same marker occur consecutively in the file and are named after that marker.
-     * There is one required header column with item names, which is identified with column header "NAME".
-     * If the provided item names are not unique or defined for some but not all items, a second header column "ID"
-     * should be included to provide unique identifiers for at least those items whose name is undefined or not unique.
+     * Marker names are required to be unique.
+     * There is one compulsory header column "ID" containing unique item identifiers.
+     * Optionally a second header column "NAME" can be included to provide (not necessarily unique)
+     * item names in addition to the unique identifiers.
      * Finally, an optional second header row can be included to define allele names per marker, identified with row
      * header "ALLELE". Allele names need not be unique and can be undefined for some alleles by leaving the
      * corresponding cells empty.
@@ -409,13 +409,12 @@ public class SimpleGenotypeData extends DataPojo implements GenotypeData {
             reader.nextRow();
             String[] markerNamesRow = reader.getRowCellsAsStringArray();
             // check presence of header columns
-            boolean withNames = (markerNamesRow.length >= 1 && Objects.equals(markerNamesRow[0], NAMES_HEADER));
-            boolean withIds = (markerNamesRow.length >= 2 && Objects.equals(markerNamesRow[1], IDENTIFIERS_HEADER));
-            int numHeaderCols = 0;
-            if(withNames){
-                numHeaderCols++;
+            if(markerNamesRow.length < 1 || !Objects.equals(markerNamesRow[0], IDENTIFIERS_HEADER)){
+                throw new IOException("Missing header column ID.");
             }
-            if(withIds){
+            boolean withNames = (markerNamesRow.length >= 2 && Objects.equals(markerNamesRow[1], NAMES_HEADER));
+            int numHeaderCols = 1;
+            if(withNames){
                 numHeaderCols++;
             }
             // infer and check number of data columns
@@ -485,10 +484,10 @@ public class SimpleGenotypeData extends DataPojo implements GenotypeData {
                 }
                 
                 // check for allele names row
-                if(withNames && Objects.equals(row[0], ALLELE_NAMES_HEADER)){
+                if(Objects.equals(row[0], ALLELE_NAMES_HEADER)){
                     // verify: second row
                     if(r != 1){
-                        throw new IOException("Allele names header should be second row in the file.");
+                        throw new IOException("Allele names header should be the second row in the file.");
                     }
                     // extract allele names grouped per marker
                     int aglob = numHeaderCols;
@@ -504,12 +503,11 @@ public class SimpleGenotypeData extends DataPojo implements GenotypeData {
                     
                     // process data row
                     
-                    // extract row headers, if any (name/identifier)
+                    // extract unique item identifier
+                    itemIdentifiers.add(StringUtils.unquote(row[0]));
+                    // extract item name, if included
                     if(withNames){
-                        itemNames.add(StringUtils.unquote(row[0]));
-                    }
-                    if(withIds){
-                        itemIdentifiers.add(StringUtils.unquote(row[1]));
+                        itemNames.add(StringUtils.unquote(row[1]));
                     }
 
                     // group frequencies per marker
@@ -549,18 +547,9 @@ public class SimpleGenotypeData extends DataPojo implements GenotypeData {
             // combine names and identifiers in headers
             SimpleEntity[] headers = new SimpleEntity[n];
             for(int i = 0; i < n; i++){
-                String name = withNames ? itemNames.get(i) : null;
-                String identifier = withIds ? itemIdentifiers.get(i) : null;
-                if(name != null || identifier != null){
-                    if(identifier == null){
-                        headers[i] = new SimpleEntityPojo(name, name);
-                    } else {
-                        headers[i] = new SimpleEntityPojo(identifier, name);
-                    }
-                }
-            }
-            if(Arrays.stream(headers).allMatch(Objects::isNull)){
-                headers = null;
+                String identifier = itemIdentifiers.get(i);
+                String name = withNames ? itemNames.get(i) : itemIdentifiers.get(i);
+                headers[i] = new SimpleEntityPojo(identifier, name);
             }
             
             // convert collections to arrays
@@ -878,11 +867,11 @@ public class SimpleGenotypeData extends DataPojo implements GenotypeData {
                 throw new IOException("Can not create writer for file " + filePath + ".");
             }
 
-            writer.writeCell(NAMES_HEADER);
+            writer.writeCell(IDENTIFIERS_HEADER);
             
             writer.newColumn() ;
 
-            writer.writeCell(IDENTIFIERS_HEADER);
+            writer.writeCell(NAMES_HEADER);
             
             for (int i = 0 ; i < alleleNames.length ; ++i) {
                 for (int j = 0 ; j < alleleNames[i].length ; ++j) {
@@ -908,11 +897,11 @@ public class SimpleGenotypeData extends DataPojo implements GenotypeData {
                 writer.newRow();
                 
                 header = getHeader(i);
-                writer.writeCell(header.getName());
+                writer.writeCell(header.getUniqueIdentifier());
                 
                 writer.newColumn() ;
                 
-                writer.writeCell(header.getUniqueIdentifier());
+                writer.writeCell(header.getName());
 
                 for (int j = 0; j < alleleFrequencies[i].length; ++j) {
                     writer.newColumn() ;

@@ -62,9 +62,9 @@ import static org.junit.Assert.assertTrue;
  */
 public class SimpleGenotypeDataTest {
 
-    private static final String TXT_NAMES = "/frequency_genotypes/names.txt";
-    private static final String CSV_NAMES = "/frequency_genotypes/names.csv";
-    private static final String CSV_NAMES_IDS = "/frequency_genotypes/names-and-ids.csv";
+    private static final String TXT_IDS = "/frequency_genotypes/ids.txt";
+    private static final String CSV_IDS = "/frequency_genotypes/ids.csv";
+    private static final String CSV_IDS_NAMES = "/frequency_genotypes/ids-and-names.csv";
     private static final String CSV_NO_ALLELE_NAMES = "/frequency_genotypes/no-allele-names.csv";
     
     private static final String DIPLOID_TXT_NAMES = "/diploid_genotypes/names.txt";
@@ -94,9 +94,9 @@ public class SimpleGenotypeDataTest {
         System.out.println("Done");
     }
     
-    /***********/
-    /* GENERAL */
-    /***********/
+    /*************/
+    /* FREQUENCY */
+    /*************/
     
     @Test
     public void inMemory() {
@@ -123,42 +123,41 @@ public class SimpleGenotypeDataTest {
     }
 
     @Test
-    public void fromTxtFileWithNames() throws IOException {
-        dataName = "names.txt";
+    public void fromTxtFileWithIds() throws IOException {
+        dataName = "ids.txt";
         expectedHeaders = HEADERS_UNIQUE_NAMES;
         expectedMarkerNames = MARKER_NAMES;
         expectedAlleleNames = ALLELE_NAMES;
         System.out.println(" |- File " + dataName);
         testDataFrequencies(SimpleGenotypeData.readData(
-            Paths.get(SimpleGenotypeDataTest.class.getResource(TXT_NAMES).getPath()), FileType.TXT
+            Paths.get(SimpleGenotypeDataTest.class.getResource(TXT_IDS).getPath()), FileType.TXT
         ));
     }
     
     @Test
-    public void fromCsvFileWithNames() throws IOException {
-        dataName = "names.csv";
+    public void fromCsvFileWithIds() throws IOException {
+        dataName = "ids.csv";
         expectedHeaders = HEADERS_UNIQUE_NAMES;
         expectedMarkerNames = MARKER_NAMES;
         expectedAlleleNames = ALLELE_NAMES;
         System.out.println(" |- File " + dataName);
         testDataFrequencies(SimpleGenotypeData.readData(
-            Paths.get(SimpleGenotypeDataTest.class.getResource(CSV_NAMES).getPath()), FileType.CSV
+            Paths.get(SimpleGenotypeDataTest.class.getResource(CSV_IDS).getPath()), FileType.CSV
         ));
     }
     
     @Test
-    public void fromCsvFileWithNamesAndIDs() throws IOException {
-        dataName = "names-and-ids.csv";
+    public void fromCsvFileWithIdsAndNames() throws IOException {
+        dataName = "ids-and-names.csv";
         expectedHeaders = HEADERS_NON_UNIQUE_NAMES;
         expectedMarkerNames = MARKER_NAMES;
         expectedAlleleNames = ALLELE_NAMES;
         System.out.println(" |- File " + dataName);
         testDataFrequencies(SimpleGenotypeData.readData(
-            Paths.get(SimpleGenotypeDataTest.class.getResource(CSV_NAMES_IDS).getPath()), FileType.CSV
+            Paths.get(SimpleGenotypeDataTest.class.getResource(CSV_IDS_NAMES).getPath()), FileType.CSV
         ));
     }
     
-    // TODO should not allele names be compulsory?
     @Test
     public void fromCsvFileWithoutAlleleNames() throws IOException {
         dataName = "no-allele-names.csv";
@@ -172,8 +171,8 @@ public class SimpleGenotypeDataTest {
     }
     
     @Test
-    public void toTxtFileWithNames() throws IOException {
-        dataName = "names.txt";
+    public void toTxtFile() throws IOException {
+        dataName = "out.txt";
         expectedHeaders = HEADERS_UNIQUE_NAMES;
         expectedMarkerNames = MARKER_NAMES;
         expectedAlleleNames = UNDEFINED_ALLELE_NAMES;
@@ -185,7 +184,7 @@ public class SimpleGenotypeDataTest {
         
         Files.createDirectories(path) ;
         
-        path = Files.createTempDirectory(path, "GenoFreqs-TxtFileWithNames") ;
+        path = Files.createTempDirectory(path, "GenoFreqs-Txt") ;
         
         path = Paths.get(path.toString(), dataName) ;
         
@@ -199,8 +198,8 @@ public class SimpleGenotypeDataTest {
     }
     
     @Test
-    public void toCsvFileWithNamesAndAlleleNames() throws IOException {
-        dataName = "allele-names.csv";
+    public void toCsvFileWithAlleleNames() throws IOException {
+        dataName = "out.csv";
         expectedHeaders = HEADERS_UNIQUE_NAMES;
         expectedMarkerNames = MARKER_NAMES;
         expectedAlleleNames = ALLELE_NAMES;
@@ -212,7 +211,7 @@ public class SimpleGenotypeDataTest {
         
         Files.createDirectories(path) ;
         
-        path = Files.createTempDirectory(path, "GenoFreqs-CsvFileWithNamesAndAlleleNames") ;
+        path = Files.createTempDirectory(path, "GenoFreqs-CsvAlleleNames") ;
         
         path = Paths.get(path.toString(), dataName) ;
         
