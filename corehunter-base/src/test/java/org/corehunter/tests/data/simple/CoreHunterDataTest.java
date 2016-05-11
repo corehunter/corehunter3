@@ -25,7 +25,6 @@ import java.nio.file.Paths;
 
 import org.corehunter.data.CoreHunterData;
 import org.corehunter.data.DistanceMatrixData;
-import org.corehunter.data.SymmetricMatrixFormat;
 import org.corehunter.data.simple.SimpleBiAllelicGenotypeData;
 import org.corehunter.data.simple.SimpleDistanceMatrixData;
 import org.corehunter.tests.TestData;
@@ -47,16 +46,16 @@ import org.corehunter.data.GenotypeData;
  */
 public class CoreHunterDataTest {
 
-    private static final String DISTANCES_SMALL = "/distances/small-names.txt";
-    private static final String DISTANCES_UNIQUE_NAMES = "/distances/full-names.txt";
-    private static final String DISTANCES_NON_UNIQUE_NAMES = "/distances/full-names-ids.txt";
+    private static final String DISTANCES_SMALL = "/distances/small-ids.txt";
+    private static final String DISTANCES_UNIQUE_NAMES = "/distances/full-ids.txt";
+    private static final String DISTANCES_NON_UNIQUE_NAMES = "/distances/full-ids-names.txt";
     
     private static final String PHENOTYPES_UNIQUE_NAMES = "/phenotypes/names.csv";
     private static final String PHENOTYPES_NON_UNIQUE_NAMES = "/phenotypes/names-and-ids.csv";
     private static final String PHENOTYPES_SAME_IDS_DIFFERENT_NAMES = "/phenotypes/same-ids-different-names.csv";
     
-    private static final String MARKERS_UNIQUE_NAMES = "/biallelic_genotypes/names.csv";
-    private static final String MARKERS_NON_UNIQUE_NAMES = "/biallelic_genotypes/names-and-ids.csv";
+    private static final String MARKERS_UNIQUE_NAMES = "/biallelic_genotypes/ids.csv";
+    private static final String MARKERS_NON_UNIQUE_NAMES = "/biallelic_genotypes/ids-and-names.csv";
     private static final String MARKERS_IDS_SOME_NAMES = "/biallelic_genotypes/ids-with-some-names.csv";
 
     private SimpleEntity[] expectedHeaders;
@@ -216,7 +215,7 @@ public class CoreHunterDataTest {
     private DistanceMatrixData readDistanceMatrixData(String file) throws IOException{
         return SimpleDistanceMatrixData.readData(
             Paths.get(CoreHunterDataTest.class.getResource(file).getPath()),
-            inferFileType(file), SymmetricMatrixFormat.FULL
+            inferFileType(file)
         );
     }
     

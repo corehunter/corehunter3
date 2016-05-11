@@ -23,15 +23,12 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 
 import org.corehunter.data.DistanceMatrixData;
-import org.corehunter.data.SymmetricMatrixFormat;
 import org.corehunter.util.StringUtils;
 
-import uno.informatics.common.Constants;
 import uno.informatics.common.io.FileType;
 import uno.informatics.common.io.IOUtilities;
 import uno.informatics.common.io.RowReader;
@@ -43,15 +40,14 @@ import uno.informatics.data.pojo.SimpleEntityPojo;
 
 /**
  * Simple implementation of a distance matrix that stores all values in a two-dimensional double array.
- * The assigned entry IDs correspond to the row/column indices in the matrix.
  * 
  * @author Guy Davenport, Herman De Beukelaer
  */
 public class SimpleDistanceMatrixData extends DataPojo implements DistanceMatrixData {
 
     private static final double DELTA = 1e-10;
-    private static final String NAMES_HEADER = "NAME";
     private static final String IDENTIFIERS_HEADER = "ID";
+    private static final String NAMES_HEADER = "NAME";
     
     // distance matrix
     private final double[][] distances;
@@ -146,31 +142,30 @@ public class SimpleDistanceMatrixData extends DataPojo implements DistanceMatrix
 
     /**
      * Read distance matrix data from file. Only file types {@link FileType#TXT} and {@link FileType#CSV} are allowed.
-     * Values are separated with a single tab (txt) or comma (csv) character and should all be positive.
-     * If the matrix is provided in a format that includes diagonal values ({@link SymmetricMatrixFormat#FULL}
-     * or {@link SymmetricMatrixFormat#LOWER_DIAG}) these should equal zero. If the full matrix is specified it
-     * should be symmetric. Violating these requirements will produce an exception.
+     * Values are separated with a single tab (txt) or comma (csv) character and should all be positive. Matrix entries
+     * are included row-wise and rows can be truncated at or after the diagonal. If included, diagonal values should
+     * always be zero. Any provided values after the diagonal (upper triangular part) are validated based on the
+     * compulsory lower triangular part, verifying that the distance matrix is symmetric.
      * <p>
-     * One required and one optional header row are included at the beginning of the file to specify individual
-     * names and (optionally) unique identifiers. The former is required and identified with row header "NAME".
-     * The latter is optional and has row header "ID".
-     * If only names are specified they should be defined for each item and unique. Else, additional unique
-     * identifiers are also required for at least those items whose name is undefined or not unique.
+     * The file includes one required and one optional header column specifying unique identifiers and item names,
+     * respectively. The first, required header column is identified with column header "ID". The second, optional
+     * header column is identified with column header "NAME", when included. If no explicit names are provided, the
+     * unique identifiers are used as names as well. Optionally, the same item identifiers from the first header
+     * column may also be included on the first row (in the same order).
+     * <p>
      * Leading and trailing whitespace is removed from names and unique identifiers and they are unquoted if
      * wrapped in single or double quotes after whitespace removal. If it is intended to start or end a
      * name/identifier with whitespace this whitespace should be contained within the quotes, as it
      * will then not be removed.
      * <p>
-     * The dataset name is set to the name of the file to which <code>filePath</code> points.
+     * The dataset name is set to the name of the file from which the data is read.
      * 
      * @param filePath path to file that contains the data
      * @param type {@link FileType#TXT} or {@link FileType#CSV}
-     * @param format specifies how the symmetric distance matrix is encoded in the file
      * @return distance matrix data
      * @throws IOException if the file can not be read or is not correctly formatted
      */
-    public static SimpleDistanceMatrixData readData(Path filePath, FileType type,
-                                                          SymmetricMatrixFormat format) throws IOException {
+    public static SimpleDistanceMatrixData readData(Path filePath, FileType type) throws IOException {
         
         // validate arguments
         
@@ -205,162 +200,121 @@ public class SimpleDistanceMatrixData extends DataPojo implements DistanceMatrix
                 throw new IOException("File is empty.");
             }
             
-            // read row per row
-            List<double[]> datarows = new ArrayList<>();
-            double[] row;
-            String firstCell;
-            int rowCount, prevRowCount = Constants.UNKNOWN_COUNT;
-            int r = 0; // row counter
-            String[] names = null;
-            String[] identifiers  = null;
-            while(reader.nextRow()){
-                                
-                // peek first cell
-                reader.nextColumn();
-                firstCell = reader.getCellAsString();
-                
-                switch (StringUtils.unquote(firstCell)) {
-                    
-                    // names
-                    case NAMES_HEADER:
-                        
-                        // check: no data rows read yet
-                        if(!datarows.isEmpty()){
-                            throw new IOException(String.format(
-                                    "Row %s should be at the top of the file.", NAMES_HEADER
-                            ));
-                        }
-                        // check: no names read yet
-                        if(names != null){
-                            throw new IOException(String.format(
-                                    "Duplicate %s row.", NAMES_HEADER
-                            ));
-                        }
-                        // read names
-                        reader.nextColumn();
-                        names = StringUtils.unquote(reader.getRowCellsAsStringArray());
-                        break;
-                    
-                    // identifiers
-                    case IDENTIFIERS_HEADER:
-                        
-                        // check: no data rows read yet
-                        if(!datarows.isEmpty()){
-                            throw new IOException(String.format(
-                                    "Row %s should be at the top of the file.", IDENTIFIERS_HEADER
-                            ));
-                        }
-                        // check: no identifiers read yet
-                        if(identifiers != null){
-                            throw new IOException(String.format(
-                                    "Duplicate %s row.", IDENTIFIERS_HEADER
-                            ));
-                        }
-                        // read identifiers
-                        reader.nextColumn();
-                        identifiers = StringUtils.unquote(reader.getRowCellsAsStringArray());
-                        break;
-                        
-                    // data row
-                    default:
-                        
-                        // read values
-                        row = reader.getRowCellsAsDoubleArray();
-                        // check number of values
-                        rowCount = row.length;
-                        checkNumValuesInRow(format, r, rowCount, prevRowCount);
-                        // store
-                        datarows.add(row);
-                        prevRowCount = rowCount;
-                        break;
-                        
+            // read all lines
+            List<String[]> rows = new ArrayList<>();
+            while (reader.nextRow()) {
+                rows.add(reader.getRowCellsAsStringArray());
+            }
+            
+            // infer dataset size
+            int n = rows.size()-1;
+            if (n <= 0) {
+                throw new IOException("No data.");
+            }
+            
+            // check presence of ID column
+            String[] firstRow = rows.get(0);
+            if(firstRow.length == 0 || !Objects.equals(IDENTIFIERS_HEADER, firstRow[0])){
+                throw new IOException("Missing ID column.");
+            }
+            
+            // check for presence of item names
+            int numHeaderCols = 1;
+            boolean withNames = false;
+            if(firstRow.length > 1 && Objects.equals(NAMES_HEADER, firstRow[1])){
+                withNames = true;
+                numHeaderCols++;
+            }
+            
+            // extract ids and names
+            String[] ids = new String[n];
+            String[] names = new String[n];
+            for(int i = 0; i < n; i++){
+                ids[i] = StringUtils.unquote(rows.get(i+1)[0]);
+                names[i] = withNames ? StringUtils.unquote(rows.get(i+1)[1]) : ids[i];
+            }
+            
+            // verify ids on header row, if provided
+            if(firstRow.length > numHeaderCols){
+                for(int i = 0; i < n; i++){
+                    if(numHeaderCols + i >= firstRow.length || !Objects.equals(ids[i], firstRow[numHeaderCols+i])){
+                        throw new IOException("Row and column identifiers differ.");
+                    }
                 }
-                
-                // next row
-                r++;
-                
             }
             
-            if(datarows.isEmpty()){
-                throw new IOException("No data rows in file.");
+            // read matrix entries
+            Double[][] dist = new Double[n][n];
+            for(int i = 0; i < n; i++){
+                String[] row = rows.get(i+1);
+                if(row.length-numHeaderCols < i){
+                    throw new IOException("Too few values at row " + (i+1) + ".");
+                }
+                if(row.length-numHeaderCols > n){
+                    throw new IOException("Too many values at row " + (i+1) + ".");
+                }
+                for(int j = 0; j < row.length-numHeaderCols; j++){
+                    String entry = row[numHeaderCols + j];
+                    Double d = entry == null ? null : Double.parseDouble(entry);
+                    dist[i][j] = d;
+                }
             }
             
-            // infer number of accessions
-            int n = datarows.get(datarows.size()-1).length;
-            if(format == SymmetricMatrixFormat.LOWER){
-                // diagonal not included
-                n++;
+            // check and complete matrix
+            for(int i = 0; i < n; i++){
+                for(int j = 0; j < n; j++){
+                    Double d = dist[i][j];
+                    if(i > j){
+                        // lower triangular
+                        if(d == null){
+                            throw new IOException(String.format(
+                                    "Missing value at row %d, col %d.",
+                                    i + 1, numHeaderCols + j
+                            ));
+                        }
+                    } else if (i == j){
+                        // diagonal
+                        if(d != null){
+                            if(d > DELTA){
+                                throw new IOException("Non-zero diagonal value at row " + (i+1) + ".");
+                            }
+                        } else {
+                            dist[i][j] = 0.0;                            
+                        }
+                    } else {
+                        // upper triangular
+                        if(dist[j][i] == null){
+                            throw new IOException(String.format(
+                                    "Missing value at row %d, col %d.",
+                                    j + 1, numHeaderCols + i
+                            ));
+                        }
+                        if(d != null){
+                            if(Math.abs(d - dist[j][i]) > DELTA){
+                                throw new IOException("Matrix is not symmetric.");
+                            }
+                        } else {
+                            dist[i][j] = dist[j][i];
+                        }
+                    }
+                }
             }
             
-            // check number of rows
-            int expectedRows = (format == SymmetricMatrixFormat.LOWER) ? n-1 : n;
-            if(datarows.size() != expectedRows){
-                throw new IOException(String.format(
-                        "Incorrect number of data rows. Expected: %d, actual: %d.",
-                        expectedRows, datarows.size()
-                ));
-            }
-            
-            // pad names with extra null values if needed when identifiers are also specified
-            if(names != null && identifiers != null && names.length < n){
-                names = Arrays.copyOf(names, n);
-            }
-            
-            // check number of names
-            if(names != null && names.length != n){
-                throw new IOException(
-                        String.format("Incorrect number of names. Expected: %d, actual: %d.", n, names.length)
-                );
-            }
-            
-            // check number of identifiers
-            if(identifiers != null && identifiers.length != n){
-                throw new IOException(
-                        String.format(
-                                "Incorrect number of identifiers. Expected: %d, actual: %d.",
-                                n, identifiers.length
-                        )
-                );
+            // unbox matrix
+            double[][] distances = new double[n][n];
+            for(int i = 0; i < n; i++){
+                for(int j = 0; j < n; j++){
+                    distances[i][j] = dist[i][j];
+                }
             }
             
             // combine names and identifiers in headers
-            SimpleEntity[] headers = null;
-            if(identifiers != null || names != null){
-                headers = new SimpleEntity[n];
-                for(int i = 0; i < n; i++){
-                    String name = names != null ? names[i] : null;
-                    String identifier = identifiers != null ? identifiers[i] : null;
-                    if(identifier == null){
-                        headers[i] = new SimpleEntityPojo(name, name);
-                    } else {
-                        headers[i] = new SimpleEntityPojo(identifier, name);
-                    }
-                }
+            SimpleEntity[] headers = new SimpleEntity[n];
+            for(int i = 0; i < n; i++){
+                headers[i] = new SimpleEntityPojo(ids[i], names[i]);
             }
             
-            // init distance matrix
-            double[][] dist = new double[n][n];
-            // skip first row if lower triangular encoding without diagonal
-            int s = (format == SymmetricMatrixFormat.LOWER) ? 1 : 0;
-            // fill matrix
-            Iterator<double[]> rowIterator = datarows.iterator();
-            for(r = s; r < n; r++){
-                row = rowIterator.next();
-                for(int c = 0; c < row.length; c++){
-                    dist[r][c] = row[c];
-                }
-            }
-            
-            // complete upper triangular part of matrix
-            if(format != SymmetricMatrixFormat.FULL){
-                for(r = 0; r < n; r++){
-                    for(int c = r+1; c < n; c++){
-                        dist[r][c] = dist[c][r];
-                    }
-                }
-            }
-            
-            return new SimpleDistanceMatrixData(filePath.getFileName().toString(), headers, dist);
+            return new SimpleDistanceMatrixData(filePath.getFileName().toString(), headers, distances);
         }
     }
     
@@ -401,70 +355,31 @@ public class SimpleDistanceMatrixData extends DataPojo implements DistanceMatrix
                 throw new IOException("Can not create writer for file " + filePath + ".");
             }
 
-            writer.writeCell(NAMES_HEADER);
-            
-            Iterator<Integer> iterator = getIDs().iterator() ;
-            
-            while (iterator.hasNext()) {
-                
-                writer.newColumn() ;
-                
-                writer.writeCell(getHeader(iterator.next()).getName()) ;
-            }
-            
-            writer.newRow() ;
-            
+            // write header row
             writer.writeCell(IDENTIFIERS_HEADER);
-                
-            iterator = getIDs().iterator() ;
-            
-            while (iterator.hasNext()) {
-                
+            writer.newColumn();
+            writer.writeCell(NAMES_HEADER);
+            for (int i = 0; i < getSize(); i++) {
                 writer.newColumn() ;
-                
-                writer.writeCell(getHeader(iterator.next()).getUniqueIdentifier()) ;
+                writer.writeCell(getHeader(i).getUniqueIdentifier()) ;
             }
-                        
-            for (int i = 0; i < distances.length; ++i) {
-                writer.newRow() ;
-                writer.writeCell(distances[i][0]);
-                for (int j = 1; j < distances.length; ++j) {
-                    writer.newColumn() ;
+            
+            // write data rows
+            for(int i = 0; i < getSize(); i++){
+                writer.newRow();
+                // write id and name
+                writer.writeCell(getHeader(i).getUniqueIdentifier());
+                writer.newColumn();
+                writer.writeCell(getHeader(i).getName());
+                // write matrix entries
+                for(int j = 0; j < getSize(); j++){
+                    writer.newColumn();
                     writer.writeCell(distances[i][j]);
                 }
             }
-
+            
             writer.close();
         } 
     }
     
-    private static void checkNumValuesInRow(SymmetricMatrixFormat format, int row,
-                                     int rowCount, int prevRowCount) throws IOException{
-        
-        int expected = Constants.UNKNOWN_COUNT;
-        switch(format){
-                
-            case FULL:
-                // same as previous row, if any
-                if(prevRowCount != Constants.UNKNOWN_COUNT){
-                    expected = prevRowCount;
-                }
-                break;
-            case LOWER_DIAG:
-            case LOWER:
-                // one more per row
-                expected = prevRowCount == Constants.UNKNOWN_COUNT ? 1 : prevRowCount + 1;
-                break;
-
-            default: throw new IOException("Unknown matrix format " + format + ".");
-
-        }
-        
-        if(expected != Constants.UNKNOWN_COUNT && expected != rowCount){
-            throw new IOException(String.format(
-                    "Incorrect number of values at row %d. Expected: %d, actual: %d", row, expected, rowCount
-            ));
-        }
-        
-    }
 }

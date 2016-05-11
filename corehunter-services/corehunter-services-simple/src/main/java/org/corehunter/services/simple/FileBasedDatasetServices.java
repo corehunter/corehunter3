@@ -31,10 +31,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.corehunter.data.BiAllelicGenotypeData;
 import org.corehunter.data.CoreHunterData;
 import org.corehunter.data.GenotypeData;
-import org.corehunter.data.SymmetricMatrixFormat;
 import org.corehunter.data.simple.SimpleBiAllelicGenotypeData;
 import org.corehunter.data.simple.SimpleDistanceMatrixData;
 import org.corehunter.data.simple.SimpleGenotypeData;
@@ -45,7 +43,6 @@ import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.StaxDriver;
 
 import uno.informatics.common.io.FileType;
-import uno.informatics.data.Data;
 import uno.informatics.data.Dataset;
 import uno.informatics.data.dataset.DatasetException;
 import uno.informatics.data.feature.array.ArrayFeatureData;
@@ -278,8 +275,7 @@ public class FileBasedDatasetServices implements DatasetServices {
                             "Genotypic Data is already associated for this dataset : " + dataset.getName());
                 }
 
-                SimpleDistanceMatrixData distance = SimpleDistanceMatrixData.readData(path, fileType,
-                        SymmetricMatrixFormat.FULL);
+                SimpleDistanceMatrixData distance = SimpleDistanceMatrixData.readData(path, fileType);
 
                 if (coreHunterData != null) {
                     coreHunterData = new CoreHunterData(coreHunterData.getGenotypicData(),
@@ -375,7 +371,7 @@ public class FileBasedDatasetServices implements DatasetServices {
         path = Paths.get(getPath().toString(), DISTANCE_PATH, datasetId + TXT_SUFFIX);
 
         if (Files.exists(path)) {
-            distance = SimpleDistanceMatrixData.readData(path, FileType.TXT, SymmetricMatrixFormat.FULL);
+            distance = SimpleDistanceMatrixData.readData(path, FileType.TXT);
         }
 
         if (genotypicData != null || phenotypicData != null || distance != null) {
