@@ -265,7 +265,7 @@ public class SimpleBiAllelicGenotypeData extends SimpleGenotypeData
             // check for presence of ids and names
             String[] firstRow = rows.get(0);
             if(firstRow.length == 0 || !Objects.equals(firstRow[0], IDENTIFIERS_HEADER)){
-                throw new IOException("Missing header column ID.");
+                throw new IOException("Missing header row/column ID.");
             }
             boolean withNames = firstRow.length >= 2 && Objects.equals(firstRow[1], NAMES_HEADER);
             int numHeaderCols = 1;

@@ -410,7 +410,7 @@ public class SimpleGenotypeData extends DataPojo implements GenotypeData {
             String[] markerNamesRow = reader.getRowCellsAsStringArray();
             // check presence of header columns
             if(markerNamesRow.length < 1 || !Objects.equals(markerNamesRow[0], IDENTIFIERS_HEADER)){
-                throw new IOException("Missing header column ID.");
+                throw new IOException("Missing header row/column ID.");
             }
             boolean withNames = (markerNamesRow.length >= 2 && Objects.equals(markerNamesRow[1], NAMES_HEADER));
             int numHeaderCols = 1;
@@ -624,21 +624,17 @@ public class SimpleGenotypeData extends DataPojo implements GenotypeData {
             }
             
             // check for presence of names and ids
-            boolean withNames = numCols >= 1 && Objects.equals(rows.get(0)[0], NAMES_HEADER);
-            boolean withIds = numCols >= 2 && Objects.equals(rows.get(0)[1], IDENTIFIERS_HEADER);
-            int numHeaderCols = 0;
+            if(numCols < 1 || !Objects.equals(rows.get(0)[0], IDENTIFIERS_HEADER)){
+                throw new IOException("Missing header row/column ID.");
+            }
+            boolean withNames = numCols >= 2 && Objects.equals(rows.get(0)[1], NAMES_HEADER);
+            int numHeaderCols = 1;
             if(withNames){
                 numHeaderCols++;
-            } else {
-                throw new IOException("Individual and marker names are required.");
             }
-            if(withIds){
-                numHeaderCols++;
-            }
-            int numHeaderRows = (withNames ? 1 : 0);
             
             // infer number of individuals
-            int n = rows.size() - numHeaderRows;
+            int n = rows.size() - 1;
             if(n == 0){
                 throw new IOException("No data rows.");
             }
@@ -674,23 +670,17 @@ public class SimpleGenotypeData extends DataPojo implements GenotypeData {
 
             String[] itemNames = new String[n];
             String[] itemIdentifiers = new String[n];
-            if(numHeaderCols > 0){
-                for(int i = 0; i < n; i++){
-                    String[] row = rows.get(numHeaderRows + i);
-                    // extract row headers, if any (name/identifier)
-                    if(withNames){
-                        itemNames[i] = row[0];
-                    }
-                    if(withIds){
-                        itemIdentifiers[i] = row[1];
-                    }
-                }
+            for(int i = 0; i < n; i++){
+                String[] row = rows.get(i+1);
+                // extract row headers
+                itemIdentifiers[i] = row[0];
+                itemNames[i] = withNames ? row[1] : itemIdentifiers[i];
             }
             
             // 3: split observed alleles per marker
             String[][][] observedAlleles = new String[n][numMarkers][];
             for(int i = 0; i < n; i++){
-                String[] row = rows.get(numHeaderRows+i);
+                String[] row = rows.get(i+1);
                 int c = numHeaderCols;
                 for(int m = 0; m < numMarkers; m++){
                     int nCol = markerNumCols.get(m);
@@ -716,7 +706,7 @@ public class SimpleGenotypeData extends DataPojo implements GenotypeData {
                 // check: at least one allele
                 if(alleles.isEmpty()){
                     throw new IOException(String.format(
-                            "No data for marker %d.", m
+                            "No data for marker %s.", markerNames.get(m)
                     ));
                 }
                 // convert to array and store
@@ -752,18 +742,7 @@ public class SimpleGenotypeData extends DataPojo implements GenotypeData {
             // combine names and identifiers in headers
             SimpleEntity[] headers = new SimpleEntity[n];
             for(int i = 0; i < n; i++){
-                String name = itemNames[i];
-                String identifier = itemIdentifiers[i];
-                if(name != null || identifier != null){
-                    if(identifier == null){
-                        headers[i] = new SimpleEntityPojo(name);
-                    } else {
-                        headers[i] = new SimpleEntityPojo(identifier, name);
-                    }
-                }
-            }
-            if(Arrays.stream(headers).allMatch(Objects::isNull)){
-                headers = null;
+                headers[i] = new SimpleEntityPojo(itemIdentifiers[i], itemNames[i]);
             }
             
             try{
@@ -791,7 +770,7 @@ public class SimpleGenotypeData extends DataPojo implements GenotypeData {
         String markerName = (i >= 0 ? columnName.substring(0, i) : columnName);
         if(markerName.equals("")){
             throw new IOException(String.format(
-                    "Empty marker name at column %d (%s).", c, columnName
+                    "Invalid marker name at column %d (%s).", c, columnName
             ));
         }
         return markerName;

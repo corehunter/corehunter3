@@ -1,4 +1,4 @@
-NAME	mk1_1	mk2_1	mk3_1	mk4_1
+ID  	mk1_1	mk2_1	mk3_1	mk4_1
 Alice	1   	B   	a1 
 Dave	2   	C   	a1  	+  
 Bob 	1   	D   	a2  	+  
