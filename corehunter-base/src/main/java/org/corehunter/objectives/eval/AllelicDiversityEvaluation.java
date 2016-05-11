@@ -22,8 +22,8 @@ package org.corehunter.objectives.eval;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Set;
-import org.corehunter.data.GenotypeVariantData;
 import org.jamesframework.core.problems.objectives.evaluations.Evaluation;
+import org.corehunter.data.GenotypeData;
 
 /**
  * @author Herman De Beukelaer
@@ -44,7 +44,7 @@ public abstract class AllelicDiversityEvaluation implements Evaluation {
      * @param ids IDs of selected items
      * @param data genotype variant data
      */
-    public AllelicDiversityEvaluation(Collection<Integer> ids, GenotypeVariantData data){
+    public AllelicDiversityEvaluation(Collection<Integer> ids, GenotypeData data){
         
         numSelected = ids.size();
         
@@ -82,7 +82,7 @@ public abstract class AllelicDiversityEvaluation implements Evaluation {
      */
     public AllelicDiversityEvaluation(AllelicDiversityEvaluation curEval,
                                       Set<Integer> add, Set<Integer> remove,
-                                      GenotypeVariantData data){
+                                      GenotypeData data){
         
         int origNumSelected = curEval.numSelected;
         numSelected = origNumSelected + add.size() - remove.size();
@@ -124,7 +124,7 @@ public abstract class AllelicDiversityEvaluation implements Evaluation {
         
     }
     
-    private double frequency(GenotypeVariantData data, int id, int m, int a){
+    private double frequency(GenotypeData data, int id, int m, int a){
         Double freq = data.getAlleleFrequency(id, m, a);
         return freq == null ? 0.0 : freq;
     }

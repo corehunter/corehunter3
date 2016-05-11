@@ -27,7 +27,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
-import org.corehunter.data.BiAllelicGenotypeVariantData;
 import org.corehunter.data.GenotypeDataFormat;
 import org.corehunter.util.StringUtils;
 
@@ -38,12 +37,13 @@ import uno.informatics.common.io.RowWriter;
 import uno.informatics.common.io.text.TextFileRowReader;
 import uno.informatics.data.SimpleEntity;
 import uno.informatics.data.pojo.SimpleEntityPojo;
+import org.corehunter.data.BiAllelicGenotypeData;
 
 /**
  * @author Guy Davenport, Herman De Beukelaer
  */
-public class SimpleBiAllelicGenotypeVariantData extends SimpleGenotypeVariantData
-                                                implements BiAllelicGenotypeVariantData {
+public class SimpleBiAllelicGenotypeData extends SimpleGenotypeData
+                                                implements BiAllelicGenotypeData {
 
     private static final String NAMES_HEADER = "NAME";
     private static final String IDENTIFIERS_HEADER = "ID";
@@ -52,13 +52,13 @@ public class SimpleBiAllelicGenotypeVariantData extends SimpleGenotypeVariantDat
 
     /**
      * Create data with name "Biallelic marker data". For details of the
-     * arguments see {@link #SimpleBiAllelicGenotypeVariantData(String, SimpleEntity[], String[], Integer[][])} .
+     * arguments see {@link #SimpleBiAllelicGenotypeData(String, SimpleEntity[], String[], Integer[][])} .
      * 
      * @param itemHeaders item headers (include name and/or unique identifier)
      * @param markerNames marker names
      * @param alleleScores 0/1/2 allele score matrix
      */
-    public SimpleBiAllelicGenotypeVariantData(SimpleEntity[] itemHeaders, String[] markerNames,
+    public SimpleBiAllelicGenotypeData(SimpleEntity[] itemHeaders, String[] markerNames,
             Integer[][] alleleScores) {
         this("Biallelic marker data", itemHeaders, markerNames, alleleScores);
     }
@@ -102,7 +102,7 @@ public class SimpleBiAllelicGenotypeVariantData extends SimpleGenotypeVariantDat
      *            <code>null</code> values (missing); dimensions indicate number
      *            of items (rows) and markers (columns)
      */
-    public SimpleBiAllelicGenotypeVariantData(String datasetName, SimpleEntity[] itemHeaders, String[] markerNames,
+    public SimpleBiAllelicGenotypeData(String datasetName, SimpleEntity[] itemHeaders, String[] markerNames,
             Integer[][] alleleScores) {
 
         // pass dataset name, size and item headers to parent
@@ -181,7 +181,7 @@ public class SimpleBiAllelicGenotypeVariantData extends SimpleGenotypeVariantDat
     }
 
     /**
-     * Read biallelic genotype variant data from file. Only file types
+     * Read biallelic genotype data from file. Only file types
      * {@link FileType#TXT} and {@link FileType#CSV} are allowed. Values are
      * separated with a single tab (txt) or comma (csv) character. The file
      * contains an allele score matrix with one row per individual and one
@@ -211,11 +211,11 @@ public class SimpleBiAllelicGenotypeVariantData extends SimpleGenotypeVariantDat
      *            path to file that contains the data
      * @param type
      *            {@link FileType#TXT} or {@link FileType#CSV}
-     * @return biallelic genotype variant data
+     * @return biallelic genotype data
      * @throws IOException
      *             if the file can not be read or is not correctly formatted
      */
-    public static SimpleBiAllelicGenotypeVariantData readData(Path filePath, FileType type) throws IOException {
+    public static SimpleBiAllelicGenotypeData readData(Path filePath, FileType type) throws IOException {
 
         // validate arguments
 
@@ -347,7 +347,7 @@ public class SimpleBiAllelicGenotypeVariantData extends SimpleGenotypeVariantDat
 
             try {
                 // create data
-                return new SimpleBiAllelicGenotypeVariantData(filePath.getFileName().toString(), headers, markerNames,
+                return new SimpleBiAllelicGenotypeData(filePath.getFileName().toString(), headers, markerNames,
                         alleleScores);
             } catch (IllegalArgumentException ex) {
                 // convert to IO exception
@@ -361,15 +361,15 @@ public class SimpleBiAllelicGenotypeVariantData extends SimpleGenotypeVariantDat
     /**
      * Get list of supported output formats that may be used in {@link #writeData(Path, FileType)}.
      * 
-     * @return list containing {@link GenotypeDataFormat#FREQUENCY} and {@link GenotypeDataFormat#BIALLELIC}
+     * @return list containing {@link GenotypeDataFormat#FREQUENCY} and {@link GenotypeDataFormat#BIPARENTAL}
      */
     @Override
     public List<GenotypeDataFormat> getSupportedOutputFormats() {
-        return Arrays.asList(GenotypeDataFormat.FREQUENCY, GenotypeDataFormat.BIALLELIC);
+        return Arrays.asList(GenotypeDataFormat.FREQUENCY, GenotypeDataFormat.BIPARENTAL);
     }
     
     /**
-     * Write data in biallelic format.
+     * Write data in format {@link GenotypeDataFormat#BIPARENTAL}.
      * 
      * @param filePath file path
      * @param fileType {@link FileType#TXT} or {@link FileType#CSV}
@@ -377,11 +377,11 @@ public class SimpleBiAllelicGenotypeVariantData extends SimpleGenotypeVariantDat
      */
     @Override
     public void writeData(Path filePath, FileType fileType) throws IOException {
-        writeData(filePath, fileType, GenotypeDataFormat.BIALLELIC);
+        writeData(filePath, fileType, GenotypeDataFormat.BIPARENTAL);
     }
 
     /**
-     * Write file to the given format (frequency or biallelic).
+     * Write file to the given format (frequency or biparental).
      * 
      * @param filePath file path
      * @param fileType {@link FileType#TXT} or {@link FileType#CSV}
@@ -396,7 +396,7 @@ public class SimpleBiAllelicGenotypeVariantData extends SimpleGenotypeVariantDat
         }
         
         switch(format){
-            case BIALLELIC:
+            case BIPARENTAL:
                 writeBiallelicData(filePath, fileType);
                 break;
             default:

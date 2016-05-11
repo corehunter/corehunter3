@@ -21,20 +21,20 @@ package org.corehunter.objectives.eval;
 
 import java.util.Collection;
 import java.util.Set;
-import org.corehunter.data.GenotypeVariantData;
+import org.corehunter.data.GenotypeData;
 
 /**
  * @author Herman De Beukelaer
  */
 public class HeterozygousLociEvaluation extends AllelicDiversityEvaluation {
     
-    public HeterozygousLociEvaluation(Collection<Integer> ids, GenotypeVariantData data) {
+    public HeterozygousLociEvaluation(Collection<Integer> ids, GenotypeData data) {
         super(ids, data);
     }
 
     public HeterozygousLociEvaluation(AllelicDiversityEvaluation curEval,
                               Set<Integer> add, Set<Integer> remove,
-                              GenotypeVariantData data) {
+                              GenotypeData data) {
         super(curEval, add, remove, data);
     }
     

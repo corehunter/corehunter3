@@ -25,13 +25,13 @@ import org.jamesframework.core.problems.objectives.Objective;
 import org.jamesframework.core.problems.objectives.evaluations.Evaluation;
 import org.jamesframework.core.subset.SubsetSolution;
 
-import org.corehunter.data.GenotypeVariantData;
 import org.corehunter.data.CoreHunterData;
 import org.corehunter.exceptions.CoreHunterException;
 import org.corehunter.objectives.eval.CoverageEvaluation;
 import org.jamesframework.core.exceptions.IncompatibleDeltaEvaluationException;
 import org.jamesframework.core.search.neigh.Move;
 import org.jamesframework.core.subset.neigh.moves.SubsetMove;
+import org.corehunter.data.GenotypeData;
 
 /**
  * @author Guy Davenport, Herman De Beukelaer
@@ -41,7 +41,7 @@ public class Coverage implements Objective<SubsetSolution, CoreHunterData> {
     @Override
     public CoverageEvaluation evaluate(SubsetSolution solution, CoreHunterData data) {
         
-        GenotypeVariantData genotypes = data.getGenotypicData();
+        GenotypeData genotypes = data.getGenotypicData();
         
         if(genotypes == null){
             throw new CoreHunterException("Genotypes are required for coverage objective.");
