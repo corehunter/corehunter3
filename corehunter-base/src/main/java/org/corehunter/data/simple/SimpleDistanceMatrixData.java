@@ -189,7 +189,7 @@ public class SimpleDistanceMatrixData extends DataPojo implements DistanceMatrix
 
         // read data from file
         try (RowReader reader = IOUtilities.createRowReader(
-                filePath.toFile(), type, TextFileRowReader.REMOVE_WHITE_SPACE
+                filePath, type, TextFileRowReader.REMOVE_WHITE_SPACE
         )) {
             
             if (reader == null || !reader.ready()) {
@@ -348,7 +348,7 @@ public class SimpleDistanceMatrixData extends DataPojo implements DistanceMatrix
         Files.createDirectories(filePath.getParent());
 
         // write data to file
-        try (RowWriter writer = IOUtilities.createRowWriter(filePath.toFile(), fileType,
+        try (RowWriter writer = IOUtilities.createRowWriter(filePath, fileType,
                 TextFileRowReader.REMOVE_WHITE_SPACE)) {
 
             if (writer == null || !writer.ready()) {

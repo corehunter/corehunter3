@@ -231,7 +231,7 @@ public class SimpleBiAllelicGenotypeData extends SimpleGenotypeData
         }
 
         // read data from file
-        try (RowReader reader = IOUtilities.createRowReader(filePath.toFile(), type,
+        try (RowReader reader = IOUtilities.createRowReader(filePath, type,
                 TextFileRowReader.REMOVE_WHITE_SPACE)) {
 
             if (reader == null || !reader.ready()) {
@@ -410,7 +410,7 @@ public class SimpleBiAllelicGenotypeData extends SimpleGenotypeData
         Files.createDirectories(filePath.getParent());
 
         // read data from file
-        try (RowWriter writer = IOUtilities.createRowWriter(filePath.toFile(), fileType,
+        try (RowWriter writer = IOUtilities.createRowWriter(filePath, fileType,
                 TextFileRowReader.REMOVE_WHITE_SPACE)) {
 
             if (writer == null || !writer.ready()) {
