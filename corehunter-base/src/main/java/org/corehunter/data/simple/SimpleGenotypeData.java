@@ -549,7 +549,12 @@ public class SimpleGenotypeData extends DataPojo implements GenotypeData {
             for(int i = 0; i < n; i++){
                 String identifier = itemIdentifiers.get(i);
                 String name = withNames ? itemNames.get(i) : itemIdentifiers.get(i);
-                headers[i] = new SimpleEntityPojo(identifier, name);
+                
+                if (name != null) {
+                    headers[i] = new SimpleEntityPojo(identifier, name);
+                } else {
+                    headers[i] = new SimpleEntityPojo(identifier);
+                }     
             }
             
             // convert collections to arrays
@@ -742,7 +747,11 @@ public class SimpleGenotypeData extends DataPojo implements GenotypeData {
             // combine names and identifiers in headers
             SimpleEntity[] headers = new SimpleEntity[n];
             for(int i = 0; i < n; i++){
-                headers[i] = new SimpleEntityPojo(itemIdentifiers[i], itemNames[i]);
+                if (itemNames[i] != null) {
+                    headers[i] = new SimpleEntityPojo(itemIdentifiers[i], itemNames[i]);
+                } else {
+                    headers[i] = new SimpleEntityPojo(itemIdentifiers[i]);
+                }     
             }
             
             try{

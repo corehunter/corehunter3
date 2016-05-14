@@ -1,4 +1,4 @@
-NAME , trait 1, trait 2, trait 3, trait 4, trait 5
+ID , trait 1, trait 2, trait 3, trait 4, trait 5
 TYPE , N      , O      , I      , R      , NB
 MIN  ,        , 0      , 0      , 0.0
 MAX  ,        , 5      , 10     , 2.0

@@ -311,7 +311,11 @@ public class SimpleDistanceMatrixData extends DataPojo implements DistanceMatrix
             // combine names and identifiers in headers
             SimpleEntity[] headers = new SimpleEntity[n];
             for(int i = 0; i < n; i++){
-                headers[i] = new SimpleEntityPojo(ids[i], names[i]);
+                if (names[i] != null) {
+                    headers[i] = new SimpleEntityPojo(ids[i], names[i]);
+                } else {
+                    headers[i] = new SimpleEntityPojo(ids[i]);
+                }             
             }
             
             return new SimpleDistanceMatrixData(filePath.getFileName().toString(), headers, distances);

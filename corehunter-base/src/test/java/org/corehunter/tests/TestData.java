@@ -54,7 +54,7 @@ public class TestData {
     };
     
     public static final String[] NON_UNIQUE_NAMES = new String[]{
-        "Alice", null, "Bob", "Bob", "Carol"
+        "Alice", "Unknown", "Bob", "Bob", "Carol"
     };
     
     public static final String[] UNIQUE_IDENTIFIERS = new String[]{

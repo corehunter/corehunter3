@@ -324,7 +324,11 @@ public class SimpleBiAllelicGenotypeData extends SimpleGenotypeData
             // combine names and identifiers in headers
             SimpleEntity[] headers = new SimpleEntity[n];
             for (int i = 0; i < n; i++) {
-                headers[i] = new SimpleEntityPojo(itemIdentifiers[i], itemNames[i]);
+                if (itemNames[i] != null) {
+                    headers[i] = new SimpleEntityPojo(itemIdentifiers[i], itemNames[i]);
+                } else {
+                    headers[i] = new SimpleEntityPojo(itemIdentifiers[i]);
+                }  
             }
 
             try {

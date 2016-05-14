@@ -1,4 +1,4 @@
-NAME,Fruit_diam,Seed_wght,nr_flow_axila,Fruit_wght,Plant_hght,Fruit_length,Seed_nr,Corola_color,Anther_color,Corola_spot_color,Fruit_epid,Fruit_form,Flower_position,Corola_form
+ID,Fruit_diam,Seed_wght,nr_flow_axila,Fruit_wght,Plant_hght,Fruit_length,Seed_nr,Corola_color,Anther_color,Corola_spot_color,Fruit_epid,Fruit_form,Flower_position,Corola_form
 TYPE,RD,RD,RD,RD,RD,RD,RD,NI,NI,NI,NI,NI,NI,NI
 10,20,0.3,1,69.4,40.8,37.3,32.1,4,2,0,2,2,5,1
 11,9.5,0.2,2,6.7,33.7,10.7,17.5,4,2,0,2,2,5,1
