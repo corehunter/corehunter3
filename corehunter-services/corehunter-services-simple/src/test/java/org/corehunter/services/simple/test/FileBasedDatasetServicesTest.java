@@ -35,7 +35,6 @@ import java.util.List;
 import org.corehunter.data.CoreHunterData;
 import org.corehunter.data.DistanceMatrixData;
 import org.corehunter.data.GenotypeData;
-import org.corehunter.data.SymmetricMatrixFormat;
 import org.corehunter.data.simple.SimpleBiAllelicGenotypeData;
 import org.corehunter.data.simple.SimpleDistanceMatrixData;
 import org.corehunter.data.simple.SimpleGenotypeData;
@@ -459,8 +458,7 @@ public class FileBasedDatasetServicesTest {
 
             assertNotNull("Phenotypic Data not found", addedData.getDistancesData());
 
-            SimpleDistanceMatrixData data = SimpleDistanceMatrixData.readData(dataPath, FileType.CSV,
-                    SymmetricMatrixFormat.FULL);
+            SimpleDistanceMatrixData data = SimpleDistanceMatrixData.readData(dataPath, FileType.CSV);
 
             //data.setUniqueIdentifier(DATA_UID);
             //data.setName(DATASET_NAME);
@@ -502,8 +500,7 @@ public class FileBasedDatasetServicesTest {
 
             assertNotNull("Restored Distances Data not found", restoredData.getDistancesData());
 
-            SimpleDistanceMatrixData data = SimpleDistanceMatrixData.readData(dataPath, FileType.CSV,
-                    SymmetricMatrixFormat.FULL);
+            SimpleDistanceMatrixData data = SimpleDistanceMatrixData.readData(dataPath, FileType.CSV);
 
             data.setUniqueIdentifier(DATA_UID);
             data.setName(DATASET_NAME);

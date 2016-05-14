@@ -34,7 +34,6 @@ import java.util.Map;
 import org.corehunter.data.CoreHunterData;
 import org.corehunter.data.GenotypeData;
 import org.corehunter.data.GenotypeDataFormat;
-import org.corehunter.data.SymmetricMatrixFormat;
 import org.corehunter.data.simple.SimpleBiAllelicGenotypeData;
 import org.corehunter.data.simple.SimpleDistanceMatrixData;
 import org.corehunter.data.simple.SimpleGenotypeData;
@@ -334,20 +333,18 @@ public class FileBasedDatasetServices implements DatasetServices {
                     throw new DatasetException(
                             "Distances Data is already associated for this dataset : " + dataset.getName());
                 }
-  
+                
                 try {
                     copyOrMoveFile(path, copyPath) ;
                 } catch (Exception e) {
                     Files.deleteIfExists(copyPath) ;
                     throw e ;
                 }
-                
-                SymmetricMatrixFormat symmetricMatrixFormat = getSymmetricMatrixFormat(options) ;
+
                 SimpleDistanceMatrixData distanceData ;
                 
                 try {
-                    distanceData = SimpleDistanceMatrixData.readData(copyPath, fileType,
-                            symmetricMatrixFormat);
+                    distanceData = SimpleDistanceMatrixData.readData(copyPath, fileType);
                 } catch (IOException e) {
                     Files.deleteIfExists(copyPath) ;
                     throw e ;
@@ -360,16 +357,6 @@ public class FileBasedDatasetServices implements DatasetServices {
                     throw e ;
                 }
                 
-                xmlPath = Paths.get(getPath().toString(), ORIGINAL_FORMAT) ;
-                
-                try {
-                    writeToXml(xmlPath, symmetricMatrixFormat) ;
-                } catch (IOException e) {
-                    Files.deleteIfExists(xmlPath) ;
-                    Files.deleteIfExists(copyPath) ;
-                    throw e;
-                }
-               
                 if (coreHunterData != null) {
                     coreHunterData = new CoreHunterData(coreHunterData.getGenotypicData(),
                             coreHunterData.getPhenotypicData(), distanceData);
@@ -410,28 +397,6 @@ public class FileBasedDatasetServices implements DatasetServices {
         Files.createDirectories(target.getParent());
         
         Files.copy(source, target) ;
-    }
-
-    private SymmetricMatrixFormat getSymmetricMatrixFormat(Object[] options) {
-        SymmetricMatrixFormat format = null ;
-        
-        if (options != null) {
-            for (int i = 0 ;  i < options.length ; ++i) {
-                if (options[i]  instanceof GenotypeDataFormat) {
-                    if (format != null) {
-                        throw new IllegalArgumentException("Symmetric Matrix Format given twice as an option!"); 
-                    }
-                    
-                    format = (SymmetricMatrixFormat)options[i] ;
-                }
-            }
-        }
-        
-        if (format == null) {
-            format = SymmetricMatrixFormat.FULL; // default option
-        }
-        
-        return format ;
     }
 
     private GenotypeDataFormat getGenotypeDataFormat(Object[] options) {
@@ -514,7 +479,7 @@ public class FileBasedDatasetServices implements DatasetServices {
         path = Paths.get(getPath().toString(), DISTANCES_PATH, datasetId + SUFFIX);
 
         if (Files.exists(path)) {
-            distance = SimpleDistanceMatrixData.readData(path, FileType.TXT, SymmetricMatrixFormat.FULL);
+            distance = SimpleDistanceMatrixData.readData(path, FileType.TXT);
 
             updateData(distance, Paths.get(path.getParent().toString(), DATA));
         }

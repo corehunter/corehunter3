@@ -1,6 +1,0 @@
-NAME , ID     , mk1-1, mk2-1, mk3, mk4-1
-Alice,        , 1    , B    , a1
-     , Unknown, 2    , C    , a1 , + 
-Bob  , Bob-1  , 1    , D    , a2 , + 
-Bob  , Bob-2  , 2    , B    , a2 , + 
-Carol,        , 1    ,      , a1 , - 
