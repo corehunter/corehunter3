@@ -78,7 +78,7 @@ public interface DatasetServices {
      * @throws DatasetException
      *             if the data can not be accessed or the dataset does not exist
      */
-    public CoreHunterData getData(String datasetId) throws DatasetException;
+    public CoreHunterData getCoreHunterData(String datasetId) throws DatasetException;
     
     /**
      * Loads the data and associates it with a dataset. If the dataset already

@@ -34,11 +34,11 @@ import java.util.List;
 
 import org.corehunter.data.CoreHunterData;
 import org.corehunter.data.DistanceMatrixData;
-import org.corehunter.data.GenotypeVariantData;
+import org.corehunter.data.GenotypeData;
 import org.corehunter.data.SymmetricMatrixFormat;
-import org.corehunter.data.simple.SimpleBiAllelicGenotypeVariantData;
+import org.corehunter.data.simple.SimpleBiAllelicGenotypeData;
 import org.corehunter.data.simple.SimpleDistanceMatrixData;
-import org.corehunter.data.simple.SimpleGenotypeVariantData;
+import org.corehunter.data.simple.SimpleGenotypeData;
 import org.corehunter.services.DataType;
 import org.corehunter.services.simple.FileBasedDatasetServices;
 import org.junit.Test;
@@ -218,7 +218,7 @@ public class FileBasedDatasetServicesTest {
 
             fileBasedDatasetServices.loadData(addedDataset, dataPath, FileType.CSV, DataType.PHENOTYPIC);
 
-            CoreHunterData addedData = fileBasedDatasetServices.getData(dataset.getUniqueIdentifier());
+            CoreHunterData addedData = fileBasedDatasetServices.getCoreHunterData(dataset.getUniqueIdentifier());
 
             assertNotNull("Data not found", addedData);
 
@@ -260,7 +260,7 @@ public class FileBasedDatasetServicesTest {
             assertNotNull("Restored dataset not found",
                     fileBasedDatasetServices.getDataset(dataset.getUniqueIdentifier()));
 
-            CoreHunterData restoredData = fileBasedDatasetServices.getData(dataset.getUniqueIdentifier());
+            CoreHunterData restoredData = fileBasedDatasetServices.getCoreHunterData(dataset.getUniqueIdentifier());
 
             assertNotNull("Restored data not found", restoredData);
 
@@ -280,7 +280,7 @@ public class FileBasedDatasetServicesTest {
         }
     }
 
-    // @Test
+    @Test
     public void testAddDatasetWithBiAllelicGenotypicData() {
         try {
             FileBasedDatasetServices fileBasedDatasetServices = new FileBasedDatasetServices(createTempDirectory());
@@ -295,13 +295,13 @@ public class FileBasedDatasetServicesTest {
 
             fileBasedDatasetServices.loadData(addedDataset, dataPath, FileType.CSV, DataType.GENOTYPIC);
 
-            CoreHunterData addedData = fileBasedDatasetServices.getData(dataset.getUniqueIdentifier());
+            CoreHunterData addedData = fileBasedDatasetServices.getCoreHunterData(dataset.getUniqueIdentifier());
 
             assertNotNull("Data not found", addedData);
 
             assertNotNull("Genotypic Data not found", addedData.getGenotypicData());
 
-            SimpleBiAllelicGenotypeVariantData data = SimpleBiAllelicGenotypeVariantData.readData(dataPath,
+            SimpleBiAllelicGenotypeData data = SimpleBiAllelicGenotypeData.readData(dataPath,
                     FileType.CSV);
 
             data.setUniqueIdentifier(DATA_UID);
@@ -316,7 +316,7 @@ public class FileBasedDatasetServicesTest {
         }
     }
 
-    // @Test
+    @Test
     public void testRestoreDatasetWithBiAllelicGenotypicData() {
         try {
             FileBasedDatasetServices fileBasedDatasetServices = new FileBasedDatasetServices(createTempDirectory());
@@ -338,13 +338,13 @@ public class FileBasedDatasetServicesTest {
             assertNotNull("Restored dataset not found",
                     fileBasedDatasetServices.getDataset(dataset.getUniqueIdentifier()));
 
-            CoreHunterData restoredData = fileBasedDatasetServices.getData(dataset.getUniqueIdentifier());
+            CoreHunterData restoredData = fileBasedDatasetServices.getCoreHunterData(dataset.getUniqueIdentifier());
 
             assertNotNull("Restored data not found", restoredData);
 
             assertNotNull("Restored Genotypic Data not found", restoredData.getGenotypicData());
 
-            SimpleBiAllelicGenotypeVariantData data = SimpleBiAllelicGenotypeVariantData.readData(dataPath,
+            SimpleBiAllelicGenotypeData data = SimpleBiAllelicGenotypeData.readData(dataPath,
                     FileType.CSV);
 
             data.setUniqueIdentifier(DATA_UID);
@@ -374,13 +374,13 @@ public class FileBasedDatasetServicesTest {
 
             fileBasedDatasetServices.loadData(addedDataset, dataPath, FileType.CSV, DataType.GENOTYPIC);
 
-            CoreHunterData addedData = fileBasedDatasetServices.getData(dataset.getUniqueIdentifier());
+            CoreHunterData addedData = fileBasedDatasetServices.getCoreHunterData(dataset.getUniqueIdentifier());
 
             assertNotNull("Data not found", addedData);
 
             assertNotNull("Genotypic Data not found", addedData.getGenotypicData());
 
-            SimpleGenotypeVariantData data = (SimpleGenotypeVariantData) SimpleGenotypeVariantData.readData(dataPath,
+            SimpleGenotypeData data = (SimpleGenotypeData) SimpleGenotypeData.readData(dataPath,
                     FileType.CSV);
 
             data.setUniqueIdentifier(DATA_UID);
@@ -417,13 +417,13 @@ public class FileBasedDatasetServicesTest {
             assertNotNull("Restored dataset not found",
                     fileBasedDatasetServices.getDataset(dataset.getUniqueIdentifier()));
 
-            CoreHunterData restoredData = fileBasedDatasetServices.getData(dataset.getUniqueIdentifier());
+            CoreHunterData restoredData = fileBasedDatasetServices.getCoreHunterData(dataset.getUniqueIdentifier());
 
             assertNotNull("Restored data not found", restoredData);
 
             assertNotNull("Restored Genotypic Data not found", restoredData.getGenotypicData());
 
-            SimpleGenotypeVariantData data = (SimpleGenotypeVariantData) SimpleGenotypeVariantData.readData(dataPath,
+            SimpleGenotypeData data = (SimpleGenotypeData) SimpleGenotypeData.readData(dataPath,
                     FileType.CSV);
 
             data.setUniqueIdentifier(DATA_UID);
@@ -453,7 +453,7 @@ public class FileBasedDatasetServicesTest {
 
             fileBasedDatasetServices.loadData(addedDataset, dataPath, FileType.CSV, DataType.DISTANCES);
 
-            CoreHunterData addedData = fileBasedDatasetServices.getData(dataset.getUniqueIdentifier());
+            CoreHunterData addedData = fileBasedDatasetServices.getCoreHunterData(dataset.getUniqueIdentifier());
 
             assertNotNull("Data not found", addedData);
 
@@ -462,8 +462,8 @@ public class FileBasedDatasetServicesTest {
             SimpleDistanceMatrixData data = SimpleDistanceMatrixData.readData(dataPath, FileType.CSV,
                     SymmetricMatrixFormat.FULL);
 
-            data.setUniqueIdentifier(DATA_UID);
-            data.setName(DATASET_NAME);
+            //data.setUniqueIdentifier(DATA_UID);
+            //data.setName(DATASET_NAME);
 
             compareDistanceMatrixData(data, addedData.getDistancesData());
 
@@ -496,7 +496,7 @@ public class FileBasedDatasetServicesTest {
             assertNotNull("Restored dataset not found",
                     fileBasedDatasetServices.getDataset(dataset.getUniqueIdentifier()));
 
-            CoreHunterData restoredData = fileBasedDatasetServices.getData(dataset.getUniqueIdentifier());
+            CoreHunterData restoredData = fileBasedDatasetServices.getCoreHunterData(dataset.getUniqueIdentifier());
 
             assertNotNull("Restored data not found", restoredData);
 
@@ -536,7 +536,7 @@ public class FileBasedDatasetServicesTest {
 
             fileBasedDatasetServices.loadData(addedDataset, genotypicDataPath, FileType.CSV, DataType.GENOTYPIC);
 
-            CoreHunterData addedData = fileBasedDatasetServices.getData(dataset.getUniqueIdentifier());
+            CoreHunterData addedData = fileBasedDatasetServices.getCoreHunterData(dataset.getUniqueIdentifier());
 
             assertNotNull("Data not found", addedData);
 
@@ -551,7 +551,7 @@ public class FileBasedDatasetServicesTest {
 
             compareFeatureData(phenotypicData, addedData.getPhenotypicData());
 
-            SimpleGenotypeVariantData genotypicData = (SimpleGenotypeVariantData) SimpleGenotypeVariantData
+            SimpleGenotypeData genotypicData = (SimpleGenotypeData) SimpleGenotypeData
                     .readData(genotypicDataPath, FileType.CSV);
 
             genotypicData.setUniqueIdentifier(DATA_UID);
@@ -592,7 +592,7 @@ public class FileBasedDatasetServicesTest {
             assertNotNull("Restored dataset not found",
                     fileBasedDatasetServices.getDataset(dataset.getUniqueIdentifier()));
 
-            CoreHunterData restoredData = fileBasedDatasetServices.getData(dataset.getUniqueIdentifier());
+            CoreHunterData restoredData = fileBasedDatasetServices.getCoreHunterData(dataset.getUniqueIdentifier());
 
             assertNotNull("Restored Data not found", restoredData);
 
@@ -607,7 +607,7 @@ public class FileBasedDatasetServicesTest {
 
             compareFeatureData(phenotypicData, restoredData.getPhenotypicData());
 
-            SimpleGenotypeVariantData genotypicData = (SimpleGenotypeVariantData) SimpleGenotypeVariantData
+            SimpleGenotypeData genotypicData = (SimpleGenotypeData) SimpleGenotypeData
                     .readData(genotypicDataPath, FileType.CSV);
 
             genotypicData.setUniqueIdentifier(DATA_UID);
@@ -623,8 +623,8 @@ public class FileBasedDatasetServicesTest {
     }
 
     private void compareData(Data expected, Data actual) {
-        assertEquals("Unique Identifier not correct", expected.getUniqueIdentifier(), actual.getUniqueIdentifier());
-        assertEquals("Name not correct", expected.getName(), actual.getName());
+        //assertEquals("Unique Identifier not correct", expected.getUniqueIdentifier(), actual.getUniqueIdentifier());
+        //assertEquals("Name not correct", expected.getName(), actual.getName());
 
         assertEquals("Dataset size is not the name", expected.getSize(), actual.getSize());
 
@@ -633,7 +633,7 @@ public class FileBasedDatasetServicesTest {
         assertEquals("Dataset is not the name", expected.getDataset(), actual.getDataset());
     }
 
-    private void compareGenotypeVariantData(GenotypeVariantData expected, GenotypeVariantData actual) {
+    private void compareGenotypeVariantData(GenotypeData expected, GenotypeData actual) {
 
         compareData(expected, actual);
 

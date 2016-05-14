@@ -247,7 +247,7 @@ public class SimpleCorehunterRunServices implements CorehunterRunServices {
                 startDate = new DateTime();
 
                 CoreHunterArguments arguments = new CoreHunterArguments(
-                        datasetServices.getData(corehunterRunArguments.getDatasetId()),
+                        datasetServices.getCoreHunterData(corehunterRunArguments.getDatasetId()),
                         corehunterRunArguments.getObjective(),
                         corehunterRunArguments.getSubsetSize());
 
