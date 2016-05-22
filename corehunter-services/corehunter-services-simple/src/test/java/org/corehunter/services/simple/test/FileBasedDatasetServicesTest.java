@@ -63,6 +63,8 @@ public class FileBasedDatasetServicesTest {
     
     private static final String DEFAULT_GENOTYPIC_FILE = FRQUENCY_GENOTYPIC_FILE ;
 
+    private static final String DEFAULT_ALT_GENOTYPIC_FILE = "frequency_alt_genotypic_data.txt";
+
     private static final String DATA_UID = "dataset1";
     private static final String DATASET_NAME = "dataset 1";
     private static final Path ROOT_DIRECTORY = Paths.get("target", "datasetServicesTests");
@@ -417,10 +419,10 @@ public class FileBasedDatasetServicesTest {
 
             assertNotNull("Genotypic Data not found", addedData.getGenotypicData());
             
-            dataPath = Paths.get(ClassLoader.getSystemResource(DEFAULT_GENOTYPIC_FILE).toURI());
+            dataPath = Paths.get(ClassLoader.getSystemResource(DEFAULT_ALT_GENOTYPIC_FILE).toURI());
 
             SimpleGenotypeData data = (SimpleGenotypeData) SimpleGenotypeData.readData(dataPath,
-                    FileType.CSV);
+                    FileType.TXT);
 
             data.setUniqueIdentifier(DATA_UID);
             data.setName(DATASET_NAME);
@@ -637,10 +639,10 @@ public class FileBasedDatasetServicesTest {
 
             assertNotNull("Restored Genotypic Data not found", restoredData.getGenotypicData());
             
-            dataPath = Paths.get(ClassLoader.getSystemResource(DEFAULT_GENOTYPIC_FILE).toURI());
+            dataPath = Paths.get(ClassLoader.getSystemResource(DEFAULT_ALT_GENOTYPIC_FILE).toURI());
 
             SimpleGenotypeData data = (SimpleGenotypeData) SimpleGenotypeData.readData(dataPath,
-                    FileType.CSV);
+                    FileType.TXT);
 
             data.setUniqueIdentifier(DATA_UID);
             data.setName(DATASET_NAME);
