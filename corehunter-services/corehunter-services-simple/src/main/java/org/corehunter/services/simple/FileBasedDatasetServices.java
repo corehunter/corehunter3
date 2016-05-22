@@ -238,17 +238,31 @@ public class FileBasedDatasetServices implements DatasetServices {
                 
                 GenotypeDataFormat genotypeDataFormat = getGenotypeDataFormat(options) ;
                 GenotypeData genotypeData ;
-                
+ 
                 try {
-                    genotypeData = SimpleGenotypeData.readData(copyPath, fileType, genotypeDataFormat);
+                    switch (genotypeDataFormat) {
+                        case BIPARENTAL:
+                            genotypeData = SimpleBiAllelicGenotypeData.readData(copyPath, fileType);
+                            break;
+                        default:
+                            genotypeData = SimpleGenotypeData.readData(copyPath, fileType, genotypeDataFormat);
+                            break;
+                    } 
                 } catch (IOException e) {
                     Files.deleteIfExists(copyPath) ;
                     throw e;
                 }
 
                 // TODO write data method should be on interface?
-                try {
-                    ((SimpleGenotypeData)genotypeData).writeData(internalPath, FileType.TXT);
+                try { 
+                    switch (genotypeDataFormat) {
+                        case BIPARENTAL:
+                            ((SimpleBiAllelicGenotypeData)genotypeData).writeData(internalPath, FileType.TXT);
+                            break;
+                        default:
+                            ((SimpleGenotypeData)genotypeData).writeData(internalPath, FileType.TXT);
+                            break;
+                    } 
                 } catch (IOException e) {
                     Files.deleteIfExists(copyPath) ;
                     throw e;
@@ -436,11 +450,8 @@ public class FileBasedDatasetServices implements DatasetServices {
 
         List<Dataset> datasets;
         if (Files.exists(datasetsPath)) {
-            InputStream inputStream = Files.newInputStream(datasetsPath);
-
-            XStream xstream = createXStream();
-
-            datasets = (List<Dataset>) xstream.fromXML(inputStream);
+            
+            datasets = (List<Dataset>) readFromXml(datasetsPath) ;
 
             Iterator<Dataset> iterator = datasets.iterator();
 
@@ -465,7 +476,17 @@ public class FileBasedDatasetServices implements DatasetServices {
 
         if (Files.exists(path)) {
             
-            genotypicData = SimpleGenotypeData.readData(path, FileType.TXT);
+            GenotypeDataFormat genotypeDataFormat = (GenotypeDataFormat) readFromXml(Paths.get(getPath().toString(), 
+                    ORIGINAL_FORMAT)) ;
+            
+            switch (genotypeDataFormat) {
+                case BIPARENTAL:
+                    genotypicData = SimpleBiAllelicGenotypeData.readData(path, FileType.TXT);
+                    break;
+                default:
+                    genotypicData = SimpleGenotypeData.readData(path, FileType.TXT);
+                    break;
+            } 
         }
 
         path = Paths.get(getPath().toString(), PHENOTYPIC_PATH, datasetId + SUFFIX);

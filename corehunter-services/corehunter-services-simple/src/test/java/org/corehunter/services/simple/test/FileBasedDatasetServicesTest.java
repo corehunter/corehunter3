@@ -35,6 +35,7 @@ import java.util.List;
 import org.corehunter.data.CoreHunterData;
 import org.corehunter.data.DistanceMatrixData;
 import org.corehunter.data.GenotypeData;
+import org.corehunter.data.GenotypeDataFormat;
 import org.corehunter.data.simple.SimpleBiAllelicGenotypeData;
 import org.corehunter.data.simple.SimpleDistanceMatrixData;
 import org.corehunter.data.simple.SimpleGenotypeData;
@@ -55,10 +56,12 @@ public class FileBasedDatasetServicesTest {
 
     private static final String PHENOTYPIC_FILE = "phenotypic_data.csv";
     private static final String DIPLOID_GENOTYPIC_FILE = "diploid_genotypic_data.csv";
-    private static final String BI_ALLELIC_GENOTYPIC_FILE = "biallelic_genotypic_data.csv";
+    private static final String BIPARENTAL_GENOTYPIC_FILE = "biparental_genotypic_data.csv";
     private static final String FRQUENCY_GENOTYPIC_FILE = "frequency_genotypic_data.csv";
     private static final String HOMOZYGOUS_GENOTYPIC_FILE = "homozygous_genotypic_data.csv";
     private static final String DISTANCES_FILE = "distances_data.csv";
+    
+    private static final String DEFAULT_GENOTYPIC_FILE = FRQUENCY_GENOTYPIC_FILE ;
 
     private static final String DATA_UID = "dataset1";
     private static final String DATASET_NAME = "dataset 1";
@@ -291,7 +294,7 @@ public class FileBasedDatasetServicesTest {
 
             Dataset addedDataset = fileBasedDatasetServices.getDataset(dataset.getUniqueIdentifier());
 
-            Path dataPath = Paths.get(ClassLoader.getSystemResource(FRQUENCY_GENOTYPIC_FILE).toURI());
+            Path dataPath = Paths.get(ClassLoader.getSystemResource(DEFAULT_GENOTYPIC_FILE).toURI());
 
             fileBasedDatasetServices.loadData(addedDataset, dataPath, FileType.CSV, DataType.GENOTYPIC);
 
@@ -300,6 +303,160 @@ public class FileBasedDatasetServicesTest {
             assertNotNull("Data not found", addedData);
 
             assertNotNull("Genotypic Data not found", addedData.getGenotypicData());
+
+            SimpleGenotypeData data = (SimpleGenotypeData) SimpleGenotypeData.readData(dataPath,
+                    FileType.CSV);
+
+            data.setUniqueIdentifier(DATA_UID);
+            data.setName(DATASET_NAME);
+
+            compareGenotypeVariantData(data, addedData.getGenotypicData());
+
+        } catch (Exception e) {
+            e.printStackTrace();
+
+            fail(e.getMessage());
+        }
+    }
+    
+    @Test
+    public void testAddDatasetWithDiploidGenotypicData() {
+        try {
+            FileBasedDatasetServices fileBasedDatasetServices = new FileBasedDatasetServices(createTempDirectory());
+
+            Dataset dataset = new DatasetPojo(DATA_UID, DATASET_NAME);
+
+            fileBasedDatasetServices.addDataset(dataset);
+
+            Dataset addedDataset = fileBasedDatasetServices.getDataset(dataset.getUniqueIdentifier());
+
+            Path dataPath = Paths.get(ClassLoader.getSystemResource(DIPLOID_GENOTYPIC_FILE).toURI());
+
+            fileBasedDatasetServices.loadData(addedDataset, dataPath, FileType.CSV, DataType.GENOTYPIC, 
+                    GenotypeDataFormat.DEFAULT);
+
+            CoreHunterData addedData = fileBasedDatasetServices.getCoreHunterData(dataset.getUniqueIdentifier());
+
+            assertNotNull("Data not found", addedData);
+
+            assertNotNull("Genotypic Data not found", addedData.getGenotypicData());
+            
+            dataPath = Paths.get(ClassLoader.getSystemResource(DEFAULT_GENOTYPIC_FILE).toURI());
+
+            SimpleGenotypeData data = (SimpleGenotypeData) SimpleGenotypeData.readData(dataPath,
+                    FileType.CSV);
+
+            data.setUniqueIdentifier(DATA_UID);
+            data.setName(DATASET_NAME);
+
+            compareGenotypeVariantData(data, addedData.getGenotypicData());
+
+        } catch (Exception e) {
+            e.printStackTrace();
+
+            fail(e.getMessage());
+        }
+    }
+    
+    @Test
+    public void testAddDatasetWithBiparentalGenotypicData() {
+        try {
+            FileBasedDatasetServices fileBasedDatasetServices = new FileBasedDatasetServices(createTempDirectory());
+
+            Dataset dataset = new DatasetPojo(DATA_UID, DATASET_NAME);
+
+            fileBasedDatasetServices.addDataset(dataset);
+
+            Dataset addedDataset = fileBasedDatasetServices.getDataset(dataset.getUniqueIdentifier());
+
+            Path dataPath = Paths.get(ClassLoader.getSystemResource(BIPARENTAL_GENOTYPIC_FILE).toURI());
+
+            fileBasedDatasetServices.loadData(addedDataset, dataPath, FileType.CSV, DataType.GENOTYPIC, 
+                    GenotypeDataFormat.BIPARENTAL);
+
+            CoreHunterData addedData = fileBasedDatasetServices.getCoreHunterData(dataset.getUniqueIdentifier());
+
+            assertNotNull("Data not found", addedData);
+
+            assertNotNull("Genotypic Data not found", addedData.getGenotypicData());
+
+            SimpleBiAllelicGenotypeData data = (SimpleBiAllelicGenotypeData) 
+                    SimpleBiAllelicGenotypeData.readData(dataPath, FileType.CSV);
+
+            data.setUniqueIdentifier(DATA_UID);
+            data.setName(DATASET_NAME);
+
+            compareGenotypeVariantData(data, addedData.getGenotypicData());
+
+        } catch (Exception e) {
+            e.printStackTrace();
+
+            fail(e.getMessage());
+        }
+    }
+    
+    @Test
+    public void testAddDatasetWithHomozygousGenotypicData() {
+        try {
+            FileBasedDatasetServices fileBasedDatasetServices = new FileBasedDatasetServices(createTempDirectory());
+
+            Dataset dataset = new DatasetPojo(DATA_UID, DATASET_NAME);
+
+            fileBasedDatasetServices.addDataset(dataset);
+
+            Dataset addedDataset = fileBasedDatasetServices.getDataset(dataset.getUniqueIdentifier());
+
+            Path dataPath = Paths.get(ClassLoader.getSystemResource(HOMOZYGOUS_GENOTYPIC_FILE).toURI());
+
+            fileBasedDatasetServices.loadData(addedDataset, dataPath, FileType.CSV, DataType.GENOTYPIC, 
+                    GenotypeDataFormat.DEFAULT);
+
+            CoreHunterData addedData = fileBasedDatasetServices.getCoreHunterData(dataset.getUniqueIdentifier());
+
+            assertNotNull("Data not found", addedData);
+
+            assertNotNull("Genotypic Data not found", addedData.getGenotypicData());
+            
+            dataPath = Paths.get(ClassLoader.getSystemResource(DEFAULT_GENOTYPIC_FILE).toURI());
+
+            SimpleGenotypeData data = (SimpleGenotypeData) SimpleGenotypeData.readData(dataPath,
+                    FileType.CSV);
+
+            data.setUniqueIdentifier(DATA_UID);
+            data.setName(DATASET_NAME);
+
+            compareGenotypeVariantData(data, addedData.getGenotypicData());
+
+        } catch (Exception e) {
+            e.printStackTrace();
+
+            fail(e.getMessage());
+        }
+    }
+    
+    @Test
+    public void testAddDatasetWithFrequencyGenotypicData() {
+        try {
+            FileBasedDatasetServices fileBasedDatasetServices = new FileBasedDatasetServices(createTempDirectory());
+
+            Dataset dataset = new DatasetPojo(DATA_UID, DATASET_NAME);
+
+            fileBasedDatasetServices.addDataset(dataset);
+
+            Dataset addedDataset = fileBasedDatasetServices.getDataset(dataset.getUniqueIdentifier());
+
+            Path dataPath = Paths.get(ClassLoader.getSystemResource(FRQUENCY_GENOTYPIC_FILE).toURI());
+
+            fileBasedDatasetServices.loadData(addedDataset, dataPath, FileType.CSV, DataType.GENOTYPIC, 
+                    GenotypeDataFormat.FREQUENCY);
+
+            CoreHunterData addedData = fileBasedDatasetServices.getCoreHunterData(dataset.getUniqueIdentifier());
+
+            assertNotNull("Data not found", addedData);
+
+            assertNotNull("Genotypic Data not found", addedData.getGenotypicData());
+            
+            dataPath = Paths.get(ClassLoader.getSystemResource(DEFAULT_GENOTYPIC_FILE).toURI());
 
             SimpleGenotypeData data = (SimpleGenotypeData) SimpleGenotypeData.readData(dataPath,
                     FileType.CSV);
@@ -329,7 +486,7 @@ public class FileBasedDatasetServicesTest {
 
             Dataset addedDataset = fileBasedDatasetServices.getDataset(dataset.getUniqueIdentifier());
 
-            Path dataPath = Paths.get(ClassLoader.getSystemResource(FRQUENCY_GENOTYPIC_FILE).toURI());
+            Path dataPath = Paths.get(ClassLoader.getSystemResource(DEFAULT_GENOTYPIC_FILE).toURI());
 
             fileBasedDatasetServices.loadData(addedDataset, dataPath, FileType.CSV, DataType.GENOTYPIC);
 
@@ -343,6 +500,190 @@ public class FileBasedDatasetServicesTest {
             assertNotNull("Restored data not found", restoredData);
 
             assertNotNull("Restored Genotypic Data not found", restoredData.getGenotypicData());
+            
+            dataPath = Paths.get(ClassLoader.getSystemResource(DEFAULT_GENOTYPIC_FILE).toURI());
+
+            SimpleGenotypeData data = (SimpleGenotypeData) SimpleGenotypeData.readData(dataPath,
+                    FileType.CSV);
+
+            data.setUniqueIdentifier(DATA_UID);
+            data.setName(DATASET_NAME);
+
+            compareGenotypeVariantData(data, restoredData.getGenotypicData());
+
+        } catch (Exception e) {
+            e.printStackTrace();
+
+            fail(e.getMessage());
+        }
+    }
+    
+    @Test
+    public void testRestoreDatasetWithDiploidGenotypicData() {
+        try {
+            FileBasedDatasetServices fileBasedDatasetServices = new FileBasedDatasetServices(createTempDirectory());
+
+            Path path = fileBasedDatasetServices.getPath();
+
+            Dataset dataset = new DatasetPojo(DATA_UID, DATASET_NAME);
+
+            fileBasedDatasetServices.addDataset(dataset);
+
+            Dataset addedDataset = fileBasedDatasetServices.getDataset(dataset.getUniqueIdentifier());
+
+            Path dataPath = Paths.get(ClassLoader.getSystemResource(DIPLOID_GENOTYPIC_FILE).toURI());
+
+            fileBasedDatasetServices.loadData(addedDataset, dataPath, FileType.CSV, DataType.GENOTYPIC, 
+                    GenotypeDataFormat.DEFAULT);
+
+            fileBasedDatasetServices = new FileBasedDatasetServices(path);
+
+            assertNotNull("Restored dataset not found",
+                    fileBasedDatasetServices.getDataset(dataset.getUniqueIdentifier()));
+
+            CoreHunterData restoredData = fileBasedDatasetServices.getCoreHunterData(dataset.getUniqueIdentifier());
+
+            assertNotNull("Restored data not found", restoredData);
+
+            assertNotNull("Restored Genotypic Data not found", restoredData.getGenotypicData());
+            
+            dataPath = Paths.get(ClassLoader.getSystemResource(DEFAULT_GENOTYPIC_FILE).toURI());
+
+            SimpleGenotypeData data = (SimpleGenotypeData) SimpleGenotypeData.readData(dataPath,
+                    FileType.CSV);
+
+            data.setUniqueIdentifier(DATA_UID);
+            data.setName(DATASET_NAME);
+
+            compareGenotypeVariantData(data, restoredData.getGenotypicData());
+
+        } catch (Exception e) {
+            e.printStackTrace();
+
+            fail(e.getMessage());
+        }
+    }
+    
+    @Test
+    public void testRestoreDatasetWithBiparentalGenotypicData() {
+        try {
+            FileBasedDatasetServices fileBasedDatasetServices = new FileBasedDatasetServices(createTempDirectory());
+
+            Path path = fileBasedDatasetServices.getPath();
+
+            Dataset dataset = new DatasetPojo(DATA_UID, DATASET_NAME);
+
+            fileBasedDatasetServices.addDataset(dataset);
+
+            Dataset addedDataset = fileBasedDatasetServices.getDataset(dataset.getUniqueIdentifier());
+
+            Path dataPath = Paths.get(ClassLoader.getSystemResource(BIPARENTAL_GENOTYPIC_FILE).toURI());
+
+            fileBasedDatasetServices.loadData(addedDataset, dataPath, FileType.CSV, DataType.GENOTYPIC, 
+                    GenotypeDataFormat.BIPARENTAL);
+
+            fileBasedDatasetServices = new FileBasedDatasetServices(path);
+
+            assertNotNull("Restored dataset not found",
+                    fileBasedDatasetServices.getDataset(dataset.getUniqueIdentifier()));
+
+            CoreHunterData restoredData = fileBasedDatasetServices.getCoreHunterData(dataset.getUniqueIdentifier());
+
+            assertNotNull("Restored data not found", restoredData);
+
+            assertNotNull("Restored Genotypic Data not found", restoredData.getGenotypicData());
+
+            SimpleBiAllelicGenotypeData data = (SimpleBiAllelicGenotypeData) 
+                    SimpleBiAllelicGenotypeData.readData(dataPath, FileType.CSV);
+
+            data.setUniqueIdentifier(DATA_UID);
+            data.setName(DATASET_NAME);
+
+            compareGenotypeVariantData(data, restoredData.getGenotypicData());
+
+        } catch (Exception e) {
+            e.printStackTrace();
+
+            fail(e.getMessage());
+        }
+    }
+    
+    @Test
+    public void testRestoreDatasetWithHomozygousGenotypicData() {
+        try {
+            FileBasedDatasetServices fileBasedDatasetServices = new FileBasedDatasetServices(createTempDirectory());
+
+            Path path = fileBasedDatasetServices.getPath();
+
+            Dataset dataset = new DatasetPojo(DATA_UID, DATASET_NAME);
+
+            fileBasedDatasetServices.addDataset(dataset);
+
+            Dataset addedDataset = fileBasedDatasetServices.getDataset(dataset.getUniqueIdentifier());
+
+            Path dataPath = Paths.get(ClassLoader.getSystemResource(HOMOZYGOUS_GENOTYPIC_FILE).toURI());
+
+            fileBasedDatasetServices.loadData(addedDataset, dataPath, FileType.CSV, DataType.GENOTYPIC, 
+                    GenotypeDataFormat.DEFAULT);
+
+            fileBasedDatasetServices = new FileBasedDatasetServices(path);
+
+            assertNotNull("Restored dataset not found",
+                    fileBasedDatasetServices.getDataset(dataset.getUniqueIdentifier()));
+
+            CoreHunterData restoredData = fileBasedDatasetServices.getCoreHunterData(dataset.getUniqueIdentifier());
+
+            assertNotNull("Restored data not found", restoredData);
+
+            assertNotNull("Restored Genotypic Data not found", restoredData.getGenotypicData());
+            
+            dataPath = Paths.get(ClassLoader.getSystemResource(DEFAULT_GENOTYPIC_FILE).toURI());
+
+            SimpleGenotypeData data = (SimpleGenotypeData) SimpleGenotypeData.readData(dataPath,
+                    FileType.CSV);
+
+            data.setUniqueIdentifier(DATA_UID);
+            data.setName(DATASET_NAME);
+
+            compareGenotypeVariantData(data, restoredData.getGenotypicData());
+
+        } catch (Exception e) {
+            e.printStackTrace();
+
+            fail(e.getMessage());
+        }
+    }
+    
+    @Test
+    public void testRestoreDatasetWithFrequencyGenotypicData() {
+        try {
+            FileBasedDatasetServices fileBasedDatasetServices = new FileBasedDatasetServices(createTempDirectory());
+
+            Path path = fileBasedDatasetServices.getPath();
+
+            Dataset dataset = new DatasetPojo(DATA_UID, DATASET_NAME);
+
+            fileBasedDatasetServices.addDataset(dataset);
+
+            Dataset addedDataset = fileBasedDatasetServices.getDataset(dataset.getUniqueIdentifier());
+
+            Path dataPath = Paths.get(ClassLoader.getSystemResource(FRQUENCY_GENOTYPIC_FILE).toURI());
+
+            fileBasedDatasetServices.loadData(addedDataset, dataPath, FileType.CSV, DataType.GENOTYPIC, 
+                    GenotypeDataFormat.FREQUENCY);
+
+            fileBasedDatasetServices = new FileBasedDatasetServices(path);
+
+            assertNotNull("Restored dataset not found",
+                    fileBasedDatasetServices.getDataset(dataset.getUniqueIdentifier()));
+
+            CoreHunterData restoredData = fileBasedDatasetServices.getCoreHunterData(dataset.getUniqueIdentifier());
+
+            assertNotNull("Restored data not found", restoredData);
+
+            assertNotNull("Restored Genotypic Data not found", restoredData.getGenotypicData());
+            
+            dataPath = Paths.get(ClassLoader.getSystemResource(DEFAULT_GENOTYPIC_FILE).toURI());
 
             SimpleGenotypeData data = (SimpleGenotypeData) SimpleGenotypeData.readData(dataPath,
                     FileType.CSV);
