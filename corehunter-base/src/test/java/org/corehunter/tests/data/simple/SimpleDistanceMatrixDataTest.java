@@ -37,7 +37,7 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import uno.informatics.common.io.FileType;
+import uno.informatics.data.io.FileType;
 import uno.informatics.data.SimpleEntity;
 
 import static org.junit.Assert.assertEquals;

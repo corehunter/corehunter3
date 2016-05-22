@@ -33,7 +33,7 @@ import org.corehunter.objectives.distance.measures.MissingValuesPolicy;
 import static org.corehunter.tests.TestData.GOWER_DISTANCES_MISSING_VALUES_CEIL;
 import static org.corehunter.tests.TestData.GOWER_DISTANCES_MISSING_VALUES_FLOOR;
 
-import uno.informatics.common.io.FileType;
+import uno.informatics.data.io.FileType;
 import uno.informatics.data.DataType;
 import uno.informatics.data.Feature;
 import uno.informatics.data.ScaleType;

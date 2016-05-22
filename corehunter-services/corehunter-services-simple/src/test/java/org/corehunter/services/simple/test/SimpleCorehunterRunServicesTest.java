@@ -38,8 +38,8 @@ import org.corehunter.services.simple.FileBasedDatasetServices;
 import org.corehunter.services.simple.SimpleCorehunterRunServices;
 import org.junit.Test;
 
-import uno.informatics.common.io.FileType;
 import uno.informatics.data.Dataset;
+import uno.informatics.data.io.FileType;
 import uno.informatics.data.pojo.DatasetPojo;
 
 public class SimpleCorehunterRunServicesTest {

@@ -24,19 +24,98 @@ import java.util.List;
 import org.jamesframework.core.subset.SubsetSolution;
 
 public interface CorehunterRunServices {
+
+    /**
+     * Executes a Core Hunter run with the given arguments
+     * 
+     * @param arguments
+     *            the Core Hunter Run Arguments
+     * @return The initial CorehunterRun object containing the current status,
+     *         arguments and unique identifier of the run
+     */
     public CorehunterRun executeCorehunter(CorehunterRunArguments arguments);
 
+    /**
+     * Gets the current information about the Core Hunter run
+     * 
+     * @param uniqueIdentifier
+     *            the unique identifier of the run that was provided on
+     *            execution
+     * @return the current information about the Core Hunter run
+     */
     public CorehunterRun getCorehunterRun(String uniqueIdentifier);
-    
+
+    /**
+     * Removes the current CorehunterRun and tries to stop the run if it is
+     * still running, If the run can not be removed, the client will need to
+     * check at date or use the {@link #removeCorehunterRun(String)} method
+     * 
+     * @param uniqueIdentifier
+     *            the unique identifier of the run that was provided on
+     *            execution
+     * @return <code>true</code> if the CorehunterRun was successfully removed,
+     *         <code>false</code> if the run can not be removed.
+     */
     public boolean removeCorehunterRun(String uniqueIdentifier);
-    
+
+    /**
+     * Deletes the current CorehunterRun and tries to stop the run if it is
+     * still running, This method guarantees to be able to delete the run
+     * regardless of if it can be stopped.
+     * 
+     * @param uniqueIdentifier
+     *            the unique identifier of the run that was provided on
+     *            execution
+     */
+    public void deleteCorehunterRun(String uniqueIdentifier);
+
+    /**
+     * Gets the current information about all Core Hunter runs
+     * 
+     * @return the current information about all Core Hunter runs
+     */
     public List<CorehunterRun> getAllCorehunterRuns();
 
-    public String getOutputStream(String uniqueIdentifier) ;
+    /**
+     * Gets the current output stream provides by the run 
+     * 
+     * @param uniqueIdentifier
+     *            the unique identifier of the run that was provided on
+     *            execution
+     * @return the current output stream provided by the run 
+     */
+    public String getOutputStream(String uniqueIdentifier);
 
-    public String getErrorStream(String uniqueIdentifier) ;
+    /**
+     * Gets the current error stream provides by the run 
+     * 
+     * @param uniqueIdentifier
+     *            the unique identifier of the run that was provided on
+     *            execution
+     * @return the current error stream provided by the run 
+     */
+    public String getErrorStream(String uniqueIdentifier);
 
-    public String getErrorMessage(String uniqueIdentifier) ;
+    /**
+     * Gets the current error message provides by the run 
+     * 
+     * @param uniqueIdentifier
+     *            the unique identifier of the run that was provided on
+     *            execution
+     * @return the current error message provided by the run 
+     */
+    public String getErrorMessage(String uniqueIdentifier);
 
-    public SubsetSolution getSubsetSolution(String uniqueIdentifier) ;
+    /**
+     * Depending on the status the method returns the solution of the run.
+     * If the run is still running the method returns the current solution,
+     * if the run is finished it will return the final solution, otherwise
+     * the method will return <code>null</code>.
+     * 
+     * @param uniqueIdentifier
+     *            the unique identifier of the run that was provided on
+     *            execution
+     * @return the current error message provided by the run 
+     */
+    public SubsetSolution getSubsetSolution(String uniqueIdentifier);
 }

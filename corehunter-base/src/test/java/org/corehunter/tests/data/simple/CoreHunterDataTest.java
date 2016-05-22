@@ -32,7 +32,7 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import uno.informatics.common.io.FileType;
+import uno.informatics.data.io.FileType;
 import uno.informatics.data.SimpleEntity;
 import uno.informatics.data.dataset.FeatureData;
 import uno.informatics.data.feature.array.ArrayFeatureData;

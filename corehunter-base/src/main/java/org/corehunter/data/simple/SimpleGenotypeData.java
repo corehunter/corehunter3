@@ -39,7 +39,7 @@ import java.util.stream.Stream;
 import org.corehunter.data.GenotypeDataFormat;
 import org.corehunter.util.StringUtils;
 
-import uno.informatics.common.io.FileType;
+import uno.informatics.data.io.FileType;
 import uno.informatics.common.io.IOUtilities;
 import uno.informatics.common.io.RowReader;
 import uno.informatics.common.io.RowWriter;
