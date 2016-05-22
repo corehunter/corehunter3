@@ -51,6 +51,8 @@ public class SimpleCorehunterRunServices implements CorehunterRunServices {
     private List<CorehunterRun> corehunterRuns;
     private Map<String, CorehunterRunnable> corehunterRunnableMap;
     public String charsetName = "utf-8";
+    private boolean shuttingDown;
+    private boolean shutDown;
 
     public SimpleCorehunterRunServices(DatasetServices datasetServices) {
         this.datasetServices = datasetServices;
@@ -63,13 +65,21 @@ public class SimpleCorehunterRunServices implements CorehunterRunServices {
     @Override
     public CorehunterRun executeCorehunter(CorehunterRunArguments arguments) {
 
+        if (shuttingDown) {
+            throw new IllegalStateException("Can not accept any new runs, in the process of shutting down!") ;
+        }
+        
+        if (shutDown) {
+            throw new IllegalStateException("Can not accept any new runs, service is not running!") ;
+        }
+        
         CorehunterRunnable corehunterRunnable = new CorehunterRunnable(arguments);
 
-        addCorehunterRunnable(corehunterRunnable);
+        corehunterRunnableMap.put(corehunterRunnable.getUniqueIdentifier(), corehunterRunnable);
 
         executor.submit(corehunterRunnable);
 
-        return createCorehunterRunFromRunnable(corehunterRunnable);
+        return new CorehunterRunFromRunnable(corehunterRunnable);
     }
 
     @Override
@@ -77,7 +87,7 @@ public class SimpleCorehunterRunServices implements CorehunterRunServices {
         CorehunterRunnable corehunterRunnable = corehunterRunnableMap.remove(uniqueIdentifier);
 
         if (corehunterRunnable != null) {
-            return createCorehunterRunFromRunnable(corehunterRunnable);
+            return new CorehunterRunFromRunnable(corehunterRunnable);
         } else {
             return null;
         }
@@ -86,19 +96,30 @@ public class SimpleCorehunterRunServices implements CorehunterRunServices {
     @Override
     public boolean removeCorehunterRun(String uniqueIdentifier) {
         CorehunterRunnable corehunterRunnable = corehunterRunnableMap.get(uniqueIdentifier);
+        
+        // TODO needs to try to stop run!
 
         return corehunterRunnable != null;
+    }
+    
+    @Override
+    public void deleteCorehunterRun(String uniqueIdentifier) {
+        CorehunterRunnable corehunterRunnable = corehunterRunnableMap.get(uniqueIdentifier);
+
+        // TODO needs to try to stop run or kill it
     }
 
     @Override
     public List<CorehunterRun> getAllCorehunterRuns() {
 
+        // iterates through all runnables can create new CorehunterRun objects, which will be a snapshot 
+        // of the current status of that runnable
         Iterator<CorehunterRunnable> iterator = corehunterRunnableMap.values().iterator();
 
         corehunterRuns = new ArrayList<>(corehunterRunnableMap.size());
 
         while (iterator.hasNext()) {
-            corehunterRuns.add(createCorehunterRunFromRunnable(iterator.next()));
+            corehunterRuns.add(new CorehunterRunFromRunnable(iterator.next()));
         }
 
         return corehunterRuns;
@@ -147,18 +168,18 @@ public class SimpleCorehunterRunServices implements CorehunterRunServices {
             return null;
         }
     }
+    
+    public void shutdown() {
+        if (!shuttingDown || shutDown) {
+            shuttingDown = true ;
+            executor.shutdown(); 
+            shutDown = true ;
+        }
+    }
 
     private ExecutorService createExecutorService() {
 
         return Executors.newSingleThreadExecutor();
-    }
-
-    private CorehunterRun createCorehunterRunFromRunnable(CorehunterRunnable corehunterRunnable) {
-        return new CorehunterRunFromRunnable(corehunterRunnable);
-    }
-
-    private void addCorehunterRunnable(CorehunterRunnable corehunterRunnable) {
-        corehunterRunnableMap.put(corehunterRunnable.getUniqueIdentifier(), corehunterRunnable);
     }
 
     private String createUniqueIdentifier() {
@@ -226,7 +247,7 @@ public class SimpleCorehunterRunServices implements CorehunterRunServices {
                 startDate = new DateTime();
 
                 CoreHunterArguments arguments = new CoreHunterArguments(
-                        datasetServices.getData(corehunterRunArguments.getDatasetId()),
+                        datasetServices.getCoreHunterData(corehunterRunArguments.getDatasetId()),
                         corehunterRunArguments.getObjective(),
                         corehunterRunArguments.getSubsetSize());
 

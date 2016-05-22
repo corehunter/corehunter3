@@ -78,12 +78,17 @@ public interface DatasetServices {
      * @throws DatasetException
      *             if the data can not be accessed or the dataset does not exist
      */
-    public CoreHunterData getData(String datasetId) throws DatasetException;
+    public CoreHunterData getCoreHunterData(String datasetId) throws DatasetException;
     
     /**
      * Loads the data and associates it with a dataset. If the dataset already
      * has data associated with it, an attempt will be made to add to the
-     * dataset merging with existing data.
+     * dataset merging with existing data. 
+     * 
+     * <p>Data loading options can include the Genotype Data Format
+     * (see {@link org.corehunter.data.GenotypeDataFormat}) for {@link DataType#GENOTYPIC} or 
+     * the Symmetric Matrix Format (see {@link org.corehunter.data.SymmetricMatrixFormat})
+     * for {@link DataType#DISTANCES}
      * 
      * @param dataset
      *            the dataset to which the data will be associated
@@ -93,14 +98,16 @@ public interface DatasetServices {
      *            the type of file from which the data will be loaded
      * @param dataType
      *            the type of data
+     * @param options
+     *            the data loading options. 
      * @throws IOException
      *             if the is an issue with reading the data from the path
      * @throws DatasetException
      *             if the data can not be merged with existing data for a
      *             dataset
      */
-    public void loadData(Dataset dataset, Path path, FileType fileType, DataType dataType)
-            throws IOException, DatasetException;
+    public void loadData(Dataset dataset, Path path, FileType fileType, DataType dataType, 
+            Object... options) throws IOException, DatasetException;
     
     /**
      * Removes the all the data associated with a dataset
