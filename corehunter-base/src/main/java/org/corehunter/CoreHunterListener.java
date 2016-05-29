@@ -25,7 +25,7 @@ import org.jamesframework.core.subset.SubsetSolution;
 /**
  * Extends SearchListener with CoreHunter specific steps.
  *
- * @author Guy Davenport
+ * @author Guy Davenport, Herman De Beukelaer
  */
 public interface CoreHunterListener extends SearchListener<SubsetSolution> {
 

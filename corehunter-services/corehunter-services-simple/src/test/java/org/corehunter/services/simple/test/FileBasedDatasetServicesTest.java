@@ -33,13 +33,14 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.corehunter.data.CoreHunterData;
+import org.corehunter.data.CoreHunterDataType;
 import org.corehunter.data.DistanceMatrixData;
 import org.corehunter.data.GenotypeData;
 import org.corehunter.data.GenotypeDataFormat;
 import org.corehunter.data.simple.SimpleBiAllelicGenotypeData;
 import org.corehunter.data.simple.SimpleDistanceMatrixData;
 import org.corehunter.data.simple.SimpleGenotypeData;
-import org.corehunter.services.DataType;
+import org.corehunter.data.CoreHunterDataType;
 import org.corehunter.services.simple.FileBasedDatasetServices;
 import org.junit.Test;
 
@@ -221,7 +222,7 @@ public class FileBasedDatasetServicesTest {
 
             Path dataPath = Paths.get(ClassLoader.getSystemResource(PHENOTYPIC_FILE).toURI());
 
-            fileBasedDatasetServices.loadData(addedDataset, dataPath, FileType.CSV, DataType.PHENOTYPIC);
+            fileBasedDatasetServices.loadData(addedDataset, dataPath, FileType.CSV, CoreHunterDataType.PHENOTYPIC);
 
             CoreHunterData addedData = fileBasedDatasetServices.getCoreHunterData(dataset.getUniqueIdentifier());
 
@@ -258,7 +259,7 @@ public class FileBasedDatasetServicesTest {
 
             Path dataPath = Paths.get(ClassLoader.getSystemResource(PHENOTYPIC_FILE).toURI());
 
-            fileBasedDatasetServices.loadData(addedDataset, dataPath, FileType.CSV, DataType.PHENOTYPIC);
+            fileBasedDatasetServices.loadData(addedDataset, dataPath, FileType.CSV, CoreHunterDataType.PHENOTYPIC);
 
             fileBasedDatasetServices = new FileBasedDatasetServices(path);
 
@@ -298,7 +299,7 @@ public class FileBasedDatasetServicesTest {
 
             Path dataPath = Paths.get(ClassLoader.getSystemResource(DEFAULT_GENOTYPIC_FILE).toURI());
 
-            fileBasedDatasetServices.loadData(addedDataset, dataPath, FileType.CSV, DataType.GENOTYPIC);
+            fileBasedDatasetServices.loadData(addedDataset, dataPath, FileType.CSV, CoreHunterDataType.GENOTYPIC);
 
             CoreHunterData addedData = fileBasedDatasetServices.getCoreHunterData(dataset.getUniqueIdentifier());
 
@@ -334,7 +335,7 @@ public class FileBasedDatasetServicesTest {
 
             Path dataPath = Paths.get(ClassLoader.getSystemResource(DIPLOID_GENOTYPIC_FILE).toURI());
 
-            fileBasedDatasetServices.loadData(addedDataset, dataPath, FileType.CSV, DataType.GENOTYPIC, 
+            fileBasedDatasetServices.loadData(addedDataset, dataPath, FileType.CSV, CoreHunterDataType.GENOTYPIC, 
                     GenotypeDataFormat.DEFAULT);
 
             CoreHunterData addedData = fileBasedDatasetServices.getCoreHunterData(dataset.getUniqueIdentifier());
@@ -373,7 +374,7 @@ public class FileBasedDatasetServicesTest {
 
             Path dataPath = Paths.get(ClassLoader.getSystemResource(BIPARENTAL_GENOTYPIC_FILE).toURI());
 
-            fileBasedDatasetServices.loadData(addedDataset, dataPath, FileType.CSV, DataType.GENOTYPIC, 
+            fileBasedDatasetServices.loadData(addedDataset, dataPath, FileType.CSV, CoreHunterDataType.GENOTYPIC, 
                     GenotypeDataFormat.BIPARENTAL);
 
             CoreHunterData addedData = fileBasedDatasetServices.getCoreHunterData(dataset.getUniqueIdentifier());
@@ -410,7 +411,7 @@ public class FileBasedDatasetServicesTest {
 
             Path dataPath = Paths.get(ClassLoader.getSystemResource(HOMOZYGOUS_GENOTYPIC_FILE).toURI());
 
-            fileBasedDatasetServices.loadData(addedDataset, dataPath, FileType.CSV, DataType.GENOTYPIC, 
+            fileBasedDatasetServices.loadData(addedDataset, dataPath, FileType.CSV, CoreHunterDataType.GENOTYPIC, 
                     GenotypeDataFormat.DEFAULT);
 
             CoreHunterData addedData = fileBasedDatasetServices.getCoreHunterData(dataset.getUniqueIdentifier());
@@ -449,7 +450,7 @@ public class FileBasedDatasetServicesTest {
 
             Path dataPath = Paths.get(ClassLoader.getSystemResource(FRQUENCY_GENOTYPIC_FILE).toURI());
 
-            fileBasedDatasetServices.loadData(addedDataset, dataPath, FileType.CSV, DataType.GENOTYPIC, 
+            fileBasedDatasetServices.loadData(addedDataset, dataPath, FileType.CSV, CoreHunterDataType.GENOTYPIC, 
                     GenotypeDataFormat.FREQUENCY);
 
             CoreHunterData addedData = fileBasedDatasetServices.getCoreHunterData(dataset.getUniqueIdentifier());
@@ -490,7 +491,7 @@ public class FileBasedDatasetServicesTest {
 
             Path dataPath = Paths.get(ClassLoader.getSystemResource(DEFAULT_GENOTYPIC_FILE).toURI());
 
-            fileBasedDatasetServices.loadData(addedDataset, dataPath, FileType.CSV, DataType.GENOTYPIC);
+            fileBasedDatasetServices.loadData(addedDataset, dataPath, FileType.CSV, CoreHunterDataType.GENOTYPIC);
 
             fileBasedDatasetServices = new FileBasedDatasetServices(path);
 
@@ -535,7 +536,7 @@ public class FileBasedDatasetServicesTest {
 
             Path dataPath = Paths.get(ClassLoader.getSystemResource(DIPLOID_GENOTYPIC_FILE).toURI());
 
-            fileBasedDatasetServices.loadData(addedDataset, dataPath, FileType.CSV, DataType.GENOTYPIC, 
+            fileBasedDatasetServices.loadData(addedDataset, dataPath, FileType.CSV, CoreHunterDataType.GENOTYPIC, 
                     GenotypeDataFormat.DEFAULT);
 
             fileBasedDatasetServices = new FileBasedDatasetServices(path);
@@ -581,7 +582,7 @@ public class FileBasedDatasetServicesTest {
 
             Path dataPath = Paths.get(ClassLoader.getSystemResource(BIPARENTAL_GENOTYPIC_FILE).toURI());
 
-            fileBasedDatasetServices.loadData(addedDataset, dataPath, FileType.CSV, DataType.GENOTYPIC, 
+            fileBasedDatasetServices.loadData(addedDataset, dataPath, FileType.CSV, CoreHunterDataType.GENOTYPIC, 
                     GenotypeDataFormat.BIPARENTAL);
 
             fileBasedDatasetServices = new FileBasedDatasetServices(path);
@@ -625,7 +626,7 @@ public class FileBasedDatasetServicesTest {
 
             Path dataPath = Paths.get(ClassLoader.getSystemResource(HOMOZYGOUS_GENOTYPIC_FILE).toURI());
 
-            fileBasedDatasetServices.loadData(addedDataset, dataPath, FileType.CSV, DataType.GENOTYPIC, 
+            fileBasedDatasetServices.loadData(addedDataset, dataPath, FileType.CSV, CoreHunterDataType.GENOTYPIC, 
                     GenotypeDataFormat.DEFAULT);
 
             fileBasedDatasetServices = new FileBasedDatasetServices(path);
@@ -671,7 +672,7 @@ public class FileBasedDatasetServicesTest {
 
             Path dataPath = Paths.get(ClassLoader.getSystemResource(FRQUENCY_GENOTYPIC_FILE).toURI());
 
-            fileBasedDatasetServices.loadData(addedDataset, dataPath, FileType.CSV, DataType.GENOTYPIC, 
+            fileBasedDatasetServices.loadData(addedDataset, dataPath, FileType.CSV, CoreHunterDataType.GENOTYPIC, 
                     GenotypeDataFormat.FREQUENCY);
 
             fileBasedDatasetServices = new FileBasedDatasetServices(path);
@@ -715,7 +716,7 @@ public class FileBasedDatasetServicesTest {
 
             Path dataPath = Paths.get(ClassLoader.getSystemResource(DISTANCES_FILE).toURI());
 
-            fileBasedDatasetServices.loadData(addedDataset, dataPath, FileType.CSV, DataType.DISTANCES);
+            fileBasedDatasetServices.loadData(addedDataset, dataPath, FileType.CSV, CoreHunterDataType.DISTANCES);
 
             CoreHunterData addedData = fileBasedDatasetServices.getCoreHunterData(dataset.getUniqueIdentifier());
 
@@ -752,7 +753,7 @@ public class FileBasedDatasetServicesTest {
 
             Path dataPath = Paths.get(ClassLoader.getSystemResource(DISTANCES_FILE).toURI());
 
-            fileBasedDatasetServices.loadData(addedDataset, dataPath, FileType.CSV, DataType.DISTANCES);
+            fileBasedDatasetServices.loadData(addedDataset, dataPath, FileType.CSV, CoreHunterDataType.DISTANCES);
 
             fileBasedDatasetServices = new FileBasedDatasetServices(path);
 
@@ -792,11 +793,13 @@ public class FileBasedDatasetServicesTest {
 
             Path phenotypicDataPath = Paths.get(ClassLoader.getSystemResource(PHENOTYPIC_FILE).toURI());
 
-            fileBasedDatasetServices.loadData(addedDataset, phenotypicDataPath, FileType.CSV, DataType.PHENOTYPIC);
+            fileBasedDatasetServices.loadData(addedDataset, phenotypicDataPath, FileType.CSV, 
+                    CoreHunterDataType.PHENOTYPIC);
 
             Path genotypicDataPath = Paths.get(ClassLoader.getSystemResource(FRQUENCY_GENOTYPIC_FILE).toURI());
 
-            fileBasedDatasetServices.loadData(addedDataset, genotypicDataPath, FileType.CSV, DataType.GENOTYPIC);
+            fileBasedDatasetServices.loadData(addedDataset, genotypicDataPath, FileType.CSV, 
+                    CoreHunterDataType.GENOTYPIC);
 
             CoreHunterData addedData = fileBasedDatasetServices.getCoreHunterData(dataset.getUniqueIdentifier());
 
@@ -843,11 +846,13 @@ public class FileBasedDatasetServicesTest {
 
             Path phenotypicDataPath = Paths.get(ClassLoader.getSystemResource(PHENOTYPIC_FILE).toURI());
 
-            fileBasedDatasetServices.loadData(addedDataset, phenotypicDataPath, FileType.CSV, DataType.PHENOTYPIC);
+            fileBasedDatasetServices.loadData(addedDataset, phenotypicDataPath, FileType.CSV, 
+                    CoreHunterDataType.PHENOTYPIC);
 
             Path genotypicDataPath = Paths.get(ClassLoader.getSystemResource(FRQUENCY_GENOTYPIC_FILE).toURI());
 
-            fileBasedDatasetServices.loadData(addedDataset, genotypicDataPath, FileType.CSV, DataType.GENOTYPIC);
+            fileBasedDatasetServices.loadData(addedDataset, genotypicDataPath, FileType.CSV, 
+                    CoreHunterDataType.GENOTYPIC);
 
             fileBasedDatasetServices = new FileBasedDatasetServices(path);
 
@@ -897,15 +902,17 @@ public class FileBasedDatasetServicesTest {
 
             Path phenotypicDataPath = Paths.get(ClassLoader.getSystemResource(PHENOTYPIC_FILE).toURI());
 
-            fileBasedDatasetServices.loadData(addedDataset, phenotypicDataPath, FileType.CSV, DataType.PHENOTYPIC);
+            fileBasedDatasetServices.loadData(addedDataset, phenotypicDataPath, FileType.CSV, 
+                    CoreHunterDataType.PHENOTYPIC);
 
             Path genotypicDataPath = Paths.get(ClassLoader.getSystemResource(FRQUENCY_GENOTYPIC_FILE).toURI());
 
-            fileBasedDatasetServices.loadData(addedDataset, genotypicDataPath, FileType.CSV, DataType.GENOTYPIC);
+            fileBasedDatasetServices.loadData(addedDataset, genotypicDataPath, FileType.CSV, 
+                    CoreHunterDataType.GENOTYPIC);
             
             Path dataPath = Paths.get(ClassLoader.getSystemResource(DISTANCES_FILE).toURI());
 
-            fileBasedDatasetServices.loadData(addedDataset, dataPath, FileType.CSV, DataType.DISTANCES);
+            fileBasedDatasetServices.loadData(addedDataset, dataPath, FileType.CSV, CoreHunterDataType.DISTANCES);
 
             CoreHunterData addedData = fileBasedDatasetServices.getCoreHunterData(dataset.getUniqueIdentifier());
 
@@ -961,15 +968,17 @@ public class FileBasedDatasetServicesTest {
 
             Path phenotypicDataPath = Paths.get(ClassLoader.getSystemResource(PHENOTYPIC_FILE).toURI());
 
-            fileBasedDatasetServices.loadData(addedDataset, phenotypicDataPath, FileType.CSV, DataType.PHENOTYPIC);
+            fileBasedDatasetServices.loadData(addedDataset, phenotypicDataPath, FileType.CSV, 
+                    CoreHunterDataType.PHENOTYPIC);
 
             Path genotypicDataPath = Paths.get(ClassLoader.getSystemResource(FRQUENCY_GENOTYPIC_FILE).toURI());
 
-            fileBasedDatasetServices.loadData(addedDataset, genotypicDataPath, FileType.CSV, DataType.GENOTYPIC);
+            fileBasedDatasetServices.loadData(addedDataset, genotypicDataPath, FileType.CSV, 
+                    CoreHunterDataType.GENOTYPIC);
             
             Path dataPath = Paths.get(ClassLoader.getSystemResource(DISTANCES_FILE).toURI());
 
-            fileBasedDatasetServices.loadData(addedDataset, dataPath, FileType.CSV, DataType.DISTANCES);
+            fileBasedDatasetServices.loadData(addedDataset, dataPath, FileType.CSV, CoreHunterDataType.DISTANCES);
 
             fileBasedDatasetServices = new FileBasedDatasetServices(path);
 

@@ -17,19 +17,20 @@
 /* under the License.                                           */
 /*--------------------------------------------------------------*/
 
-package org.corehunter.services;
+package org.corehunter.data;
 
-import java.util.List;
+public enum CoreHunterDataType {
+    PHENOTYPIC("Phenotypic"),
+    GENOTYPIC("Genotypic"), 
+    DISTANCES("Distances");
 
-import org.corehunter.CoreHunterObjective;
+    private String name;
 
-import uno.informatics.data.SimpleEntity;
+    private CoreHunterDataType(String name) {
+        this.name = name;
+    }
 
-public interface CorehunterRunArguments extends SimpleEntity {
-   
-    public int getSubsetSize() ;
-
-    public String getDatasetId();
-    
-    public List<CoreHunterObjective> getObjectives() ;
+    public synchronized final String getName() {
+        return name;
+    }
 }

@@ -17,7 +17,7 @@
 /* under the License.                                           */
 /*--------------------------------------------------------------*/
 
-package org.corehunter.objectives.distance;
+package org.corehunter.objectives;
 
 
 import java.util.ArrayList;
@@ -25,6 +25,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import org.corehunter.data.CoreHunterData;
+import org.corehunter.objectives.distance.DistanceMeasure;
 import org.corehunter.objectives.distance.eval.NearestEntry;
 import org.corehunter.objectives.distance.eval.NearestEntryEvaluation;
 import org.corehunter.objectives.distance.measures.MissingValuesPolicy;
@@ -43,11 +44,11 @@ import org.jamesframework.core.subset.neigh.moves.SubsetMove;
  * 
  * @author Herman De Beukelaer
  */
-public class AverageAccessionToNearestEntryDistance implements Objective<SubsetSolution, CoreHunterData> {
+public class AverageAccessionToNearestEntry implements Objective<SubsetSolution, CoreHunterData> {
 
     private final DistanceMeasure distanceMeasure;
 
-    public AverageAccessionToNearestEntryDistance(DistanceMeasure distanceMeasure) {
+    public AverageAccessionToNearestEntry(DistanceMeasure distanceMeasure) {
         this.distanceMeasure = distanceMeasure;
         // ceil missing values contribution (worst case when minimizing distances)
         distanceMeasure.setMissingValuesPolicy(MissingValuesPolicy.CEIL);

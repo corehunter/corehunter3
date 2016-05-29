@@ -19,63 +19,106 @@
 
 package org.corehunter;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import org.corehunter.data.CoreHunterData;
-import org.jamesframework.core.problems.objectives.Objective;
-import org.jamesframework.core.subset.SubsetSolution;
 
 public class CoreHunterArguments {
 
-    private int minimumSubsetSize;
-
-    private int maximumSubsetSize;
-
-    private Objective<SubsetSolution, CoreHunterData> objective;
-
+    private int subsetSize;
+    
     private CoreHunterData data;
 
-    public CoreHunterArguments(CoreHunterData data, Objective<SubsetSolution,
-                               CoreHunterData> objective,
-                               int subsetSize) {
-        this(data, objective, subsetSize, subsetSize);
+    private List<CoreHunterObjective> objectives;
+    
+    /**
+     * Creates arguments with no objectives.
+     *
+     * 
+     * @param data the data for the run
+     * @param subsetSize the desired subset size
+     */
+    public CoreHunterArguments(CoreHunterData data, int subsetSize) {
+        if (data == null) {
+            throw new IllegalArgumentException("Data undefined!");
+        }
+
+        if (subsetSize < 2) {
+            throw new IllegalArgumentException("Requested subset size must at least be 2 or more");
+        }
+        
+        if (subsetSize >= data.getSize()) {
+            throw new IllegalArgumentException(
+                    String.format("Requested subset size less than total data size %s", data.getSize()));
+        }
+        
+        this.data = data ;
+        this.subsetSize = subsetSize ;
+        
+        objectives = new LinkedList<CoreHunterObjective>() ;
+    }
+    
+    /**
+     * Creates a single objective configuration with no defined measure
+     *
+     * 
+     * @param data the data for the run
+     * @param subsetSize the desired subset size
+     * @param objective the objective type 
+     */
+    public CoreHunterArguments(CoreHunterData data, int subsetSize, CoreHunterObjectiveType objective) {
+        this(data, subsetSize) ;
+        
+        if (objective == null) {
+            throw new IllegalArgumentException("Objective not defined!");
+        }
+        
+        objectives.add(new CoreHunterObjective(objective)) ; 
     }
 
-    public CoreHunterArguments(CoreHunterData data, Objective<SubsetSolution, CoreHunterData> objective,
-                               int minimumSubsetSize, int maximumSubsetSize) {
-        this.data = data;
-        this.objective = objective;
-        this.minimumSubsetSize = minimumSubsetSize;
-        this.maximumSubsetSize = maximumSubsetSize;
+    /**
+     * Creates a single objective configuration.
+     *
+     * 
+     * @param data the data for the run
+     * @param subsetSize the desired subset size
+     * @param objective the objective type 
+     * @param measure the optional measure required for the objective
+     */
+    public CoreHunterArguments(CoreHunterData data, int subsetSize, CoreHunterObjectiveType objective,
+                              CoreHunterMeasure measure) {
+        this(data, subsetSize) ;
+        objectives.add(new CoreHunterObjective(objective, measure)) ; 
     }
-
-    public final int getMinimumSubsetSize() {
-        return minimumSubsetSize;
-    }
-
-    public final void setMinimumSubsetSize(int minimumSubsetSize) {
-        this.minimumSubsetSize = minimumSubsetSize;
-    }
-
-    public final int getMaximumSubsetSize() {
-        return maximumSubsetSize;
-    }
-
-    public final void setMaximumSubsetSize(int maximumSubsetSize) {
-        this.maximumSubsetSize = maximumSubsetSize;
+    
+    /**
+     * Creates a multiple objective configuration.
+     *
+     * 
+     * @param data the data for the run
+     * @param subsetSize the desired subset size
+     * @param objectives the objectives for the run
+     */
+    public CoreHunterArguments(CoreHunterData data, int subsetSize, List<CoreHunterObjective> objectives) {
+        this(data, subsetSize) ;
+        
+        if (objectives == null) {
+            throw new IllegalArgumentException("Objectives not defined!");
+        }
+        
+        objectives.addAll(objectives) ; 
     }
 
     public final CoreHunterData getData() {
         return data;
     }
-
-    public final void setData(CoreHunterData data) {
-        this.data = data;
+    
+    public final List<CoreHunterObjective> getObjectives() {
+        return objectives;
     }
 
-    public final Objective<SubsetSolution, CoreHunterData> getObjective() {
-        return objective;
-    }
-
-    public final void setObjective(Objective<SubsetSolution, CoreHunterData> objective) {
-        this.objective = objective;
+    public final int getSubsetSize() {
+        return subsetSize;
     }
 }

@@ -17,19 +17,34 @@
 /* under the License.                                           */
 /*--------------------------------------------------------------*/
 
-package org.corehunter.services;
+package org.corehunter;
 
-import java.util.List;
-
-import org.corehunter.CoreHunterObjective;
-
-import uno.informatics.data.SimpleEntity;
-
-public interface CorehunterRunArguments extends SimpleEntity {
-   
-    public int getSubsetSize() ;
-
-    public String getDatasetId();
+/**
+ * Available objective types
+ *
+ * @author Guy Davenport, Herman De Beukelaer
+ */
+public enum CoreHunterObjectiveType {
+    AV_ENTRY_TO_ENTRY("Average Entry to Entry", "AE"),
+    AV_ENTRY_TO_NEAREST_ENTRY("Average Entry to Nearest Entry", "AN") ,
+    AV_ACCESSION_TO_NEAREST_ENTRY("Average Accession to Nearest Entry", "AC") ,
+    SHANNON_DIVERSITY("Shannon diversity index", "SH"),
+    HETEROZYGOUS_LOCI("Expected proportion of heterozygous loci per individual", "HE"),
+    COVERAGE("Coverage", "CV") ;
     
-    public List<CoreHunterObjective> getObjectives() ;
+    private String name ;
+    private String abbreviation ;
+    
+    private CoreHunterObjectiveType(String name, String abbreviation) {
+        this.name = name;
+        this.abbreviation = abbreviation ;
+    }
+
+    public final String getName() {
+        return name;
+    }  
+    
+    public final String getAbbreviation() {
+        return abbreviation;
+    }
 }

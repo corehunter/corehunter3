@@ -24,10 +24,10 @@ import org.corehunter.data.DistanceMatrixData;
 import org.corehunter.data.CoreHunterData;
 import org.corehunter.data.simple.SimpleDistanceMatrixData;
 import org.corehunter.data.simple.SimpleGenotypeData;
+import org.corehunter.objectives.AverageEntryToEntry;
 import org.corehunter.objectives.distance.measures.CavalliSforzaEdwardsDistance;
 import org.corehunter.objectives.distance.measures.ModifiedRogersDistance;
 import org.corehunter.objectives.distance.measures.PrecomputedDistance;
-import org.corehunter.objectives.distance.AverageEntryToEntryDistance;
 import org.corehunter.objectives.distance.measures.GowerDistance;
 
 import static org.corehunter.tests.TestData.ALLELE_FREQUENCIES;
@@ -82,7 +82,7 @@ public class AverageEntryToEntryDistanceTest extends EvaluationTest {
         );
         CoreHunterData data = new CoreHunterData(geno);
         
-        AverageEntryToEntryDistance objective = new AverageEntryToEntryDistance(new ModifiedRogersDistance());
+        AverageEntryToEntry objective = new AverageEntryToEntry(new ModifiedRogersDistance());
 
         assertEquals(
                 "Evaluation for subset 1 is not correct!",
@@ -122,7 +122,7 @@ public class AverageEntryToEntryDistanceTest extends EvaluationTest {
         );
         CoreHunterData data = new CoreHunterData(geno);
         
-        AverageEntryToEntryDistance objective = new AverageEntryToEntryDistance(new CavalliSforzaEdwardsDistance());
+        AverageEntryToEntry objective = new AverageEntryToEntry(new CavalliSforzaEdwardsDistance());
 
         assertEquals(
                 "Evaluation for subset 1 is not correct!",
@@ -162,7 +162,7 @@ public class AverageEntryToEntryDistanceTest extends EvaluationTest {
         );
         CoreHunterData data = new CoreHunterData(pheno);
         
-        AverageEntryToEntryDistance objective = new AverageEntryToEntryDistance(new GowerDistance());
+        AverageEntryToEntry objective = new AverageEntryToEntry(new GowerDistance());
 
         assertEquals(
                 "Evaluation for subset 1 is not correct!",
@@ -200,7 +200,7 @@ public class AverageEntryToEntryDistanceTest extends EvaluationTest {
         DistanceMatrixData dist = new SimpleDistanceMatrixData(HEADERS_UNIQUE_NAMES, MODIFIED_ROGERS_DISTANCES);
         CoreHunterData data = new CoreHunterData(dist);
         
-        AverageEntryToEntryDistance objective = new AverageEntryToEntryDistance(new PrecomputedDistance());
+        AverageEntryToEntry objective = new AverageEntryToEntry(new PrecomputedDistance());
 
         assertEquals(
                 "Evaluation for subset 1 is not correct!",
@@ -242,7 +242,7 @@ public class AverageEntryToEntryDistanceTest extends EvaluationTest {
         );
         CoreHunterData data = new CoreHunterData(geno);
         
-        AverageEntryToEntryDistance objective = new AverageEntryToEntryDistance(new ModifiedRogersDistance());
+        AverageEntryToEntry objective = new AverageEntryToEntry(new ModifiedRogersDistance());
         SubsetProblem<CoreHunterData> problem = new SubsetProblem<>(data, objective);
         
         Neighbourhood<SubsetSolution> neigh = new SinglePerturbationNeighbourhood();

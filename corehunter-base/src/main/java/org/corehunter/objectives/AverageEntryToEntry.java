@@ -17,13 +17,14 @@
 /* under the License.                                           */
 /*--------------------------------------------------------------*/
 
-package org.corehunter.objectives.distance;
+package org.corehunter.objectives;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
 import org.corehunter.data.CoreHunterData;
+import org.corehunter.objectives.distance.DistanceMeasure;
 import org.corehunter.objectives.distance.measures.MissingValuesPolicy;
 
 import org.jamesframework.core.exceptions.IncompatibleDeltaEvaluationException;
@@ -40,11 +41,11 @@ import org.jamesframework.core.subset.neigh.moves.SubsetMove;
  * 
  * @author Guy Davenport, Herman De Beukelaer
  */
-public class AverageEntryToEntryDistance implements Objective<SubsetSolution, CoreHunterData> {
+public class AverageEntryToEntry implements Objective<SubsetSolution, CoreHunterData> {
 
     private final DistanceMeasure distanceMeasure;
 
-    public AverageEntryToEntryDistance(DistanceMeasure distanceMeasure) {
+    public AverageEntryToEntry(DistanceMeasure distanceMeasure) {
         this.distanceMeasure = distanceMeasure;
         // floor missing values contribution (worst case when maximizing distances)
         distanceMeasure.setMissingValuesPolicy(MissingValuesPolicy.FLOOR);

@@ -17,20 +17,32 @@
 /* under the License.                                           */
 /*--------------------------------------------------------------*/
 
-package org.corehunter.services;
+package org.corehunter;
 
-public enum DataType {
-    PHENOTYPIC("Phenotypic"),
-    GENOTYPIC("Genotypic"), 
-    DISTANCES("Distances");
+/**
+ * Available objective measures
+ *
+ * @author Guy Davenport, Herman De Beukelaer
+ */
+public enum CoreHunterMeasure {
+    GOWERS("Gowers distance", "GD"),
+    MODIFIED_ROGERS("Modified Rogers distance", "MR"),
+    CAVALLI_SFORZA_EDWARDS("Cavalli-Sforza and Edwards distance", "CE"),
+    PRECOMPUTED_DISTANCE("Precomputed Distance", "PD") ;
 
-    private String name;
-
-    private DataType(String name) {
+    private String name ;
+    private String abbreviation ;
+    
+    private CoreHunterMeasure(String name, String abbreviation) {
         this.name = name;
+        this.abbreviation = abbreviation ;
     }
 
-    public synchronized final String getName() {
+    public final String getName() {
         return name;
     }
+
+    public final String getAbbreviation() {
+        return abbreviation;
+    } 
 }

@@ -21,13 +21,14 @@ package org.corehunter.objectives.distance.eval;
 
 import java.util.HashMap;
 import java.util.Map;
-import org.corehunter.objectives.distance.AverageAccessionToNearestEntryDistance;
-import org.corehunter.objectives.distance.AverageEntryToNearestEntryDistance;
+
+import org.corehunter.objectives.AverageAccessionToNearestEntry;
+import org.corehunter.objectives.AverageEntryToNearestEntry;
 import org.jamesframework.core.problems.objectives.evaluations.Evaluation;
 
 /**
- * Stores metadata for efficient delta evaluation in {@link AverageEntryToNearestEntryDistance} and
- * {@link AverageAccessionToNearestEntryDistance}.
+ * Stores metadata for efficient delta evaluation in {@link AverageEntryToNearestEntry} and
+ * {@link AverageAccessionToNearestEntry}.
  * 
  * @author Herman De Beukelaer
  */
