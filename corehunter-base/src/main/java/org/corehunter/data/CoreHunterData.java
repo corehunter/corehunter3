@@ -20,8 +20,12 @@
 package org.corehunter.data;
 
 import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Objects;
 
+import org.corehunter.CoreHunterMeasure;
+import org.corehunter.CoreHunterObjectiveType;
 import org.jamesframework.core.problems.datatypes.IntegerIdentifiedData;
 
 import uno.informatics.data.Data;
@@ -36,10 +40,13 @@ import uno.informatics.data.pojo.DataPojo;
  * @author Herman De Beukelaer
  */
 public class CoreHunterData extends DataPojo implements IntegerIdentifiedData {
-
+    
+    private static final List<CoreHunterMeasure> NO_MEASURES = new LinkedList<CoreHunterMeasure>() ;
     private final GenotypeData genotypicData; 
     private final FeatureData phenotypicData;
     private final DistanceMatrixData distancesData;
+    private final List<CoreHunterObjectiveType> validObjectiveTypes;
+    private final List<CoreHunterMeasure> validMeasures;
 
     /**
      * Initialize Core Hunter data consisting of genotypic data, phenotypic
@@ -68,6 +75,33 @@ public class CoreHunterData extends DataPojo implements IntegerIdentifiedData {
         this.genotypicData = genotypicData;
         this.phenotypicData = phenotypicData;
         this.distancesData = distancesData;
+        
+        validObjectiveTypes = new LinkedList<CoreHunterObjectiveType>() ;
+        validMeasures = new LinkedList<CoreHunterMeasure>() ;
+        
+        if (genotypicData != null || phenotypicData != null || distancesData != null) {
+            validObjectiveTypes.add(CoreHunterObjectiveType.AV_ENTRY_TO_ENTRY) ;
+            validObjectiveTypes.add(CoreHunterObjectiveType.AV_ENTRY_TO_NEAREST_ENTRY) ;
+            validObjectiveTypes.add(CoreHunterObjectiveType.AV_ACCESSION_TO_NEAREST_ENTRY) ;
+            
+            if (genotypicData != null) {
+                validObjectiveTypes.add(CoreHunterObjectiveType.COVERAGE) ;
+                validObjectiveTypes.add(CoreHunterObjectiveType.HETEROZYGOUS_LOCI) ;
+                validObjectiveTypes.add(CoreHunterObjectiveType.SHANNON_DIVERSITY) ;
+                
+                validMeasures.add(CoreHunterMeasure.MODIFIED_ROGERS) ;
+                validMeasures.add(CoreHunterMeasure.CAVALLI_SFORZA_EDWARDS) ;
+            }
+            
+            if (phenotypicData != null) {
+                validMeasures.add(CoreHunterMeasure.GOWERS) ;
+            }
+            
+            if (distancesData != null) {
+                validMeasures.add(CoreHunterMeasure.PRECOMPUTED_DISTANCE) ;
+            }
+        }
+        
     }
 
     /**
@@ -213,7 +247,25 @@ public class CoreHunterData extends DataPojo implements IntegerIdentifiedData {
         }
 
         return headers;
-
     }
 
+    public final List<CoreHunterObjectiveType> getValidObjectiveTypes() {
+        return validObjectiveTypes ;
+    }  
+    
+    public final List<CoreHunterMeasure> getValidMeasures(CoreHunterObjectiveType objectiveType) {
+        
+        switch(objectiveType) {
+            case AV_ACCESSION_TO_NEAREST_ENTRY:
+            case AV_ENTRY_TO_ENTRY:
+            case AV_ENTRY_TO_NEAREST_ENTRY:
+                return validMeasures ;
+            case COVERAGE:
+            case HETEROZYGOUS_LOCI:
+            case SHANNON_DIVERSITY:
+            default:
+                return NO_MEASURES ;
+            
+        }
+    }
 }

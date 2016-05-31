@@ -38,10 +38,18 @@ public enum CoreHunterMeasure {
         this.abbreviation = abbreviation ;
     }
 
+    /**
+     * Gets the name of the measure 
+     * @return the name of the measure 
+     */
     public final String getName() {
         return name;
     }
 
+    /**
+     * Gets the two letter abbreviation of the measure 
+     * @return the abbreviation of the measure
+     */
     public final String getAbbreviation() {
         return abbreviation;
     } 
