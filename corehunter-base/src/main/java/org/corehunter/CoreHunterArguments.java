@@ -50,13 +50,13 @@ public class CoreHunterArguments {
         
         if (subsetSize >= data.getSize()) {
             throw new IllegalArgumentException(
-                    String.format("Requested subset size less than total data size %s", data.getSize()));
+                    String.format("Requested subset size must be less than total data size %s", data.getSize()));
         }
         
         this.data = data ;
         this.subsetSize = subsetSize ;
         
-        objectives = new LinkedList<CoreHunterObjective>() ;
+        objectives = new LinkedList<>() ;
     }
     
     /**
@@ -89,6 +89,15 @@ public class CoreHunterArguments {
     public CoreHunterArguments(CoreHunterData data, int subsetSize, CoreHunterObjectiveType objective,
                               CoreHunterMeasure measure) {
         this(data, subsetSize) ;
+        
+        if (objective == null) {
+            throw new IllegalArgumentException("Objective not defined!");
+        }
+        
+        if (measure == null) {
+            throw new IllegalArgumentException("Measure not defined!");
+        }
+        
         objectives.add(new CoreHunterObjective(objective, measure)) ; 
     }
     
@@ -103,7 +112,7 @@ public class CoreHunterArguments {
     public CoreHunterArguments(CoreHunterData data, int subsetSize, List<CoreHunterObjective> objectives) {
         this(data, subsetSize) ;
         
-        if (objectives == null) {
+        if (objectives == null || objectives.isEmpty()) {
             throw new IllegalArgumentException("Objectives not defined!");
         }
         

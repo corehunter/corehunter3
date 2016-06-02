@@ -19,7 +19,6 @@
 
 package org.corehunter;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -41,6 +40,7 @@ import org.jamesframework.core.search.Search;
 import org.jamesframework.core.search.algo.RandomDescent;
 import org.jamesframework.core.search.neigh.Neighbourhood;
 import org.jamesframework.core.search.stopcriteria.MaxRuntime;
+import org.jamesframework.core.search.stopcriteria.MaxTimeWithoutImprovement;
 import org.jamesframework.core.subset.SubsetProblem;
 import org.jamesframework.core.subset.SubsetSolution;
 import org.jamesframework.core.subset.neigh.SingleSwapNeighbourhood;
@@ -54,18 +54,13 @@ import org.jamesframework.ext.problems.objectives.WeightedIndex;
 public class CoreHunter {
 
     private CoreHunterListener listener;
-    private long timeLimit = 60;
+    private long timeLimit = -1;
+    private long maxTimeWithoutImprovement = -1;
 
-    public CoreHunter() {
-
-    }
+    public CoreHunter() {}
 
     public CoreHunter(CoreHunterListener listener) {
         this.listener = listener;
-    }
-
-    public final SubsetSolution execute() {
-        return execute(null);
     }
 
     public SubsetSolution execute(CoreHunterArguments arguments) {
@@ -78,12 +73,21 @@ public class CoreHunter {
             throw new IllegalArgumentException("Dataset not defined!");
         }
 
+        // create search from arguments
         Search<SubsetSolution> search = createSearch(arguments);
 
+        // set stop criteria
+        if(timeLimit <= 0 && maxTimeWithoutImprovement <= 0){
+            throw new IllegalStateException("Specify time limit or maximum time without improvement before execution.");
+        }
         if (timeLimit > 0) {
             search.addStopCriterion(new MaxRuntime(timeLimit, TimeUnit.SECONDS));
         }
-
+        if (maxTimeWithoutImprovement > 0){
+            search.addStopCriterion(new MaxTimeWithoutImprovement(maxTimeWithoutImprovement, TimeUnit.SECONDS));
+        }
+        
+        // add search listener (if any)
         if (listener != null) {
             search.addSearchListener(listener);
         }
@@ -101,98 +105,91 @@ public class CoreHunter {
         return timeLimit;
     }
 
-    public final void setTimeLimit(long timeLimit) {
-        this.timeLimit = timeLimit;
+    public final void setTimeLimit(long seconds) {
+        this.timeLimit = seconds;
+    }
+    
+    public final long getMaxTimeWithoutImprovement(){
+        return maxTimeWithoutImprovement;
+    }
+    
+    public final void setMaxTimeWithoutImprovement(long seconds){
+        maxTimeWithoutImprovement = seconds;
     }
 
     protected Search<SubsetSolution> createSearch(CoreHunterArguments arguments) {
 
         int size = arguments.getSubsetSize();
 
-        Objective<SubsetSolution, CoreHunterData> objective = createObjective(arguments.getData(),
-                arguments.getObjectives());
+        Objective<SubsetSolution, CoreHunterData> objective = createObjective(arguments);
 
-        SubsetProblem<CoreHunterData> problem = new SubsetProblem<CoreHunterData>(arguments.getData(), objective, size,
-                size);
-
+        SubsetProblem<CoreHunterData> problem = new SubsetProblem<>(arguments.getData(), objective, size);
         Neighbourhood<SubsetSolution> neigh = new SingleSwapNeighbourhood();
-
+        // TODO: default to parallel tempering, option for fast selection with random descent
         RandomDescent<SubsetSolution> search = new RandomDescent<>(problem, neigh);
 
         return search;
 
     }
 
-    private Objective<SubsetSolution, CoreHunterData> createObjective(CoreHunterData data,
-            List<CoreHunterObjective> objectives) {
-        if (objectives.size() == 0) {
-            throw new CoreHunterException("No objective given.");
+    private Objective<SubsetSolution, CoreHunterData> createObjective(CoreHunterArguments arguments) {
+        // extract data and objectives
+        CoreHunterData data = arguments.getData();
+        List<CoreHunterObjective> objectives = arguments.getObjectives();
+        // compose objective
+        if (objectives == null || objectives.isEmpty()) {
+            throw new CoreHunterException("No objective(s) given.");
         } else {
             if (objectives.size() == 1) {
+                // single objective
                 return createObjective(data, objectives.get(0));
             } else {
-                Iterator<CoreHunterObjective> iterator = objectives.iterator();
-
-                double totalWeight = 0;
-
-                while (iterator.hasNext()) {
-                    totalWeight = totalWeight + iterator.next().getWeight();
+                // multiple objectives (weighted index)
+                WeightedIndex<SubsetSolution, CoreHunterData> weightedIndex =  new WeightedIndex<>();
+                for(CoreHunterObjective obj : objectives) {
+                    weightedIndex.addObjective(createObjective(data, obj), obj.getWeight());
                 }
-
-                iterator = objectives.iterator();
-
-                CoreHunterObjective coreHunterObjective;
-
-                WeightedIndex<SubsetSolution, CoreHunterData> weightedIndex = 
-                        new WeightedIndex<SubsetSolution, CoreHunterData>();
-
-                while (iterator.hasNext()) {
-                    coreHunterObjective = iterator.next();
-
-                    weightedIndex.addObjective(createObjective(data, coreHunterObjective),
-                            coreHunterObjective.getWeight());
-                }
-
                 return weightedIndex;
             }
         }
     }
 
     private Objective<SubsetSolution, CoreHunterData> createObjective(CoreHunterData data,
-            CoreHunterObjective coreHunterObjective) {
+                                                                      CoreHunterObjective coreHunterObjective) {
 
         Objective<SubsetSolution, CoreHunterData> objective = null;
         DistanceMeasure distanceMeasure = null;
 
         if (coreHunterObjective.getMeasure() != null) {
             switch (coreHunterObjective.getMeasure()) {
-                case CAVALLI_SFORZA_EDWARDS:
-                    if (data.getGenotypicData() == null) {
-                        throw new CoreHunterException(
-                                "Genotypes are required for Cavalli-Sforza and Edwards distance.");
-                    }
-                    distanceMeasure = new CavalliSforzaEdwardsDistance();
-                    break;
-                case GOWERS:
-                    if (data.getPhenotypicData() == null) {
-                        throw new CoreHunterException("Phenotypes are required for Gower distance.");
-                    }
-                    distanceMeasure = new GowerDistance();
-                    break;
                 case MODIFIED_ROGERS:
-                    if (data.getGenotypicData() == null) {
+                    if (!data.hasGenotypes()) {
                         throw new CoreHunterException("Genotypes are required for Modified Rogers distance.");
                     }
                     distanceMeasure = new ModifiedRogersDistance();
                     break;
+                case CAVALLI_SFORZA_EDWARDS:
+                    if (!data.hasGenotypes()) {
+                        throw new CoreHunterException(
+                                "Genotypes are required for Cavalli-Sforza and Edwards distance."
+                        );
+                    }
+                    distanceMeasure = new CavalliSforzaEdwardsDistance();
+                    break;
+                case GOWERS:
+                    if (!data.hasPhenotypes()) {
+                        throw new CoreHunterException("Phenotypes are required for Gower distance.");
+                    }
+                    distanceMeasure = new GowerDistance();
+                    break;
                 case PRECOMPUTED_DISTANCE:
-                    if (data.getDistancesData() == null) {
+                    if (!data.hasDistances()) {
                         throw new CoreHunterException("No precomputed distance matrix has been defined.");
                     }
                     distanceMeasure = new PrecomputedDistance();
                     break;
                 default:
-                    break;
+                    // do nothing (not all objectives require a distance measure)
             }
         }
 
@@ -201,7 +198,7 @@ public class CoreHunter {
                 if (distanceMeasure == null) {
                     throw new CoreHunterException(String.format(
                             "No distance measure defined. A distance measure is required for %s",
-                            CoreHunterObjectiveType.AV_ACCESSION_TO_NEAREST_ENTRY.name()));
+                            CoreHunterObjectiveType.AV_ACCESSION_TO_NEAREST_ENTRY));
                 }
                 objective = new AverageAccessionToNearestEntry(distanceMeasure);
                 break;
@@ -209,7 +206,7 @@ public class CoreHunter {
                 if (distanceMeasure == null) {
                     throw new CoreHunterException(String.format(
                             "No distance measure defined. A distance measure is required for %s",
-                            CoreHunterObjectiveType.AV_ENTRY_TO_ENTRY.name()));
+                            CoreHunterObjectiveType.AV_ENTRY_TO_ENTRY));
                 }
                 objective = new AverageEntryToEntry(distanceMeasure);
                 break;
@@ -217,31 +214,32 @@ public class CoreHunter {
                 if (distanceMeasure == null) {
                     throw new CoreHunterException(String.format(
                             "No distance measure defined. A distance measure is required for %s",
-                            CoreHunterObjectiveType.AV_ENTRY_TO_NEAREST_ENTRY.name()));
+                            CoreHunterObjectiveType.AV_ENTRY_TO_NEAREST_ENTRY));
                 }
                 objective = new AverageEntryToNearestEntry(distanceMeasure);
                 break;
             case COVERAGE:
-                if (data.getGenotypicData() == null) {
+                if (!data.hasGenotypes()) {
                     throw new CoreHunterException("Genotypes are required for coverage objective.");
                 }
                 objective = new Coverage();
                 break;
             case HETEROZYGOUS_LOCI:
-                if (data.getGenotypicData() == null) {
+                if (!data.hasGenotypes()) {
                     throw new CoreHunterException(
-                            "Genotypes are required for expected proportion of heterozygous loci objective.");
+                            "Genotypes are required for expected proportion of heterozygous loci objective."
+                    );
                 }
                 objective = new HeterozygousLoci();
                 break;
             case SHANNON_DIVERSITY:
-                if (data.getGenotypicData() == null) {
+                if (!data.hasGenotypes()) {
                     throw new CoreHunterException("Genotypes are required for Shannon's index.");
                 }
                 objective = new Shannon();
                 break;
             default:
-                throw new IllegalArgumentException(String.format("Unknown format : %s", coreHunterObjective));
+                throw new IllegalArgumentException(String.format("Unknown objective : %s", coreHunterObjective));
 
         }
 

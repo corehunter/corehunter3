@@ -71,9 +71,7 @@ public class CoreHunterObjective {
      * @param measure the measure to be used for this objective type
      * @param weight the relative weight of this objective when used in conjunction with another objective
      */
-    public CoreHunterObjective(CoreHunterObjectiveType objectiveType, CoreHunterMeasure measure,
-            double weight) {
-        super();
+    public CoreHunterObjective(CoreHunterObjectiveType objectiveType, CoreHunterMeasure measure, double weight) {
         this.objectiveType = objectiveType;
         this.measure = measure;
         this.weight = weight;

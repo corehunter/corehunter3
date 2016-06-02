@@ -19,8 +19,6 @@
 
 package org.corehunter;
 
-import java.util.List;
-
 /**
  * Available objective types
  *
@@ -57,4 +55,10 @@ public enum CoreHunterObjectiveType {
     public final String getAbbreviation() {
         return abbreviation;
     }
+    
+    @Override
+    public String toString(){
+        return name;
+    }
+    
 }

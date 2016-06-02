@@ -41,7 +41,7 @@ import uno.informatics.data.pojo.DataPojo;
  */
 public class CoreHunterData extends DataPojo implements IntegerIdentifiedData {
     
-    private static final List<CoreHunterMeasure> NO_MEASURES = new LinkedList<CoreHunterMeasure>() ;
+    private static final List<CoreHunterMeasure> NO_MEASURES = new LinkedList<>() ;
     private final GenotypeData genotypicData; 
     private final FeatureData phenotypicData;
     private final DistanceMatrixData distancesData;
@@ -76,8 +76,8 @@ public class CoreHunterData extends DataPojo implements IntegerIdentifiedData {
         this.phenotypicData = phenotypicData;
         this.distancesData = distancesData;
         
-        validObjectiveTypes = new LinkedList<CoreHunterObjectiveType>() ;
-        validMeasures = new LinkedList<CoreHunterMeasure>() ;
+        validObjectiveTypes = new LinkedList<>() ;
+        validMeasures = new LinkedList<>() ;
         
         if (genotypicData != null || phenotypicData != null || distancesData != null) {
             validObjectiveTypes.add(CoreHunterObjectiveType.AV_ENTRY_TO_ENTRY) ;
@@ -153,6 +153,18 @@ public class CoreHunterData extends DataPojo implements IntegerIdentifiedData {
 
     public DistanceMatrixData getDistancesData() {
         return distancesData;
+    }
+    
+    public boolean hasGenotypes(){
+        return genotypicData != null;
+    }
+    
+    public boolean hasPhenotypes(){
+        return phenotypicData != null;
+    }
+    
+    public boolean hasDistances(){
+        return distancesData != null;
     }
 
     private static int inferSize(GenotypeData genotypicData,
