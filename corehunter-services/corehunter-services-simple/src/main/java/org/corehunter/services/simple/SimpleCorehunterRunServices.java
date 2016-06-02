@@ -252,7 +252,8 @@ public class SimpleCorehunterRunServices implements CorehunterRunServices {
 
                 PrintStream printStream = new PrintStream(outputStream);
 
-                corehunter = new CoreHunter(new SimpleCorehunterListener(printStream));
+                corehunter = new CoreHunter();
+                corehunter.setListener(new SimpleCorehunterListener(printStream));
 
                 outputStream = new ByteArrayOutputStream();
                 
