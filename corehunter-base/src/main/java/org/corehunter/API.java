@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.nio.file.Paths;
 import org.corehunter.data.DistanceMatrixData;
 import org.corehunter.data.simple.SimpleDistanceMatrixData;
+import uno.informatics.data.Data;
 import uno.informatics.data.SimpleEntity;
 import uno.informatics.data.io.FileType;
 import uno.informatics.data.pojo.SimpleEntityPojo;
@@ -34,9 +35,22 @@ import uno.informatics.data.pojo.SimpleEntityPojo;
  */
 public class API {
 
-    /************************/
+    /* -------- */
+    /* All data */
+    /* -------- */
+    
+    public static String[] getIds(Data data){
+        int n = data.getSize();
+        String[] ids = new String[n];
+        for(int i = 0; i < n; i++){
+            ids[i] = data.getHeader(i).getUniqueIdentifier();
+        }
+        return ids;
+    }
+    
+    /* -------------------- */
     /* Distance matrix data */
-    /************************/
+    /* -------------------- */
     
     public static DistanceMatrixData readDistanceMatrixData(String file) throws IOException{
         return SimpleDistanceMatrixData.readData(Paths.get(file), inferFileType(file));
@@ -69,23 +83,23 @@ public class API {
     /**
      * Get a copy of the full distance matrix.
      * 
+     * @param data distance data
      * @return full distance matrix (copy)
      */
-    public static double[][] getDistanceMatrix(DistanceMatrixData distances){
-        int n = distances.getSize();
+    public static double[][] getDistanceMatrix(DistanceMatrixData data){
+        int n = data.getSize();
         double[][] dist = new double[n][n];
         for(int i = 0; i < n; i++){
             for (int j = 0; j < n; j++) {
-                dist[i][j] = distances.getDistance(i, j);
+                dist[i][j] = data.getDistance(i, j);
             }
         }
         return dist;
     }
     
-    
-    /***************************/
+    /* ----------------------- */
     /* Private utility methods */
-    /***************************/
+    /* ----------------------- */
     
     /**
      * Infer file type from the extension of the file.
