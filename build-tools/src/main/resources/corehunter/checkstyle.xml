@@ -170,12 +170,12 @@
         
         <!-- 
             Enforce camel case. Static variables and methods tagged with @Override are ignored.
-            Also, the abbreviation "IT" for "integration test" is allowed.
+            Also, some abbreviations like "API" and "IT" for "integration test" are allowed.
         -->
         <module name="AbbreviationAsWordInName">
             <property name="allowedAbbreviationLength" value="1"/>
             <property name="ignoreFinal" value="false"/>
-            <property name="allowedAbbreviations" value="IT"/>
+            <property name="allowedAbbreviations" value="IT,API"/>
         </module>
         
         <!-- Verifies that there are no finalize() methods defined in a class. -->
