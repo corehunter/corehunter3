@@ -237,7 +237,8 @@ public class SimpleDistanceMatrixData extends DataPojo implements DistanceMatrix
             // verify ids on header row, if provided
             if(firstRow.length > numHeaderCols){
                 for(int i = 0; i < n; i++){
-                    if(numHeaderCols + i >= firstRow.length || !Objects.equals(ids[i], firstRow[numHeaderCols+i])){
+                    if(numHeaderCols + i >= firstRow.length
+                            || !Objects.equals(ids[i], StringUtils.unquote(firstRow[numHeaderCols+i]))){
                         throw new IOException("Row and column identifiers differ.");
                     }
                 }
