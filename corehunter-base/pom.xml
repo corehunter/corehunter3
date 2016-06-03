@@ -96,7 +96,7 @@
                                 <!-- copy jar with dependencies to bin directory after packaging -->
                                 <copy
                                     file="${project.build.directory}/${project.artifactId}-${project.version}-jar-with-dependencies.jar"
-                                    tofile="bin/corehunter.jar"
+                                    tofile="bin/corehunter-${project.version}.jar"
                                 />
                             </target>
                         </configuration>
