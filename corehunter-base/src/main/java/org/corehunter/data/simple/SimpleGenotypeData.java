@@ -348,8 +348,7 @@ public class SimpleGenotypeData extends DataPojo implements GenotypeData {
      * @return genotype data
      * @throws IOException if the file can not be read or is not correctly formatted
      */
-    public static GenotypeData readData(Path filePath, FileType type,
-                                               GenotypeDataFormat format) throws IOException {
+    public static GenotypeData readData(Path filePath, FileType type, GenotypeDataFormat format) throws IOException {
         
         if (format == null) {
             throw new IllegalArgumentException("Format not defined.");

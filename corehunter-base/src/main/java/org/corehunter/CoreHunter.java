@@ -19,10 +19,14 @@
 
 package org.corehunter;
 
+import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.corehunter.data.CoreHunterData;
+import org.corehunter.data.DistanceMatrixData;
+import org.corehunter.data.simple.SimpleDistanceMatrixData;
 import org.corehunter.exceptions.CoreHunterException;
 import org.corehunter.objectives.AverageAccessionToNearestEntry;
 import org.corehunter.objectives.AverageEntryToEntry;
@@ -46,6 +50,7 @@ import org.jamesframework.core.subset.SubsetProblem;
 import org.jamesframework.core.subset.SubsetSolution;
 import org.jamesframework.core.subset.neigh.SingleSwapNeighbourhood;
 import org.jamesframework.ext.problems.objectives.WeightedIndex;
+import uno.informatics.data.io.FileType;
 
 /**
  * A facade for executing Core Hunter searches. Can be re-used.
@@ -305,4 +310,27 @@ public class CoreHunter {
 
         return objective;
     }
+    
+    public static DistanceMatrixData readDistanceMatrixData(String file) throws IOException{
+        return SimpleDistanceMatrixData.readData(Paths.get(file), inferFileType(file));
+    }
+    
+    /**
+     * Infer file type from the extension of the file.
+     * Only supports {@link FileType#TXT} and {@link FileType#CSV} and returns <code>null</code> for other extensions.
+     * 
+     * @param file file path
+     * @return file type
+     */
+    private static FileType inferFileType(String file){
+        file = file.toLowerCase();
+        if(file.endsWith(".txt")){
+            return FileType.TXT;
+        }
+        if(file.endsWith(".csv")){
+            return FileType.CSV;
+        }
+        return null;
+    }
+    
 }
