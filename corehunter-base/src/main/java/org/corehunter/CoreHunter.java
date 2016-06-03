@@ -50,7 +50,9 @@ import org.jamesframework.core.subset.SubsetProblem;
 import org.jamesframework.core.subset.SubsetSolution;
 import org.jamesframework.core.subset.neigh.SingleSwapNeighbourhood;
 import org.jamesframework.ext.problems.objectives.WeightedIndex;
+import uno.informatics.data.SimpleEntity;
 import uno.informatics.data.io.FileType;
+import uno.informatics.data.pojo.SimpleEntityPojo;
 
 /**
  * A facade for executing Core Hunter searches. Can be re-used.
@@ -313,6 +315,30 @@ public class CoreHunter {
     
     public static DistanceMatrixData readDistanceMatrixData(String file) throws IOException{
         return SimpleDistanceMatrixData.readData(Paths.get(file), inferFileType(file));
+    }
+    
+    public static DistanceMatrixData createDistanceMatrixData(double[][] distances, String[] ids, String[] names){
+        // combine ids and names into headers
+        int n = distances.length;
+        if(ids == null){
+            throw new IllegalArgumentException("Ids are required.");
+        }
+        if(ids.length != n){
+            throw new IllegalArgumentException("Number of ids does not correspond to size of matrix.");
+        }
+        if(names == null){
+            // use ids as names if no names are given
+            names = ids;
+        }
+        if(names.length != n){
+            throw new IllegalArgumentException("Number of names does not correspond to size of matrix.");
+        }
+        SimpleEntity[] headers = new SimpleEntity[n];
+        for(int i = 0; i < n; i++){
+            headers[i] = new SimpleEntityPojo(ids[i], names[i]);
+        }
+        // create and return data
+        return new SimpleDistanceMatrixData(headers, distances);
     }
     
     /**
