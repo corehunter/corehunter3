@@ -25,9 +25,9 @@ package org.corehunter;
  * @author Guy Davenport, Herman De Beukelaer
  */
 public enum CoreHunterObjectiveType {
-    AV_ENTRY_TO_ENTRY("Average Entry to Entry", "AE"),
-    AV_ENTRY_TO_NEAREST_ENTRY("Average Entry to Nearest Entry", "AN") ,
-    AV_ACCESSION_TO_NEAREST_ENTRY("Average Accession to Nearest Entry", "AC") ,
+    AV_ENTRY_TO_NEAREST_ENTRY("Average Entry to Nearest Entry", "EN") ,
+    AV_ACCESSION_TO_NEAREST_ENTRY("Average Accession to Nearest Entry", "AN") ,
+    AV_ENTRY_TO_ENTRY("Average Entry to Entry", "EE"),
     SHANNON_DIVERSITY("Shannon diversity index", "SH"),
     HETEROZYGOUS_LOCI("Expected proportion of heterozygous loci per individual", "HE"),
     COVERAGE("Coverage", "CV") ;
@@ -59,6 +59,23 @@ public enum CoreHunterObjectiveType {
     @Override
     public String toString(){
         return name;
+    }
+    
+    /**
+     * Get Core Hunter objective type from its abbreviation.
+     * 
+     * @param abbr objective type abbreviation
+     * @return objective type
+     * @throws IllegalArgumentException if no objective type with the given abbreviation exists
+     */
+    public static CoreHunterObjectiveType createFromAbbreviation(String abbr){
+        CoreHunterObjectiveType[] objs = values();
+        for (CoreHunterObjectiveType obj : objs) {
+            if (obj.getAbbreviation().equals(abbr)) {
+                return obj;
+            }
+        }
+        throw new IllegalArgumentException("No objective type with abbreviation " + abbr + ".");
     }
     
 }

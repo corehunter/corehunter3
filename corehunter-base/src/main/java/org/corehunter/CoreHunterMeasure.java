@@ -25,10 +25,10 @@ package org.corehunter;
  * @author Guy Davenport, Herman De Beukelaer
  */
 public enum CoreHunterMeasure {
+    PRECOMPUTED_DISTANCE("Precomputed Distance", "PD"),
     GOWERS("Gowers distance", "GD"),
     MODIFIED_ROGERS("Modified Rogers distance", "MR"),
-    CAVALLI_SFORZA_EDWARDS("Cavalli-Sforza and Edwards distance", "CE"),
-    PRECOMPUTED_DISTANCE("Precomputed Distance", "PD") ;
+    CAVALLI_SFORZA_EDWARDS("Cavalli-Sforza and Edwards distance", "CE");
 
     private String name ;
     private String abbreviation ;
@@ -52,5 +52,23 @@ public enum CoreHunterMeasure {
      */
     public final String getAbbreviation() {
         return abbreviation;
-    } 
+    }
+    
+    /**
+     * Get Core Hunter measure from its abbreviation.
+     * 
+     * @param abbr measure abbreviation
+     * @return measure
+     * @throws IllegalArgumentException if no measure with the given abbreviation exists
+     */
+    public static CoreHunterMeasure createFromAbbreviation(String abbr){
+        CoreHunterMeasure[] measures = values();
+        for (CoreHunterMeasure measure : measures) {
+            if (measure.getAbbreviation().equals(abbr)) {
+                return measure;
+            }
+        }
+        throw new IllegalArgumentException("No measure with abbreviation " + abbr + ".");
+    }
+    
 }

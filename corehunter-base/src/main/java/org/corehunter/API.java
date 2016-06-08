@@ -97,6 +97,18 @@ public class API {
         return dist;
     }
     
+    /* ---------- */
+    /* Objectives */
+    /* ---------- */
+    
+    public static CoreHunterObjective createObjective(String type, String measure, double weight){
+        return new CoreHunterObjective(
+                CoreHunterObjectiveType.createFromAbbreviation(type),
+                CoreHunterMeasure.createFromAbbreviation(measure),
+                weight
+        );
+    }
+    
     /* ----------------------- */
     /* Private utility methods */
     /* ----------------------- */
