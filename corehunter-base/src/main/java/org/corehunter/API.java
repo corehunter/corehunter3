@@ -21,6 +21,8 @@ package org.corehunter;
 
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.util.Arrays;
+import org.corehunter.data.CoreHunterData;
 import org.corehunter.data.DistanceMatrixData;
 import org.corehunter.data.simple.SimpleDistanceMatrixData;
 import uno.informatics.data.Data;
@@ -97,9 +99,9 @@ public class API {
         return dist;
     }
     
-    /* ---------- */
-    /* Objectives */
-    /* ---------- */
+    /* --------- */
+    /* Arguments */
+    /* --------- */
     
     public static CoreHunterObjective createObjective(String type, String measure, double weight){        
         return new CoreHunterObjective(
@@ -107,6 +109,10 @@ public class API {
                 CoreHunterMeasure.createFromAbbreviation(measure),
                 weight
         );
+    }
+    
+    public static CoreHunterArguments createArguments(CoreHunterData data, int size, CoreHunterObjective[] objectives){
+        return new CoreHunterArguments(data, size, Arrays.asList(objectives));
     }
     
     /* ----------------------- */
