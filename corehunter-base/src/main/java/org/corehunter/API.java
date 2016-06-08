@@ -51,6 +51,13 @@ public class API {
         return ids;
     }
     
+    public static String[] getIdsFromIndices(Data data, int[] indices){
+        String[] ids = Arrays.stream(indices)
+                             .mapToObj(i -> data.getHeader(i).getUniqueIdentifier())
+                             .toArray(n -> new String[n]);
+        return ids;
+    }
+    
     /* -------------------- */
     /* Distance matrix data */
     /* -------------------- */
@@ -120,15 +127,17 @@ public class API {
     /* Execution */
     /* --------- */
     
-    public static String[] sampleCore(CoreHunterArguments args){
+    public static int[] sampleCore(CoreHunterArguments args){
         CoreHunter ch = new CoreHunter();
         SubsetSolution core = ch.execute(args);
-        String[] ids = core.getSelectedIDs().stream()
-                                            .map(i -> args.getData().getHeader(i).getUniqueIdentifier())
-                                            .toArray(n -> new String[n]);
+        int[] ids = new int[core.getNumSelectedIDs()];
+        int i = 0;
+        for(int id : core.getSelectedIDs()){
+            ids[i++] = id;
+        }
         return ids;
     }
-    
+        
     /* ----------------------- */
     /* Private utility methods */
     /* ----------------------- */
