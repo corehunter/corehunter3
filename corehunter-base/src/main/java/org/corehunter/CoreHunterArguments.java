@@ -19,6 +19,7 @@
 
 package org.corehunter;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -34,7 +35,6 @@ public class CoreHunterArguments {
     
     /**
      * Creates arguments with no objectives.
-     *
      * 
      * @param data the data for the run
      * @param subsetSize the desired subset size
@@ -61,7 +61,6 @@ public class CoreHunterArguments {
     
     /**
      * Creates a single objective configuration with no defined measure
-     *
      * 
      * @param data the data for the run
      * @param subsetSize the desired subset size
@@ -79,7 +78,6 @@ public class CoreHunterArguments {
 
     /**
      * Creates a single objective configuration.
-     *
      * 
      * @param data the data for the run
      * @param subsetSize the desired subset size
@@ -104,7 +102,6 @@ public class CoreHunterArguments {
     /**
      * Creates a multiple objective configuration.
      *
-     * 
      * @param data the data for the run
      * @param subsetSize the desired subset size
      * @param objectives the objectives for the run
@@ -117,6 +114,17 @@ public class CoreHunterArguments {
         }
         
         objectives.addAll(objectives) ; 
+    }
+    
+    /**
+     * Creates a multiple objective configuration.
+     * 
+     * @param data the data for the run
+     * @param subsetSize the desired subset size
+     * @param objectives the objectives for the run
+     */
+    public CoreHunterArguments(CoreHunterData data, int subsetSize, CoreHunterObjective[] objectives) {
+        this(data, subsetSize, Arrays.asList(objectives));
     }
 
     public final CoreHunterData getData() {
