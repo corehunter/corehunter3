@@ -25,6 +25,7 @@ import java.util.Arrays;
 import org.corehunter.data.CoreHunterData;
 import org.corehunter.data.DistanceMatrixData;
 import org.corehunter.data.simple.SimpleDistanceMatrixData;
+import org.jamesframework.core.subset.SubsetSolution;
 import uno.informatics.data.Data;
 import uno.informatics.data.SimpleEntity;
 import uno.informatics.data.io.FileType;
@@ -113,6 +114,19 @@ public class API {
     
     public static CoreHunterArguments createArguments(CoreHunterData data, int size, CoreHunterObjective[] objectives){
         return new CoreHunterArguments(data, size, Arrays.asList(objectives));
+    }
+    
+    /* --------- */
+    /* Execution */
+    /* --------- */
+    
+    public static String[] sampleCore(CoreHunterArguments args){
+        CoreHunter ch = new CoreHunter();
+        SubsetSolution core = ch.execute(args);
+        String[] ids = core.getSelectedIDs().stream()
+                                            .map(args.getData()::getHeader)
+                                            .toArray(n -> new String[n]);
+        return ids;
     }
     
     /* ----------------------- */
