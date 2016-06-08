@@ -19,14 +19,10 @@
 
 package org.corehunter;
 
-import java.io.IOException;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.corehunter.data.CoreHunterData;
-import org.corehunter.data.DistanceMatrixData;
-import org.corehunter.data.simple.SimpleDistanceMatrixData;
 import org.corehunter.exceptions.CoreHunterException;
 import org.corehunter.objectives.AverageAccessionToNearestEntry;
 import org.corehunter.objectives.AverageEntryToEntry;
@@ -50,9 +46,6 @@ import org.jamesframework.core.subset.SubsetProblem;
 import org.jamesframework.core.subset.SubsetSolution;
 import org.jamesframework.core.subset.neigh.SingleSwapNeighbourhood;
 import org.jamesframework.ext.problems.objectives.WeightedIndex;
-import uno.informatics.data.SimpleEntity;
-import uno.informatics.data.io.FileType;
-import uno.informatics.data.pojo.SimpleEntityPojo;
 
 /**
  * A facade for executing Core Hunter searches. Can be re-used.
