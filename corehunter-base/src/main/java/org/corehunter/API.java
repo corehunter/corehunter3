@@ -124,7 +124,7 @@ public class API {
         CoreHunter ch = new CoreHunter();
         SubsetSolution core = ch.execute(args);
         String[] ids = core.getSelectedIDs().stream()
-                                            .map(args.getData()::getHeader)
+                                            .map(i -> args.getData().getHeader(i).getUniqueIdentifier())
                                             .toArray(n -> new String[n]);
         return ids;
     }
