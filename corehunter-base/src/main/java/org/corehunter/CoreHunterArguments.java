@@ -19,8 +19,7 @@
 
 package org.corehunter;
 
-import java.util.Arrays;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.corehunter.data.CoreHunterData;
@@ -56,7 +55,7 @@ public class CoreHunterArguments {
         this.data = data ;
         this.subsetSize = subsetSize ;
         
-        objectives = new LinkedList<>() ;
+        objectives = new ArrayList<>() ;
     }
     
     /**
@@ -113,7 +112,7 @@ public class CoreHunterArguments {
             throw new IllegalArgumentException("Objectives not defined!");
         }
         
-        objectives.addAll(objectives) ; 
+        this.objectives.addAll(objectives) ; 
     }
 
     public final CoreHunterData getData() {
