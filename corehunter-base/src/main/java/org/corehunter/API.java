@@ -101,7 +101,7 @@ public class API {
     /* Objectives */
     /* ---------- */
     
-    public static CoreHunterObjective createObjective(String type, String measure, double weight){
+    public static CoreHunterObjective createObjective(String type, String measure, double weight){        
         return new CoreHunterObjective(
                 CoreHunterObjectiveType.createFromAbbreviation(type),
                 CoreHunterMeasure.createFromAbbreviation(measure),

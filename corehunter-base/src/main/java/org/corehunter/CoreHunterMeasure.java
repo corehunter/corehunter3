@@ -58,8 +58,7 @@ public enum CoreHunterMeasure {
      * Get Core Hunter measure from its abbreviation.
      * 
      * @param abbr measure abbreviation
-     * @return measure
-     * @throws IllegalArgumentException if no measure with the given abbreviation exists
+     * @return measure; <code>null</code> if there is no measure with the given abbreviation
      */
     public static CoreHunterMeasure createFromAbbreviation(String abbr){
         CoreHunterMeasure[] measures = values();
@@ -68,7 +67,7 @@ public enum CoreHunterMeasure {
                 return measure;
             }
         }
-        throw new IllegalArgumentException("No measure with abbreviation " + abbr + ".");
+        return null;
     }
     
 }

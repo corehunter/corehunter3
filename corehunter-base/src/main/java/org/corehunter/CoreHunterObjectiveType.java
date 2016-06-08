@@ -65,8 +65,7 @@ public enum CoreHunterObjectiveType {
      * Get Core Hunter objective type from its abbreviation.
      * 
      * @param abbr objective type abbreviation
-     * @return objective type
-     * @throws IllegalArgumentException if no objective type with the given abbreviation exists
+     * @return objective type; <code>null</code> if there is no objective type with the given abbreviation
      */
     public static CoreHunterObjectiveType createFromAbbreviation(String abbr){
         CoreHunterObjectiveType[] objs = values();
@@ -75,7 +74,7 @@ public enum CoreHunterObjectiveType {
                 return obj;
             }
         }
-        throw new IllegalArgumentException("No objective type with abbreviation " + abbr + ".");
+        return null;
     }
     
 }
