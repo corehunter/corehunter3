@@ -22,6 +22,7 @@ package org.corehunter;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.HashSet;
 import org.corehunter.data.CoreHunterData;
 import org.corehunter.data.DistanceMatrixData;
 import org.corehunter.data.simple.SimpleDistanceMatrixData;
@@ -29,6 +30,7 @@ import org.jamesframework.core.subset.SubsetSolution;
 import uno.informatics.data.Data;
 import uno.informatics.data.SimpleEntity;
 import uno.informatics.data.io.FileType;
+import uno.informatics.data.pojo.DataPojo;
 import uno.informatics.data.pojo.SimpleEntityPojo;
 
 /**
@@ -56,6 +58,13 @@ public class API {
                              .mapToObj(i -> data.getHeader(i).getUniqueIdentifier())
                              .toArray(n -> new String[n]);
         return ids;
+    }
+    
+    public static int[] getIndicesFromIds(DataPojo data, String[] ids){
+        int[] indices = Arrays.stream(ids)
+                              .mapToInt(id -> data.indexOf(id))
+                              .toArray();
+        return indices;
     }
     
     /* -------------------- */
@@ -136,6 +145,19 @@ public class API {
             ids[i++] = id;
         }
         return ids;
+    }
+    
+    /* ---------- */
+    /* Evaluation */
+    /* ---------- */
+    
+    public static double evaluateCore(int[] selected, CoreHunterData data, CoreHunterObjective obj){
+        CoreHunter ch = new CoreHunter();
+        SubsetSolution sol = new SubsetSolution(data.getIDs());
+        for(int sel : selected){
+            sol.select(sel);
+        }
+        return ch.evaluate(sol, data, obj);
     }
         
     /* ----------------------- */

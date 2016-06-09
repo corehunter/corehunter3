@@ -129,6 +129,19 @@ public class CoreHunter {
 
         return search.getBestSolution();
     }
+    
+    /**
+     * Evaluate the given solution with the specified objective. The weight of the objective is ignored.
+     * 
+     * @param sol subset solution
+     * @param data Core Hunter data
+     * @param objective objective used to evaluate the subset (weight is ignored)
+     * @return value of the subset according to the specified objective
+     */
+    public double evaluate(SubsetSolution sol, CoreHunterData data, CoreHunterObjective objective){
+        Objective<SubsetSolution, CoreHunterData> obj = createObjective(data, objective);
+        return obj.evaluate(sol, data).getValue();
+    }
 
     public long getTimeLimit() {
         return timeLimit;
