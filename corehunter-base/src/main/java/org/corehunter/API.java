@@ -26,6 +26,7 @@ import java.util.HashSet;
 import org.corehunter.data.CoreHunterData;
 import org.corehunter.data.DistanceMatrixData;
 import org.corehunter.data.simple.SimpleDistanceMatrixData;
+import org.corehunter.listener.SimpleCorehunterListener;
 import org.jamesframework.core.subset.SubsetSolution;
 import uno.informatics.data.Data;
 import uno.informatics.data.SimpleEntity;
@@ -136,9 +137,28 @@ public class API {
     /* Execution */
     /* --------- */
     
-    public static int[] sampleCore(CoreHunterArguments args){
-        CoreHunter ch = new CoreHunter();
+    public static int[] sampleCore(CoreHunterArguments args, String mode,
+                                   int timeLimit, int maxTimeWithoutImprovement,
+                                   boolean silent){
+        // interpret arguments
+        CoreHunterExecutionMode exMode = CoreHunterExecutionMode.DEFAULT;
+        if(mode.equals("fast")){
+            exMode = CoreHunterExecutionMode.FAST;
+        }
+        // create Core Hunter executor
+        CoreHunter ch = new CoreHunter(exMode);
+        if(timeLimit > 0){
+            ch.setTimeLimit(timeLimit);
+        }
+        if(maxTimeWithoutImprovement > 0){
+            ch.setMaxTimeWithoutImprovement(maxTimeWithoutImprovement);
+        }
+        if(!silent){
+            ch.setListener(new SimpleCorehunterListener());
+        }
+        // sample core
         SubsetSolution core = ch.execute(args);
+        // convert result
         int[] ids = new int[core.getNumSelectedIDs()];
         int i = 0;
         for(int id : core.getSelectedIDs()){
