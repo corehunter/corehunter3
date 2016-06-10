@@ -312,8 +312,8 @@ public class SimpleGenotypeData extends DataPojo implements GenotypeData {
      * Consecutive columns corresponding to the same marker should be tagged with the name of that marker, optionally
      * followed by an arbitrary suffix starting with a dash, underscore or dot character. The latter allows to use
      * column names such as "M1-1" and "M1-2", "M1.a" and "M1.b" or "M1_1" and "M1_2" for a marker named "M1" (in case
-     * of two columns per marker). The marker name itself can not contain any dash, underscore or dot characters,
-     * otherwise part of the name will be lost when loading the data.
+     * of two columns per marker). The column name prefix up to before the last occurrence of any dash, underscore or
+     * dot character is taken to be the marker name.
      * 
      * <p>For {@link GenotypeDataFormat#FREQUENCY} the file contains allele frequencies following the
      * requirements as described in the constructor {@link #SimpleGenotypeData(String, SimpleEntity[], String[],
@@ -772,9 +772,7 @@ public class SimpleGenotypeData extends DataPojo implements GenotypeData {
         if(columnName == null){
             throw new IOException("Missing column name for column " + c + ".");
         }
-        int i = Stream.of('-', '_', '.').mapToInt(suf -> columnName.indexOf(suf))
-                                        .filter(j -> j >= 0)
-                                        .min().orElse(-1);
+        int i = Stream.of('-', '_', '.').mapToInt(suf -> columnName.indexOf(suf)).max().orElse(-1);
         String markerName = (i >= 0 ? columnName.substring(0, i) : columnName);
         if(markerName.equals("")){
             throw new IOException(String.format(
