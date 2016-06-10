@@ -64,22 +64,53 @@
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
             </plugin>
-            <!-- assemblies -->
+            <!-- jar with dependencies -->
             <plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <version>2.6</version>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>2.4.3</version>
                 <executions>
-                    <!-- jar with dependencies -->
                     <execution>
-                        <id>make-jar-with-dependencies</id>
                         <phase>package</phase>
                         <goals>
-                            <goal>single</goal>
+                            <goal>shade</goal>
                         </goals>
                         <configuration>
-                            <descriptors>
-                                <descriptor>src/assemble/jar-with-dependencies.xml</descriptor>
-                            </descriptors>
+                            <transformers>
+                                <!-- exclude LICENSE and NOTICE files of dependencies  -->
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.DontIncludeResourceTransformer">
+                                    <resources>
+                                        <resource>LICENSE</resource>
+                                        <resource>LICENSE.txt</resource>
+                                        <resource>NOTICE</resource>
+                                        <resource>NOTICE.txt</resource>
+                                    </resources>
+                                </transformer>
+                                <!-- include Core Hunter README, LICENSE and NOTICE -->
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.IncludeResourceTransformer">
+                                    <resource>META-INF/README.md</resource>
+                                    <file>../README.md</file>
+                                </transformer>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.IncludeResourceTransformer">
+                                    <resource>META-INF/LICENSE</resource>
+                                    <file>../LICENSE</file>
+                                </transformer>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.IncludeResourceTransformer">
+                                    <resource>META-INF/NOTICE</resource>
+                                    <file>../NOTICE</file>
+                                </transformer>
+                            </transformers>
+                            <!-- omit unused components of dependencies -->
+                            <minimizeJar>true</minimizeJar>
+                            <filters>
+                                <!-- explicitly include slf4j classes because some are loaded at runtime -->
+                                <filter>
+                                    <artifact>org.slf4j:slf4j-api</artifact>
+                                    <includes>
+                                        <include>**</include>
+                                    </includes>
+                                </filter>
+                            </filters>
                         </configuration>
                     </execution>
                 </executions>
@@ -95,7 +126,7 @@
                             <target>
                                 <!-- copy jar with dependencies to bin directory after packaging -->
                                 <copy
-                                    file="${project.build.directory}/${project.artifactId}-${project.version}-jar-with-dependencies.jar"
+                                    file="${project.build.directory}/${project.artifactId}-${project.version}.jar"
                                     tofile="bin/corehunter-${project.version}.jar"
                                 />
                             </target>
