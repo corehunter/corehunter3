@@ -76,6 +76,7 @@
                             <goal>shade</goal>
                         </goals>
                         <configuration>
+                            <shadedArtifactAttached>true</shadedArtifactAttached>
                             <transformers>
                                 <!-- exclude LICENSE and NOTICE files of dependencies  -->
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.DontIncludeResourceTransformer">
@@ -126,7 +127,7 @@
                             <target>
                                 <!-- copy jar with dependencies to bin directory after packaging -->
                                 <copy
-                                    file="${project.build.directory}/${project.artifactId}-${project.version}.jar"
+                                    file="${project.build.directory}/${project.artifactId}-${project.version}-shaded.jar"
                                     tofile="bin/corehunter-${project.version}.jar"
                                 />
                             </target>
