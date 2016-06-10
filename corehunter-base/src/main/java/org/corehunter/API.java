@@ -22,7 +22,6 @@ package org.corehunter;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.Arrays;
-import java.util.HashSet;
 import org.corehunter.data.CoreHunterData;
 import org.corehunter.data.DistanceMatrixData;
 import org.corehunter.data.GenotypeData;
