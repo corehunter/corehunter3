@@ -25,11 +25,16 @@ import java.util.Arrays;
 import java.util.HashSet;
 import org.corehunter.data.CoreHunterData;
 import org.corehunter.data.DistanceMatrixData;
+import org.corehunter.data.GenotypeData;
+import org.corehunter.data.GenotypeDataFormat;
 import org.corehunter.data.simple.SimpleDistanceMatrixData;
+import org.corehunter.data.simple.SimpleGenotypeData;
 import org.corehunter.listener.SimpleCorehunterListener;
 import org.jamesframework.core.subset.SubsetSolution;
 import uno.informatics.data.Data;
 import uno.informatics.data.SimpleEntity;
+import uno.informatics.data.dataset.FeatureData;
+import uno.informatics.data.feature.array.ArrayFeatureData;
 import uno.informatics.data.io.FileType;
 import uno.informatics.data.pojo.DataPojo;
 import uno.informatics.data.pojo.SimpleEntityPojo;
@@ -98,6 +103,26 @@ public class API {
         }
         // create and return data
         return new SimpleDistanceMatrixData(headers, distances);
+    }
+    
+    /* ------------- */
+    /* Genotype data */
+    /* ------------- */
+    
+    public static GenotypeData readGenotypeData(String file, String format) throws IOException{
+        return SimpleGenotypeData.readData(
+                Paths.get(file),
+                inferFileType(file),
+                GenotypeDataFormat.valueOf(format.toUpperCase())
+        );
+    }
+    
+    /* -------------- */
+    /* Phenotype data */
+    /* -------------- */
+    
+    public static FeatureData readPhenotypeData(String file) throws IOException{
+        return ArrayFeatureData.readData(Paths.get(file), inferFileType(file));
     }
     
     /**
