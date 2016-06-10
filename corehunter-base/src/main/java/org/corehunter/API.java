@@ -124,23 +124,6 @@ public class API {
         return ArrayFeatureData.readData(Paths.get(file), inferFileType(file));
     }
     
-    /**
-     * Get a copy of the full distance matrix.
-     * 
-     * @param data distance data
-     * @return full distance matrix (copy)
-     */
-    public static double[][] getDistanceMatrix(DistanceMatrixData data){
-        int n = data.getSize();
-        double[][] dist = new double[n][n];
-        for(int i = 0; i < n; i++){
-            for (int j = 0; j < n; j++) {
-                dist[i][j] = data.getDistance(i, j);
-            }
-        }
-        return dist;
-    }
-    
     /* --------- */
     /* Arguments */
     /* --------- */
