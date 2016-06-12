@@ -46,9 +46,9 @@ import com.thoughtworks.xstream.io.xml.StaxDriver;
 import uno.informatics.data.Data;
 import uno.informatics.data.Dataset;
 import uno.informatics.data.dataset.DatasetException;
-import uno.informatics.data.dataset.MatrixData;
 import uno.informatics.data.feature.array.ArrayFeatureData;
 import uno.informatics.data.io.FileType;
+import uno.informatics.data.pojo.DatasetPojo;
 import uno.informatics.data.pojo.SimpleEntityPojo;
 
 public class FileBasedDatasetServices implements DatasetServices {
@@ -65,7 +65,7 @@ public class FileBasedDatasetServices implements DatasetServices {
     private static final String TXT_SUFFIX = ".txt";
     private static final String SUFFIX = ".corehunter";
 
-    private static Map<String, Dataset> datasetMap;
+    private static Map<String, DatasetPojo> datasetMap;
     private static Map<String, CoreHunterData> dataCache;
 
     private Path path;
@@ -115,18 +115,12 @@ public class FileBasedDatasetServices implements DatasetServices {
         }
 
         if (!datasetMap.containsKey(dataset.getUniqueIdentifier())) {
-            datasetMap.put(dataset.getUniqueIdentifier(), dataset);
+            datasetMap.put(dataset.getUniqueIdentifier(), new DatasetPojo(dataset));
         } else {
             throw new DatasetException("Dataset already added : " + dataset.getUniqueIdentifier());
         }
-
-        ArrayList<Dataset> datasets = new ArrayList<Dataset>(datasetMap.values());
-
-        try {
-            writeToXml(Paths.get(getPath().toString(), DATASETS), datasets);
-        } catch (IOException e) {
-            throw new DatasetException(e);
-        }
+        
+        writeDatasets() ;
     }
 
     @Override
@@ -201,7 +195,7 @@ public class FileBasedDatasetServices implements DatasetServices {
             throw new DatasetException("Data type not defined!");
         }
 
-        Dataset internalDataset = getDataset(dataset.getUniqueIdentifier());
+        DatasetPojo internalDataset = datasetMap.get(dataset.getUniqueIdentifier());
 
         if (internalDataset == null) {
             throw new DatasetException("Unknown dataset with datasetId : " + dataset.getUniqueIdentifier());
@@ -391,6 +385,10 @@ public class FileBasedDatasetServices implements DatasetServices {
         } catch (IOException e) {
             throw new DatasetException(e);
         }
+        
+        internalDataset.setSize(coreHunterData.getSize());
+        
+        writeDatasets() ;
     }
 
     @Override
@@ -473,6 +471,16 @@ public class FileBasedDatasetServices implements DatasetServices {
             throw new DatasetException("Can not reload original data!", e) ;
         }
     }
+    
+    private void writeDatasets() throws DatasetException {
+        ArrayList<Dataset> datasets = new ArrayList<Dataset>(datasetMap.values());
+
+        try {
+            writeToXml(Paths.get(getPath().toString(), DATASETS), datasets);
+        } catch (IOException e) {
+            throw new DatasetException(e);
+        }
+    }
 
     private FileType getFileType(Path path, String dataTypePath, String datasetId) {
 
@@ -551,7 +559,7 @@ public class FileBasedDatasetServices implements DatasetServices {
     @SuppressWarnings("unchecked")
     private void initialise() throws IOException {
 
-        datasetMap = new HashMap<String, Dataset>();
+        datasetMap = new HashMap<String, DatasetPojo>();
         dataCache = new HashMap<String, CoreHunterData>();
 
         if (!Files.exists(getPath())) {
@@ -560,14 +568,14 @@ public class FileBasedDatasetServices implements DatasetServices {
 
         Path datasetsPath = Paths.get(getPath().toString(), DATASETS);
 
-        List<Dataset> datasets;
+        List<DatasetPojo> datasets;
         if (Files.exists(datasetsPath)) {
 
-            datasets = (List<Dataset>) readFromXml(datasetsPath);
+            datasets = (List<DatasetPojo>) readFromXml(datasetsPath);
 
-            Iterator<Dataset> iterator = datasets.iterator();
+            Iterator<DatasetPojo> iterator = datasets.iterator();
 
-            Dataset dataset = null;
+            DatasetPojo dataset = null;
 
             while (iterator.hasNext()) {
                 dataset = iterator.next();

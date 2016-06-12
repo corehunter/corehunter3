@@ -69,6 +69,7 @@ public class FileBasedDatasetServicesTest {
     private static final String DATASET_NAME = "dataset 1";
     private static final Path ROOT_DIRECTORY = Paths.get("target", "datasetServicesTests");
     private static final double PRECISION = 0.0000000001;
+    private static final int DATASET_SIZE = 1000;
 
     @Test
     public void testAddDatasetNoData() {
@@ -91,7 +92,8 @@ public class FileBasedDatasetServicesTest {
                     addedDataset.getDescription());
             assertEquals("Added Dataset type is not correct", dataset.getType(), addedDataset.getType());
             assertEquals("Added Dataset study is not correct", dataset.getStudy(), addedDataset.getStudy());
-
+            assertEquals("Added Dataset size is not correct", 0, addedDataset.getSize());
+            
             List<Dataset> datasets = fileBasedDatasetServices.getAllDatasets();
 
             assertEquals("Number of datasets is not 1", 1, datasets.size());
@@ -107,6 +109,7 @@ public class FileBasedDatasetServicesTest {
                     addedDatasetInList.getDescription());
             assertEquals("Added Dataset type is not correct", dataset.getType(), addedDatasetInList.getType());
             assertEquals("Added Dataset study is not correct", dataset.getStudy(), addedDatasetInList.getStudy());
+            assertEquals("Added Dataset size is not correct", 0, addedDatasetInList.getSize());
             
             assertNull("Distances data should be null", 
                     fileBasedDatasetServices.getOriginalData(dataset.getUniqueIdentifier(), DataType.DISTANCES)) ;
@@ -157,7 +160,6 @@ public class FileBasedDatasetServicesTest {
             Dataset dataset3 = fileBasedDatasetServices.getDataset(dataset.getUniqueIdentifier());
 
             assertNull("Dataset is still found after removing!", dataset3);
-
         } catch (Exception e) {
             e.printStackTrace();
 
@@ -191,7 +193,8 @@ public class FileBasedDatasetServicesTest {
                     restoredDataset.getDescription());
             assertEquals("Restored Dataset type is not correct", dataset.getType(), restoredDataset.getType());
             assertEquals("Restored Dataset study is not correct", dataset.getStudy(), restoredDataset.getStudy());
-
+            assertEquals("Restored Dataset size is not correct", 0, restoredDataset.getSize());
+            
             List<Dataset> datasets = fileBasedDatasetServices.getAllDatasets();
 
             assertEquals("Number of datasets is not 1", 1, datasets.size());
@@ -256,6 +259,8 @@ public class FileBasedDatasetServicesTest {
                     fileBasedDatasetServices.getOriginalData(dataset.getUniqueIdentifier(), DataType.GENOTYPIC)) ;
             assertNotNull("Phenotypic data should be not null", 
                     fileBasedDatasetServices.getOriginalData(dataset.getUniqueIdentifier(), DataType.PHENOTYPIC)) ;
+            
+            assertEquals("Dataset size is not correct", DATASET_SIZE, addedDataset.getSize());
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -283,8 +288,9 @@ public class FileBasedDatasetServicesTest {
 
             fileBasedDatasetServices = new FileBasedDatasetServices(path);
 
-            assertNotNull("Restored dataset not found",
-                    fileBasedDatasetServices.getDataset(dataset.getUniqueIdentifier()));
+            Dataset restoredDataset = fileBasedDatasetServices.getDataset(dataset.getUniqueIdentifier()) ;
+
+            assertNotNull("Restored dataset not found", restoredDataset);
 
             CoreHunterData restoredData = fileBasedDatasetServices.getCoreHunterData(dataset.getUniqueIdentifier());
 
@@ -305,6 +311,8 @@ public class FileBasedDatasetServicesTest {
                     fileBasedDatasetServices.getOriginalData(dataset.getUniqueIdentifier(), DataType.GENOTYPIC)) ;
             assertNotNull("Phenotypic data should be not null", 
                     fileBasedDatasetServices.getOriginalData(dataset.getUniqueIdentifier(), DataType.PHENOTYPIC)) ;
+            
+            assertEquals("Dataset size is not correct", DATASET_SIZE, restoredDataset.getSize());
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -348,6 +356,8 @@ public class FileBasedDatasetServicesTest {
                     fileBasedDatasetServices.getOriginalData(dataset.getUniqueIdentifier(), DataType.GENOTYPIC)) ;
             assertNull("Phenotypic data should be null", 
                     fileBasedDatasetServices.getOriginalData(dataset.getUniqueIdentifier(), DataType.PHENOTYPIC)) ;
+            
+            assertEquals("Dataset size is not correct", DATASET_SIZE, addedDataset.getSize());
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -394,6 +404,8 @@ public class FileBasedDatasetServicesTest {
                     fileBasedDatasetServices.getOriginalData(dataset.getUniqueIdentifier(), DataType.GENOTYPIC)) ;
             assertNull("Phenotypic data should be null", 
                     fileBasedDatasetServices.getOriginalData(dataset.getUniqueIdentifier(), DataType.PHENOTYPIC)) ;
+            
+            assertEquals("Dataset size is not correct", DATASET_SIZE, addedDataset.getSize());
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -438,6 +450,8 @@ public class FileBasedDatasetServicesTest {
                     fileBasedDatasetServices.getOriginalData(dataset.getUniqueIdentifier(), DataType.GENOTYPIC)) ;
             assertNull("Phenotypic data should be null", 
                     fileBasedDatasetServices.getOriginalData(dataset.getUniqueIdentifier(), DataType.PHENOTYPIC)) ;
+            
+            assertEquals("Dataset size is not correct", DATASET_SIZE, addedDataset.getSize());
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -484,6 +498,8 @@ public class FileBasedDatasetServicesTest {
                     fileBasedDatasetServices.getOriginalData(dataset.getUniqueIdentifier(), DataType.GENOTYPIC)) ;
             assertNull("Phenotypic data should be null", 
                     fileBasedDatasetServices.getOriginalData(dataset.getUniqueIdentifier(), DataType.PHENOTYPIC)) ;
+            
+            assertEquals("Dataset size is not correct", DATASET_SIZE, addedDataset.getSize());
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -530,6 +546,8 @@ public class FileBasedDatasetServicesTest {
                     fileBasedDatasetServices.getOriginalData(dataset.getUniqueIdentifier(), DataType.GENOTYPIC)) ;
             assertNull("Phenotypic data should be null", 
                     fileBasedDatasetServices.getOriginalData(dataset.getUniqueIdentifier(), DataType.PHENOTYPIC)) ;
+            
+            assertEquals("Dataset size is not correct", DATASET_SIZE, addedDataset.getSize());
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -557,8 +575,9 @@ public class FileBasedDatasetServicesTest {
 
             fileBasedDatasetServices = new FileBasedDatasetServices(path);
 
-            assertNotNull("Restored dataset not found",
-                    fileBasedDatasetServices.getDataset(dataset.getUniqueIdentifier()));
+            Dataset restoredDataset = fileBasedDatasetServices.getDataset(dataset.getUniqueIdentifier()) ;
+
+            assertNotNull("Restored dataset not found", restoredDataset);
 
             CoreHunterData restoredData = fileBasedDatasetServices.getCoreHunterData(dataset.getUniqueIdentifier());
 
@@ -582,6 +601,8 @@ public class FileBasedDatasetServicesTest {
                     fileBasedDatasetServices.getOriginalData(dataset.getUniqueIdentifier(), DataType.GENOTYPIC)) ;
             assertNull("Phenotypic data should be null", 
                     fileBasedDatasetServices.getOriginalData(dataset.getUniqueIdentifier(), DataType.PHENOTYPIC)) ;
+            
+            assertEquals("Dataset size is not correct", DATASET_SIZE, restoredDataset.getSize());
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -610,8 +631,9 @@ public class FileBasedDatasetServicesTest {
 
             fileBasedDatasetServices = new FileBasedDatasetServices(path);
 
-            assertNotNull("Restored dataset not found",
-                    fileBasedDatasetServices.getDataset(dataset.getUniqueIdentifier()));
+            Dataset restoredDataset = fileBasedDatasetServices.getDataset(dataset.getUniqueIdentifier()) ;
+
+            assertNotNull("Restored dataset not found", restoredDataset);
 
             CoreHunterData restoredData = fileBasedDatasetServices.getCoreHunterData(dataset.getUniqueIdentifier());
 
@@ -635,6 +657,8 @@ public class FileBasedDatasetServicesTest {
                     fileBasedDatasetServices.getOriginalData(dataset.getUniqueIdentifier(), DataType.GENOTYPIC)) ;
             assertNull("Phenotypic data should be null", 
                     fileBasedDatasetServices.getOriginalData(dataset.getUniqueIdentifier(), DataType.PHENOTYPIC)) ;
+            
+            assertEquals("Dataset size is not correct", DATASET_SIZE, restoredDataset.getSize());
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -663,8 +687,9 @@ public class FileBasedDatasetServicesTest {
 
             fileBasedDatasetServices = new FileBasedDatasetServices(path);
 
-            assertNotNull("Restored dataset not found",
-                    fileBasedDatasetServices.getDataset(dataset.getUniqueIdentifier()));
+            Dataset restoredDataset = fileBasedDatasetServices.getDataset(dataset.getUniqueIdentifier()) ;
+
+            assertNotNull("Restored dataset not found", restoredDataset);
 
             CoreHunterData restoredData = fileBasedDatasetServices.getCoreHunterData(dataset.getUniqueIdentifier());
 
@@ -686,6 +711,8 @@ public class FileBasedDatasetServicesTest {
                     fileBasedDatasetServices.getOriginalData(dataset.getUniqueIdentifier(), DataType.GENOTYPIC)) ;
             assertNull("Phenotypic data should be null", 
                     fileBasedDatasetServices.getOriginalData(dataset.getUniqueIdentifier(), DataType.PHENOTYPIC)) ;
+            
+            assertEquals("Dataset size is not correct", DATASET_SIZE, restoredDataset.getSize());
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -714,8 +741,9 @@ public class FileBasedDatasetServicesTest {
 
             fileBasedDatasetServices = new FileBasedDatasetServices(path);
 
-            assertNotNull("Restored dataset not found",
-                    fileBasedDatasetServices.getDataset(dataset.getUniqueIdentifier()));
+            Dataset restoredDataset = fileBasedDatasetServices.getDataset(dataset.getUniqueIdentifier()) ;
+
+            assertNotNull("Restored dataset not found", restoredDataset);
 
             CoreHunterData restoredData = fileBasedDatasetServices.getCoreHunterData(dataset.getUniqueIdentifier());
 
@@ -739,6 +767,8 @@ public class FileBasedDatasetServicesTest {
                     fileBasedDatasetServices.getOriginalData(dataset.getUniqueIdentifier(), DataType.GENOTYPIC)) ;
             assertNull("Phenotypic data should be null", 
                     fileBasedDatasetServices.getOriginalData(dataset.getUniqueIdentifier(), DataType.PHENOTYPIC)) ;
+            
+            assertEquals("Dataset size is not correct", DATASET_SIZE, restoredDataset.getSize());
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -765,7 +795,9 @@ public class FileBasedDatasetServicesTest {
             fileBasedDatasetServices.loadData(addedDataset, dataPath, FileType.CSV, DataType.GENOTYPIC, 
                     GenotypeDataFormat.FREQUENCY);
 
-            fileBasedDatasetServices = new FileBasedDatasetServices(path);
+            Dataset restoredDataset = fileBasedDatasetServices.getDataset(dataset.getUniqueIdentifier()) ;
+
+            assertNotNull("Restored dataset not found", restoredDataset);
 
             assertNotNull("Restored dataset not found",
                     fileBasedDatasetServices.getDataset(dataset.getUniqueIdentifier()));
@@ -792,6 +824,8 @@ public class FileBasedDatasetServicesTest {
                     fileBasedDatasetServices.getOriginalData(dataset.getUniqueIdentifier(), DataType.GENOTYPIC)) ;
             assertNull("Phenotypic data should be null", 
                     fileBasedDatasetServices.getOriginalData(dataset.getUniqueIdentifier(), DataType.PHENOTYPIC)) ;
+            
+            assertEquals("Dataset size is not correct", DATASET_SIZE, restoredDataset.getSize());
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -834,6 +868,8 @@ public class FileBasedDatasetServicesTest {
                     fileBasedDatasetServices.getOriginalData(dataset.getUniqueIdentifier(), DataType.GENOTYPIC)) ;
             assertNull("Phenotypic data should be null", 
                     fileBasedDatasetServices.getOriginalData(dataset.getUniqueIdentifier(), DataType.PHENOTYPIC)) ;
+            
+            assertEquals("Dataset size is not correct", DATASET_SIZE, addedDataset.getSize());
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -860,9 +896,10 @@ public class FileBasedDatasetServicesTest {
             fileBasedDatasetServices.loadData(addedDataset, dataPath, FileType.CSV, DataType.DISTANCES);
 
             fileBasedDatasetServices = new FileBasedDatasetServices(path);
+            
+            Dataset restoredDataset = fileBasedDatasetServices.getDataset(dataset.getUniqueIdentifier()) ;
 
-            assertNotNull("Restored dataset not found",
-                    fileBasedDatasetServices.getDataset(dataset.getUniqueIdentifier()));
+            assertNotNull("Restored dataset not found", restoredDataset);
 
             CoreHunterData restoredData = fileBasedDatasetServices.getCoreHunterData(dataset.getUniqueIdentifier());
 
@@ -883,6 +920,8 @@ public class FileBasedDatasetServicesTest {
                     fileBasedDatasetServices.getOriginalData(dataset.getUniqueIdentifier(), DataType.GENOTYPIC)) ;
             assertNull("Phenotypic data should be null", 
                     fileBasedDatasetServices.getOriginalData(dataset.getUniqueIdentifier(), DataType.PHENOTYPIC)) ;
+            
+            assertEquals("Dataset size is not correct", DATASET_SIZE, restoredDataset.getSize());
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -939,6 +978,8 @@ public class FileBasedDatasetServicesTest {
                     fileBasedDatasetServices.getOriginalData(dataset.getUniqueIdentifier(), DataType.GENOTYPIC)) ;
             assertNotNull("Phenotypic data should be not null", 
                     fileBasedDatasetServices.getOriginalData(dataset.getUniqueIdentifier(), DataType.PHENOTYPIC)) ;
+            
+            assertEquals("Dataset size is not correct", DATASET_SIZE, addedDataset.getSize());
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -970,8 +1011,9 @@ public class FileBasedDatasetServicesTest {
 
             fileBasedDatasetServices = new FileBasedDatasetServices(path);
 
-            assertNotNull("Restored dataset not found",
-                    fileBasedDatasetServices.getDataset(dataset.getUniqueIdentifier()));
+            Dataset restoredDataset = fileBasedDatasetServices.getDataset(dataset.getUniqueIdentifier()) ;
+
+            assertNotNull("Restored dataset not found", restoredDataset);
 
             CoreHunterData restoredData = fileBasedDatasetServices.getCoreHunterData(dataset.getUniqueIdentifier());
 
@@ -1002,6 +1044,8 @@ public class FileBasedDatasetServicesTest {
                     fileBasedDatasetServices.getOriginalData(dataset.getUniqueIdentifier(), DataType.GENOTYPIC)) ;
             assertNotNull("Phenotypic data should be not null", 
                     fileBasedDatasetServices.getOriginalData(dataset.getUniqueIdentifier(), DataType.PHENOTYPIC)) ;
+            
+            assertEquals("Dataset size is not correct", DATASET_SIZE, restoredDataset.getSize());
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -1071,6 +1115,8 @@ public class FileBasedDatasetServicesTest {
                     fileBasedDatasetServices.getOriginalData(dataset.getUniqueIdentifier(), DataType.GENOTYPIC)) ;
             assertNotNull("Phenotypic data should be not null", 
                     fileBasedDatasetServices.getOriginalData(dataset.getUniqueIdentifier(), DataType.PHENOTYPIC)) ;
+            
+            assertEquals("Dataset size is not correct", DATASET_SIZE, addedDataset.getSize());
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -1106,8 +1152,9 @@ public class FileBasedDatasetServicesTest {
 
             fileBasedDatasetServices = new FileBasedDatasetServices(path);
 
-            assertNotNull("Restored dataset not found",
-                    fileBasedDatasetServices.getDataset(dataset.getUniqueIdentifier()));
+            Dataset restoredDataset = fileBasedDatasetServices.getDataset(dataset.getUniqueIdentifier()) ;
+
+            assertNotNull("Restored dataset not found", restoredDataset);
 
             CoreHunterData restoredData = fileBasedDatasetServices.getCoreHunterData(dataset.getUniqueIdentifier());
 
@@ -1147,6 +1194,8 @@ public class FileBasedDatasetServicesTest {
                     fileBasedDatasetServices.getOriginalData(dataset.getUniqueIdentifier(), DataType.GENOTYPIC)) ;
             assertNotNull("Phenotypic data should be not null", 
                     fileBasedDatasetServices.getOriginalData(dataset.getUniqueIdentifier(), DataType.PHENOTYPIC)) ;
+            
+            assertEquals("Dataset size is not correct", DATASET_SIZE, restoredDataset.getSize());
 
         } catch (Exception e) {
             e.printStackTrace();
