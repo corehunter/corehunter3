@@ -19,32 +19,32 @@
 
 package org.corehunter.services.simple;
 
-import org.corehunter.services.CorehunterRun;
-import org.corehunter.services.CorehunterRunStatus;
+import org.corehunter.services.CoreHunterRun;
+import org.corehunter.services.CoreHunterRunStatus;
 import org.joda.time.DateTime;
 
 import uno.informatics.data.pojo.SimpleEntityPojo;
 
-public class CorehunterRunPojo extends SimpleEntityPojo implements CorehunterRun {
+public class CoreHunterRunPojo extends SimpleEntityPojo implements CoreHunterRun {
     
     private DateTime startDate;
     private DateTime endDate;
-    private CorehunterRunStatus status;
+    private CoreHunterRunStatus status;
 
-    public CorehunterRunPojo(String name) {
+    public CoreHunterRunPojo(String name) {
         super(name);
         
         startDate = new DateTime() ;
         endDate = null ;
-        status = CorehunterRunStatus.NOT_STARTED ;
+        status = CoreHunterRunStatus.NOT_STARTED ;
     }
     
-    public CorehunterRunPojo(String uniqueIdentifier, String name) {
+    public CoreHunterRunPojo(String uniqueIdentifier, String name) {
         super(uniqueIdentifier, name);
         
         startDate = new DateTime() ;
         endDate = null ;
-        status = CorehunterRunStatus.NOT_STARTED ;
+        status = CoreHunterRunStatus.NOT_STARTED ;
     }
 
     @Override
@@ -67,11 +67,11 @@ public class CorehunterRunPojo extends SimpleEntityPojo implements CorehunterRun
     }
 
     @Override
-    public CorehunterRunStatus getStatus() {
+    public CoreHunterRunStatus getStatus() {
         return status;
     }
 
-    public final void setStatus(CorehunterRunStatus status) {
+    public final void setStatus(CoreHunterRunStatus status) {
         this.status = status;
     }
 

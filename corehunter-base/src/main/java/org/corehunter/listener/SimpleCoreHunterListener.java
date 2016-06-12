@@ -27,18 +27,18 @@ import org.jamesframework.core.search.Search;
 import org.jamesframework.core.subset.SubsetSolution;
 import org.corehunter.CoreHunterListener;
 
-public class SimpleCorehunterListener implements CoreHunterListener {
+public class SimpleCoreHunterListener implements CoreHunterListener {
 
     private static final String DEFAULT_PREFIX = "";
 
     private String prefix;
     private PrintStream printStream;
 
-    public SimpleCorehunterListener() {
+    public SimpleCoreHunterListener() {
         this(System.err);
     }
 
-    public SimpleCorehunterListener(PrintStream printStream) {
+    public SimpleCoreHunterListener(PrintStream printStream) {
         super();
         this.printStream = printStream;
 

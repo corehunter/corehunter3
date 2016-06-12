@@ -30,10 +30,10 @@ public interface CoreHunterRunServices {
      * 
      * @param arguments
      *            the Core Hunter Run Arguments
-     * @return The initial CorehunterRun object containing the current status,
+     * @return The initial CoreHunterRun object containing the current status,
      *         arguments and unique identifier of the run
      */
-    public CoreHunterRun executeCorehunter(CoreHunterRunArguments arguments);
+    public CoreHunterRun executeCoreHunter(CoreHunterRunArguments arguments);
 
     /**
      * Gets the current information about the Core Hunter run
@@ -43,23 +43,23 @@ public interface CoreHunterRunServices {
      *            execution
      * @return the current information about the Core Hunter run
      */
-    public CoreHunterRun getCorehunterRun(String uniqueIdentifier);
+    public CoreHunterRun getCoreHunterRun(String uniqueIdentifier);
 
     /**
-     * Removes the current CorehunterRun and tries to stop the run if it is
+     * Removes the current CoreHunterRun and tries to stop the run if it is
      * still running, If the run can not be removed, the client will need to
-     * check at date or use the {@link #removeCorehunterRun(String)} method
+     * check at date or use the {@link #removeCoreHunterRun(String)} method
      * 
      * @param uniqueIdentifier
      *            the unique identifier of the run that was provided on
      *            execution
-     * @return <code>true</code> if the CorehunterRun was successfully removed,
+     * @return <code>true</code> if the CoreHunterRun was successfully removed,
      *         <code>false</code> if the run can not be removed.
      */
-    public boolean removeCorehunterRun(String uniqueIdentifier);
+    public boolean removeCoreHunterRun(String uniqueIdentifier);
 
     /**
-     * Deletes the current CorehunterRun and tries to stop the run if it is
+     * Deletes the current CoreHunterRun and tries to stop the run if it is
      * still running, This method guarantees to be able to delete the run
      * regardless of if it can be stopped.
      * 
@@ -67,14 +67,14 @@ public interface CoreHunterRunServices {
      *            the unique identifier of the run that was provided on
      *            execution
      */
-    public void deleteCorehunterRun(String uniqueIdentifier);
+    public void deleteCoreHunterRun(String uniqueIdentifier);
 
     /**
      * Gets the current information about all Core Hunter runs
      * 
      * @return the current information about all Core Hunter runs
      */
-    public List<CoreHunterRun> getAllCorehunterRuns();
+    public List<CoreHunterRun> getAllCoreHunterRuns();
 
     /**
      * Gets the current output stream provides by the run 

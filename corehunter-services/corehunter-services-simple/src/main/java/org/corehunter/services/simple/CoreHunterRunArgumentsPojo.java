@@ -22,18 +22,18 @@ package org.corehunter.services.simple;
 import java.util.UUID;
 
 import org.corehunter.data.CoreHunterData;
-import org.corehunter.services.CorehunterRunArguments;
+import org.corehunter.services.CoreHunterRunArguments;
 import org.jamesframework.core.problems.objectives.Objective;
 import org.jamesframework.core.subset.SubsetSolution;
 
 import uno.informatics.data.pojo.SimpleEntityPojo;
 
-public class CorehunterRunArgumentsPojo extends SimpleEntityPojo implements CorehunterRunArguments {
+public class CoreHunterRunArgumentsPojo extends SimpleEntityPojo implements CoreHunterRunArguments {
     private int subsetSize;
     private String datasetId;
     private Objective<SubsetSolution, CoreHunterData> objective;
 
-    public CorehunterRunArgumentsPojo(String name, int subsetSize, String datasetId,
+    public CoreHunterRunArgumentsPojo(String name, int subsetSize, String datasetId,
             Objective<SubsetSolution, CoreHunterData> objective) {
         super(UUID.randomUUID().toString(), name);
         this.subsetSize = subsetSize;

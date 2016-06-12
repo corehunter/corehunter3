@@ -72,7 +72,7 @@ public interface DatasetServices {
     public boolean removeDataset(String datasetId) throws DatasetException;
 
     /**
-     * Gets the data associated with a dataset by unique dataset identifier
+     * Gets the CoreHunter data associated with a dataset by unique dataset identifier
      * 
      * @param datasetId
      *            the identifier of the dataset

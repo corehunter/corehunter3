@@ -394,7 +394,7 @@ public class FileBasedDatasetServices implements DatasetServices {
     }
 
     @Override
-    public Data getOriginalData(String datasetId, DataType dataType) throws DatasetException, IOException{
+    public Data getOriginalData(String datasetId, DataType dataType) throws DatasetException {
 
         if (datasetId == null) {
             throw new DatasetException("Dataset Id not defined!");
@@ -408,65 +408,69 @@ public class FileBasedDatasetServices implements DatasetServices {
 
         FileType fileType;
 
-        switch (dataType) {
-            case GENOTYPIC:
+        try {
+            switch (dataType) {
+                case GENOTYPIC:
 
-                fileType = getFileType(path, GENOTYPIC_PATH, datasetId);
+                    fileType = getFileType(path, GENOTYPIC_PATH, datasetId);
 
-                if (fileType == null) {
-                    return null ;
-                }
+                    if (fileType == null) {
+                        return null ;
+                    }
 
-                originalPath = Paths.get(getPath().toString(), GENOTYPIC_PATH, datasetId + getSuffix(fileType));
+                    originalPath = Paths.get(getPath().toString(), GENOTYPIC_PATH, datasetId + getSuffix(fileType));
 
-                GenotypeDataFormat genotypeDataFormat = (GenotypeDataFormat) readFromXml(
-                        Paths.get(getPath().toString(), ORIGINAL_FORMAT));
-                
-                GenotypeData genotypeData;
+                    GenotypeDataFormat genotypeDataFormat = (GenotypeDataFormat) readFromXml(
+                            Paths.get(getPath().toString(), ORIGINAL_FORMAT));
+                    
+                    GenotypeData genotypeData;
 
-                switch (genotypeDataFormat) {
-                    case BIPARENTAL:
-                        genotypeData = SimpleBiAllelicGenotypeData.readData(originalPath, fileType);
-                        break;
-                    default:
-                        genotypeData = SimpleGenotypeData.readData(originalPath, fileType, genotypeDataFormat);
-                        break;
-                }
+                    switch (genotypeDataFormat) {
+                        case BIPARENTAL:
+                            genotypeData = SimpleBiAllelicGenotypeData.readData(originalPath, fileType);
+                            break;
+                        default:
+                            genotypeData = SimpleGenotypeData.readData(originalPath, fileType, genotypeDataFormat);
+                            break;
+                    }
 
-                return genotypeData;
-            case PHENOTYPIC:
+                    return genotypeData;
+                case PHENOTYPIC:
 
-                fileType = getFileType(path, PHENOTYPIC_PATH, datasetId);
+                    fileType = getFileType(path, PHENOTYPIC_PATH, datasetId);
 
-                if (fileType == null) {
-                    return null ;
-                }
-                
-                originalPath = Paths.get(getPath().toString(), PHENOTYPIC_PATH, datasetId + getSuffix(fileType));
+                    if (fileType == null) {
+                        return null ;
+                    }
+                    
+                    originalPath = Paths.get(getPath().toString(), PHENOTYPIC_PATH, datasetId + getSuffix(fileType));
 
-                originalPath = Paths.get(getPath().toString(), PHENOTYPIC_PATH, datasetId + getSuffix(fileType));
+                    originalPath = Paths.get(getPath().toString(), PHENOTYPIC_PATH, datasetId + getSuffix(fileType));
 
-                ArrayFeatureData arrayFeatureData = ArrayFeatureData.readData(originalPath, fileType);
+                    ArrayFeatureData arrayFeatureData = ArrayFeatureData.readData(originalPath, fileType);
 
-                return arrayFeatureData;
-            case DISTANCES:
+                    return arrayFeatureData;
+                case DISTANCES:
 
-                fileType = getFileType(path, DISTANCES_PATH, datasetId);
-                
-                if (fileType == null) {
-                    return null ;
-                }
-                
-                originalPath = Paths.get(getPath().toString(), DISTANCES_PATH, datasetId + getSuffix(fileType));
+                    fileType = getFileType(path, DISTANCES_PATH, datasetId);
+                    
+                    if (fileType == null) {
+                        return null ;
+                    }
+                    
+                    originalPath = Paths.get(getPath().toString(), DISTANCES_PATH, datasetId + getSuffix(fileType));
 
-                originalPath = Paths.get(getPath().toString(), DISTANCES_PATH, datasetId + getSuffix(fileType));
+                    originalPath = Paths.get(getPath().toString(), DISTANCES_PATH, datasetId + getSuffix(fileType));
 
-                SimpleDistanceMatrixData distanceData = SimpleDistanceMatrixData.readData(originalPath, fileType);
+                    SimpleDistanceMatrixData distanceData = SimpleDistanceMatrixData.readData(originalPath, fileType);
 
-                return distanceData;
-            default:
-                throw new IllegalArgumentException("Unknown data type : " + dataType);
+                    return distanceData;
+                default:
+                    throw new IllegalArgumentException("Unknown data type : " + dataType);
 
+            }
+        } catch (IOException e) {
+            throw new DatasetException("Can not reload original data!", e) ;
         }
     }
 
