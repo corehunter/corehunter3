@@ -119,6 +119,15 @@ public interface DatasetServices {
      */
     public void removeData(String datasetId) throws DatasetException;
     
-    public Data getOriginalData(String datasetId, DataType dataType) throws DatasetException, IOException ;
+    /**
+     * Gets the original data upload by the user
+     * @param datasetId
+     *            the identifier of the dataset
+     * @param dataType
+     *            the type of data
+     * @return the original data upload by the user
+     * @throws DatasetException if the data can not be accessed or the dataset does not exist
+     */
+    public Data getOriginalData(String datasetId, DataType dataType) throws DatasetException ;
 
 }
