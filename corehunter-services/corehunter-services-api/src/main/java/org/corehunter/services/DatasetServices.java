@@ -70,7 +70,7 @@ public interface DatasetServices {
      *             if the dataset does not exist
      */
     public boolean removeDataset(String datasetId) throws DatasetException;
-
+    
     /**
      * Gets the CoreHunter data associated with a dataset by unique dataset identifier
      * 
