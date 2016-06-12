@@ -19,17 +19,17 @@
 
 package org.corehunter.services;
 
-public enum CorehunterRunStatus {
+import org.corehunter.data.CoreHunterData;
+import org.jamesframework.core.problems.objectives.Objective;
+import org.jamesframework.core.subset.SubsetSolution;
 
-    NOT_STARTED("Not Started"), RUNNING("Running"), FAILED("Failed"), FINISHED("Finished");
+import uno.informatics.data.SimpleEntity;
 
-    private String name;
+public interface CoreHunterRunArguments extends SimpleEntity {
+   
+    public int getSubsetSize() ;
 
-    private CorehunterRunStatus(String name) {
-        this.name = name;
-    }
-
-    public final String getName() {
-        return name;
-    }
+    public String getDatasetId();
+    
+    public Objective<SubsetSolution, CoreHunterData> getObjective() ;
 }

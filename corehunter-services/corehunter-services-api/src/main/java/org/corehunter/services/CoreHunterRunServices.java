@@ -23,7 +23,7 @@ import java.util.List;
 
 import org.jamesframework.core.subset.SubsetSolution;
 
-public interface CorehunterRunServices {
+public interface CoreHunterRunServices {
 
     /**
      * Executes a Core Hunter run with the given arguments
@@ -33,7 +33,7 @@ public interface CorehunterRunServices {
      * @return The initial CorehunterRun object containing the current status,
      *         arguments and unique identifier of the run
      */
-    public CorehunterRun executeCorehunter(CorehunterRunArguments arguments);
+    public CoreHunterRun executeCorehunter(CoreHunterRunArguments arguments);
 
     /**
      * Gets the current information about the Core Hunter run
@@ -43,7 +43,7 @@ public interface CorehunterRunServices {
      *            execution
      * @return the current information about the Core Hunter run
      */
-    public CorehunterRun getCorehunterRun(String uniqueIdentifier);
+    public CoreHunterRun getCorehunterRun(String uniqueIdentifier);
 
     /**
      * Removes the current CorehunterRun and tries to stop the run if it is
@@ -74,7 +74,7 @@ public interface CorehunterRunServices {
      * 
      * @return the current information about all Core Hunter runs
      */
-    public List<CorehunterRun> getAllCorehunterRuns();
+    public List<CoreHunterRun> getAllCorehunterRuns();
 
     /**
      * Gets the current output stream provides by the run 

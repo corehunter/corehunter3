@@ -107,6 +107,13 @@ public class FileBasedDatasetServicesTest {
                     addedDatasetInList.getDescription());
             assertEquals("Added Dataset type is not correct", dataset.getType(), addedDatasetInList.getType());
             assertEquals("Added Dataset study is not correct", dataset.getStudy(), addedDatasetInList.getStudy());
+            
+            assertNull("Distances data should be null", 
+                    fileBasedDatasetServices.getOriginalData(dataset.getUniqueIdentifier(), DataType.DISTANCES)) ;
+            assertNull("Genotypic data should be null", 
+                    fileBasedDatasetServices.getOriginalData(dataset.getUniqueIdentifier(), DataType.GENOTYPIC)) ;
+            assertNull("Phenotypic data should be null", 
+                    fileBasedDatasetServices.getOriginalData(dataset.getUniqueIdentifier(), DataType.PHENOTYPIC)) ;
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -200,6 +207,13 @@ public class FileBasedDatasetServicesTest {
                     addedDatasetInList.getDescription());
             assertEquals("Restored Dataset type is not correct", dataset.getType(), addedDatasetInList.getType());
             assertEquals("Restored Dataset study is not correct", dataset.getStudy(), addedDatasetInList.getStudy());
+            
+            assertNull("Distances data should be null", 
+                    fileBasedDatasetServices.getOriginalData(dataset.getUniqueIdentifier(), DataType.DISTANCES)) ;
+            assertNull("Genotypic data should be null", 
+                    fileBasedDatasetServices.getOriginalData(dataset.getUniqueIdentifier(), DataType.GENOTYPIC)) ;
+            assertNull("Phenotypic data should be null", 
+                    fileBasedDatasetServices.getOriginalData(dataset.getUniqueIdentifier(), DataType.PHENOTYPIC)) ;
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -235,6 +249,13 @@ public class FileBasedDatasetServicesTest {
             data.setName(DATASET_NAME);
 
             compareFeatureData(data, addedData.getPhenotypicData());
+            
+            assertNull("Distances data should be null", 
+                    fileBasedDatasetServices.getOriginalData(dataset.getUniqueIdentifier(), DataType.DISTANCES)) ;
+            assertNull("Genotypic data should be null", 
+                    fileBasedDatasetServices.getOriginalData(dataset.getUniqueIdentifier(), DataType.GENOTYPIC)) ;
+            assertNotNull("Phenotypic data should be not null", 
+                    fileBasedDatasetServices.getOriginalData(dataset.getUniqueIdentifier(), DataType.PHENOTYPIC)) ;
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -277,6 +298,13 @@ public class FileBasedDatasetServicesTest {
             data.setName(DATASET_NAME);
 
             compareFeatureData(data, restoredData.getPhenotypicData());
+            
+            assertNull("Distances data should be null", 
+                    fileBasedDatasetServices.getOriginalData(dataset.getUniqueIdentifier(), DataType.DISTANCES)) ;
+            assertNull("Genotypic data should be null", 
+                    fileBasedDatasetServices.getOriginalData(dataset.getUniqueIdentifier(), DataType.GENOTYPIC)) ;
+            assertNotNull("Phenotypic data should be not null", 
+                    fileBasedDatasetServices.getOriginalData(dataset.getUniqueIdentifier(), DataType.PHENOTYPIC)) ;
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -313,6 +341,13 @@ public class FileBasedDatasetServicesTest {
             data.setName(DATASET_NAME);
 
             compareGenotypeVariantData(data, addedData.getGenotypicData());
+            
+            assertNull("Distances data should be null", 
+                    fileBasedDatasetServices.getOriginalData(dataset.getUniqueIdentifier(), DataType.DISTANCES)) ;
+            assertNotNull("Genotypic data should be not null", 
+                    fileBasedDatasetServices.getOriginalData(dataset.getUniqueIdentifier(), DataType.GENOTYPIC)) ;
+            assertNull("Phenotypic data should be null", 
+                    fileBasedDatasetServices.getOriginalData(dataset.getUniqueIdentifier(), DataType.PHENOTYPIC)) ;
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -352,6 +387,13 @@ public class FileBasedDatasetServicesTest {
             data.setName(DATASET_NAME);
 
             compareGenotypeVariantData(data, addedData.getGenotypicData());
+            
+            assertNull("Distances data should be null", 
+                    fileBasedDatasetServices.getOriginalData(dataset.getUniqueIdentifier(), DataType.DISTANCES)) ;
+            assertNotNull("Genotypic data should be not null", 
+                    fileBasedDatasetServices.getOriginalData(dataset.getUniqueIdentifier(), DataType.GENOTYPIC)) ;
+            assertNull("Phenotypic data should be null", 
+                    fileBasedDatasetServices.getOriginalData(dataset.getUniqueIdentifier(), DataType.PHENOTYPIC)) ;
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -389,6 +431,13 @@ public class FileBasedDatasetServicesTest {
             data.setName(DATASET_NAME);
 
             compareGenotypeVariantData(data, addedData.getGenotypicData());
+            
+            assertNull("Distances data should be null", 
+                    fileBasedDatasetServices.getOriginalData(dataset.getUniqueIdentifier(), DataType.DISTANCES)) ;
+            assertNotNull("Genotypic data should be not null", 
+                    fileBasedDatasetServices.getOriginalData(dataset.getUniqueIdentifier(), DataType.GENOTYPIC)) ;
+            assertNull("Phenotypic data should be null", 
+                    fileBasedDatasetServices.getOriginalData(dataset.getUniqueIdentifier(), DataType.PHENOTYPIC)) ;
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -428,6 +477,13 @@ public class FileBasedDatasetServicesTest {
             data.setName(DATASET_NAME);
 
             compareGenotypeVariantData(data, addedData.getGenotypicData());
+            
+            assertNull("Distances data should be null", 
+                    fileBasedDatasetServices.getOriginalData(dataset.getUniqueIdentifier(), DataType.DISTANCES)) ;
+            assertNotNull("Genotypic data should be not null", 
+                    fileBasedDatasetServices.getOriginalData(dataset.getUniqueIdentifier(), DataType.GENOTYPIC)) ;
+            assertNull("Phenotypic data should be null", 
+                    fileBasedDatasetServices.getOriginalData(dataset.getUniqueIdentifier(), DataType.PHENOTYPIC)) ;
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -467,6 +523,13 @@ public class FileBasedDatasetServicesTest {
             data.setName(DATASET_NAME);
 
             compareGenotypeVariantData(data, addedData.getGenotypicData());
+            
+            assertNull("Distances data should be null", 
+                    fileBasedDatasetServices.getOriginalData(dataset.getUniqueIdentifier(), DataType.DISTANCES)) ;
+            assertNotNull("Genotypic data should be not null", 
+                    fileBasedDatasetServices.getOriginalData(dataset.getUniqueIdentifier(), DataType.GENOTYPIC)) ;
+            assertNull("Phenotypic data should be null", 
+                    fileBasedDatasetServices.getOriginalData(dataset.getUniqueIdentifier(), DataType.PHENOTYPIC)) ;
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -512,6 +575,13 @@ public class FileBasedDatasetServicesTest {
             data.setName(DATASET_NAME);
 
             compareGenotypeVariantData(data, restoredData.getGenotypicData());
+            
+            assertNull("Distances data should be null", 
+                    fileBasedDatasetServices.getOriginalData(dataset.getUniqueIdentifier(), DataType.DISTANCES)) ;
+            assertNotNull("Genotypic data should be not null", 
+                    fileBasedDatasetServices.getOriginalData(dataset.getUniqueIdentifier(), DataType.GENOTYPIC)) ;
+            assertNull("Phenotypic data should be null", 
+                    fileBasedDatasetServices.getOriginalData(dataset.getUniqueIdentifier(), DataType.PHENOTYPIC)) ;
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -558,6 +628,13 @@ public class FileBasedDatasetServicesTest {
             data.setName(DATASET_NAME);
 
             compareGenotypeVariantData(data, restoredData.getGenotypicData());
+            
+            assertNull("Distances data should be null", 
+                    fileBasedDatasetServices.getOriginalData(dataset.getUniqueIdentifier(), DataType.DISTANCES)) ;
+            assertNotNull("Genotypic data should be not null", 
+                    fileBasedDatasetServices.getOriginalData(dataset.getUniqueIdentifier(), DataType.GENOTYPIC)) ;
+            assertNull("Phenotypic data should be null", 
+                    fileBasedDatasetServices.getOriginalData(dataset.getUniqueIdentifier(), DataType.PHENOTYPIC)) ;
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -602,6 +679,13 @@ public class FileBasedDatasetServicesTest {
             data.setName(DATASET_NAME);
 
             compareGenotypeVariantData(data, restoredData.getGenotypicData());
+            
+            assertNull("Distances data should be null", 
+                    fileBasedDatasetServices.getOriginalData(dataset.getUniqueIdentifier(), DataType.DISTANCES)) ;
+            assertNotNull("Genotypic data should be not null", 
+                    fileBasedDatasetServices.getOriginalData(dataset.getUniqueIdentifier(), DataType.GENOTYPIC)) ;
+            assertNull("Phenotypic data should be null", 
+                    fileBasedDatasetServices.getOriginalData(dataset.getUniqueIdentifier(), DataType.PHENOTYPIC)) ;
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -648,6 +732,13 @@ public class FileBasedDatasetServicesTest {
             data.setName(DATASET_NAME);
 
             compareGenotypeVariantData(data, restoredData.getGenotypicData());
+            
+            assertNull("Distances data should be null", 
+                    fileBasedDatasetServices.getOriginalData(dataset.getUniqueIdentifier(), DataType.DISTANCES)) ;
+            assertNotNull("Genotypic data should be not null", 
+                    fileBasedDatasetServices.getOriginalData(dataset.getUniqueIdentifier(), DataType.GENOTYPIC)) ;
+            assertNull("Phenotypic data should be null", 
+                    fileBasedDatasetServices.getOriginalData(dataset.getUniqueIdentifier(), DataType.PHENOTYPIC)) ;
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -694,6 +785,13 @@ public class FileBasedDatasetServicesTest {
             data.setName(DATASET_NAME);
 
             compareGenotypeVariantData(data, restoredData.getGenotypicData());
+            
+            assertNull("Distances data should be null", 
+                    fileBasedDatasetServices.getOriginalData(dataset.getUniqueIdentifier(), DataType.DISTANCES)) ;
+            assertNotNull("Genotypic data should be not null", 
+                    fileBasedDatasetServices.getOriginalData(dataset.getUniqueIdentifier(), DataType.GENOTYPIC)) ;
+            assertNull("Phenotypic data should be null", 
+                    fileBasedDatasetServices.getOriginalData(dataset.getUniqueIdentifier(), DataType.PHENOTYPIC)) ;
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -729,6 +827,13 @@ public class FileBasedDatasetServicesTest {
             //data.setName(DATASET_NAME);
 
             compareDistanceMatrixData(data, addedData.getDistancesData());
+            
+            assertNotNull("Distances data should be not null", 
+                    fileBasedDatasetServices.getOriginalData(dataset.getUniqueIdentifier(), DataType.DISTANCES)) ;
+            assertNull("Genotypic data should be null", 
+                    fileBasedDatasetServices.getOriginalData(dataset.getUniqueIdentifier(), DataType.GENOTYPIC)) ;
+            assertNull("Phenotypic data should be null", 
+                    fileBasedDatasetServices.getOriginalData(dataset.getUniqueIdentifier(), DataType.PHENOTYPIC)) ;
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -771,6 +876,13 @@ public class FileBasedDatasetServicesTest {
             data.setName(DATASET_NAME);
 
             compareDistanceMatrixData(data, restoredData.getDistancesData());
+            
+            assertNotNull("Distances data should be not null", 
+                    fileBasedDatasetServices.getOriginalData(dataset.getUniqueIdentifier(), DataType.DISTANCES)) ;
+            assertNull("Genotypic data should be null", 
+                    fileBasedDatasetServices.getOriginalData(dataset.getUniqueIdentifier(), DataType.GENOTYPIC)) ;
+            assertNull("Phenotypic data should be null", 
+                    fileBasedDatasetServices.getOriginalData(dataset.getUniqueIdentifier(), DataType.PHENOTYPIC)) ;
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -820,6 +932,13 @@ public class FileBasedDatasetServicesTest {
             genotypicData.setName(DATASET_NAME);
 
             compareGenotypeVariantData(genotypicData, addedData.getGenotypicData());
+            
+            assertNull("Distances data should be null", 
+                    fileBasedDatasetServices.getOriginalData(dataset.getUniqueIdentifier(), DataType.DISTANCES)) ;
+            assertNotNull("Genotypic data should be not null", 
+                    fileBasedDatasetServices.getOriginalData(dataset.getUniqueIdentifier(), DataType.GENOTYPIC)) ;
+            assertNotNull("Phenotypic data should be not null", 
+                    fileBasedDatasetServices.getOriginalData(dataset.getUniqueIdentifier(), DataType.PHENOTYPIC)) ;
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -876,6 +995,13 @@ public class FileBasedDatasetServicesTest {
             genotypicData.setName(DATASET_NAME);
 
             compareGenotypeVariantData(genotypicData, restoredData.getGenotypicData());
+            
+            assertNull("Distances data should be null", 
+                    fileBasedDatasetServices.getOriginalData(dataset.getUniqueIdentifier(), DataType.DISTANCES)) ;
+            assertNotNull("Genotypic data should be not null", 
+                    fileBasedDatasetServices.getOriginalData(dataset.getUniqueIdentifier(), DataType.GENOTYPIC)) ;
+            assertNotNull("Phenotypic data should be not null", 
+                    fileBasedDatasetServices.getOriginalData(dataset.getUniqueIdentifier(), DataType.PHENOTYPIC)) ;
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -938,6 +1064,13 @@ public class FileBasedDatasetServicesTest {
             data.setName(DATASET_NAME);
 
             compareDistanceMatrixData(data, addedData.getDistancesData());
+            
+            assertNotNull("Distances data should be not null", 
+                    fileBasedDatasetServices.getOriginalData(dataset.getUniqueIdentifier(), DataType.DISTANCES)) ;
+            assertNotNull("Genotypic data should be not null", 
+                    fileBasedDatasetServices.getOriginalData(dataset.getUniqueIdentifier(), DataType.GENOTYPIC)) ;
+            assertNotNull("Phenotypic data should be not null", 
+                    fileBasedDatasetServices.getOriginalData(dataset.getUniqueIdentifier(), DataType.PHENOTYPIC)) ;
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -1007,6 +1140,13 @@ public class FileBasedDatasetServicesTest {
             data.setName(DATASET_NAME);
 
             compareDistanceMatrixData(data, restoredData.getDistancesData());
+            
+            assertNotNull("Distances data should be not null", 
+                    fileBasedDatasetServices.getOriginalData(dataset.getUniqueIdentifier(), DataType.DISTANCES)) ;
+            assertNotNull("Genotypic data should be not null", 
+                    fileBasedDatasetServices.getOriginalData(dataset.getUniqueIdentifier(), DataType.GENOTYPIC)) ;
+            assertNotNull("Phenotypic data should be not null", 
+                    fileBasedDatasetServices.getOriginalData(dataset.getUniqueIdentifier(), DataType.PHENOTYPIC)) ;
 
         } catch (Exception e) {
             e.printStackTrace();

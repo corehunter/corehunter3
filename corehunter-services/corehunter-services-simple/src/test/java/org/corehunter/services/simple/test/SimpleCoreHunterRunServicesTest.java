@@ -42,7 +42,7 @@ import uno.informatics.data.Dataset;
 import uno.informatics.data.io.FileType;
 import uno.informatics.data.pojo.DatasetPojo;
 
-public class SimpleCorehunterRunServicesTest {
+public class SimpleCoreHunterRunServicesTest {
 
     private static final String PHENOTYPIC_FILE = "phenotypic_data.csv";
     private static final String NAME1 = "phenotypic_data.csv";

@@ -19,14 +19,17 @@
 
 package org.corehunter.services;
 
-import org.joda.time.DateTime;
+public enum CoreHunterRunStatus {
 
-import uno.informatics.data.SimpleEntity;
+    NOT_STARTED("Not Started"), RUNNING("Running"), FAILED("Failed"), FINISHED("Finished");
 
-public interface CorehunterRun extends SimpleEntity {
-    public DateTime getStartDate();
+    private String name;
 
-    public DateTime getEndDate();
+    private CoreHunterRunStatus(String name) {
+        this.name = name;
+    }
 
-    public CorehunterRunStatus getStatus();
+    public final String getName() {
+        return name;
+    }
 }
