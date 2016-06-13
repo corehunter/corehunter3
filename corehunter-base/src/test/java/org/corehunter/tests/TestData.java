@@ -19,6 +19,7 @@
 
 package org.corehunter.tests;
 
+import java.util.Arrays;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -329,7 +330,7 @@ public class TestData {
     
     public static final Feature[] PHENOTYPIC_TRAIT_FEATURES = {
         new SimpleFeaturePojo("trait 1", DataType.STRING, ScaleType.NOMINAL),
-        new SimpleFeaturePojo("trait 2", DataType.INTEGER, ScaleType.ORDINAL, 0, 3),
+        new SimpleFeaturePojo("trait 2", DataType.INTEGER, ScaleType.ORDINAL, Arrays.asList(0, 1, 2, 3)),
         new SimpleFeaturePojo("trait 3", DataType.INTEGER, ScaleType.INTERVAL, 1, 9),
         new SimpleFeaturePojo("trait 4", DataType.DOUBLE, ScaleType.RATIO, 0.5, 1.4),
         new SimpleFeaturePojo("trait 5", DataType.BOOLEAN, ScaleType.NOMINAL)        
@@ -345,30 +346,30 @@ public class TestData {
     
     public static final Object[][] PHENOTYPIC_TRAIT_VALUES_WITH_HEADERS  = {
         {"Alice", "A", 3, 4, 1.4, false},
-        {"Dave", "B", 1, 5, 0.5, true},
-        {"Bob", "A", 0, 6, 0.5, true},
+        {"Dave" , "B", 1, 5, 0.5, true},
+        {"Bob"  , "A", 0, 6, 0.5, true},
         {"Carol", "C", 2, 9, 0.5, false},
-        {"Eve", "B", 2, 1, 1.3, true}
+        {"Eve"  , "B", 2, 1, 1.3, true}
     };
     
     public static final Object[][] PHENOTYPIC_TRAIT_MISSING_VALUES  = {
-        {"A" , 3   , 4, 1.4 , false},
-        {"B" , 1   , 5, 0.5 , null},
-        {null, 0   , 6, null, true},
-        {"C" , 2   , 9, null, false},
-        {"B" , null, 1, 1.3 , true}
+        {"A" , 3, 4, 1.4 , false},
+        {"B" , 1, 5, 0.5 , null},
+        {null, 0, 6, null, true},
+        {"C" , 2, 9, null, false},
+        {"B" , null    , 1, 1.3 , true}
     };
     
     public static final Object[][] PHENOTYPIC_TRAIT_INFERRED_BOUNDS = {
         {null, null},
-        {0, 3},
+        {null, null},
         {1, 9},
         {0.5, 1.4},
         {null, null}
     };
     public static final Object[][] PHENOTYPIC_TRAIT_EXPLICIT_BOUNDS = {
         {null, null},
-        {0, 5},
+        {null, null},
         {0, 10},
         {0.0, 2.0},
         {null, null}

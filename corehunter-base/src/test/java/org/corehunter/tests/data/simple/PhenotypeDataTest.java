@@ -29,8 +29,6 @@ import static org.corehunter.tests.TestData.PHENOTYPIC_TRAIT_VALUES;
 import static org.corehunter.tests.TestData.SET;
 import static org.corehunter.tests.TestData.PHENOTYPIC_TRAIT_MISSING_VALUES;
 
-
-
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
@@ -163,7 +161,7 @@ public class PhenotypeDataTest {
         
         // check trait names and bounds (min/max)
         for(int t = 0; t < data.getFeatures().size(); t++){
-            
+                        
             // check name
             assertEquals("Trait name for trait " + t + " is not correct.",
                          PHENOTYPIC_TRAIT_NAMES[t], data.getFeatures().get(t).getName());
