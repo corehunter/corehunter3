@@ -19,26 +19,25 @@
 
 package org.corehunter.services.simple;
 
+import java.util.List;
 import java.util.UUID;
 
-import org.corehunter.data.CoreHunterData;
+import org.corehunter.CoreHunterObjective;
 import org.corehunter.services.CorehunterRunArguments;
-import org.jamesframework.core.problems.objectives.Objective;
-import org.jamesframework.core.subset.SubsetSolution;
 
 import uno.informatics.data.pojo.SimpleEntityPojo;
 
 public class CorehunterRunArgumentsPojo extends SimpleEntityPojo implements CorehunterRunArguments {
     private int subsetSize;
     private String datasetId;
-    private Objective<SubsetSolution, CoreHunterData> objective;
+    private List<CoreHunterObjective> objectives ;
 
     public CorehunterRunArgumentsPojo(String name, int subsetSize, String datasetId,
-            Objective<SubsetSolution, CoreHunterData> objective) {
+            List<CoreHunterObjective> objectives) {
         super(UUID.randomUUID().toString(), name);
         this.subsetSize = subsetSize;
         this.datasetId = datasetId;
-        this.objective = objective;
+        this.objectives = objectives;
     }
 
     @Override
@@ -52,10 +51,7 @@ public class CorehunterRunArgumentsPojo extends SimpleEntityPojo implements Core
     }
 
     @Override
-    public Objective<SubsetSolution, CoreHunterData> getObjective() {
-        return objective;
+    public List<CoreHunterObjective> getObjectives() {
+        return objectives;
     }
-    
-    
-
 }

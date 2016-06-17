@@ -32,7 +32,7 @@ import java.util.List;
 import org.corehunter.services.CorehunterRun;
 import org.corehunter.services.CorehunterRunArguments;
 import org.corehunter.services.CorehunterRunStatus;
-import org.corehunter.services.DataType;
+import org.corehunter.data.CoreHunterDataType;
 import org.corehunter.services.simple.CorehunterRunArgumentsPojo;
 import org.corehunter.services.simple.FileBasedDatasetServices;
 import org.corehunter.services.simple.SimpleCorehunterRunServices;
@@ -85,9 +85,7 @@ public class SimpleCorehunterRunServicesTest {
             Path phenotypicDataPath = Paths.get(ClassLoader.getSystemResource(PHENOTYPIC_FILE).toURI());
 
             fileBasedDatasetServices.loadData(dataset, phenotypicDataPath, FileType.CSV,
-                    DataType.PHENOTYPIC);
-            
-            
+                    CoreHunterDataType.PHENOTYPIC);
 
             SimpleCorehunterRunServices simpleCorehunterRunServices = new SimpleCorehunterRunServices(
                     fileBasedDatasetServices);

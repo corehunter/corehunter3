@@ -17,19 +17,14 @@
 /* under the License.                                           */
 /*--------------------------------------------------------------*/
 
-package org.corehunter.services;
+package org.corehunter;
 
-import java.util.List;
-
-import org.corehunter.CoreHunterObjective;
-
-import uno.informatics.data.SimpleEntity;
-
-public interface CorehunterRunArguments extends SimpleEntity {
-   
-    public int getSubsetSize() ;
-
-    public String getDatasetId();
-    
-    public List<CoreHunterObjective> getObjectives() ;
+/**
+ * Available execution modes.
+ * 
+ * @author Herman De Beukelaer, Guy Davenport
+ */
+public enum CoreHunterExecutionMode {
+    DEFAULT,
+    FAST;
 }

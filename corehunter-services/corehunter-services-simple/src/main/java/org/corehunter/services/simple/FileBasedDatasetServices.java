@@ -37,7 +37,7 @@ import org.corehunter.data.GenotypeDataFormat;
 import org.corehunter.data.simple.SimpleBiAllelicGenotypeData;
 import org.corehunter.data.simple.SimpleDistanceMatrixData;
 import org.corehunter.data.simple.SimpleGenotypeData;
-import org.corehunter.services.DataType;
+import org.corehunter.data.CoreHunterDataType ;
 import org.corehunter.services.DatasetServices;
 
 import com.thoughtworks.xstream.XStream;
@@ -186,7 +186,7 @@ public class FileBasedDatasetServices implements DatasetServices {
     }
 
     @Override
-    public void loadData(Dataset dataset, Path path, FileType fileType, DataType dataType, Object... options)
+    public void loadData(Dataset dataset, Path path, FileType fileType, CoreHunterDataType dataType, Object... options)
             throws IOException, DatasetException {
 
         if (dataset == null) {
@@ -557,17 +557,17 @@ public class FileBasedDatasetServices implements DatasetServices {
         dataCache.remove(datasetId);
 
         try {
-            Files.deleteIfExists(getDataPath(datasetId, DataType.GENOTYPIC));
+            Files.deleteIfExists(getDataPath(datasetId, CoreHunterDataType.GENOTYPIC));
 
-            Files.deleteIfExists(getDataPath(datasetId, DataType.PHENOTYPIC));
+            Files.deleteIfExists(getDataPath(datasetId, CoreHunterDataType.PHENOTYPIC));
 
-            Files.deleteIfExists(getDataPath(datasetId, DataType.DISTANCES));
+            Files.deleteIfExists(getDataPath(datasetId, CoreHunterDataType.DISTANCES));
         } catch (IOException e) {
             throw new DatasetException(e);
         }
     }
 
-    private Path getDataPath(String datasetId, DataType dataType) {
+    private Path getDataPath(String datasetId, CoreHunterDataType dataType) {
         switch (dataType) {
             case GENOTYPIC:
                 return Paths.get(getPath().toString(), GENOTYPIC_PATH, datasetId + TXT_SUFFIX);

@@ -248,17 +248,18 @@ public class SimpleCorehunterRunServices implements CorehunterRunServices {
 
                 CoreHunterArguments arguments = new CoreHunterArguments(
                         datasetServices.getCoreHunterData(corehunterRunArguments.getDatasetId()),
-                        corehunterRunArguments.getObjective(),
-                        corehunterRunArguments.getSubsetSize());
+                        corehunterRunArguments.getSubsetSize(), corehunterRunArguments.getObjectives());
 
-                corehunter = new CoreHunter(arguments);
-
-                outputStream = new ByteArrayOutputStream();
                 PrintStream printStream = new PrintStream(outputStream);
 
+                corehunter = new CoreHunter();
+                corehunter.setListener(new SimpleCorehunterListener(printStream));
+
+                outputStream = new ByteArrayOutputStream();
+                
                 status = CorehunterRunStatus.RUNNING;
 
-                subsetSolution = corehunter.execute(new SimpleCorehunterListener(printStream));
+                subsetSolution = corehunter.execute(arguments);
 
                 printStream.close();
 

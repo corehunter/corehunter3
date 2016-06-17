@@ -35,31 +35,36 @@ import uno.informatics.data.dataset.FeatureDataRow;
  */
 public class GowerDistance extends AbstractDistanceMeasure {
 
-    private static final int BINARY_SCALE_TYPE = 0;
-    private static final int DISCRETE_SCALE_TYPE = 1;
-    private static final int RANGED_SCALE_TYPE = 2;
+    private static final int BINARY = 0;
+    private static final int NOMINAL = 1;
+    private static final int ORDINAL = 2;
+    private static final int RANGED = 3;
 
     // scale type and range cache
     private final Map<FeatureData, FeatureMetadata> cache = new HashMap<>();
     
     private class FeatureMetadata {
         
-        private final int numFeatures;
         private final int[] scaleTypes;
+        private final Scale[] scales;
         private final double[] ranges;
 
-        public FeatureMetadata(int numFeatures, int[] scaleTypes, double[] ranges) {
-            this.numFeatures = numFeatures;
-            this.scaleTypes = scaleTypes;
+        public FeatureMetadata(int[] gowerScaleTypes, Scale[] scaleTypes, double[] ranges) {
+            this.scaleTypes = gowerScaleTypes;
+            this.scales = scaleTypes;
             this.ranges = ranges;
         }
 
         public int getNumFeatures() {
-            return numFeatures;
+            return scaleTypes.length;
         }
 
         public int[] getScaleTypes() {
             return scaleTypes;
+        }
+        
+        public Scale[] getScales() {
+            return scales;
         }
 
         public double[] getRanges() {
@@ -76,7 +81,7 @@ public class GowerDistance extends AbstractDistanceMeasure {
         }
         
         FeatureData phenotypes = data.getPhenotypicData();
-                
+        
         if(phenotypes == null){
             throw new CoreHunterException("Phenotypes are required for Gower distance.");
         }
@@ -88,13 +93,14 @@ public class GowerDistance extends AbstractDistanceMeasure {
         // get cached scale types and ranges
         FeatureMetadata featureMetadata = getFeatureMetadata(phenotypes);
         int[] scaleTypes = featureMetadata.getScaleTypes();
+        Scale[] scales = featureMetadata.getScales();
         double[] ranges  = featureMetadata.getRanges();
         
         double distSum = 0.0;
         double weightSum = 0.0;
         for (int k = 0; k < featureMetadata.getNumFeatures(); k++) {
             
-            double distance = distance(scaleTypes[k], ranges[k], rowX.getValue(k), rowY.getValue(k));
+            double distance = distance(scaleTypes[k], scales[k], ranges[k], rowX.getValue(k), rowY.getValue(k));
             double weight = weight(scaleTypes[k], rowX.getValue(k), rowY.getValue(k));
             distSum += distance * weight;
             weightSum += weight;
@@ -113,21 +119,32 @@ public class GowerDistance extends AbstractDistanceMeasure {
             List<Feature> features = data.getFeatures();
             int numFeatures = features.size();
             int[] scaleTypes = new int[numFeatures];
+            Scale[] scales = new Scale[numFeatures];
             double[] ranges = new double[numFeatures];
             for(int k = 0; k < numFeatures; k++){
                 Scale scale = features.get(k).getMethod().getScale();
+                scales[k] = scale;
                 switch (scale.getScaleType()) {
                     case NOMINAL:
                         switch (scale.getDataType()) {
                             case BOOLEAN:
-                                scaleTypes[k] = BINARY_SCALE_TYPE; // assymetric binary
+                                scaleTypes[k] = BINARY; // assymetric binary
                                 break;
                             default:
-                                scaleTypes[k] = DISCRETE_SCALE_TYPE; // default nominal
+                                scaleTypes[k] = NOMINAL; // default nominal
                         }
                         break;
-                    case INTERVAL:
                     case ORDINAL:
+                        scaleTypes[k] = ORDINAL;
+                        if(scale.getValues().isEmpty()){
+                            throw new IllegalArgumentException(
+                                    "Ordered list of possible values should be provided for scale type "
+                                    + scale.getScaleType() + "."
+                            );
+                        }
+                        ranges[k] = scale.getValues().size()-1;
+                        break;
+                    case INTERVAL:
                     case RATIO:
                         switch (scale.getDataType()) {
                             case BIG_DECIMAL:
@@ -137,7 +154,7 @@ public class GowerDistance extends AbstractDistanceMeasure {
                             case INTEGER:
                             case LONG:
                             case SHORT:
-                                scaleTypes[k] = RANGED_SCALE_TYPE;
+                                scaleTypes[k] = RANGED;
                                 ranges[k] = scale.getMaximumValue().doubleValue()
                                           - scale.getMinimumValue().doubleValue();
                                 break;
@@ -156,31 +173,45 @@ public class GowerDistance extends AbstractDistanceMeasure {
                 }
             }
             // combine in metadata and store in cache
-            metadata = new FeatureMetadata(numFeatures, scaleTypes, ranges);
+            metadata = new FeatureMetadata(scaleTypes, scales, ranges);
             cache.put(data, metadata);
         }
         return metadata;
     }
     
-    private double distance(int scaleType, double range, Object elementA, Object elementB) {
+    private double distance(int scaleType, Scale scale, double range, Object elementA, Object elementB) {
         if (elementA != null && elementB != null) {
             switch (scaleType) {
-                case BINARY_SCALE_TYPE:
+                case BINARY:
                     if ((Boolean) elementA && (Boolean) elementB) {
                         return 0.0;
                     } else {
                         return 1.0;
                     }
-                case DISCRETE_SCALE_TYPE:
+                case ORDINAL:
+                    if(range > 0.0){
+                        // convert values to indices in list of possible values
+                        int indexA = scale.indexOf(elementA);
+                        int indexB = scale.indexOf(elementB);
+                        // treat indices as interval variables
+                        return Math.abs(indexA - indexB) / range;
+                    } else {
+                        return 0.0;
+                    }
+                case NOMINAL:
                     if (Objects.equals(elementA, elementB)) {
                         return 0.0;
                     } else {
                         return 1.0;
                     }
-                case RANGED_SCALE_TYPE:
-                    double aValue = ((Number) elementA).doubleValue();
-                    double bValue = ((Number) elementB).doubleValue();
-                    return Math.abs(aValue - bValue) / range;
+                case RANGED:
+                    if(range > 0.0){
+                        double aValue = ((Number) elementA).doubleValue();
+                        double bValue = ((Number) elementB).doubleValue();
+                        return Math.abs(aValue - bValue) / range;
+                    } else {
+                        return 0.0;
+                    }
                 default:
                     throw new RuntimeException(
                             "This should not happen: unexpected scale type " + scaleType + " in Gower distance."
@@ -193,14 +224,15 @@ public class GowerDistance extends AbstractDistanceMeasure {
     private double weight(int scaleType, Object elementA, Object elementB) {
         if (elementA != null && elementB != null) {
             switch (scaleType) {
-                case BINARY_SCALE_TYPE:
+                case BINARY:
                     if ((Boolean) elementA || (Boolean) elementB) {
                         return 1.0;
                     } else {
                         return 0.0;
                     }
-                case DISCRETE_SCALE_TYPE:
-                case RANGED_SCALE_TYPE:
+                case ORDINAL:
+                case NOMINAL:
+                case RANGED:
                     return 1.0;
                 default:
                     throw new RuntimeException(

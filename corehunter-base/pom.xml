@@ -20,6 +20,10 @@
             <artifactId>james-core</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.jamesframework</groupId>
+            <artifactId>james-extensions</artifactId>
+        </dependency>
+        <dependency>
             <groupId>uno.informatics.common</groupId>
             <artifactId>informatics-data-impl</artifactId>
         </dependency>
@@ -59,6 +63,93 @@
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
+            </plugin>
+            <!-- jar with dependencies -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>2.4.3</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <shadedArtifactAttached>true</shadedArtifactAttached>
+                            <transformers>
+                                <!-- exclude LICENSE and NOTICE files of dependencies  -->
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.DontIncludeResourceTransformer">
+                                    <resources>
+                                        <resource>LICENSE</resource>
+                                        <resource>LICENSE.txt</resource>
+                                        <resource>NOTICE</resource>
+                                        <resource>NOTICE.txt</resource>
+                                    </resources>
+                                </transformer>
+                                <!-- include Core Hunter README, LICENSE and NOTICE -->
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.IncludeResourceTransformer">
+                                    <resource>META-INF/README.md</resource>
+                                    <file>../README.md</file>
+                                </transformer>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.IncludeResourceTransformer">
+                                    <resource>META-INF/LICENSE</resource>
+                                    <file>../LICENSE</file>
+                                </transformer>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.IncludeResourceTransformer">
+                                    <resource>META-INF/NOTICE</resource>
+                                    <file>../NOTICE</file>
+                                </transformer>
+                            </transformers>
+                            <!-- omit unused components of dependencies -->
+                            <minimizeJar>true</minimizeJar>
+                            <filters>
+                                <!-- explicitly include slf4j classes because some are loaded at runtime -->
+                                <filter>
+                                    <artifact>org.slf4j:slf4j-api</artifact>
+                                    <includes>
+                                        <include>**</include>
+                                    </includes>
+                                </filter>
+                            </filters>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <!-- attach ant tasks to maven phases -->
+            <plugin>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>1.8</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <configuration>
+                            <target>
+                                <!-- copy jar with dependencies to bin directory after packaging -->
+                                <copy
+                                    file="${project.build.directory}/${project.artifactId}-${project.version}-shaded.jar"
+                                    tofile="bin/corehunter-${project.version}.jar"
+                                />
+                            </target>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <!-- extend clean phase -->
+            <plugin>
+                <artifactId>maven-clean-plugin</artifactId>
+                <version>3.0.0</version>
+                <configuration>
+                    <filesets>
+                        <!-- remove contents of bin directory -->
+                        <fileset>
+                            <directory>bin</directory>
+                        </fileset>
+                    </filesets>
+                </configuration>
             </plugin>
         </plugins>
     </build>
