@@ -121,7 +121,11 @@ public class API {
         }
         SimpleEntity[] headers = new SimpleEntity[n];
         for(int i = 0; i < n; i++){
-            headers[i] = new SimpleEntityPojo(ids[i], names[i]);
+            if(names[i] != null){
+                headers[i] = new SimpleEntityPojo(ids[i], names[i]);
+            } else {
+                headers[i] = new SimpleEntityPojo(ids[i], ids[i]);
+            }
         }
         // create and return data
         return new SimpleDistanceMatrixData(headers, distances);
