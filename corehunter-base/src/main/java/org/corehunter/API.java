@@ -124,7 +124,7 @@ public class API {
             if(names[i] != null){
                 headers[i] = new SimpleEntityPojo(ids[i], names[i]);
             } else {
-                headers[i] = new SimpleEntityPojo(ids[i], ids[i]);
+                headers[i] = new SimpleEntityPojo(ids[i]);
             }
         }
         // create and return data
