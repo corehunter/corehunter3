@@ -25,13 +25,13 @@ import org.joda.time.DateTime;
 
 import uno.informatics.data.pojo.SimpleEntityPojo;
 
-public class CorehunterRunPojo extends SimpleEntityPojo implements CorehunterRun {
+public class CoreHunterRunPojo extends SimpleEntityPojo implements CorehunterRun {
     
     private DateTime startDate;
     private DateTime endDate;
     private CorehunterRunStatus status;
 
-    public CorehunterRunPojo(String name) {
+    public CoreHunterRunPojo(String name) {
         super(name);
         
         startDate = new DateTime() ;
@@ -39,7 +39,7 @@ public class CorehunterRunPojo extends SimpleEntityPojo implements CorehunterRun
         status = CorehunterRunStatus.NOT_STARTED ;
     }
     
-    public CorehunterRunPojo(String uniqueIdentifier, String name) {
+    public CoreHunterRunPojo(String uniqueIdentifier, String name) {
         super(uniqueIdentifier, name);
         
         startDate = new DateTime() ;

@@ -33,9 +33,9 @@ import org.corehunter.services.CorehunterRun;
 import org.corehunter.services.CorehunterRunArguments;
 import org.corehunter.services.CorehunterRunStatus;
 import org.corehunter.data.CoreHunterDataType;
-import org.corehunter.services.simple.CorehunterRunArgumentsPojo;
+import org.corehunter.services.simple.CoreHunterRunArgumentsPojo;
 import org.corehunter.services.simple.FileBasedDatasetServices;
-import org.corehunter.services.simple.SimpleCorehunterRunServices;
+import org.corehunter.services.simple.SimpleCoreHunterRunServices;
 import org.junit.Test;
 
 import uno.informatics.data.Dataset;
@@ -60,7 +60,7 @@ public class SimpleCorehunterRunServicesTest {
             FileBasedDatasetServices fileBasedDatasetServices = new FileBasedDatasetServices(
                     Files.createTempDirectory(null));
 
-            new SimpleCorehunterRunServices(fileBasedDatasetServices);
+            new SimpleCoreHunterRunServices(fileBasedDatasetServices);
         } catch (Exception e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -87,12 +87,12 @@ public class SimpleCorehunterRunServicesTest {
             fileBasedDatasetServices.loadData(dataset, phenotypicDataPath, FileType.CSV,
                     CoreHunterDataType.PHENOTYPIC);
 
-            SimpleCorehunterRunServices simpleCorehunterRunServices = new SimpleCorehunterRunServices(
+            SimpleCoreHunterRunServices simpleCorehunterRunServices = new SimpleCoreHunterRunServices(
                     fileBasedDatasetServices);
 
-            CorehunterRunArguments arguments = new CorehunterRunArgumentsPojo(NAME1, SUBSET_SIZE1, datasetId, null);
+            CorehunterRunArguments arguments = new CoreHunterRunArgumentsPojo(NAME1, SUBSET_SIZE1, datasetId, null);
 
-            CorehunterRun startCorehunterRun = simpleCorehunterRunServices.executeCorehunter(arguments);
+            CorehunterRun startCorehunterRun = simpleCorehunterRunServices.executeCoreHunter(arguments);
             
             String corehunterRunId = startCorehunterRun.getUniqueIdentifier() ;
 
@@ -104,14 +104,14 @@ public class SimpleCorehunterRunServicesTest {
 
             while (CorehunterRunStatus.NOT_STARTED.equals(corehunterRun.getStatus())
                     || CorehunterRunStatus.RUNNING.equals(corehunterRun.getStatus())) {
-                corehunterRun = simpleCorehunterRunServices.getCorehunterRun(corehunterRunId);
+                corehunterRun = simpleCorehunterRunServices.getCoreHunterRun(corehunterRunId);
                 
                 Thread.sleep(100);
             }
 
             assertEquals("Status is not finished", CorehunterRunStatus.FINISHED, corehunterRun.getStatus());
 
-            List<CorehunterRun> allCorehunterRuns = simpleCorehunterRunServices.getAllCorehunterRuns();
+            List<CorehunterRun> allCorehunterRuns = simpleCorehunterRunServices.getAllCoreHunterRuns();
 
             assertEquals("Number of corehunterRuns is not 1", 1, allCorehunterRuns.size());
 

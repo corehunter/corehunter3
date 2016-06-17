@@ -33,7 +33,7 @@ public interface CorehunterRunServices {
      * @return The initial CorehunterRun object containing the current status,
      *         arguments and unique identifier of the run
      */
-    public CorehunterRun executeCorehunter(CorehunterRunArguments arguments);
+    public CorehunterRun executeCoreHunter(CorehunterRunArguments arguments);
 
     /**
      * Gets the current information about the Core Hunter run
@@ -43,12 +43,12 @@ public interface CorehunterRunServices {
      *            execution
      * @return the current information about the Core Hunter run
      */
-    public CorehunterRun getCorehunterRun(String uniqueIdentifier);
+    public CorehunterRun getCoreHunterRun(String uniqueIdentifier);
 
     /**
      * Removes the current CorehunterRun and tries to stop the run if it is
      * still running, If the run can not be removed, the client will need to
-     * check at date or use the {@link #removeCorehunterRun(String)} method
+     * check at date or use the {@link #removeCoreHunterRun(String)} method
      * 
      * @param uniqueIdentifier
      *            the unique identifier of the run that was provided on
@@ -56,7 +56,7 @@ public interface CorehunterRunServices {
      * @return <code>true</code> if the CorehunterRun was successfully removed,
      *         <code>false</code> if the run can not be removed.
      */
-    public boolean removeCorehunterRun(String uniqueIdentifier);
+    public boolean removeCoreHunterRun(String uniqueIdentifier);
 
     /**
      * Deletes the current CorehunterRun and tries to stop the run if it is
@@ -67,14 +67,14 @@ public interface CorehunterRunServices {
      *            the unique identifier of the run that was provided on
      *            execution
      */
-    public void deleteCorehunterRun(String uniqueIdentifier);
+    public void deleteCoreHunterRun(String uniqueIdentifier);
 
     /**
      * Gets the current information about all Core Hunter runs
      * 
      * @return the current information about all Core Hunter runs
      */
-    public List<CorehunterRun> getAllCorehunterRuns();
+    public List<CorehunterRun> getAllCoreHunterRuns();
 
     /**
      * Gets the current output stream provides by the run 

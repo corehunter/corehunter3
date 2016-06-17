@@ -27,12 +27,12 @@ import org.corehunter.services.CorehunterRunArguments;
 
 import uno.informatics.data.pojo.SimpleEntityPojo;
 
-public class CorehunterRunArgumentsPojo extends SimpleEntityPojo implements CorehunterRunArguments {
+public class CoreHunterRunArgumentsPojo extends SimpleEntityPojo implements CorehunterRunArguments {
     private int subsetSize;
     private String datasetId;
     private List<CoreHunterObjective> objectives ;
 
-    public CorehunterRunArgumentsPojo(String name, int subsetSize, String datasetId,
+    public CoreHunterRunArgumentsPojo(String name, int subsetSize, String datasetId,
             List<CoreHunterObjective> objectives) {
         super(UUID.randomUUID().toString(), name);
         this.subsetSize = subsetSize;
