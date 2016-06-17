@@ -27,7 +27,6 @@ import org.corehunter.data.CoreHunterData;
 import org.corehunter.exceptions.CoreHunterException;
 import uno.informatics.data.Feature;
 import uno.informatics.data.Scale;
-import uno.informatics.data.ScaleType;
 import uno.informatics.data.dataset.FeatureData;
 import uno.informatics.data.dataset.FeatureDataRow;
 
