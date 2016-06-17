@@ -118,7 +118,7 @@
                 <version>2.19.1</version>
                 <configuration>
                     <!-- Enable JaCoCo agent when unit tests are run -->
-                    <argLine>-Xmx1024m -XX:MaxPermSize=256m</argLine>
+                    <argLine>${jacocoSurefireArgLine} -Xmx1024m</argLine>
                 </configuration>
             </plugin>
             
@@ -144,7 +144,7 @@
                         </goals>
                         <configuration>
                             <!-- Enable JaCoCo agent when integration tests are run -->
-                            <argLine>${failsafeArgLine}</argLine>
+                            <argLine>${jacocoFailsafeArgLine}</argLine>
                         </configuration>
                     </execution>
                 </executions>
@@ -215,7 +215,7 @@
                                 Sets the name of the property containing the settings
                                 for JaCoCo runtime agent.
                             -->
-                            <propertyName>surefireArgLine</propertyName>
+                            <propertyName>jacocoSurefireArgLine</propertyName>
                         </configuration>
                     </execution>
                     <!--
@@ -235,7 +235,7 @@
                                 Sets the name of the property containing the settings
                                 for JaCoCo runtime agent.
                             -->
-                            <propertyName>failsafeArgLine</propertyName>
+                            <propertyName>jacocoFailsafeArgLine</propertyName>
                         </configuration>
                     </execution>
                     <!-- Merge unit and integration test execution data -->
