@@ -58,6 +58,13 @@ public class API {
         return ids;
     }
     
+    /**
+     * Get unique identifier strings from item indices.
+     * 
+     * @param data a data object
+     * @param indices item indices (zero-based).
+     * @return unique identifiers
+     */
     public static String[] getIdsFromIndices(Data data, int[] indices){
         String[] ids = Arrays.stream(indices)
                              .mapToObj(i -> data.getHeader(i).getUniqueIdentifier())
@@ -65,6 +72,13 @@ public class API {
         return ids;
     }
     
+    /**
+     * Get item indices from their string identifiers.
+     * 
+     * @param data a data object
+     * @param ids string identifiers
+     * @return item indices (zero-based)
+     */
     public static int[] getIndicesFromIds(DataPojo data, String[] ids){
         int[] indices = Arrays.stream(ids)
                               .mapToInt(id -> data.indexOf(id))
@@ -144,6 +158,16 @@ public class API {
     /* Execution */
     /* --------- */
     
+    /**
+     * Sample a core collection.
+     * 
+     * @param args Core Hunter arguments including data, objective and subset size.
+     * @param mode Execution mode, one of "default" or "fast".
+     * @param timeLimit Absolute runtime limit in seconds.
+     * @param maxTimeWithoutImprovement Maximum time without finding an improvement, in seconds.
+     * @param silent If <code>true</code> no output is written to the console.
+     * @return Indices of selected items (zero-based).
+     */
     public static int[] sampleCore(CoreHunterArguments args, String mode,
                                    int timeLimit, int maxTimeWithoutImprovement,
                                    boolean silent){
@@ -178,6 +202,14 @@ public class API {
     /* Evaluation */
     /* ---------- */
     
+    /**
+     * Evaluate a core collection.
+     * 
+     * @param selected Indices of selected items (zero-based).
+     * @param data Core Hunter data
+     * @param obj Objective used to evaluate the core.
+     * @return Core value according to the used objective.
+     */
     public static double evaluateCore(int[] selected, CoreHunterData data, CoreHunterObjective obj){
         CoreHunter ch = new CoreHunter();
         SubsetSolution sol = new SubsetSolution(data.getIDs());
