@@ -29,10 +29,10 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
+import org.corehunter.data.CoreHunterDataType;
 import org.corehunter.services.CoreHunterRun;
 import org.corehunter.services.CoreHunterRunArguments;
 import org.corehunter.services.CoreHunterRunStatus;
-import org.corehunter.services.DataType;
 import org.corehunter.services.simple.CoreHunterRunArgumentsPojo;
 import org.corehunter.services.simple.FileBasedDatasetServices;
 import org.corehunter.services.simple.SimpleCoreHunterRunServices;
@@ -85,9 +85,7 @@ public class SimpleCoreHunterRunServicesTest {
             Path phenotypicDataPath = Paths.get(ClassLoader.getSystemResource(PHENOTYPIC_FILE).toURI());
 
             fileBasedDatasetServices.loadData(dataset, phenotypicDataPath, FileType.CSV,
-                    DataType.PHENOTYPIC);
-            
-            
+                    CoreHunterDataType.PHENOTYPIC);
 
             SimpleCoreHunterRunServices simpleCoreHunterRunServices = new SimpleCoreHunterRunServices(
                     fileBasedDatasetServices);
@@ -95,7 +93,7 @@ public class SimpleCoreHunterRunServicesTest {
             CoreHunterRunArguments arguments = new CoreHunterRunArgumentsPojo(NAME1, SUBSET_SIZE1, datasetId, null);
 
             CoreHunterRun startCoreHunterRun = simpleCoreHunterRunServices.executeCoreHunter(arguments);
-            
+        
             String corehunterRunId = startCoreHunterRun.getUniqueIdentifier() ;
 
             simpleCoreHunterRunServices.getOutputStream(datasetId);
@@ -114,7 +112,7 @@ public class SimpleCoreHunterRunServicesTest {
             assertEquals("Status is not finished", CoreHunterRunStatus.FINISHED, corehunterRun.getStatus());
 
             List<CoreHunterRun> allCoreHunterRuns = simpleCoreHunterRunServices.getAllCoreHunterRuns();
-
+        
             assertEquals("Number of corehunterRuns is not 1", 1, allCoreHunterRuns.size());
 
             assertNotNull("Output Stream is null", simpleCoreHunterRunServices.getOutputStream(datasetId));

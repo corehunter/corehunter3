@@ -23,9 +23,11 @@ import java.util.Set;
 
 import org.corehunter.CoreHunter;
 import org.corehunter.CoreHunterArguments;
+import org.corehunter.CoreHunterMeasure;
+import org.corehunter.CoreHunterObjectiveType;
 import org.corehunter.data.CoreHunterData;
+import org.corehunter.objectives.AverageEntryToEntry;
 import org.corehunter.objectives.distance.measures.PrecomputedDistance;
-import org.corehunter.objectives.distance.AverageEntryToEntryDistance;
 import org.jamesframework.core.problems.objectives.Objective;
 import org.jamesframework.core.search.Search;
 import org.jamesframework.core.search.algo.exh.ExhaustiveSearch;
@@ -49,19 +51,22 @@ public class ITCorehunter extends TestData {
 
         int size = 2;
         int time = 2;
-        Objective<SubsetSolution, CoreHunterData> obj = new AverageEntryToEntryDistance(new PrecomputedDistance());
+        Objective<SubsetSolution, CoreHunterData> obj = new AverageEntryToEntry(new PrecomputedDistance());
 
         // determine optimal solution through exhaustive search
-        SubsetProblem problem = new SubsetProblem<>(new CoreHunterData(DATA), obj, size);
+        SubsetProblem<CoreHunterData> problem = new SubsetProblem<>(new CoreHunterData(DATA), obj, size);
         Search<SubsetSolution> exh = new ExhaustiveSearch<>(problem, new SubsetSolutionIterator(SET, size));
         exh.run();
         Set<Integer> opt = exh.getBestSolution().getSelectedIDs();
 
         // run Core Hunter
-        CoreHunterArguments arguments = new CoreHunterArguments(new CoreHunterData(DATA), obj, size);
-        CoreHunter corehunter = new CoreHunter(arguments);
+        CoreHunterArguments arguments = 
+                new CoreHunterArguments(new CoreHunterData(DATA), size, 
+                        CoreHunterObjectiveType.AV_ENTRY_TO_ENTRY, 
+                        CoreHunterMeasure.PRECOMPUTED_DISTANCE);
+        CoreHunter corehunter = new CoreHunter();
         corehunter.setTimeLimit(time);
-        SubsetSolution result = corehunter.execute();
+        SubsetSolution result = corehunter.execute(arguments);
 
         // compare
         assertEquals(opt, result.getSelectedIDs());

@@ -29,8 +29,6 @@ import static org.corehunter.tests.TestData.PHENOTYPIC_TRAIT_VALUES;
 import static org.corehunter.tests.TestData.SET;
 import static org.corehunter.tests.TestData.PHENOTYPIC_TRAIT_MISSING_VALUES;
 
-
-
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
@@ -57,10 +55,10 @@ import static org.junit.Assert.assertTrue;
  */
 public class PhenotypeDataTest {
 
-    private static final String CSV_NAMES = "/phenotypes/names.csv";
-    private static final String CSV_NAMES_IDS = "/phenotypes/names-and-ids.csv";
-    private static final String CSV_NAMES_MIN_MAX = "/phenotypes/names-min-max.csv";
-    private static final String CSV_NAMES_MISSING_VALUES = "/phenotypes/missing-values.csv";
+    private static final String CSV_IDS = "/phenotypes/ids.csv";
+    private static final String CSV_IDS_NAMES = "/phenotypes/ids-and-names.csv";
+    private static final String CSV_IDS_MIN_MAX = "/phenotypes/ids-min-max.csv";
+    private static final String CSV_IDS_MISSING_VALUES = "/phenotypes/missing-values.csv";
 
     private static final String ERRONEOUS_FILES_DIR = "/phenotypes/err/";
     
@@ -80,37 +78,37 @@ public class PhenotypeDataTest {
     }
     
     @Test
-    public void fromCsvFileWithNames() throws IOException {
-        datasetName = "names.csv";
+    public void fromCsvFileWithIds() throws IOException {
+        datasetName = "ids.csv";
         expectedHeaders = HEADERS_UNIQUE_NAMES;
         expectedBounds = PHENOTYPIC_TRAIT_INFERRED_BOUNDS;
         expectedValues = PHENOTYPIC_TRAIT_VALUES;
         System.out.println(" |- File " + datasetName);
-        testData(ArrayFeatureData.readData(Paths.get(PhenotypeDataTest.class.getResource(CSV_NAMES).getPath()),
+        testData(ArrayFeatureData.readData(Paths.get(PhenotypeDataTest.class.getResource(CSV_IDS).getPath()),
             FileType.CSV
         ));
     }
     
     @Test
-    public void fromCsvFileWithNamesAndIds() throws IOException {
-        datasetName = "names-and-ids.csv";
+    public void fromCsvFileWithIdsAndNames() throws IOException {
+        datasetName = "ids-and-names.csv";
         expectedHeaders = HEADERS_NON_UNIQUE_NAMES;
         expectedBounds = PHENOTYPIC_TRAIT_INFERRED_BOUNDS;
         expectedValues = PHENOTYPIC_TRAIT_VALUES;
         System.out.println(" |- File " + datasetName);
-        testData(ArrayFeatureData.readData(Paths.get(PhenotypeDataTest.class.getResource(CSV_NAMES_IDS).getPath()),
+        testData(ArrayFeatureData.readData(Paths.get(PhenotypeDataTest.class.getResource(CSV_IDS_NAMES).getPath()),
             FileType.CSV
         ));
     }
     
     @Test
-    public void fromCsvFileWithNamesAndBounds() throws IOException {
-        datasetName = "names-min-max.csv";
+    public void fromCsvFileWithIdsAndBounds() throws IOException {
+        datasetName = "ids-min-max.csv";
         expectedHeaders = HEADERS_UNIQUE_NAMES;
         expectedBounds = PHENOTYPIC_TRAIT_EXPLICIT_BOUNDS;
         expectedValues = PHENOTYPIC_TRAIT_VALUES;
         System.out.println(" |- File " + datasetName);
-        testData(ArrayFeatureData.readData(Paths.get(PhenotypeDataTest.class.getResource(CSV_NAMES_MIN_MAX).getPath()),
+        testData(ArrayFeatureData.readData(Paths.get(PhenotypeDataTest.class.getResource(CSV_IDS_MIN_MAX).getPath()),
             FileType.CSV
         ));
     }
@@ -123,7 +121,7 @@ public class PhenotypeDataTest {
         expectedValues = PHENOTYPIC_TRAIT_MISSING_VALUES;
         System.out.println(" |- File " + datasetName);
         testData(ArrayFeatureData.readData(
-                Paths.get(PhenotypeDataTest.class.getResource(CSV_NAMES_MISSING_VALUES).getPath()
+                Paths.get(PhenotypeDataTest.class.getResource(CSV_IDS_MISSING_VALUES).getPath()
             ), FileType.CSV
         ));
     }
@@ -163,7 +161,7 @@ public class PhenotypeDataTest {
         
         // check trait names and bounds (min/max)
         for(int t = 0; t < data.getFeatures().size(); t++){
-            
+                        
             // check name
             assertEquals("Trait name for trait " + t + " is not correct.",
                          PHENOTYPIC_TRAIT_NAMES[t], data.getFeatures().get(t).getName());

@@ -25,6 +25,7 @@ import org.joda.time.DateTime;
 
 import uno.informatics.data.pojo.SimpleEntityPojo;
 
+
 public class CoreHunterRunPojo extends SimpleEntityPojo implements CoreHunterRun {
     
     private DateTime startDate;

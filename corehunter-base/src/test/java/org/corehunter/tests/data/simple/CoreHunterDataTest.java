@@ -23,6 +23,7 @@ package org.corehunter.tests.data.simple;
 import java.io.IOException;
 import java.nio.file.Paths;
 
+import org.corehunter.CoreHunterObjectiveType;
 import org.corehunter.data.CoreHunterData;
 import org.corehunter.data.DistanceMatrixData;
 import org.corehunter.data.simple.SimpleBiAllelicGenotypeData;
@@ -38,6 +39,8 @@ import uno.informatics.data.dataset.FeatureData;
 import uno.informatics.data.feature.array.ArrayFeatureData;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import org.corehunter.data.GenotypeData;
 
 
@@ -50,8 +53,8 @@ public class CoreHunterDataTest {
     private static final String DISTANCES_UNIQUE_NAMES = "/distances/full-ids.txt";
     private static final String DISTANCES_NON_UNIQUE_NAMES = "/distances/full-ids-names.txt";
     
-    private static final String PHENOTYPES_UNIQUE_NAMES = "/phenotypes/names.csv";
-    private static final String PHENOTYPES_NON_UNIQUE_NAMES = "/phenotypes/names-and-ids.csv";
+    private static final String PHENOTYPES_UNIQUE_NAMES = "/phenotypes/ids.csv";
+    private static final String PHENOTYPES_NON_UNIQUE_NAMES = "/phenotypes/ids-and-names.csv";
     private static final String PHENOTYPES_SAME_IDS_DIFFERENT_NAMES = "/phenotypes/same-ids-different-names.csv";
     
     private static final String MARKERS_UNIQUE_NAMES = "/biallelic_genotypes/ids.csv";
@@ -74,6 +77,27 @@ public class CoreHunterDataTest {
     public void testAllDatasetsUndefined(){
         System.out.println(" |- Test no data defined");
         CoreHunterData data = new CoreHunterData(null, null, null);
+        
+        assertNotNull(data.getValidObjectiveTypes()) ;
+        assertTrue("Valid Objective Types should be empty", data.getValidObjectiveTypes().isEmpty()) ;
+        assertNotNull(data.getValidMeasures(CoreHunterObjectiveType.AV_ACCESSION_TO_NEAREST_ENTRY)) ;
+        assertTrue("Valid Measures Types should be empty", data.getValidMeasures(
+                CoreHunterObjectiveType.AV_ACCESSION_TO_NEAREST_ENTRY).isEmpty()) ;
+        assertNotNull(data.getValidMeasures(CoreHunterObjectiveType.AV_ENTRY_TO_ENTRY)) ;
+        assertTrue("Valid Measures Types should be empty", data.getValidMeasures(
+                CoreHunterObjectiveType.AV_ENTRY_TO_ENTRY).isEmpty()) ;
+        assertNotNull(data.getValidMeasures(CoreHunterObjectiveType.AV_ENTRY_TO_NEAREST_ENTRY)) ;
+        assertTrue("Valid Measures Types should be empty", data.getValidMeasures(
+                CoreHunterObjectiveType.AV_ENTRY_TO_NEAREST_ENTRY).isEmpty()) ;
+        assertNotNull(data.getValidMeasures(CoreHunterObjectiveType.COVERAGE)) ;
+        assertTrue("Valid Measures Types should be empty", data.getValidMeasures(
+                CoreHunterObjectiveType.COVERAGE).isEmpty()) ;
+        assertNotNull(data.getValidMeasures(CoreHunterObjectiveType.HETEROZYGOUS_LOCI)) ;
+        assertTrue("Valid Measures Types should be empty", data.getValidMeasures(
+                CoreHunterObjectiveType.HETEROZYGOUS_LOCI).isEmpty()) ;
+        assertNotNull(data.getValidMeasures(CoreHunterObjectiveType.SHANNON_DIVERSITY)) ;
+        assertTrue("Valid Measures Types should be empty", data.getValidMeasures(
+                CoreHunterObjectiveType.SHANNON_DIVERSITY).isEmpty()) ;
     }
     
     @Test(expected = IllegalArgumentException.class)
@@ -85,8 +109,7 @@ public class CoreHunterDataTest {
         FeatureData pheno = readPhenotypicTraitData(PHENOTYPES_UNIQUE_NAMES);
         GenotypeData geno = readMarkerData(MARKERS_NON_UNIQUE_NAMES);
                 
-        CoreHunterData data = new CoreHunterData(geno, pheno, dist);
-        
+        CoreHunterData data = new CoreHunterData(geno, pheno, dist);      
     }
     
     @Test(expected = IllegalArgumentException.class)
@@ -155,6 +178,26 @@ public class CoreHunterDataTest {
         CoreHunterData data = new CoreHunterData(geno, pheno, dist);
         testData(data);
         
+        assertNotNull(data.getValidObjectiveTypes()) ;
+        assertEquals("Number of Objective Types should be 6", 6, data.getValidObjectiveTypes().size()) ;
+        assertNotNull(data.getValidMeasures(CoreHunterObjectiveType.AV_ACCESSION_TO_NEAREST_ENTRY)) ;
+        assertEquals("Number of Measures should be 4", 4, data.getValidMeasures(
+                CoreHunterObjectiveType.AV_ACCESSION_TO_NEAREST_ENTRY).size()) ;
+        assertNotNull(data.getValidMeasures(CoreHunterObjectiveType.AV_ENTRY_TO_ENTRY)) ;
+        assertEquals("Number of Measures should be 4", 4, data.getValidMeasures(
+                CoreHunterObjectiveType.AV_ENTRY_TO_ENTRY).size()) ;
+        assertNotNull(data.getValidMeasures(CoreHunterObjectiveType.AV_ENTRY_TO_NEAREST_ENTRY)) ;
+        assertEquals("Number of Measures should be 4", 4, data.getValidMeasures(
+                CoreHunterObjectiveType.AV_ENTRY_TO_NEAREST_ENTRY).size()) ;
+        assertNotNull(data.getValidMeasures(CoreHunterObjectiveType.COVERAGE)) ;
+        assertTrue("Valid Measures Types should be empty", data.getValidMeasures(
+                CoreHunterObjectiveType.COVERAGE).isEmpty()) ;
+        assertNotNull(data.getValidMeasures(CoreHunterObjectiveType.HETEROZYGOUS_LOCI)) ;
+        assertTrue("Valid Measures Types should be empty", data.getValidMeasures(
+                CoreHunterObjectiveType.HETEROZYGOUS_LOCI).isEmpty()) ;
+        assertNotNull(data.getValidMeasures(CoreHunterObjectiveType.SHANNON_DIVERSITY)) ;
+        assertTrue("Valid Measures Types should be empty", data.getValidMeasures(
+                CoreHunterObjectiveType.SHANNON_DIVERSITY).isEmpty()) ;
     }
     
     @Test
@@ -171,6 +214,26 @@ public class CoreHunterDataTest {
         CoreHunterData data = new CoreHunterData(geno, pheno, dist);
         testData(data);
         
+        assertNotNull(data.getValidObjectiveTypes()) ;
+        assertEquals("Number of Objective Types should be 6", 6, data.getValidObjectiveTypes().size()) ;
+        assertNotNull(data.getValidMeasures(CoreHunterObjectiveType.AV_ACCESSION_TO_NEAREST_ENTRY)) ;
+        assertEquals("Number of Measures should be 4", 4, data.getValidMeasures(
+                CoreHunterObjectiveType.AV_ACCESSION_TO_NEAREST_ENTRY).size()) ;
+        assertNotNull(data.getValidMeasures(CoreHunterObjectiveType.AV_ENTRY_TO_ENTRY)) ;
+        assertEquals("Number of Measures should be 4", 4, data.getValidMeasures(
+                CoreHunterObjectiveType.AV_ENTRY_TO_ENTRY).size()) ;
+        assertNotNull(data.getValidMeasures(CoreHunterObjectiveType.AV_ENTRY_TO_NEAREST_ENTRY)) ;
+        assertEquals("Number of Measures should be 4", 4, data.getValidMeasures(
+                CoreHunterObjectiveType.AV_ENTRY_TO_NEAREST_ENTRY).size()) ;
+        assertNotNull(data.getValidMeasures(CoreHunterObjectiveType.COVERAGE)) ;
+        assertTrue("Valid Measures Types should be empty", data.getValidMeasures(
+                CoreHunterObjectiveType.COVERAGE).isEmpty()) ;
+        assertNotNull(data.getValidMeasures(CoreHunterObjectiveType.HETEROZYGOUS_LOCI)) ;
+        assertTrue("Valid Measures Types should be empty", data.getValidMeasures(
+                CoreHunterObjectiveType.HETEROZYGOUS_LOCI).isEmpty()) ;
+        assertNotNull(data.getValidMeasures(CoreHunterObjectiveType.SHANNON_DIVERSITY)) ;
+        assertTrue("Valid Measures Types should be empty", data.getValidMeasures(
+                CoreHunterObjectiveType.SHANNON_DIVERSITY).isEmpty()) ;
     }
     
     @Test
@@ -184,6 +247,26 @@ public class CoreHunterDataTest {
         CoreHunterData data = new CoreHunterData(dist);
         testData(data);
         
+        assertNotNull(data.getValidObjectiveTypes()) ;
+        assertEquals("Number of Objective Types should be 3", 3, data.getValidObjectiveTypes().size()) ;
+        assertNotNull(data.getValidMeasures(CoreHunterObjectiveType.AV_ACCESSION_TO_NEAREST_ENTRY)) ;
+        assertEquals("Number of Measures should be 1", 1, data.getValidMeasures(
+                CoreHunterObjectiveType.AV_ACCESSION_TO_NEAREST_ENTRY).size()) ;
+        assertNotNull(data.getValidMeasures(CoreHunterObjectiveType.AV_ENTRY_TO_ENTRY)) ;
+        assertEquals("Number of Measures should be 1", 1, data.getValidMeasures(
+                CoreHunterObjectiveType.AV_ENTRY_TO_ENTRY).size()) ;
+        assertNotNull(data.getValidMeasures(CoreHunterObjectiveType.AV_ENTRY_TO_NEAREST_ENTRY)) ;
+        assertEquals("Number of Measures should be 1", 1, data.getValidMeasures(
+                CoreHunterObjectiveType.AV_ENTRY_TO_NEAREST_ENTRY).size()) ;
+        assertNotNull(data.getValidMeasures(CoreHunterObjectiveType.COVERAGE)) ;
+        assertTrue("Valid Measures Types should be empty", data.getValidMeasures(
+                CoreHunterObjectiveType.COVERAGE).isEmpty()) ;
+        assertNotNull(data.getValidMeasures(CoreHunterObjectiveType.HETEROZYGOUS_LOCI)) ;
+        assertTrue("Valid Measures Types should be empty", data.getValidMeasures(
+                CoreHunterObjectiveType.HETEROZYGOUS_LOCI).isEmpty()) ;
+        assertNotNull(data.getValidMeasures(CoreHunterObjectiveType.SHANNON_DIVERSITY)) ;
+        assertTrue("Valid Measures Types should be empty", data.getValidMeasures(
+                CoreHunterObjectiveType.SHANNON_DIVERSITY).isEmpty()) ;
     }
     
     @Test
@@ -197,6 +280,26 @@ public class CoreHunterDataTest {
         CoreHunterData data = new CoreHunterData(markers);
         testData(data);
         
+        assertNotNull(data.getValidObjectiveTypes()) ;
+        assertEquals("Number of Objective Types should be 6", 6, data.getValidObjectiveTypes().size()) ;
+        assertNotNull(data.getValidMeasures(CoreHunterObjectiveType.AV_ACCESSION_TO_NEAREST_ENTRY)) ;
+        assertEquals("Number of Measures should be 2", 2, data.getValidMeasures(
+                CoreHunterObjectiveType.AV_ACCESSION_TO_NEAREST_ENTRY).size()) ;
+        assertNotNull(data.getValidMeasures(CoreHunterObjectiveType.AV_ENTRY_TO_ENTRY)) ;
+        assertEquals("Number of Measures should be 2", 2, data.getValidMeasures(
+                CoreHunterObjectiveType.AV_ENTRY_TO_ENTRY).size()) ;
+        assertNotNull(data.getValidMeasures(CoreHunterObjectiveType.AV_ENTRY_TO_NEAREST_ENTRY)) ;
+        assertEquals("Number of Measures should be 2", 2, data.getValidMeasures(
+                CoreHunterObjectiveType.AV_ENTRY_TO_NEAREST_ENTRY).size()) ;
+        assertNotNull(data.getValidMeasures(CoreHunterObjectiveType.COVERAGE)) ;
+        assertTrue("Valid Measures Types should be empty", data.getValidMeasures(
+                CoreHunterObjectiveType.COVERAGE).isEmpty()) ;
+        assertNotNull(data.getValidMeasures(CoreHunterObjectiveType.HETEROZYGOUS_LOCI)) ;
+        assertTrue("Valid Measures Types should be empty", data.getValidMeasures(
+                CoreHunterObjectiveType.HETEROZYGOUS_LOCI).isEmpty()) ;
+        assertNotNull(data.getValidMeasures(CoreHunterObjectiveType.SHANNON_DIVERSITY)) ;
+        assertTrue("Valid Measures Types should be empty", data.getValidMeasures(
+                CoreHunterObjectiveType.SHANNON_DIVERSITY).isEmpty()) ;
     }
     
     @Test
@@ -210,6 +313,26 @@ public class CoreHunterDataTest {
         CoreHunterData data = new CoreHunterData(pheno);
         testData(data);
         
+        assertNotNull(data.getValidObjectiveTypes()) ;
+        assertEquals("Number of Objective Types should be 3", 3, data.getValidObjectiveTypes().size()) ;
+        assertNotNull(data.getValidMeasures(CoreHunterObjectiveType.AV_ACCESSION_TO_NEAREST_ENTRY)) ;
+        assertEquals("Number of Measures should be 1", 1, data.getValidMeasures(
+                CoreHunterObjectiveType.AV_ACCESSION_TO_NEAREST_ENTRY).size()) ;
+        assertNotNull(data.getValidMeasures(CoreHunterObjectiveType.AV_ENTRY_TO_ENTRY)) ;
+        assertEquals("Number of Measures should be 1", 1, data.getValidMeasures(
+                CoreHunterObjectiveType.AV_ENTRY_TO_ENTRY).size()) ;
+        assertNotNull(data.getValidMeasures(CoreHunterObjectiveType.AV_ENTRY_TO_NEAREST_ENTRY)) ;
+        assertEquals("Number of Measures should be 1", 1, data.getValidMeasures(
+                CoreHunterObjectiveType.AV_ENTRY_TO_NEAREST_ENTRY).size()) ;
+        assertNotNull(data.getValidMeasures(CoreHunterObjectiveType.COVERAGE)) ;
+        assertTrue("Valid Measures Types should be empty", data.getValidMeasures(
+                CoreHunterObjectiveType.COVERAGE).isEmpty()) ;
+        assertNotNull(data.getValidMeasures(CoreHunterObjectiveType.HETEROZYGOUS_LOCI)) ;
+        assertTrue("Valid Measures Types should be empty", data.getValidMeasures(
+                CoreHunterObjectiveType.HETEROZYGOUS_LOCI).isEmpty()) ;
+        assertNotNull(data.getValidMeasures(CoreHunterObjectiveType.SHANNON_DIVERSITY)) ;
+        assertTrue("Valid Measures Types should be empty", data.getValidMeasures(
+                CoreHunterObjectiveType.SHANNON_DIVERSITY).isEmpty()) ;
     }
     
     private DistanceMatrixData readDistanceMatrixData(String file) throws IOException{

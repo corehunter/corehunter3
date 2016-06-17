@@ -24,8 +24,10 @@ import java.nio.file.Path;
 import java.util.List;
 
 import org.corehunter.data.CoreHunterData;
+import org.corehunter.data.CoreHunterDataType;
 
 import uno.informatics.data.Data;
+import uno.informatics.data.DataType;
 import uno.informatics.data.Dataset;
 import uno.informatics.data.dataset.DatasetException;
 import uno.informatics.data.dataset.MatrixData;
@@ -88,7 +90,7 @@ public interface DatasetServices {
      * dataset merging with existing data. 
      * 
      * <p>Data loading options can include the Genotype Data Format
-     * (see {@link org.corehunter.data.GenotypeDataFormat}) for {@link DataType#GENOTYPIC} 
+     * (see {@link org.corehunter.data.GenotypeDataFormat}) for {@link CoreHunterDataType#GENOTYPIC} 
      * 
      * @param dataset
      *            the dataset to which the data will be associated
@@ -106,7 +108,7 @@ public interface DatasetServices {
      *             if the data can not be merged with existing data for a
      *             dataset
      */
-    public void loadData(Dataset dataset, Path path, FileType fileType, DataType dataType, 
+    public void loadData(Dataset dataset, Path path, FileType fileType, CoreHunterDataType dataType, 
             Object... options) throws IOException, DatasetException;
     
     /**
@@ -128,6 +130,6 @@ public interface DatasetServices {
      * @return the original data upload by the user
      * @throws DatasetException if the data can not be accessed or the dataset does not exist
      */
-    public Data getOriginalData(String datasetId, DataType dataType) throws DatasetException ;
+    public Data getOriginalData(String datasetId, CoreHunterDataType dataType) throws DatasetException ;
 
 }

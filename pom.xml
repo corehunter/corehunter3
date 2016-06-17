@@ -13,6 +13,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <informatics-common.version>1.0.3</informatics-common.version>
     </properties>
 
     <distributionManagement>
@@ -80,17 +81,17 @@
             <dependency>
                 <groupId>uno.informatics.common</groupId>
                 <artifactId>informatics-utils</artifactId>
-                <version>1.0.3-SNAPSHOT</version>
+                <version>${informatics-common.version}</version>
             </dependency>
             <dependency>
                 <groupId>uno.informatics.common</groupId>
                 <artifactId>informatics-data-api</artifactId>
-                <version>1.0.3-SNAPSHOT</version>
+                <version>${informatics-common.version}</version>
             </dependency>
             <dependency>
                 <groupId>uno.informatics.common</groupId>
                 <artifactId>informatics-data-impl</artifactId>
-                <version>1.0.3-SNAPSHOT</version>
+                <version>${informatics-common.version}</version>
             </dependency>
             <dependency>
                 <groupId>joda-time</groupId>

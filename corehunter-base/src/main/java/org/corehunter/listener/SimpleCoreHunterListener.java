@@ -40,8 +40,8 @@ public class SimpleCoreHunterListener implements CoreHunterListener {
 
     public SimpleCoreHunterListener(PrintStream printStream) {
         super();
-        this.printStream = printStream;
 
+        this.printStream = printStream;
         prefix = DEFAULT_PREFIX;
     }
 
@@ -55,20 +55,22 @@ public class SimpleCoreHunterListener implements CoreHunterListener {
 
     @Override
     public void searchStarted(Search<? extends SubsetSolution> search) {
-        printStream.println(prefix + "Search started");
+        printStream.println(prefix + "Search started: " + search.getName());
     }
 
     @Override
     public void searchStopped(Search<? extends SubsetSolution> search) {
         double t = search.getRuntime() / 1000;
-        double s = search.getSteps();
+        long s = search.getSteps();
         printStream.println(prefix + "Search stopped (" + t + " sec, " + s + " steps)");
     }
 
     @Override
-    public void newBestSolution(Search<? extends SubsetSolution> search, SubsetSolution newBestSolution,
-            Evaluation newBestSolutionEvaluation, Validation newBestSolutionValidation) {
-        printStream.println(prefix + "New best solution: " + newBestSolutionEvaluation);
+    public void newBestSolution(Search<? extends SubsetSolution> search,
+                                SubsetSolution newBestSolution,
+                                Evaluation newBestSolutionEvaluation,
+                                Validation newBestSolutionValidation) {
+        printStream.println(prefix + "New best solution: " + newBestSolutionEvaluation.getValue());
     }
 
     @Override

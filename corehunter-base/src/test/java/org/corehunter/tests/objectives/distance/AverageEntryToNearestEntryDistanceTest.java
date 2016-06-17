@@ -24,10 +24,10 @@ import org.corehunter.data.DistanceMatrixData;
 import org.corehunter.data.CoreHunterData;
 import org.corehunter.data.simple.SimpleDistanceMatrixData;
 import org.corehunter.data.simple.SimpleGenotypeData;
+import org.corehunter.objectives.AverageEntryToNearestEntry;
 import org.corehunter.objectives.distance.measures.CavalliSforzaEdwardsDistance;
 import org.corehunter.objectives.distance.measures.ModifiedRogersDistance;
 import org.corehunter.objectives.distance.measures.PrecomputedDistance;
-import org.corehunter.objectives.distance.AverageEntryToNearestEntryDistance;
 import org.corehunter.objectives.distance.measures.GowerDistance;
 
 import static org.corehunter.tests.TestData.ALLELE_FREQUENCIES;
@@ -82,7 +82,7 @@ public class AverageEntryToNearestEntryDistanceTest extends EvaluationTest {
         );
         CoreHunterData data = new CoreHunterData(geno);
         
-        AverageEntryToNearestEntryDistance objective = new AverageEntryToNearestEntryDistance(
+        AverageEntryToNearestEntry objective = new AverageEntryToNearestEntry(
                 new ModifiedRogersDistance()
         );
 
@@ -124,7 +124,7 @@ public class AverageEntryToNearestEntryDistanceTest extends EvaluationTest {
         );
         CoreHunterData data = new CoreHunterData(geno);
         
-        AverageEntryToNearestEntryDistance objective = new AverageEntryToNearestEntryDistance(
+        AverageEntryToNearestEntry objective = new AverageEntryToNearestEntry(
                 new CavalliSforzaEdwardsDistance()
         );
 
@@ -166,7 +166,7 @@ public class AverageEntryToNearestEntryDistanceTest extends EvaluationTest {
         );
         CoreHunterData data = new CoreHunterData(pheno);
         
-        AverageEntryToNearestEntryDistance objective = new AverageEntryToNearestEntryDistance(
+        AverageEntryToNearestEntry objective = new AverageEntryToNearestEntry(
                 new GowerDistance()
         );
 
@@ -206,7 +206,7 @@ public class AverageEntryToNearestEntryDistanceTest extends EvaluationTest {
         DistanceMatrixData dist = new SimpleDistanceMatrixData(HEADERS_UNIQUE_NAMES, MODIFIED_ROGERS_DISTANCES);
         CoreHunterData data = new CoreHunterData(dist);
         
-        AverageEntryToNearestEntryDistance objective = new AverageEntryToNearestEntryDistance(
+        AverageEntryToNearestEntry objective = new AverageEntryToNearestEntry(
                 new PrecomputedDistance()
         );
 
@@ -250,7 +250,7 @@ public class AverageEntryToNearestEntryDistanceTest extends EvaluationTest {
         );
         CoreHunterData data = new CoreHunterData(geno);
         
-        AverageEntryToNearestEntryDistance objective = new AverageEntryToNearestEntryDistance(
+        AverageEntryToNearestEntry objective = new AverageEntryToNearestEntry(
                 new CavalliSforzaEdwardsDistance()
         );
         SubsetProblem<CoreHunterData> problem = new SubsetProblem<>(data, objective);

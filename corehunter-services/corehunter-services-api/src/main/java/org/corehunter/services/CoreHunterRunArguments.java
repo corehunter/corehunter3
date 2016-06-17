@@ -19,9 +19,9 @@
 
 package org.corehunter.services;
 
-import org.corehunter.data.CoreHunterData;
-import org.jamesframework.core.problems.objectives.Objective;
-import org.jamesframework.core.subset.SubsetSolution;
+import java.util.List;
+
+import org.corehunter.CoreHunterObjective;
 
 import uno.informatics.data.SimpleEntity;
 
@@ -31,5 +31,5 @@ public interface CoreHunterRunArguments extends SimpleEntity {
 
     public String getDatasetId();
     
-    public Objective<SubsetSolution, CoreHunterData> getObjective() ;
+    public List<CoreHunterObjective> getObjectives() ;
 }

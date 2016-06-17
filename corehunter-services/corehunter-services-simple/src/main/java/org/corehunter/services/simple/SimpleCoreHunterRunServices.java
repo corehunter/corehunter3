@@ -112,6 +112,7 @@ public class SimpleCoreHunterRunServices implements CoreHunterRunServices {
     @Override
     public List<CoreHunterRun> getAllCoreHunterRuns() {
 
+
         // iterates through all runnables can create new CoreHunterRun objects, which will be a snapshot 
         // of the current status of that runnable
         Iterator<CoreHunterRunnable> iterator = corehunterRunnableMap.values().iterator();
@@ -248,18 +249,18 @@ public class SimpleCoreHunterRunServices implements CoreHunterRunServices {
 
                 CoreHunterArguments arguments = new CoreHunterArguments(
                         datasetServices.getCoreHunterData(corehunterRunArguments.getDatasetId()),
-                        corehunterRunArguments.getObjective(),
-                        corehunterRunArguments.getSubsetSize());
+                        corehunterRunArguments.getSubsetSize(), corehunterRunArguments.getObjectives());
 
-                corehunter = new CoreHunter(arguments);
-
-                outputStream = new ByteArrayOutputStream();
                 PrintStream printStream = new PrintStream(outputStream);
 
                 status = CoreHunterRunStatus.RUNNING;
 
-                subsetSolution = corehunter.execute(new SimpleCoreHunterListener(printStream));
+                corehunter = new CoreHunter();
+                corehunter.setListener(new SimpleCoreHunterListener(printStream));
 
+                outputStream = new ByteArrayOutputStream();
+
+                subsetSolution = corehunter.execute(arguments);
                 printStream.close();
 
                 status = CoreHunterRunStatus.FINISHED;

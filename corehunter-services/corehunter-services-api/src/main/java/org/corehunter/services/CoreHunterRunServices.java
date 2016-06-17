@@ -43,6 +43,7 @@ public interface CoreHunterRunServices {
      *            execution
      * @return the current information about the Core Hunter run
      */
+
     public CoreHunterRun getCoreHunterRun(String uniqueIdentifier);
 
     /**

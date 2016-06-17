@@ -17,16 +17,16 @@
 /* under the License.                                           */
 /*--------------------------------------------------------------*/
 
-package org.corehunter.services;
+package org.corehunter.data;
 
-public enum DataType {
+public enum CoreHunterDataType {
     PHENOTYPIC("Phenotypic"),
     GENOTYPIC("Genotypic"), 
     DISTANCES("Distances");
 
     private String name;
 
-    private DataType(String name) {
+    private CoreHunterDataType(String name) {
         this.name = name;
     }
 

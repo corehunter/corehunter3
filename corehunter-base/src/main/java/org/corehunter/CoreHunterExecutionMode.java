@@ -17,42 +17,14 @@
 /* under the License.                                           */
 /*--------------------------------------------------------------*/
 
-package org.corehunter.services.simple;
+package org.corehunter;
 
-import java.util.List;
-import java.util.UUID;
-
-import org.corehunter.CoreHunterObjective;
-import org.corehunter.services.CoreHunterRunArguments;
-
-import uno.informatics.data.pojo.SimpleEntityPojo;
-
-public class CoreHunterRunArgumentsPojo extends SimpleEntityPojo implements CoreHunterRunArguments {
-
-    private int subsetSize;
-    private String datasetId;
-    private List<CoreHunterObjective> objectives;
-
-    public CoreHunterRunArgumentsPojo(String name, int subsetSize, String datasetId,
-            List<CoreHunterObjective> objectives) {
-        super(UUID.randomUUID().toString(), name);
-        this.subsetSize = subsetSize;
-        this.datasetId = datasetId;
-        this.objectives = objectives;
-    }
-
-    @Override
-    public int getSubsetSize() {
-        return subsetSize;
-    }
-
-    @Override
-    public String getDatasetId() {
-        return datasetId;
-    }
-
-    @Override
-    public List<CoreHunterObjective> getObjectives() {
-        return objectives;
-    }
+/**
+ * Available execution modes.
+ * 
+ * @author Herman De Beukelaer, Guy Davenport
+ */
+public enum CoreHunterExecutionMode {
+    DEFAULT,
+    FAST;
 }
