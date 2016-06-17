@@ -28,7 +28,7 @@ import org.corehunter.data.GenotypeData;
 import org.corehunter.data.GenotypeDataFormat;
 import org.corehunter.data.simple.SimpleDistanceMatrixData;
 import org.corehunter.data.simple.SimpleGenotypeData;
-import org.corehunter.listener.SimpleCorehunterListener;
+import org.corehunter.listener.SimpleCoreHunterListener;
 import org.jamesframework.core.subset.SubsetSolution;
 import uno.informatics.data.Data;
 import uno.informatics.data.SimpleEntity;
@@ -211,7 +211,7 @@ public class API {
             ch.setMaxTimeWithoutImprovement(maxTimeWithoutImprovement);
         }
         if(!silent){
-            ch.setListener(new SimpleCorehunterListener());
+            ch.setListener(new SimpleCoreHunterListener());
         }
         // sample core
         SubsetSolution core = ch.execute(args);

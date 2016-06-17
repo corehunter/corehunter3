@@ -19,13 +19,13 @@
 
 package org.corehunter.services;
 
-public enum CorehunterRunStatus {
+public enum CoreHunterRunStatus {
 
     NOT_STARTED("Not Started"), RUNNING("Running"), FAILED("Failed"), FINISHED("Finished");
 
     private String name;
 
-    private CorehunterRunStatus(String name) {
+    private CoreHunterRunStatus(String name) {
         this.name = name;
     }
 

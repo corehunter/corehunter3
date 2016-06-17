@@ -19,17 +19,14 @@
 
 package org.corehunter.services;
 
-import java.util.List;
-
-import org.corehunter.CoreHunterObjective;
+import org.joda.time.DateTime;
 
 import uno.informatics.data.SimpleEntity;
 
-public interface CorehunterRunArguments extends SimpleEntity {
-   
-    public int getSubsetSize() ;
+public interface CoreHunterRun extends SimpleEntity {
+    public DateTime getStartDate();
 
-    public String getDatasetId();
-    
-    public List<CoreHunterObjective> getObjectives() ;
+    public DateTime getEndDate();
+
+    public CoreHunterRunStatus getStatus();
 }

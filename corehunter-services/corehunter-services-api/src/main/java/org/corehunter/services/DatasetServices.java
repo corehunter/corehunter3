@@ -26,8 +26,11 @@ import java.util.List;
 import org.corehunter.data.CoreHunterData;
 import org.corehunter.data.CoreHunterDataType;
 
+import uno.informatics.data.Data;
+import uno.informatics.data.DataType;
 import uno.informatics.data.Dataset;
 import uno.informatics.data.dataset.DatasetException;
+import uno.informatics.data.dataset.MatrixData;
 import uno.informatics.data.io.FileType;
 
 public interface DatasetServices {
@@ -69,9 +72,9 @@ public interface DatasetServices {
      *             if the dataset does not exist
      */
     public boolean removeDataset(String datasetId) throws DatasetException;
-
+    
     /**
-     * Gets the data associated with a dataset by unique dataset identifier
+     * Gets the CoreHunter data associated with a dataset by unique dataset identifier
      * 
      * @param datasetId
      *            the identifier of the dataset
@@ -117,5 +120,16 @@ public interface DatasetServices {
      *             if the data can not be accessed or the dataset does not exist
      */
     public void removeData(String datasetId) throws DatasetException;
+    
+    /**
+     * Gets the original data upload by the user
+     * @param datasetId
+     *            the identifier of the dataset
+     * @param dataType
+     *            the type of data
+     * @return the original data upload by the user
+     * @throws DatasetException if the data can not be accessed or the dataset does not exist
+     */
+    public Data getOriginalData(String datasetId, CoreHunterDataType dataType) throws DatasetException ;
 
 }

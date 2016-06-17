@@ -33,22 +33,22 @@ import java.util.concurrent.Executors;
 
 import org.corehunter.CoreHunter;
 import org.corehunter.CoreHunterArguments;
-import org.corehunter.listener.SimpleCorehunterListener;
-import org.corehunter.services.CorehunterRun;
-import org.corehunter.services.CorehunterRunArguments;
-import org.corehunter.services.CorehunterRunServices;
-import org.corehunter.services.CorehunterRunStatus;
+import org.corehunter.listener.SimpleCoreHunterListener;
+import org.corehunter.services.CoreHunterRun;
+import org.corehunter.services.CoreHunterRunArguments;
+import org.corehunter.services.CoreHunterRunServices;
+import org.corehunter.services.CoreHunterRunStatus;
 import org.corehunter.services.DatasetServices;
 import org.jamesframework.core.subset.SubsetSolution;
 import org.joda.time.DateTime;
 
 import uno.informatics.data.pojo.SimpleEntityPojo;
 
-public class SimpleCoreHunterRunServices implements CorehunterRunServices {
+public class SimpleCoreHunterRunServices implements CoreHunterRunServices {
 
     private DatasetServices datasetServices;
     private ExecutorService executor;
-    private List<CorehunterRun> corehunterRuns;
+    private List<CoreHunterRun> corehunterRuns;
     private Map<String, CoreHunterRunnable> corehunterRunnableMap;
     public String charsetName = "utf-8";
     private boolean shuttingDown;
@@ -63,7 +63,7 @@ public class SimpleCoreHunterRunServices implements CorehunterRunServices {
     }
 
     @Override
-    public CorehunterRun executeCoreHunter(CorehunterRunArguments arguments) {
+    public CoreHunterRun executeCoreHunter(CoreHunterRunArguments arguments) {
 
         if (shuttingDown) {
             throw new IllegalStateException("Can not accept any new runs, in the process of shutting down!") ;
@@ -83,7 +83,7 @@ public class SimpleCoreHunterRunServices implements CorehunterRunServices {
     }
 
     @Override
-    public CorehunterRun getCoreHunterRun(String uniqueIdentifier) {
+    public CoreHunterRun getCoreHunterRun(String uniqueIdentifier) {
         CoreHunterRunnable corehunterRunnable = corehunterRunnableMap.remove(uniqueIdentifier);
 
         if (corehunterRunnable != null) {
@@ -110,9 +110,10 @@ public class SimpleCoreHunterRunServices implements CorehunterRunServices {
     }
 
     @Override
-    public List<CorehunterRun> getAllCoreHunterRuns() {
+    public List<CoreHunterRun> getAllCoreHunterRuns() {
 
-        // iterates through all runnables can create new CorehunterRun objects, which will be a snapshot 
+
+        // iterates through all runnables can create new CoreHunterRun objects, which will be a snapshot 
         // of the current status of that runnable
         Iterator<CoreHunterRunnable> iterator = corehunterRunnableMap.values().iterator();
 
@@ -187,7 +188,7 @@ public class SimpleCoreHunterRunServices implements CorehunterRunServices {
     }
 
     private class CoreHunterRunnable extends SimpleEntityPojo implements Runnable {
-        private CorehunterRunArguments corehunterRunArguments;
+        private CoreHunterRunArguments corehunterRunArguments;
         private CoreHunter corehunter;
         private ByteArrayOutputStream outputStream;
         private ByteArrayOutputStream errorStream;
@@ -195,13 +196,13 @@ public class SimpleCoreHunterRunServices implements CorehunterRunServices {
         private SubsetSolution subsetSolution;
         private DateTime startDate;
         private DateTime endDate;
-        private CorehunterRunStatus status;
+        private CoreHunterRunStatus status;
 
-        public CoreHunterRunnable(CorehunterRunArguments corehunterRunArguments) {
+        public CoreHunterRunnable(CoreHunterRunArguments corehunterRunArguments) {
             super(createUniqueIdentifier(), corehunterRunArguments.getName());
             this.corehunterRunArguments = corehunterRunArguments;
 
-            status = CorehunterRunStatus.NOT_STARTED;
+            status = CoreHunterRunStatus.NOT_STARTED;
         }
 
         public final String getOutputStream() {
@@ -236,7 +237,7 @@ public class SimpleCoreHunterRunServices implements CorehunterRunServices {
             return endDate;
         }
 
-        public CorehunterRunStatus getStatus() {
+        public CoreHunterRunStatus getStatus() {
             return status;
         }
 
@@ -252,20 +253,19 @@ public class SimpleCoreHunterRunServices implements CorehunterRunServices {
 
                 PrintStream printStream = new PrintStream(outputStream);
 
+                status = CoreHunterRunStatus.RUNNING;
+
                 corehunter = new CoreHunter();
-                corehunter.setListener(new SimpleCorehunterListener(printStream));
+                corehunter.setListener(new SimpleCoreHunterListener(printStream));
 
                 outputStream = new ByteArrayOutputStream();
-                
-                status = CorehunterRunStatus.RUNNING;
 
                 subsetSolution = corehunter.execute(arguments);
-
                 printStream.close();
 
-                status = CorehunterRunStatus.FINISHED;
+                status = CoreHunterRunStatus.FINISHED;
             } catch (Exception e) {
-                status = CorehunterRunStatus.FAILED;
+                status = CoreHunterRunStatus.FAILED;
                 errorMessage = e.getMessage();
                 errorStream = new ByteArrayOutputStream();
                 PrintStream printStream = new PrintStream(errorStream);

@@ -23,14 +23,15 @@ import java.util.List;
 import java.util.UUID;
 
 import org.corehunter.CoreHunterObjective;
-import org.corehunter.services.CorehunterRunArguments;
+import org.corehunter.services.CoreHunterRunArguments;
 
 import uno.informatics.data.pojo.SimpleEntityPojo;
 
-public class CoreHunterRunArgumentsPojo extends SimpleEntityPojo implements CorehunterRunArguments {
+public class CoreHunterRunArgumentsPojo extends SimpleEntityPojo implements CoreHunterRunArguments {
+
     private int subsetSize;
     private String datasetId;
-    private List<CoreHunterObjective> objectives ;
+    private List<CoreHunterObjective> objectives;
 
     public CoreHunterRunArgumentsPojo(String name, int subsetSize, String datasetId,
             List<CoreHunterObjective> objectives) {

@@ -29,10 +29,10 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
-import org.corehunter.services.CorehunterRun;
-import org.corehunter.services.CorehunterRunArguments;
-import org.corehunter.services.CorehunterRunStatus;
 import org.corehunter.data.CoreHunterDataType;
+import org.corehunter.services.CoreHunterRun;
+import org.corehunter.services.CoreHunterRunArguments;
+import org.corehunter.services.CoreHunterRunStatus;
 import org.corehunter.services.simple.CoreHunterRunArgumentsPojo;
 import org.corehunter.services.simple.FileBasedDatasetServices;
 import org.corehunter.services.simple.SimpleCoreHunterRunServices;
@@ -42,7 +42,7 @@ import uno.informatics.data.Dataset;
 import uno.informatics.data.io.FileType;
 import uno.informatics.data.pojo.DatasetPojo;
 
-public class SimpleCorehunterRunServicesTest {
+public class SimpleCoreHunterRunServicesTest {
 
     private static final String PHENOTYPIC_FILE = "phenotypic_data.csv";
     private static final String NAME1 = "phenotypic_data.csv";
@@ -54,7 +54,7 @@ public class SimpleCorehunterRunServicesTest {
     private static final String DATASET_NAME = "dataset 1";
 
     @Test
-    public void testSimpleCorehunterRunServices() {
+    public void testSimpleCoreHunterRunServices() {
 
         try {
             FileBasedDatasetServices fileBasedDatasetServices = new FileBasedDatasetServices(
@@ -70,7 +70,7 @@ public class SimpleCorehunterRunServicesTest {
     }
 
     //@Test
-    public void testExecuteCorehunter() {
+    public void testExecuteCoreHunter() {
 
         try {
             FileBasedDatasetServices fileBasedDatasetServices = new FileBasedDatasetServices(
@@ -87,41 +87,41 @@ public class SimpleCorehunterRunServicesTest {
             fileBasedDatasetServices.loadData(dataset, phenotypicDataPath, FileType.CSV,
                     CoreHunterDataType.PHENOTYPIC);
 
-            SimpleCoreHunterRunServices simpleCorehunterRunServices = new SimpleCoreHunterRunServices(
+            SimpleCoreHunterRunServices simpleCoreHunterRunServices = new SimpleCoreHunterRunServices(
                     fileBasedDatasetServices);
 
-            CorehunterRunArguments arguments = new CoreHunterRunArgumentsPojo(NAME1, SUBSET_SIZE1, datasetId, null);
+            CoreHunterRunArguments arguments = new CoreHunterRunArgumentsPojo(NAME1, SUBSET_SIZE1, datasetId, null);
 
-            CorehunterRun startCorehunterRun = simpleCorehunterRunServices.executeCoreHunter(arguments);
-            
-            String corehunterRunId = startCorehunterRun.getUniqueIdentifier() ;
+            CoreHunterRun startCoreHunterRun = simpleCoreHunterRunServices.executeCoreHunter(arguments);
+        
+            String corehunterRunId = startCoreHunterRun.getUniqueIdentifier() ;
 
-            simpleCorehunterRunServices.getOutputStream(datasetId);
+            simpleCoreHunterRunServices.getOutputStream(datasetId);
 
-            assertEquals("Status is not not started", CorehunterRunStatus.NOT_STARTED, startCorehunterRun.getStatus());
+            assertEquals("Status is not not started", CoreHunterRunStatus.NOT_STARTED, startCoreHunterRun.getStatus());
 
-            CorehunterRun corehunterRun = startCorehunterRun;
+            CoreHunterRun corehunterRun = startCoreHunterRun;
 
-            while (CorehunterRunStatus.NOT_STARTED.equals(corehunterRun.getStatus())
-                    || CorehunterRunStatus.RUNNING.equals(corehunterRun.getStatus())) {
-                corehunterRun = simpleCorehunterRunServices.getCoreHunterRun(corehunterRunId);
+            while (CoreHunterRunStatus.NOT_STARTED.equals(corehunterRun.getStatus())
+                    || CoreHunterRunStatus.RUNNING.equals(corehunterRun.getStatus())) {
+                corehunterRun = simpleCoreHunterRunServices.getCoreHunterRun(corehunterRunId);
                 
                 Thread.sleep(100);
             }
 
-            assertEquals("Status is not finished", CorehunterRunStatus.FINISHED, corehunterRun.getStatus());
+            assertEquals("Status is not finished", CoreHunterRunStatus.FINISHED, corehunterRun.getStatus());
 
-            List<CorehunterRun> allCorehunterRuns = simpleCorehunterRunServices.getAllCoreHunterRuns();
+            List<CoreHunterRun> allCoreHunterRuns = simpleCoreHunterRunServices.getAllCoreHunterRuns();
+        
+            assertEquals("Number of corehunterRuns is not 1", 1, allCoreHunterRuns.size());
 
-            assertEquals("Number of corehunterRuns is not 1", 1, allCorehunterRuns.size());
+            assertNotNull("Output Stream is null", simpleCoreHunterRunServices.getOutputStream(datasetId));
 
-            assertNotNull("Output Stream is null", simpleCorehunterRunServices.getOutputStream(datasetId));
+            assertNull("Error Stream is not null", simpleCoreHunterRunServices.getErrorStream(datasetId));
 
-            assertNull("Error Stream is not null", simpleCorehunterRunServices.getErrorStream(datasetId));
+            assertNull("Error Message is not null", simpleCoreHunterRunServices.getErrorMessage(datasetId));
 
-            assertNull("Error Message is not null", simpleCorehunterRunServices.getErrorMessage(datasetId));
-
-            assertNotNull("Subset Solution is null", simpleCorehunterRunServices.getSubsetSolution(datasetId));
+            assertNotNull("Subset Solution is null", simpleCoreHunterRunServices.getSubsetSolution(datasetId));
 
         } catch (Exception e) {
             e.printStackTrace();
