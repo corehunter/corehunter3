@@ -130,6 +130,19 @@ public class API {
         );
     }
     
+    public static String[][] getAlleles(GenotypeData data){
+        int numMarkers = data.getNumberOfMarkers();
+        String[][] alleles = new String[numMarkers][];
+        for(int m = 0; m < numMarkers; m++){
+            int numAlleles = data.getNumberOfAlleles(m);
+            alleles[m] = new String[numAlleles];
+            for(int a = 0; a < numAlleles; a++){
+                alleles[m][a] = data.getAlleleName(m, a);
+            }
+        }
+        return alleles;
+    }
+    
     /* -------------- */
     /* Phenotype data */
     /* -------------- */
