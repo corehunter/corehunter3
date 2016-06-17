@@ -58,6 +58,15 @@ public class API {
         return ids;
     }
     
+    public static String[] getNames(Data data){
+        int n = data.getSize();
+        String[] ids = new String[n];
+        for(int i = 0; i < n; i++){
+            ids[i] = data.getHeader(i).getName();
+        }
+        return ids;
+    }
+    
     /**
      * Get unique identifier strings from item indices.
      * 
