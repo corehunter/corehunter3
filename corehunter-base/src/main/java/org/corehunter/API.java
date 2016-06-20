@@ -22,6 +22,7 @@ package org.corehunter;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.List;
 import org.corehunter.data.CoreHunterData;
 import org.corehunter.data.DistanceMatrixData;
 import org.corehunter.data.GenotypeData;
@@ -31,6 +32,8 @@ import org.corehunter.data.simple.SimpleGenotypeData;
 import org.corehunter.listener.SimpleCoreHunterListener;
 import org.jamesframework.core.subset.SubsetSolution;
 import uno.informatics.data.Data;
+import uno.informatics.data.Feature;
+import uno.informatics.data.Scale;
 import uno.informatics.data.SimpleEntity;
 import uno.informatics.data.dataset.FeatureData;
 import uno.informatics.data.feature.array.ArrayFeatureData;
@@ -162,6 +165,21 @@ public class API {
     
     public static FeatureData readPhenotypeData(String file) throws IOException{
         return ArrayFeatureData.readData(Paths.get(file), inferFileType(file));
+    }
+    
+    public static Double[] getRanges(FeatureData data){
+        List<Feature> features = data.getFeatures();
+        int numTraits = features.size();
+        Double[] ranges = new Double[numTraits];
+        for(int t = 0; t < numTraits; t++){
+            Scale scale = features.get(t).getMethod().getScale();
+            Number min = scale.getMinimumValue();
+            Number max = scale.getMaximumValue();
+            if(min != null && max != null){
+                ranges[t] = max.doubleValue() - min.doubleValue();
+            }
+        }
+        return ranges;
     }
     
     /* --------- */
