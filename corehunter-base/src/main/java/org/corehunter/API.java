@@ -21,6 +21,7 @@ package org.corehunter;
 
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import org.corehunter.data.CoreHunterData;
@@ -39,6 +40,7 @@ import uno.informatics.data.dataset.FeatureData;
 import uno.informatics.data.feature.array.ArrayFeatureData;
 import uno.informatics.data.io.FileType;
 import uno.informatics.data.pojo.DataPojo;
+import uno.informatics.data.pojo.FeaturePojo;
 import uno.informatics.data.pojo.SimpleEntityPojo;
 
 /**
@@ -107,7 +109,7 @@ public class API {
     }
     
     public static DistanceMatrixData createDistanceMatrixData(double[][] distances, String[] ids, String[] names){
-        // combine ids and names into headers
+        // check arguments
         int n = distances.length;
         if(ids == null){
             throw new IllegalArgumentException("Ids are required.");
@@ -115,23 +117,11 @@ public class API {
         if(ids.length != n){
             throw new IllegalArgumentException("Number of ids does not correspond to size of matrix.");
         }
-        if(names == null){
-            // use ids as names if no names are given
-            names = ids;
-        }
-        if(names.length != n){
+        if(names != null && names.length != n){
             throw new IllegalArgumentException("Number of names does not correspond to size of matrix.");
         }
-        SimpleEntity[] headers = new SimpleEntity[n];
-        for(int i = 0; i < n; i++){
-            if(names[i] != null){
-                headers[i] = new SimpleEntityPojo(ids[i], names[i]);
-            } else {
-                headers[i] = new SimpleEntityPojo(ids[i]);
-            }
-        }
         // create and return data
-        return new SimpleDistanceMatrixData(headers, distances);
+        return new SimpleDistanceMatrixData(createHeaders(ids, names), distances);
     }
     
     /* ------------- */
@@ -283,6 +273,22 @@ public class API {
             return FileType.CSV;
         }
         return null;
+    }
+    
+    private static SimpleEntity[] createHeaders(String[] ids, String[] names){
+        if(names == null){
+            names = ids;
+        }
+        int n = ids.length;
+        SimpleEntity[] headers = new SimpleEntity[n];
+        for(int i = 0; i < n; i++){
+            if(names[i] != null){
+                headers[i] = new SimpleEntityPojo(ids[i], names[i]);
+            } else {
+                headers[i] = new SimpleEntityPojo(ids[i]);
+            }
+        }
+        return headers;
     }
     
 }
