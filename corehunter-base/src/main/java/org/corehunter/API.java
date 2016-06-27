@@ -22,6 +22,9 @@ package org.corehunter;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+
 import org.corehunter.data.CoreHunterData;
 import org.corehunter.data.DistanceMatrixData;
 import org.corehunter.data.GenotypeData;
@@ -39,12 +42,15 @@ import uno.informatics.data.pojo.DataPojo;
 import uno.informatics.data.pojo.SimpleEntityPojo;
 
 /**
- * Simple API used by the R interface.
+ * Simple API used by the R interface and as a utility class.
  *
  * @author Herman De Beukelaer, Guy Davenport
  */
 public class API {
 
+    private static final CoreHunterObjectiveType DEFAULT_OBJECTIVE = CoreHunterObjectiveType.AV_ACCESSION_TO_NEAREST_ENTRY;
+    private static final CoreHunterMeasure DEFAULT_GENOTYPE_MEASURE = CoreHunterMeasure.MODIFIED_ROGERS;
+    
     /* -------- */
     /* All data */
     /* -------- */
@@ -243,6 +249,139 @@ public class API {
             sol.select(sel);
         }
         return ch.evaluate(sol, data, obj);
+    }
+    
+    /**
+     * Creates a list of default objectives, one for each type of data available.
+     * 
+     * @param coreHunterData the data for which the objectives are required
+     * @return a list of default objectives, one for each type of data available
+     */
+    public static final List<CoreHunterObjective> createDefaultObjectives(CoreHunterData coreHunterData) {
+        List<CoreHunterObjective> objectives = new LinkedList<CoreHunterObjective>();
+
+        if (coreHunterData != null) {
+            double count = 0.0;
+
+            if (coreHunterData.hasPhenotypes()) {
+                ++count;
+            }
+
+            if (coreHunterData.hasGenotypes()) {
+                ++count;
+            }
+
+            if (coreHunterData.hasDistances()) {
+                ++count;
+            }
+
+            if (coreHunterData.hasPhenotypes()) {
+                objectives.add(new CoreHunterObjective(DEFAULT_OBJECTIVE, CoreHunterMeasure.GOWERS, 1.0 / count));
+            }
+
+            if (coreHunterData.hasGenotypes()) {
+                objectives.add(new CoreHunterObjective(DEFAULT_OBJECTIVE, DEFAULT_GENOTYPE_MEASURE, 1.0 / count));
+            }
+
+            if (coreHunterData.hasDistances()) {
+                objectives.add(new CoreHunterObjective(DEFAULT_OBJECTIVE, CoreHunterMeasure.PRECOMPUTED_DISTANCE,
+                        1.0 / count));
+            }
+        }
+
+        return objectives;
+    }
+
+    /**
+     * Creates a default allowed objective, the data. If the data contains phenotypic data, the default
+     * phenotypic data objective is returned. If no phenotypic data is available, then the 
+     * default genotypic data objective is returned. Finally, if no phenotypic or genotypic data
+     * is available, then the default distances data objective is returned.
+     * 
+     * @param coreHunterData the data for which the objective is required
+     * @return a default objective
+     */
+    public static CoreHunterObjective createDefaultObjective(CoreHunterData coreHunterData) {
+
+        if (coreHunterData != null) {
+
+            if (coreHunterData.hasPhenotypes()) {
+                return new CoreHunterObjective(DEFAULT_OBJECTIVE, CoreHunterMeasure.GOWERS, 1.0);
+            }
+
+            if (coreHunterData.hasGenotypes()) {
+                return new CoreHunterObjective(DEFAULT_OBJECTIVE, DEFAULT_GENOTYPE_MEASURE, 1.0);
+            }
+
+            if (coreHunterData.hasDistances()) {
+                return new CoreHunterObjective(DEFAULT_OBJECTIVE, CoreHunterMeasure.PRECOMPUTED_DISTANCE, 1.0);
+            }
+        }
+
+        return null;
+    }
+    
+    /** 
+     * Create a list of all possible CoreHunter objective types for a given data object
+     * 
+     * @param coreHunterData the data for which the objective types are required
+     * @return a list of all possible CoreHunter objective types for a given data object
+     */
+    public static final List<CoreHunterObjectiveType> createAllowedObjectives(CoreHunterData coreHunterData) {
+        List<CoreHunterObjectiveType> objectives = new LinkedList<CoreHunterObjectiveType>();
+
+        if (coreHunterData != null && (coreHunterData.hasPhenotypes() || coreHunterData.hasGenotypes()) || coreHunterData.hasDistances()) {
+
+            objectives.add(CoreHunterObjectiveType.AV_ACCESSION_TO_NEAREST_ENTRY);
+            objectives.add(CoreHunterObjectiveType.AV_ENTRY_TO_ENTRY);
+            objectives.add(CoreHunterObjectiveType.AV_ENTRY_TO_NEAREST_ENTRY);
+            
+            if (coreHunterData.hasGenotypes()) {
+                objectives.add(CoreHunterObjectiveType.COVERAGE);
+                objectives.add(CoreHunterObjectiveType.HETEROZYGOUS_LOCI);
+                objectives.add(CoreHunterObjectiveType.SHANNON_DIVERSITY);
+            }
+        }
+
+        return objectives;
+    }
+    
+    /** 
+     * Create a list of all possible CoreHunter measures for a given data object
+     * 
+     * @param coreHunterData the data for which the measures are required
+     * @param objectiveType the objective type for which the measures are required
+     * @return a list of all possible CoreHunter measures for a given data object and objective type 
+     */
+    public static final List<CoreHunterMeasure> createAllowedMeasures(CoreHunterData coreHunterData, CoreHunterObjectiveType objectiveType) {
+        List<CoreHunterMeasure> measures = new LinkedList<CoreHunterMeasure>();
+
+        switch(objectiveType) {
+            case AV_ACCESSION_TO_NEAREST_ENTRY:
+            case AV_ENTRY_TO_ENTRY:
+            case AV_ENTRY_TO_NEAREST_ENTRY:
+                if (coreHunterData.hasPhenotypes()) {
+                    measures.add(CoreHunterMeasure.GOWERS);
+                }
+                
+                if (coreHunterData.hasGenotypes()) {
+                    measures.add(CoreHunterMeasure.MODIFIED_ROGERS);
+                    measures.add(CoreHunterMeasure.CAVALLI_SFORZA_EDWARDS);
+                }
+                
+                if (coreHunterData.hasDistances()) {
+                    measures.add(CoreHunterMeasure.PRECOMPUTED_DISTANCE);
+                }
+                break;
+            case COVERAGE:
+            case HETEROZYGOUS_LOCI:
+            case SHANNON_DIVERSITY:
+            default:
+                break;
+            
+        }
+
+        return measures;
     }
         
     /* ----------------------- */

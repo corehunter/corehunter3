@@ -72,9 +72,9 @@ public class CoreHunterObjective {
      * @param weight the relative weight of this objective when used in conjunction with another objective
      */
     public CoreHunterObjective(CoreHunterObjectiveType objectiveType, CoreHunterMeasure measure, double weight) {
-        this.objectiveType = objectiveType;
-        this.measure = measure;
-        this.weight = weight;
+        setObjectiveType(objectiveType) ;
+        setMeasure(measure) ;
+        setWeight(weight) ;
     }
 
     /**
@@ -86,12 +86,29 @@ public class CoreHunterObjective {
     }
 
     /**
+     * Sets the objective type for this objective
+     * @param the objective type for this objective
+     */
+    public final void setObjectiveType(CoreHunterObjectiveType objectiveType) {
+        this.objectiveType = objectiveType;
+    } 
+
+    /**
      * Gets the measure for this objective if defined
      * @return the measure for this objective if defined, or 
-     * <code>null</code> if not measure has been given
+     * <code>null</code> if no measure has been given
      */
     public final CoreHunterMeasure getMeasure() {
         return measure;
+    }
+
+    /**
+     * Gets the measure for this objective if defined
+     * @param the measure for this objective if defined, or 
+     * <code>null</code> if no measure is given
+     */
+    public final void setMeasure(CoreHunterMeasure measure) {
+        this.measure = measure;
     }
 
     /**
@@ -102,5 +119,15 @@ public class CoreHunterObjective {
      */
     public double getWeight() {
         return weight;
-    } 
+    }
+
+    /**
+     * Sets the relative weight of this objective when used in conjunction with another objective.
+     * The weight is ignored if the objective is not used with any other objectives.
+     * 
+     * @param the relative weight of this objective
+     */
+    public final void setWeight(double weight) {
+        this.weight = weight;
+    }     
 }
