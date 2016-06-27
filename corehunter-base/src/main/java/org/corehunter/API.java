@@ -48,9 +48,11 @@ import uno.informatics.data.pojo.SimpleEntityPojo;
  */
 public class API {
 
-    private static final CoreHunterObjectiveType DEFAULT_OBJECTIVE = CoreHunterObjectiveType.AV_ACCESSION_TO_NEAREST_ENTRY;
-    private static final CoreHunterMeasure DEFAULT_GENOTYPE_MEASURE = CoreHunterMeasure.MODIFIED_ROGERS;
-    
+    private static final CoreHunterObjectiveType DEFAULT_OBJECTIVE = 
+            CoreHunterObjectiveType.AV_ACCESSION_TO_NEAREST_ENTRY;
+    private static final CoreHunterMeasure DEFAULT_GENOTYPE_MEASURE = 
+            CoreHunterMeasure.MODIFIED_ROGERS;
+  
     /* -------- */
     /* All data */
     /* -------- */
@@ -252,9 +254,11 @@ public class API {
     }
     
     /**
-     * Creates a list of default objectives, one for each type of data available.
+     * Creates a list of default objectives, one for each type of data
+     * available.
      * 
-     * @param coreHunterData the data for which the objectives are required
+     * @param coreHunterData
+     *            the data for which the objectives are required
      * @return a list of default objectives, one for each type of data available
      */
     public static final List<CoreHunterObjective> createDefaultObjectives(CoreHunterData coreHunterData) {
@@ -293,12 +297,14 @@ public class API {
     }
 
     /**
-     * Creates a default allowed objective, the data. If the data contains phenotypic data, the default
-     * phenotypic data objective is returned. If no phenotypic data is available, then the 
-     * default genotypic data objective is returned. Finally, if no phenotypic or genotypic data
-     * is available, then the default distances data objective is returned.
+     * Creates a default allowed objective, the data. If the data contains
+     * phenotypic data, the default phenotypic data objective is returned. If no
+     * phenotypic data is available, then the default genotypic data objective
+     * is returned. Finally, if no phenotypic or genotypic data is available,
+     * then the default distances data objective is returned.
      * 
-     * @param coreHunterData the data for which the objective is required
+     * @param coreHunterData
+     *            the data for which the objective is required
      * @return a default objective
      */
     public static CoreHunterObjective createDefaultObjective(CoreHunterData coreHunterData) {
@@ -320,22 +326,26 @@ public class API {
 
         return null;
     }
-    
-    /** 
-     * Create a list of all possible CoreHunter objective types for a given data object
+
+    /**
+     * Create a list of all possible CoreHunter objective types for a given data
+     * object
      * 
-     * @param coreHunterData the data for which the objective types are required
-     * @return a list of all possible CoreHunter objective types for a given data object
+     * @param coreHunterData
+     *            the data for which the objective types are required
+     * @return a list of all possible CoreHunter objective types for a given
+     *         data object
      */
     public static final List<CoreHunterObjectiveType> createAllowedObjectives(CoreHunterData coreHunterData) {
         List<CoreHunterObjectiveType> objectives = new LinkedList<CoreHunterObjectiveType>();
 
-        if (coreHunterData != null && (coreHunterData.hasPhenotypes() || coreHunterData.hasGenotypes()) || coreHunterData.hasDistances()) {
+        if (coreHunterData != null && (coreHunterData.hasPhenotypes() || coreHunterData.hasGenotypes())
+                || coreHunterData.hasDistances()) {
 
             objectives.add(CoreHunterObjectiveType.AV_ACCESSION_TO_NEAREST_ENTRY);
             objectives.add(CoreHunterObjectiveType.AV_ENTRY_TO_ENTRY);
             objectives.add(CoreHunterObjectiveType.AV_ENTRY_TO_NEAREST_ENTRY);
-            
+
             if (coreHunterData.hasGenotypes()) {
                 objectives.add(CoreHunterObjectiveType.COVERAGE);
                 objectives.add(CoreHunterObjectiveType.HETEROZYGOUS_LOCI);
@@ -345,30 +355,34 @@ public class API {
 
         return objectives;
     }
-    
-    /** 
+
+    /**
      * Create a list of all possible CoreHunter measures for a given data object
      * 
-     * @param coreHunterData the data for which the measures are required
-     * @param objectiveType the objective type for which the measures are required
-     * @return a list of all possible CoreHunter measures for a given data object and objective type 
+     * @param coreHunterData
+     *            the data for which the measures are required
+     * @param objectiveType
+     *            the objective type for which the measures are required
+     * @return a list of all possible CoreHunter measures for a given data
+     *         object and objective type
      */
-    public static final List<CoreHunterMeasure> createAllowedMeasures(CoreHunterData coreHunterData, CoreHunterObjectiveType objectiveType) {
+    public static final List<CoreHunterMeasure> createAllowedMeasures(CoreHunterData coreHunterData,
+            CoreHunterObjectiveType objectiveType) {
         List<CoreHunterMeasure> measures = new LinkedList<CoreHunterMeasure>();
 
-        switch(objectiveType) {
+        switch (objectiveType) {
             case AV_ACCESSION_TO_NEAREST_ENTRY:
             case AV_ENTRY_TO_ENTRY:
             case AV_ENTRY_TO_NEAREST_ENTRY:
                 if (coreHunterData.hasPhenotypes()) {
                     measures.add(CoreHunterMeasure.GOWERS);
                 }
-                
+
                 if (coreHunterData.hasGenotypes()) {
                     measures.add(CoreHunterMeasure.MODIFIED_ROGERS);
                     measures.add(CoreHunterMeasure.CAVALLI_SFORZA_EDWARDS);
                 }
-                
+
                 if (coreHunterData.hasDistances()) {
                     measures.add(CoreHunterMeasure.PRECOMPUTED_DISTANCE);
                 }
@@ -378,7 +392,7 @@ public class API {
             case SHANNON_DIVERSITY:
             default:
                 break;
-            
+
         }
 
         return measures;
