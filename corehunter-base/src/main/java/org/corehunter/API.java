@@ -28,6 +28,7 @@ import org.corehunter.data.CoreHunterData;
 import org.corehunter.data.DistanceMatrixData;
 import org.corehunter.data.GenotypeData;
 import org.corehunter.data.GenotypeDataFormat;
+import org.corehunter.data.simple.SimpleBiAllelicGenotypeData;
 import org.corehunter.data.simple.SimpleDistanceMatrixData;
 import org.corehunter.data.simple.SimpleGenotypeData;
 import org.corehunter.listener.SimpleCoreHunterListener;
@@ -110,6 +111,9 @@ public class API {
     
     public static DistanceMatrixData createDistanceMatrixData(double[][] distances, String[] ids, String[] names){
         // check arguments
+        if(distances == null){
+            throw new IllegalArgumentException("Distances are required.");
+        }
         int n = distances.length;
         if(ids == null){
             throw new IllegalArgumentException("Ids are required.");
@@ -147,6 +151,31 @@ public class API {
             }
         }
         return alleles;
+    }
+    
+    public static GenotypeData createBiparentalGenotypeData(int[][] alleleScores,
+                                                            String[] ids, String[] names,
+                                                            String[] markerNames){
+        // check arguments
+        if(alleleScores == null){
+            throw new IllegalArgumentException("Allele scores are required.");
+        }
+        int n = alleleScores.length;
+        int m = alleleScores[0].length;
+        if(ids == null){
+            throw new IllegalArgumentException("Ids are required.");
+        }
+        if(ids.length != n){
+            throw new IllegalArgumentException("Number of ids does not correspond to number of rows.");
+        }
+        if(names != null && names.length != n){
+            throw new IllegalArgumentException("Number of names does not correspond to number of rows.");
+        }
+        if(markerNames != null && markerNames.length != m){
+            throw new IllegalArgumentException("Number of marker names does not correspond to number of columns.");
+        }
+        // create and return data
+        return new SimpleBiAllelicGenotypeData(createHeaders(ids, names), markerNames, toIntegerMatrix(alleleScores));
     }
     
     /* -------------- */
@@ -289,6 +318,25 @@ public class API {
             }
         }
         return headers;
+    }
+    
+    /**
+     * Convert primitive to Integer matrix.
+     * All occurrences of {@link Integer#MIN_VALUE} are replaced with <code>null</code>,
+     * which is used by rJava to encode missing values (NAs in R).
+     * 
+     * @param matrix primitive integer matrix
+     * @return Integer matrix
+     */
+    private static Integer[][] toIntegerMatrix(int[][] matrix){
+        Integer[][] conv = new Integer[matrix.length][];
+        for(int i = 0; i < conv.length; i++){
+            conv[i] = new Integer[matrix[i].length];
+            for(int j = 0; j < conv[i].length; j++){
+                conv[i][j] = (matrix[i][j] != Integer.MIN_VALUE ? matrix[i][j] : null);
+            }
+        }
+        return conv;
     }
     
 }
