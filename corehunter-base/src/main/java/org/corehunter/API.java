@@ -21,8 +21,8 @@ package org.corehunter;
 
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
 
 import org.corehunter.data.CoreHunterData;
@@ -85,8 +85,9 @@ public class API {
      * @return unique identifiers
      */
     public static String[] getIdsFromIndices(Data data, int[] indices) {
-        String[] ids = Arrays.stream(indices).mapToObj(i -> data.getHeader(i).getUniqueIdentifier())
-                .toArray(n -> new String[n]);
+        String[] ids = Arrays.stream(indices)
+                             .mapToObj(i -> data.getHeader(i).getUniqueIdentifier())
+                             .toArray(n -> new String[n]);
         return ids;
     }
 
@@ -265,7 +266,7 @@ public class API {
      * @return a list of default objectives, one for each type of data available
      */
     public static final List<CoreHunterObjective> createDefaultObjectives(CoreHunterData coreHunterData) {
-        List<CoreHunterObjective> objectives = new LinkedList<CoreHunterObjective>();
+        List<CoreHunterObjective> objectives = new ArrayList<>();
 
         if (coreHunterData != null) {
             double count = 0.0;
@@ -340,10 +341,10 @@ public class API {
      *         data object
      */
     public static final List<CoreHunterObjectiveType> getAllowedObjectives(CoreHunterData coreHunterData) {
-        List<CoreHunterObjectiveType> objectives = new LinkedList<CoreHunterObjectiveType>();
+        List<CoreHunterObjectiveType> objectives = new ArrayList<>();
 
-        if (coreHunterData != null && (coreHunterData.hasPhenotypes() || coreHunterData.hasGenotypes())
-                || coreHunterData.hasDistances()) {
+        if (coreHunterData != null
+             && (coreHunterData.hasPhenotypes() || coreHunterData.hasGenotypes() || coreHunterData.hasDistances())) {
 
             objectives.add(CoreHunterObjectiveType.AV_ACCESSION_TO_NEAREST_ENTRY);
             objectives.add(CoreHunterObjectiveType.AV_ENTRY_TO_ENTRY);
@@ -391,7 +392,7 @@ public class API {
      */
     public static final List<CoreHunterMeasure> getAllowedMeasures(boolean hasPhenotypes, boolean hasGenotypes,
             boolean hasDistances, CoreHunterObjectiveType objectiveType) {
-        List<CoreHunterMeasure> measures = new LinkedList<CoreHunterMeasure>();
+        List<CoreHunterMeasure> measures = new ArrayList<>();
 
         switch (objectiveType) {
             case AV_ACCESSION_TO_NEAREST_ENTRY:
