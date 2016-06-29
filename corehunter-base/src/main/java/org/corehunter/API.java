@@ -22,6 +22,7 @@ package org.corehunter;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import org.corehunter.data.CoreHunterData;
 import org.corehunter.data.DistanceMatrixData;
@@ -168,7 +169,7 @@ public class API {
     
     public static GenotypeData createFrequencyGenotypeData(double[][] frequencies,
                                                            String[] ids, String[] names,
-                                                           String[] markerNames, String[][] alleleNames){
+                                                           String[] columnNames, String[] alleleNames){
         // check arguments
         if(frequencies == null){
             throw new IllegalArgumentException("Allele frequencies are required.");
@@ -177,6 +178,7 @@ public class API {
             throw new IllegalArgumentException("Empty allele frequency matrix.");
         }
         int n = frequencies.length;
+        int c = frequencies[0].length;
         if(ids == null){
             throw new IllegalArgumentException("Ids are required.");
         }
@@ -186,30 +188,34 @@ public class API {
         if(names != null && names.length != n){
             throw new IllegalArgumentException("Number of names does not correspond to number of rows.");
         }
-        if(markerNames == null){
-            throw new IllegalArgumentException("Marker names are required.");
+        if(columnNames == null){
+            throw new IllegalArgumentException("Column names are required.");
         }
-        int numMarkers = markerNames.length;
+        if(columnNames.length != c){
+            throw new IllegalArgumentException("Number of column names does not correspond to number of columns.");
+        }
         if(alleleNames == null){
             throw new IllegalArgumentException("Allele names are required.");
         }
-        if(alleleNames.length != numMarkers){
-            throw new IllegalArgumentException("Size of allele names array does not correspond to number of markers.");
+        if(alleleNames.length != c){
+            throw new IllegalArgumentException("Number of allele names does not correspond to number of columns.");
         }
-        // infer allele counts from allele names
-        int[] alleleCounts = Arrays.stream(alleleNames).mapToInt(alleles -> alleles.length).toArray();
-        int totalNumAlleles = Arrays.stream(alleleCounts).sum();
-        // split alleles per marker and convert to Double with missing values encoded as null
+        // infer marker names and allele counts from column names
+        HashMap<String, Integer> markers = SimpleGenotypeData.inferMarkerNames(columnNames);
+        int numMarkers = markers.size();
+        String[] markerNames = markers.keySet().toArray(new String[0]);
+        Integer[] alleleCounts = markers.values().toArray(new Integer[0]);
+        // split allele frequencies and names per marker
         Double[][][] convFreqs = new Double[n][numMarkers][];
         for(int i = 0; i < n; i++){
-            if(frequencies[i].length != totalNumAlleles){
+            if(frequencies[i].length != c){
                 throw new IllegalArgumentException("Incorrect number of values at row " + i + ".");
             }
             int j = 0;
             for(int m = 0; m < numMarkers; m++){
-                int markerAllelCount = alleleCounts[m];
-                convFreqs[i][m] = new Double[markerAllelCount];
-                for(int a = 0; a < markerAllelCount; a++){
+                int markerAlleleCount = alleleCounts[m];
+                convFreqs[i][m] = new Double[markerAlleleCount];
+                for(int a = 0; a < markerAlleleCount; a++){
                     Double freq = frequencies[i][j++];
                     // rJava encodes missing double values (NA in R) as NaN in Java
                     if(Double.isNaN(freq)){
@@ -219,7 +225,16 @@ public class API {
                 }
             }
         }
-        return new SimpleGenotypeData(createHeaders(ids, names), markerNames, alleleNames, convFreqs);
+        String[][] convAlleles = new String[numMarkers][];
+        int j = 0;
+        for(int m = 0; m < numMarkers; m++){
+            int markerAlleleCount = alleleCounts[m];
+            convAlleles[m] = new String[markerAlleleCount];
+            for(int a = 0; a < markerAlleleCount; a++){
+                convAlleles[m][a] = alleleNames[j++];
+            }
+        }
+        return new SimpleGenotypeData(createHeaders(ids, names), markerNames, convAlleles, convFreqs);
     }
     
     public static String[][] getAlleles(GenotypeData data){

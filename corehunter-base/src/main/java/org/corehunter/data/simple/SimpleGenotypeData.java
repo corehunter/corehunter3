@@ -28,8 +28,9 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -650,25 +651,17 @@ public class SimpleGenotypeData extends DataPojo implements GenotypeData {
                 throw new IOException("No data columns.");
             }
             
-            LinkedList<String> markerNames = new LinkedList<>();
-            LinkedList<Integer> markerNumCols = new LinkedList<>();
             String[] headerRow = rows.get(0);
-            for(int c = numHeaderCols; c < numCols; c++){
-                String markerName = inferMarkerName(headerRow, c);
-                if(markerNames.isEmpty() || !markerName.equals(markerNames.getLast())){
-                    // first column for new marker
-                    if(markerNames.contains(markerName)){
-                        throw new IOException("Duplicate marker name: " + markerName + ". "
-                                + "Columns corresponding to same marker should occur consecutively in the file.");
-                    }
-                    markerNumCols.add(1);
-                    markerNames.add(markerName);
-                } else {
-                    // additional column for current marker
-                    markerNumCols.add(markerNumCols.removeLast() + 1);
-                }
+            String[] dataColumnNames = Arrays.copyOfRange(headerRow, numHeaderCols, numCols);
+            HashMap<String, Integer> markers;
+            try{
+                markers = inferMarkerNames(dataColumnNames);
+            } catch(IllegalArgumentException ex){
+                throw new IOException(ex);
             }
-            int numMarkers = markerNames.size();
+            int numMarkers = markers.size();
+            String[] markerNames = markers.keySet().toArray(new String[0]);
+            Integer[] markerNumCols = markers.values().toArray(new Integer[0]);
             
             // 2: extract item names/identifiers
 
@@ -687,7 +680,7 @@ public class SimpleGenotypeData extends DataPojo implements GenotypeData {
                 String[] row = rows.get(i+1);
                 int c = numHeaderCols;
                 for(int m = 0; m < numMarkers; m++){
-                    int nCol = markerNumCols.get(m);
+                    int nCol = markerNumCols[m];
                     observedAlleles[i][m] = new String[nCol];
                     for(int mc = 0; mc < nCol; mc++){
                         observedAlleles[i][m][mc] = row[c++];
@@ -710,7 +703,7 @@ public class SimpleGenotypeData extends DataPojo implements GenotypeData {
                 // check: at least one allele
                 if(alleles.isEmpty()){
                     throw new IOException(String.format(
-                            "No data for marker %s.", markerNames.get(m)
+                            "No data for marker %s.", markerNames[m]
                     ));
                 }
                 // convert to array and store
@@ -756,7 +749,7 @@ public class SimpleGenotypeData extends DataPojo implements GenotypeData {
             try{
                 // create data
                 return new SimpleGenotypeData(filePath.getFileName().toString(),
-                                                     headers, markerNames.toArray(new String[0]),
+                                                     headers, markerNames,
                                                      alleleNames, alleleFreqs);
             } catch(IllegalArgumentException ex){
                 // convert to IO exception
@@ -767,19 +760,54 @@ public class SimpleGenotypeData extends DataPojo implements GenotypeData {
                 
     }
     
-    private static String inferMarkerName(String[] header, int c) throws IOException {
-        String columnName = header[c];
-        if(columnName == null){
-            throw new IOException("Missing column name for column " + c + ".");
-        }
+    private static String inferMarkerName(String columnName){
         int i = Stream.of('-', '_', '.').mapToInt(suf -> columnName.lastIndexOf(suf)).max().orElse(-1);
         String markerName = (i >= 0 ? columnName.substring(0, i) : columnName);
-        if(markerName.equals("")){
-            throw new IOException(String.format(
-                    "Invalid marker name at column %d (%s).", c, columnName
-            ));
-        }
         return markerName;
+    }
+    
+    /**
+     * Infer marker names and number of columns per marker from column names.
+     * Any suffix after the last dot, dash or underscore character is
+     * removed from the column name to obtain the marker name.
+     * 
+     * @param columnNames column names
+     * @return Linked hash map that maps the inferred marker names on the
+     *         number of columns for that marker. The order of entries in
+     *         the map corresponds to the original column order and is
+     *         retained due to the behavior of a linked hash map.
+     */
+    public static LinkedHashMap<String, Integer> inferMarkerNames(String[] columnNames){
+        if(columnNames == null){
+            throw new IllegalArgumentException("Column names undefined.");
+        }
+        LinkedHashMap<String, Integer> markerNames = new LinkedHashMap<>();
+        String curName = null;
+        for(int c = 0; c < columnNames.length; c++){
+            String columnName = columnNames[c];
+            if(columnName == null){
+                throw new IllegalArgumentException("Missing column name for column " + c + ".");
+            }
+            String markerName = inferMarkerName(columnName);
+            if(markerName.equals("")){
+                throw new IllegalArgumentException(String.format(
+                        "Invalid marker name at column %d (%s).", c, columnName
+                ));
+            }
+            if(curName == null || !markerName.equals(curName)){
+                // first column for new marker
+                if(markerNames.containsKey(markerName)){
+                    throw new IllegalArgumentException("Duplicate marker name: " + markerName + ". "
+                                + "Columns corresponding to same marker should occur consecutively.");
+                }
+                markerNames.put(markerName, 1);
+                curName = markerName;
+            } else {
+                // additional column for current marker
+                markerNames.put(markerName, markerNames.get(markerName) + 1);
+            }
+        }
+        return markerNames;
     }
     
     private static void increaseFrequency(Double[] freqs, int a, double incr){
