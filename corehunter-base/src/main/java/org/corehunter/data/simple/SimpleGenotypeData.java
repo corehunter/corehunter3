@@ -61,7 +61,6 @@ public class SimpleGenotypeData extends DataPojo implements GenotypeData {
     private static final String IDENTIFIERS_HEADER = "ID";
     
     private final Double[][][] alleleFrequencies;   // null element means missing value
-    private final boolean[][] hasMissingValues;     // which individuals have missing values for which markers
     private final int numberOfMarkers;
     private final int[] numberOfAllelesForMarker;
     private final int totalNumberAlleles;
@@ -190,12 +189,10 @@ public class SimpleGenotypeData extends DataPojo implements GenotypeData {
         // set total number of alleles
         totalNumberAlleles = Arrays.stream(numberOfAllelesForMarker).sum();
         
-        // copy allele frequencies and detect missing values
+        // copy allele frequencies
         this.alleleFrequencies = new Double[n][m][];
-        hasMissingValues = new boolean[n][m];
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < m; j++) {
-                hasMissingValues[i][j] = Arrays.stream(alleleFrequencies[i][j]).anyMatch(Objects::isNull);
                 this.alleleFrequencies[i][j] = Arrays.copyOf(
                         alleleFrequencies[i][j], numberOfAllelesForMarker[j]
                 );
@@ -276,7 +273,7 @@ public class SimpleGenotypeData extends DataPojo implements GenotypeData {
     
     @Override
     public boolean hasMissingValues(int id, int markerIndex) {
-        return hasMissingValues[id][markerIndex];
+        return Arrays.stream(alleleFrequencies[id][markerIndex]).anyMatch(Objects::isNull);
     }
     
     /**
