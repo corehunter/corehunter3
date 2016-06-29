@@ -145,6 +145,9 @@ public class API {
         if(alleleScores == null){
             throw new IllegalArgumentException("Allele scores are required.");
         }
+        if(alleleScores.length == 0){
+            throw new IllegalArgumentException("Empty allele score matrix.");
+        }
         int n = alleleScores.length;
         int m = alleleScores[0].length;
         if(ids == null){
@@ -161,6 +164,62 @@ public class API {
         }
         // create and return data
         return new SimpleBiAllelicGenotypeData(createHeaders(ids, names), markerNames, toIntegerMatrix(alleleScores));
+    }
+    
+    public static GenotypeData createFrequencyGenotypeData(double[][] frequencies,
+                                                           String[] ids, String[] names,
+                                                           String[] markerNames, String[][] alleleNames){
+        // check arguments
+        if(frequencies == null){
+            throw new IllegalArgumentException("Allele frequencies are required.");
+        }
+        if(frequencies.length == 0){
+            throw new IllegalArgumentException("Empty allele frequency matrix.");
+        }
+        int n = frequencies.length;
+        if(ids == null){
+            throw new IllegalArgumentException("Ids are required.");
+        }
+        if(ids.length != n){
+            throw new IllegalArgumentException("Number of ids does not correspond to number of rows.");
+        }
+        if(names != null && names.length != n){
+            throw new IllegalArgumentException("Number of names does not correspond to number of rows.");
+        }
+        if(markerNames == null){
+            throw new IllegalArgumentException("Marker names are required.");
+        }
+        int numMarkers = markerNames.length;
+        if(alleleNames == null){
+            throw new IllegalArgumentException("Allele names are required.");
+        }
+        if(alleleNames.length != numMarkers){
+            throw new IllegalArgumentException("Size of allele names array does not correspond to number of markers.");
+        }
+        // infer allele counts from allele names
+        int[] alleleCounts = Arrays.stream(alleleNames).mapToInt(alleles -> alleles.length).toArray();
+        int totalNumAlleles = Arrays.stream(alleleCounts).sum();
+        // split alleles per marker and convert to Double with missing values encoded as null
+        Double[][][] convFreqs = new Double[n][numMarkers][];
+        for(int i = 0; i < n; i++){
+            if(frequencies[i].length != totalNumAlleles){
+                throw new IllegalArgumentException("Incorrect number of values at row " + i + ".");
+            }
+            int j = 0;
+            for(int m = 0; m < numMarkers; m++){
+                int markerAllelCount = alleleCounts[m];
+                convFreqs[i][m] = new Double[markerAllelCount];
+                for(int a = 0; a < markerAllelCount; a++){
+                    Double freq = frequencies[i][j++];
+                    // rJava encodes missing double values (NA in R) as NaN in Java
+                    if(Double.isNaN(freq)){
+                        freq = null;
+                    }
+                    convFreqs[i][m][a] = freq;
+                }
+            }
+        }
+        return new SimpleGenotypeData(createHeaders(ids, names), markerNames, alleleNames, convFreqs);
     }
     
     public static String[][] getAlleles(GenotypeData data){
