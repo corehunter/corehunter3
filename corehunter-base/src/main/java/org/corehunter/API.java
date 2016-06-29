@@ -21,7 +21,6 @@ package org.corehunter;
 
 import java.io.IOException;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import org.corehunter.data.CoreHunterData;
@@ -41,7 +40,6 @@ import uno.informatics.data.dataset.FeatureData;
 import uno.informatics.data.feature.array.ArrayFeatureData;
 import uno.informatics.data.io.FileType;
 import uno.informatics.data.pojo.DataPojo;
-import uno.informatics.data.pojo.FeaturePojo;
 import uno.informatics.data.pojo.SimpleEntityPojo;
 
 /**
@@ -140,19 +138,6 @@ public class API {
         );
     }
     
-    public static String[][] getAlleles(GenotypeData data){
-        int numMarkers = data.getNumberOfMarkers();
-        String[][] alleles = new String[numMarkers][];
-        for(int m = 0; m < numMarkers; m++){
-            int numAlleles = data.getNumberOfAlleles(m);
-            alleles[m] = new String[numAlleles];
-            for(int a = 0; a < numAlleles; a++){
-                alleles[m][a] = data.getAlleleName(m, a);
-            }
-        }
-        return alleles;
-    }
-    
     public static GenotypeData createBiparentalGenotypeData(int[][] alleleScores,
                                                             String[] ids, String[] names,
                                                             String[] markerNames){
@@ -176,6 +161,28 @@ public class API {
         }
         // create and return data
         return new SimpleBiAllelicGenotypeData(createHeaders(ids, names), markerNames, toIntegerMatrix(alleleScores));
+    }
+    
+    public static String[][] getAlleles(GenotypeData data){
+        int numMarkers = data.getNumberOfMarkers();
+        String[][] alleles = new String[numMarkers][];
+        for(int m = 0; m < numMarkers; m++){
+            int numAlleles = data.getNumberOfAlleles(m);
+            alleles[m] = new String[numAlleles];
+            for(int a = 0; a < numAlleles; a++){
+                alleles[m][a] = data.getAlleleName(m, a);
+            }
+        }
+        return alleles;
+    }
+    
+    public static String[] getMarkerNames(GenotypeData data){
+        int numMarkers = data.getNumberOfMarkers();
+        String[] markerNames = new String[numMarkers];
+        for(int m = 0; m < numMarkers; m++){
+            markerNames[m] = data.getMarkerName(m);
+        }
+        return markerNames;
     }
     
     /* -------------- */
