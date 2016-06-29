@@ -772,7 +772,7 @@ public class SimpleGenotypeData extends DataPojo implements GenotypeData {
         if(columnName == null){
             throw new IOException("Missing column name for column " + c + ".");
         }
-        int i = Stream.of('-', '_', '.').mapToInt(suf -> columnName.indexOf(suf)).max().orElse(-1);
+        int i = Stream.of('-', '_', '.').mapToInt(suf -> columnName.lastIndexOf(suf)).max().orElse(-1);
         String markerName = (i >= 0 ? columnName.substring(0, i) : columnName);
         if(markerName.equals("")){
             throw new IOException(String.format(
