@@ -139,6 +139,57 @@ public class API {
         );
     }
     
+    public static GenotypeData createDefaultGenotypeData(String[][] data,
+                                                         String[] ids, String[] names,
+                                                         String[] columnNames){
+        // check arguments
+        if(data == null){
+            throw new IllegalArgumentException("Data is required.");
+        }
+        if(data.length == 0){
+            throw new IllegalArgumentException("Empty allele matrix.");
+        }
+        int n = data.length;
+        int c = data[0].length;
+        if(ids == null){
+            throw new IllegalArgumentException("Ids are required.");
+        }
+        if(ids.length != n){
+            throw new IllegalArgumentException("Number of ids does not correspond to number of rows.");
+        }
+        if(names != null && names.length != n){
+            throw new IllegalArgumentException("Number of names does not correspond to number of rows.");
+        }
+        if(columnNames == null){
+            throw new IllegalArgumentException("Column names are required.");
+        }
+        if(columnNames.length != c){
+            throw new IllegalArgumentException("Number of column names does not correspond to number of columns.");
+        }
+        // infer marker names and number of columns per marker
+        HashMap<String, Integer> markers = SimpleGenotypeData.inferMarkerNames(columnNames);
+        int numMarkers = markers.size();
+        String[] markerNames = markers.keySet().toArray(new String[0]);
+        Integer[] markerNumCols = markers.values().toArray(new Integer[0]);
+        // split data per marker
+        String[][][] splitData = new String[n][numMarkers][];
+        for(int i = 0; i < n; i++){
+            if(data[i].length != c){
+                throw new IllegalArgumentException("Incorrect number of values at row " + i + ".");
+            }
+            int j = 0;
+            for(int m = 0; m < numMarkers; m++){
+                int markerCols = markerNumCols[m];
+                splitData[i][m] = new String[markerCols];
+                for(int mc = 0; mc < markerCols; mc++){
+                    splitData[i][m][mc] = data[i][j++];
+                }
+            }
+        }
+        // create and return data
+        return SimpleGenotypeData.createDefaultData(splitData, ids, names, markerNames);
+    }
+    
     public static GenotypeData createBiparentalGenotypeData(int[][] alleleScores,
                                                             String[] ids, String[] names,
                                                             String[] markerNames){

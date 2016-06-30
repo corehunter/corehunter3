@@ -19,9 +19,6 @@
 
 package org.corehunter.data.simple;
 
-
-import static uno.informatics.common.Constants.UNKNOWN_COUNT;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -30,7 +27,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -660,76 +656,93 @@ public class SimpleGenotypeData extends DataPojo implements GenotypeData {
                 }
             }
             
-            // 4: infer and sort allele names per marker
-            String[][] alleleNames = new String[numMarkers][];
-            for(int m = 0; m < numMarkers; m++){
-                // infer set of observed alleles for marker m (sort)
-                Set<String> alleles = new TreeSet<>();
-                for(int i = 0; i < n; i++){
-                    for(String observed : observedAlleles[i][m]){
-                        if(observed != null){
-                            alleles.add(observed);
-                        }
-                    }
-                }
-                // check: at least one allele
-                if(alleles.isEmpty()){
-                    throw new IOException(String.format(
-                            "No data for marker %s.", markerNames[m]
-                    ));
-                }
-                // convert to array and store
-                alleleNames[m] = alleles.toArray(new String[alleles.size()]);
-            }
-            
-            // 5: infer frequencies
-            Double[][][] alleleFreqs = new Double[n][numMarkers][];
-            for(int i = 0; i < n; i++){
-                for(int m = 0; m < numMarkers; m++){
-                    String[] markerAlleleNames = alleleNames[m];
-                    int totalNumAlleles = markerAlleleNames.length;
-                    String[] observed = observedAlleles[i][m];
-                    Double[] freqs = new Double[totalNumAlleles];
-                    // check for missing values
-                    if(Arrays.stream(observed).noneMatch(Objects::isNull)){
-                        // no missing values
-                        Arrays.fill(freqs, 0.0);
-                    }
-                    // increase frequencies according to the observed alleles
-                    double incr = 1.0 / observed.length;
-                    for(int possibleAllele = 0; possibleAllele < totalNumAlleles; possibleAllele++){
-                        for(int observedAllele = 0; observedAllele < observed.length; observedAllele++){
-                            if(markerAlleleNames[possibleAllele].equals(observed[observedAllele])){
-                                increaseFrequency(freqs, possibleAllele, incr);
-                            }
-                        }
-                    }
-                    alleleFreqs[i][m] = freqs;
-                }
-            }
-            
-            // combine names and identifiers in headers
-            SimpleEntity[] headers = new SimpleEntity[n];
-            for(int i = 0; i < n; i++){
-                if (itemNames[i] != null) {
-                    headers[i] = new SimpleEntityPojo(itemIdentifiers[i], itemNames[i]);
-                } else {
-                    headers[i] = new SimpleEntityPojo(itemIdentifiers[i]);
-                }     
-            }
-            
-            try{
-                // create data
-                return new SimpleGenotypeData(filePath.getFileName().toString(),
-                                                     headers, markerNames,
-                                                     alleleNames, alleleFreqs);
-            } catch(IllegalArgumentException ex){
-                // convert to IO exception
-                throw new IOException(ex.getMessage());
+            // 4: create data (convert to frequencies)
+            try {
+                return createDefaultData(observedAlleles, itemIdentifiers, itemNames,
+                                         markerNames, filePath.getFileName().toString());
+            } catch (IllegalArgumentException ex){
+                throw new IOException(ex);
             }
             
         }
                 
+    }
+    
+    public static SimpleGenotypeData createDefaultData(String[][][] data, String[] ids, String[] names,
+                                                       String[] markerNames){
+        return createDefaultData(data, ids, names, markerNames, null);
+    }
+    
+    public static SimpleGenotypeData createDefaultData(String[][][] data, String[] ids, String[] names,
+                                                       String[] markerNames, String dataName){
+        int n = data.length;
+        int numMarkers = data[0].length;
+        
+        // 1: infer and sort allele names per marker
+        String[][] alleleNames = new String[numMarkers][];
+        for(int m = 0; m < numMarkers; m++){
+            // infer set of observed alleles for marker m (sort)
+            Set<String> alleles = new TreeSet<>();
+            for(int i = 0; i < n; i++){
+                for(String observed : data[i][m]){
+                    if(observed != null){
+                        alleles.add(observed);
+                    }
+                }
+            }
+            // check: at least one allele
+            if(alleles.isEmpty()){
+                throw new IllegalArgumentException(String.format(
+                        "No data for marker %s.", markerNames[m]
+                ));
+            }
+            // convert to array and store
+            alleleNames[m] = alleles.toArray(new String[alleles.size()]);
+        }
+
+        // 2: infer frequencies
+        Double[][][] alleleFreqs = new Double[n][numMarkers][];
+        for(int i = 0; i < n; i++){
+            for(int m = 0; m < numMarkers; m++){
+                String[] markerAlleleNames = alleleNames[m];
+                int totalNumAlleles = markerAlleleNames.length;
+                String[] observed = data[i][m];
+                Double[] freqs = new Double[totalNumAlleles];
+                // check for missing values
+                if(Arrays.stream(observed).noneMatch(Objects::isNull)){
+                    // no missing values
+                    Arrays.fill(freqs, 0.0);
+                }
+                // increase frequencies according to the observed alleles
+                double incr = 1.0 / observed.length;
+                for(int possibleAllele = 0; possibleAllele < totalNumAlleles; possibleAllele++){
+                    for(int observedAllele = 0; observedAllele < observed.length; observedAllele++){
+                        if(markerAlleleNames[possibleAllele].equals(observed[observedAllele])){
+                            increaseFrequency(freqs, possibleAllele, incr);
+                        }
+                    }
+                }
+                alleleFreqs[i][m] = freqs;
+            }
+        }
+
+        // combine names and identifiers in headers
+        SimpleEntity[] headers = new SimpleEntity[n];
+        for(int i = 0; i < n; i++){
+            if (names[i] != null) {
+                headers[i] = new SimpleEntityPojo(ids[i], names[i]);
+            } else {
+                headers[i] = new SimpleEntityPojo(ids[i]);
+            }     
+        }
+        
+        // create data
+        if(dataName != null){
+            return new SimpleGenotypeData(dataName, headers, markerNames, alleleNames, alleleFreqs);
+        } else {
+            return new SimpleGenotypeData(headers, markerNames, alleleNames, alleleFreqs);
+        }
+        
     }
     
     private static String inferMarkerName(String columnName){
