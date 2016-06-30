@@ -359,7 +359,11 @@ public class API {
      * @param args Core Hunter arguments including data, objective and subset size.
      * @param mode Execution mode, one of "default" or "fast".
      * @param timeLimit Absolute runtime limit in seconds.
+     *                  If set to a negative value no time limit is used.
      * @param maxTimeWithoutImprovement Maximum time without finding an improvement, in seconds.
+     *                                  If set to a negative value, the default improvement time of
+     *                                  the chosen execution mode is used: 5 seconds in default mode,
+     *                                  1 second in fast mode.
      * @param silent If <code>true</code> no output is written to the console.
      * @return Indices of selected items (zero-based).
      */
