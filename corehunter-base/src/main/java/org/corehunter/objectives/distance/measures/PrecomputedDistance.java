@@ -47,6 +47,9 @@ public class PrecomputedDistance implements DistanceMeasure {
         // ignored (distances have already been computed)
     }
     
-    
+    @Override
+    public String toString(){
+        return "Precomputed";
+    }
 
 }

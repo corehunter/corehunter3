@@ -171,5 +171,10 @@ public class AverageAccessionToNearestEntry implements Objective<SubsetSolution,
     public boolean isMinimizing() {
         return true;
     }
+    
+    @Override
+    public String toString(){
+        return "Average accession to nearest entry (" + distanceMeasure + ")";
+    }
 
 }

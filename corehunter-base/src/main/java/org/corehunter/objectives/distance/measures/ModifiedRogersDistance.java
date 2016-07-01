@@ -66,4 +66,10 @@ public class ModifiedRogersDistance extends AbstractDistanceMeasure {
         return distance;
 
     }
+    
+    @Override
+    public String toString(){
+        return "Modified Rogers";
+    }
+    
 }

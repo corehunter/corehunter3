@@ -81,4 +81,9 @@ public class Coverage implements Objective<SubsetSolution, CoreHunterData> {
         return false;
     }
     
+    @Override
+    public String toString(){
+        return "Coverage";
+    }
+    
 }
