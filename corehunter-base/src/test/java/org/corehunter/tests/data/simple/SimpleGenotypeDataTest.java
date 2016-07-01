@@ -28,7 +28,6 @@ import static org.corehunter.tests.TestData.ALLELE_NAMES_HOMOZYGOUS;
 import static org.corehunter.tests.TestData.HEADERS_NON_UNIQUE_NAMES;
 import static org.corehunter.tests.TestData.HEADERS_UNIQUE_NAMES;
 import static org.corehunter.tests.TestData.MARKER_NAMES;
-import static org.corehunter.tests.TestData.MARKER_NAMES_PHASED;
 import static org.corehunter.tests.TestData.NAME;
 import static org.corehunter.tests.TestData.PRECISION;
 import static org.corehunter.tests.TestData.SET;
@@ -52,6 +51,7 @@ import uno.informatics.data.SimpleEntity;
 
 import org.corehunter.data.GenotypeData;
 
+import static org.corehunter.tests.TestData.MARKER_NAMES_DEFAULT;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -255,9 +255,9 @@ public class SimpleGenotypeDataTest {
         System.out.println(" |- In memory test (homozygous)");
         dataName = NAME;
         expectedHeaders = HEADERS_NON_UNIQUE_NAMES;
-        expectedMarkerNames = MARKER_NAMES_PHASED;
+        expectedMarkerNames = MARKER_NAMES_DEFAULT;
         expectedAlleleNames = ALLELE_NAMES_HOMOZYGOUS;
-        testDataHomozygous(new SimpleGenotypeData(NAME, HEADERS_NON_UNIQUE_NAMES, MARKER_NAMES_PHASED,
+        testDataHomozygous(new SimpleGenotypeData(NAME, HEADERS_NON_UNIQUE_NAMES, MARKER_NAMES_DEFAULT,
                                                          ALLELE_NAMES_HOMOZYGOUS, ALLELE_FREQUENCIES_HOMOZYGOUS));
     }
     
@@ -265,7 +265,7 @@ public class SimpleGenotypeDataTest {
     public void homozygousFromCsvFileWithIdsAndNames() throws IOException {
         dataName = "ids-and-names.csv";
         expectedHeaders = HEADERS_NON_UNIQUE_NAMES;
-        expectedMarkerNames = MARKER_NAMES_PHASED;
+        expectedMarkerNames = MARKER_NAMES_DEFAULT;
         expectedAlleleNames = ALLELE_NAMES_HOMOZYGOUS;
         System.out.println(" |- File homozygous/" + dataName);
         testDataHomozygous(SimpleGenotypeData.readData(
@@ -278,7 +278,7 @@ public class SimpleGenotypeDataTest {
     public void homozygousFromTxtFileWithIds() throws IOException {
         dataName = "ids.txt";
         expectedHeaders = HEADERS_UNIQUE_NAMES;
-        expectedMarkerNames = MARKER_NAMES_PHASED;
+        expectedMarkerNames = MARKER_NAMES_DEFAULT;
         expectedAlleleNames = ALLELE_NAMES_HOMOZYGOUS;
         System.out.println(" |- File homozygous/" + dataName);
         testDataHomozygous(SimpleGenotypeData.readData(
@@ -291,7 +291,7 @@ public class SimpleGenotypeDataTest {
     public void homozygousFromCsvFileWithIds() throws IOException {
         dataName = "ids.csv";
         expectedHeaders = HEADERS_UNIQUE_NAMES;
-        expectedMarkerNames = MARKER_NAMES_PHASED;
+        expectedMarkerNames = MARKER_NAMES_DEFAULT;
         expectedAlleleNames = ALLELE_NAMES_HOMOZYGOUS;
         System.out.println(" |- File homozygous/" + dataName);
         testDataHomozygous(SimpleGenotypeData.readData(
@@ -304,7 +304,7 @@ public class SimpleGenotypeDataTest {
     public void homozygousToCsvFile() throws IOException {
         dataName = "out.csv";
         expectedHeaders = HEADERS_NON_UNIQUE_NAMES;
-        expectedMarkerNames = MARKER_NAMES_PHASED;
+        expectedMarkerNames = MARKER_NAMES_DEFAULT;
         expectedAlleleNames = ALLELE_NAMES_HOMOZYGOUS;
         
         SimpleGenotypeData genotypicData = new SimpleGenotypeData(
@@ -337,9 +337,9 @@ public class SimpleGenotypeDataTest {
         System.out.println(" |- In memory test (diploid)");
         dataName = NAME;
         expectedHeaders = HEADERS_NON_UNIQUE_NAMES;
-        expectedMarkerNames = MARKER_NAMES_PHASED;
+        expectedMarkerNames = MARKER_NAMES_DEFAULT;
         expectedAlleleNames = ALLELE_NAMES_DIPLOID;
-        testDataDiploid(new SimpleGenotypeData(NAME, HEADERS_NON_UNIQUE_NAMES, MARKER_NAMES_PHASED,
+        testDataDiploid(new SimpleGenotypeData(NAME, HEADERS_NON_UNIQUE_NAMES, MARKER_NAMES_DEFAULT,
                                                       ALLELE_NAMES_DIPLOID, ALLELE_FREQUENCIES_DIPLOID));
     }
     
@@ -347,7 +347,7 @@ public class SimpleGenotypeDataTest {
     public void diploidFromTxtFileWithIds() throws IOException {
         dataName = "ids.txt";
         expectedHeaders = HEADERS_UNIQUE_NAMES;
-        expectedMarkerNames = MARKER_NAMES_PHASED;
+        expectedMarkerNames = MARKER_NAMES_DEFAULT;
         expectedAlleleNames = ALLELE_NAMES_DIPLOID;
         System.out.println(" |- File diploid/" + dataName);
         testDataDiploid(SimpleGenotypeData.readData(
@@ -360,7 +360,7 @@ public class SimpleGenotypeDataTest {
     public void diploidFromCsvFileWithIds() throws IOException {
         dataName = "ids.csv";
         expectedHeaders = HEADERS_UNIQUE_NAMES;
-        expectedMarkerNames = MARKER_NAMES_PHASED;
+        expectedMarkerNames = MARKER_NAMES_DEFAULT;
         expectedAlleleNames = ALLELE_NAMES_DIPLOID;
         System.out.println(" |- File diploid/" + dataName);
         testDataDiploid(SimpleGenotypeData.readData(
@@ -373,7 +373,7 @@ public class SimpleGenotypeDataTest {
     public void diploidFromCsvFileWithIdsAndNames() throws IOException {
         dataName = "ids-and-names.csv";
         expectedHeaders = HEADERS_NON_UNIQUE_NAMES;
-        expectedMarkerNames = MARKER_NAMES_PHASED;
+        expectedMarkerNames = MARKER_NAMES_DEFAULT;
         expectedAlleleNames = ALLELE_NAMES_DIPLOID;
         System.out.println(" |- File diploid/" + dataName);
         testDataDiploid(SimpleGenotypeData.readData(
@@ -386,7 +386,7 @@ public class SimpleGenotypeDataTest {
     public void diploidToCsvFile() throws IOException {
         dataName = "out.csv";
         expectedHeaders = HEADERS_NON_UNIQUE_NAMES;
-        expectedMarkerNames = MARKER_NAMES_PHASED;
+        expectedMarkerNames = MARKER_NAMES_DEFAULT;
         expectedAlleleNames = ALLELE_NAMES_DIPLOID;
         
         SimpleGenotypeData genotypicData = new SimpleGenotypeData(

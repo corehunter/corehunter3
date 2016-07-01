@@ -23,7 +23,6 @@ import java.util.Arrays;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.corehunter.data.simple.SimpleDistanceMatrixData;
 import org.jamesframework.core.problems.objectives.evaluations.Evaluation;
 import org.jamesframework.core.problems.objectives.evaluations.SimpleEvaluation;
 import uno.informatics.data.DataType;
@@ -86,10 +85,6 @@ public class TestData {
         SET.add(4);
     }
 
-    public static final SimpleDistanceMatrixData DATA = new SimpleDistanceMatrixData(
-            NAME, HEADERS_NON_UNIQUE_NAMES, DISTANCES
-    );
-
     public static final String[] MARKER_NAMES = {
         "mk1",
         "mk2",
@@ -109,7 +104,7 @@ public class TestData {
         null
     };
     
-    public static final String[] MARKER_NAMES_PHASED = {
+    public static final String[] MARKER_NAMES_DEFAULT = {
         "mk1",
         "mk2",
         "mk3",

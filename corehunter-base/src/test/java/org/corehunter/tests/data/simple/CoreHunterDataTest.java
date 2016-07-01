@@ -38,10 +38,11 @@ import uno.informatics.data.SimpleEntity;
 import uno.informatics.data.dataset.FeatureData;
 import uno.informatics.data.feature.array.ArrayFeatureData;
 
+import org.corehunter.data.GenotypeData;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import org.corehunter.data.GenotypeData;
 
 
 /**
@@ -166,7 +167,7 @@ public class CoreHunterDataTest {
     
     @Test
     public void testWhenAllDatasetsHaveSameHeaders() throws IOException {
-        
+                
         System.out.println(" |- Test when all datsets have same headers");
         
         DistanceMatrixData dist = readDistanceMatrixData(DISTANCES_UNIQUE_NAMES);
