@@ -345,8 +345,10 @@ public class API {
         );
     }
     
-    public static CoreHunterArguments createArguments(CoreHunterData data, int size, CoreHunterObjective[] objectives){
-        return new CoreHunterArguments(data, size, Arrays.asList(objectives));
+    public static CoreHunterArguments createArguments(CoreHunterData data, int size,
+                                                      CoreHunterObjective[] objectives,
+                                                      boolean normalizeMultiObjective){
+        return new CoreHunterArguments(data, size, Arrays.asList(objectives), normalizeMultiObjective);
     }
     
     /* --------- */
