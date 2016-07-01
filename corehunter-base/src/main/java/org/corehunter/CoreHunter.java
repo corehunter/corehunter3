@@ -19,8 +19,11 @@
 
 package org.corehunter;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import org.corehunter.data.CoreHunterData;
 import org.corehunter.exceptions.CoreHunterException;
@@ -45,6 +48,7 @@ import org.jamesframework.core.search.stopcriteria.MaxTimeWithoutImprovement;
 import org.jamesframework.core.subset.SubsetProblem;
 import org.jamesframework.core.subset.SubsetSolution;
 import org.jamesframework.core.subset.neigh.SingleSwapNeighbourhood;
+import org.jamesframework.ext.problems.objectives.NormalizedObjective;
 import org.jamesframework.ext.problems.objectives.WeightedIndex;
 
 /**
@@ -72,6 +76,7 @@ public class CoreHunter {
 
     /**
      * Create Core Hunter facade with the specified mode.
+     * <p>
      * In {@link CoreHunterExecutionMode#DEFAULT} mode parallel tempering is applied
      * and terminated when no improvement has been made for 5 seconds.
      * In {@link CoreHunterExecutionMode#FAST} mode random descent is applied
@@ -79,6 +84,14 @@ public class CoreHunter {
      * By default no absolute time limit is set in any of the two modes.
      * Stop conditions can be altered with {@link #setMaxTimeWithoutImprovement(long)}
      * and {@link #setTimeLimit(long)}.
+     * <p>
+     * In case of a multi-objective configuration with normalization enabled, a preliminary
+     * random descent search is performed per objective to determine suitable bounds based
+     * on the Pareto minima/maxima. If a time limit has been set, 10% of the available time
+     * is reserved for normalization of all objectives in total (equally divided among objectives).
+     * The actual execution than takes up to the remaining 90% of time.
+     * When limiting the time without finding an improvement, one tenth of that limit is applied
+     * for each preliminary normalization search (i.e. per objective).
      * 
      * @param mode execution mode
      */
@@ -104,13 +117,14 @@ public class CoreHunter {
         Search<SubsetSolution> search = createSearch(arguments);
 
         // set stop criteria
-        if(timeLimit <= 0 && maxTimeWithoutImprovement <= 0){
+        long remainingTime = arguments.isNormalized() ? (long) 900 * timeLimit : timeLimit; // in ms
+        if(remainingTime <= 0 && maxTimeWithoutImprovement <= 0){
             throw new IllegalStateException(
                     "Please specify time limit and/or maximum time without improvement before execution."
             );
         }
-        if (timeLimit > 0) {
-            search.addStopCriterion(new MaxRuntime(timeLimit, TimeUnit.SECONDS));
+        if (remainingTime > 0) {
+            search.addStopCriterion(new MaxRuntime(remainingTime, TimeUnit.MILLISECONDS));
         }
         if (maxTimeWithoutImprovement > 0){
             search.addStopCriterion(new MaxTimeWithoutImprovement(maxTimeWithoutImprovement, TimeUnit.SECONDS));
@@ -219,8 +233,17 @@ public class CoreHunter {
             } else {
                 // multiple objectives (weighted index)
                 WeightedIndex<SubsetSolution, CoreHunterData> weightedIndex =  new WeightedIndex<>();
-                for(CoreHunterObjective obj : objectives) {
-                    weightedIndex.addObjective(createObjective(data, obj), obj.getWeight());
+                // create all objectives
+                List<Objective<SubsetSolution, CoreHunterData>> jamesObjectives = objectives.stream()
+                        .map(obj -> createObjective(data, obj))
+                        .collect(Collectors.toList());
+                // normalize if requested
+                if(arguments.isNormalized()){
+                    jamesObjectives = normalizeObjectives(arguments, jamesObjectives);
+                }
+                // combine in weighted index
+                for(int o = 0; o < objectives.size(); o++) {
+                    weightedIndex.addObjective(jamesObjectives.get(o), objectives.get(o).getWeight());
                 }
                 return weightedIndex;
             }
@@ -317,6 +340,77 @@ public class CoreHunter {
         }
 
         return objective;
+    }
+    
+    private List<Objective<SubsetSolution, CoreHunterData>> normalizeObjectives(
+            CoreHunterArguments arguments,
+            List<Objective<SubsetSolution, CoreHunterData>> objectives
+    ){
+        
+        if(listener != null){
+            listener.preprocessingStarted("Normalizing objectives.");
+        }
+        
+        CoreHunterData data = arguments.getData();
+        int size = arguments.getSubsetSize();
+        
+        // determine optimal solution for each objective (extremes of Pareto front)
+        // through preliminary search per objective
+        List<SubsetSolution> optimalSolutions = new ArrayList<>();
+        objectives.forEach(obj -> {
+            SubsetProblem<CoreHunterData> problem = new SubsetProblem(data, obj, size);
+            Search<SubsetSolution> normalizationSearch = new RandomDescent<>(problem, new SingleSwapNeighbourhood());
+            // limit total normalization runtime to 10% of execution time limit
+            long normalizationTime = (long) (100.0 * timeLimit / objectives.size()); // in ms
+            if(normalizationTime > 0){
+                normalizationSearch.addStopCriterion(new MaxRuntime(normalizationTime, TimeUnit.MILLISECONDS));
+            }
+            // set improvement time to 10% of that used for execution, per normalization search
+            long normalizationImprTime = 100 * maxTimeWithoutImprovement; // in ms
+            if(maxTimeWithoutImprovement > 0){
+                normalizationSearch.addStopCriterion(
+                        new MaxTimeWithoutImprovement(normalizationImprTime, TimeUnit.MILLISECONDS)
+                );
+            }
+            // execute normalization search
+            normalizationSearch.run();
+            // store optimal solution for considered objective
+            optimalSolutions.add(normalizationSearch.getBestSolution());
+        });
+        
+        // normalize objective (lower-upper bound scaling with Pareto maxima/minima)
+        List<Objective<SubsetSolution, CoreHunterData>> normalizedObjectives = new ArrayList<>();
+        for(int o = 0; o < objectives.size(); o++){
+            Objective<SubsetSolution, CoreHunterData> obj = objectives.get(o);
+            // determine value of best solution in terms of this objective
+            double bestValue = obj.evaluate(optimalSolutions.get(o), data).getValue();
+            // determine values of all optimal solutions when evaluated with this objective
+            List<Double> allOpt = optimalSolutions.stream()
+                                                  .map(sol -> obj.evaluate(sol, data).getValue())
+                                                  .collect(Collectors.toList());
+            // set bounds taking into account whether the objective is minimized or maximized
+            double min, max;
+            if(obj.isMinimizing()){
+                // best solution value = lower bound
+                min = bestValue;
+                // max of all values = upper bound
+                max = Collections.max(allOpt);
+            } else {
+                // best solution value = upper bound
+                max = bestValue;
+                // min of all values = lower bound
+                min = Collections.min(allOpt);
+            }
+            // scale objective
+            normalizedObjectives.add(new NormalizedObjective<>(obj, min, max));
+        }
+        
+        if(listener != null){
+            listener.preprocessingStopped("Finished normalization.");
+        }
+        
+        return normalizedObjectives;
+        
     }
     
 }
