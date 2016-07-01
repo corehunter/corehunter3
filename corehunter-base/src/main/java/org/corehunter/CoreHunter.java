@@ -60,6 +60,7 @@ public class CoreHunter {
 
     private static final int DEFAULT_MAX_TIME_WITHOUT_IMPROVEMENT = 5;
     private static final int FAST_MAX_TIME_WITHOUT_IMPROVEMENT = 1;
+    private static final double RELATIVE_NORMALIZATION_TIME = 0.2;
     
     private static final int PT_NUM_REPLICAS = 10;
     private static final double PT_MIN_TEMP = 1e-8;
@@ -117,7 +118,11 @@ public class CoreHunter {
         Search<SubsetSolution> search = createSearch(arguments);
 
         // set stop criteria
-        long remainingTime = arguments.isNormalized() ? (long) 800 * timeLimit : timeLimit; // in ms
+        long remainingTime = 1000 * timeLimit; // sec to ms
+        if(arguments.isNormalized()){
+            // subtract time taken for normalization
+            remainingTime -= RELATIVE_NORMALIZATION_TIME * remainingTime;
+        }
         if(remainingTime <= 0 && maxTimeWithoutImprovement <= 0){
             throw new IllegalStateException(
                     "Please specify time limit and/or maximum time without improvement before execution."
@@ -370,13 +375,13 @@ public class CoreHunter {
             });
             SubsetProblem<CoreHunterData> problem = new SubsetProblem(data, index, size);
             Search<SubsetSolution> normalizationSearch = createSearch(problem, new SingleSwapNeighbourhood());
-            // limit total normalization runtime to 20% of execution time limit
-            long normalizationTime = (long) (200.0 * timeLimit / objectives.size()); // in ms
-            if(normalizationTime > 0){
-                normalizationSearch.addStopCriterion(new MaxRuntime(normalizationTime, TimeUnit.MILLISECONDS));
+            // limit total normalization runtime to 20% of execution time limit (in ms)
+            long normTime = (long) (1000 * timeLimit * RELATIVE_NORMALIZATION_TIME / objectives.size());
+            if(normTime > 0){
+                normalizationSearch.addStopCriterion(new MaxRuntime(normTime, TimeUnit.MILLISECONDS));
             }
-            // set improvement time to one fifth of that used for execution, per normalization search
-            long normalizationImprTime = 200 * maxTimeWithoutImprovement; // in ms
+            // set improvement time to one fifth of that used for execution, per normalization search (in ms)
+            long normalizationImprTime = (long) (1000 * maxTimeWithoutImprovement * RELATIVE_NORMALIZATION_TIME);
             if(normalizationImprTime > 0){
                 normalizationSearch.addStopCriterion(
                         new MaxTimeWithoutImprovement(normalizationImprTime, TimeUnit.MILLISECONDS)
