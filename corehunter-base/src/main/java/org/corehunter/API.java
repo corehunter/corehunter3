@@ -23,17 +23,21 @@ import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 import org.corehunter.data.CoreHunterData;
 import org.corehunter.data.DistanceMatrixData;
 import org.corehunter.data.GenotypeData;
 import org.corehunter.data.GenotypeDataFormat;
+import org.corehunter.data.simple.SimpleBiAllelicGenotypeData;
 import org.corehunter.data.simple.SimpleDistanceMatrixData;
 import org.corehunter.data.simple.SimpleGenotypeData;
 import org.corehunter.listener.SimpleCoreHunterListener;
 import org.jamesframework.core.subset.SubsetSolution;
 import uno.informatics.data.Data;
+import uno.informatics.data.Feature;
+import uno.informatics.data.Scale;
 import uno.informatics.data.SimpleEntity;
 import uno.informatics.data.dataset.FeatureData;
 import uno.informatics.data.feature.array.ArrayFeatureData;
@@ -49,7 +53,7 @@ import uno.informatics.data.pojo.SimpleEntityPojo;
 public class API {
 
     private static final CoreHunterObjectiveType DEFAULT_OBJECTIVE = 
-            CoreHunterObjectiveType.AV_ACCESSION_TO_NEAREST_ENTRY;
+            CoreHunterObjectiveType.AV_ENTRY_TO_NEAREST_ENTRY;
     private static final CoreHunterMeasure DEFAULT_GENOTYPE_MEASURE = 
             CoreHunterMeasure.MODIFIED_ROGERS;
 
@@ -113,8 +117,11 @@ public class API {
         return SimpleDistanceMatrixData.readData(Paths.get(file), inferFileType(file));
     }
 
-    public static DistanceMatrixData createDistanceMatrixData(double[][] distances, String[] ids, String[] names) {
-        // combine ids and names into headers
+    public static DistanceMatrixData createDistanceMatrixData(double[][] distances, String[] ids, String[] names){
+        // check arguments
+        if(distances == null){
+            throw new IllegalArgumentException("Distances are required.");
+        }
         int n = distances.length;
         if (ids == null) {
             throw new IllegalArgumentException("Ids are required.");
@@ -122,23 +129,11 @@ public class API {
         if (ids.length != n) {
             throw new IllegalArgumentException("Number of ids does not correspond to size of matrix.");
         }
-        if (names == null) {
-            // use ids as names if no names are given
-            names = ids;
-        }
-        if (names.length != n) {
+        if(names != null && names.length != n){
             throw new IllegalArgumentException("Number of names does not correspond to size of matrix.");
         }
-        SimpleEntity[] headers = new SimpleEntity[n];
-        for (int i = 0; i < n; i++) {
-            if (names[i] != null) {
-                headers[i] = new SimpleEntityPojo(ids[i], names[i]);
-            } else {
-                headers[i] = new SimpleEntityPojo(ids[i]);
-            }
-        }
         // create and return data
-        return new SimpleDistanceMatrixData(headers, distances);
+        return new SimpleDistanceMatrixData(createHeaders(ids, names), distances);
     }
 
     /* ------------- */
@@ -149,8 +144,157 @@ public class API {
         return SimpleGenotypeData.readData(Paths.get(file), inferFileType(file),
                 GenotypeDataFormat.valueOf(format.toUpperCase()));
     }
-
-    public static String[][] getAlleles(GenotypeData data) {
+    
+    public static GenotypeData createDefaultGenotypeData(String[][] data,
+                                                         String[] ids, String[] names,
+                                                         String[] columnNames){
+        // check arguments
+        if(data == null){
+            throw new IllegalArgumentException("Data is required.");
+        }
+        if(data.length == 0){
+            throw new IllegalArgumentException("Empty allele matrix.");
+        }
+        int n = data.length;
+        int c = data[0].length;
+        if(ids == null){
+            throw new IllegalArgumentException("Ids are required.");
+        }
+        if(ids.length != n){
+            throw new IllegalArgumentException("Number of ids does not correspond to number of rows.");
+        }
+        if(names != null && names.length != n){
+            throw new IllegalArgumentException("Number of names does not correspond to number of rows.");
+        }
+        if(columnNames == null){
+            throw new IllegalArgumentException("Column names are required.");
+        }
+        if(columnNames.length != c){
+            throw new IllegalArgumentException("Number of column names does not correspond to number of columns.");
+        }
+        // infer marker names and number of columns per marker
+        HashMap<String, Integer> markers = SimpleGenotypeData.inferMarkerNames(columnNames);
+        int numMarkers = markers.size();
+        String[] markerNames = markers.keySet().toArray(new String[0]);
+        Integer[] markerNumCols = markers.values().toArray(new Integer[0]);
+        // split data per marker
+        String[][][] splitData = new String[n][numMarkers][];
+        for(int i = 0; i < n; i++){
+            if(data[i].length != c){
+                throw new IllegalArgumentException("Incorrect number of values at row " + i + ".");
+            }
+            int j = 0;
+            for(int m = 0; m < numMarkers; m++){
+                int markerCols = markerNumCols[m];
+                splitData[i][m] = new String[markerCols];
+                for(int mc = 0; mc < markerCols; mc++){
+                    splitData[i][m][mc] = data[i][j++];
+                }
+            }
+        }
+        // create and return data
+        return SimpleGenotypeData.createDefaultData(splitData, ids, names, markerNames);
+    }
+    
+    public static GenotypeData createBiparentalGenotypeData(int[][] alleleScores,
+                                                            String[] ids, String[] names,
+                                                            String[] markerNames){
+        // check arguments
+        if(alleleScores == null){
+            throw new IllegalArgumentException("Allele scores are required.");
+        }
+        if(alleleScores.length == 0){
+            throw new IllegalArgumentException("Empty allele score matrix.");
+        }
+        int n = alleleScores.length;
+        int m = alleleScores[0].length;
+        if(ids == null){
+            throw new IllegalArgumentException("Ids are required.");
+        }
+        if(ids.length != n){
+            throw new IllegalArgumentException("Number of ids does not correspond to number of rows.");
+        }
+        if(names != null && names.length != n){
+            throw new IllegalArgumentException("Number of names does not correspond to number of rows.");
+        }
+        if(markerNames != null && markerNames.length != m){
+            throw new IllegalArgumentException("Number of marker names does not correspond to number of columns.");
+        }
+        // create and return data
+        return new SimpleBiAllelicGenotypeData(createHeaders(ids, names), markerNames, toIntegerMatrix(alleleScores));
+    }
+    
+    public static GenotypeData createFrequencyGenotypeData(double[][] frequencies,
+                                                           String[] ids, String[] names,
+                                                           String[] columnNames, String[] alleleNames){
+        // check arguments
+        if(frequencies == null){
+            throw new IllegalArgumentException("Allele frequencies are required.");
+        }
+        if(frequencies.length == 0){
+            throw new IllegalArgumentException("Empty allele frequency matrix.");
+        }
+        int n = frequencies.length;
+        int c = frequencies[0].length;
+        if(ids == null){
+            throw new IllegalArgumentException("Ids are required.");
+        }
+        if(ids.length != n){
+            throw new IllegalArgumentException("Number of ids does not correspond to number of rows.");
+        }
+        if(names != null && names.length != n){
+            throw new IllegalArgumentException("Number of names does not correspond to number of rows.");
+        }
+        if(columnNames == null){
+            throw new IllegalArgumentException("Column names are required.");
+        }
+        if(columnNames.length != c){
+            throw new IllegalArgumentException("Number of column names does not correspond to number of columns.");
+        }
+        if(alleleNames == null){
+            throw new IllegalArgumentException("Allele names are required.");
+        }
+        if(alleleNames.length != c){
+            throw new IllegalArgumentException("Number of allele names does not correspond to number of columns.");
+        }
+        // infer marker names and allele counts from column names
+        HashMap<String, Integer> markers = SimpleGenotypeData.inferMarkerNames(columnNames);
+        int numMarkers = markers.size();
+        String[] markerNames = markers.keySet().toArray(new String[0]);
+        Integer[] alleleCounts = markers.values().toArray(new Integer[0]);
+        // split allele frequencies and names per marker
+        Double[][][] convFreqs = new Double[n][numMarkers][];
+        for(int i = 0; i < n; i++){
+            if(frequencies[i].length != c){
+                throw new IllegalArgumentException("Incorrect number of values at row " + i + ".");
+            }
+            int j = 0;
+            for(int m = 0; m < numMarkers; m++){
+                int markerAlleleCount = alleleCounts[m];
+                convFreqs[i][m] = new Double[markerAlleleCount];
+                for(int a = 0; a < markerAlleleCount; a++){
+                    Double freq = frequencies[i][j++];
+                    // rJava encodes missing double values (NA in R) as NaN in Java
+                    if(Double.isNaN(freq)){
+                        freq = null;
+                    }
+                    convFreqs[i][m][a] = freq;
+                }
+            }
+        }
+        String[][] convAlleles = new String[numMarkers][];
+        int j = 0;
+        for(int m = 0; m < numMarkers; m++){
+            int markerAlleleCount = alleleCounts[m];
+            convAlleles[m] = new String[markerAlleleCount];
+            for(int a = 0; a < markerAlleleCount; a++){
+                convAlleles[m][a] = alleleNames[j++];
+            }
+        }
+        return new SimpleGenotypeData(createHeaders(ids, names), markerNames, convAlleles, convFreqs);
+    }
+    
+    public static String[][] getAlleles(GenotypeData data){
         int numMarkers = data.getNumberOfMarkers();
         String[][] alleles = new String[numMarkers][];
         for (int m = 0; m < numMarkers; m++) {
@@ -162,13 +306,37 @@ public class API {
         }
         return alleles;
     }
-
+    
+    public static String[] getMarkerNames(GenotypeData data){
+        int numMarkers = data.getNumberOfMarkers();
+        String[] markerNames = new String[numMarkers];
+        for(int m = 0; m < numMarkers; m++){
+            markerNames[m] = data.getMarkerName(m);
+        }
+        return markerNames;
+    }
+    
     /* -------------- */
     /* Phenotype data */
     /* -------------- */
 
     public static FeatureData readPhenotypeData(String file) throws IOException {
         return ArrayFeatureData.readData(Paths.get(file), inferFileType(file));
+    }
+    
+    public static Double[] getRanges(FeatureData data){
+        List<Feature> features = data.getFeatures();
+        int numTraits = features.size();
+        Double[] ranges = new Double[numTraits];
+        for(int t = 0; t < numTraits; t++){
+            Scale scale = features.get(t).getMethod().getScale();
+            Number min = scale.getMinimumValue();
+            Number max = scale.getMaximumValue();
+            if(min != null && max != null){
+                ranges[t] = max.doubleValue() - min.doubleValue();
+            }
+        }
+        return ranges;
     }
 
     /* --------- */
@@ -179,9 +347,11 @@ public class API {
         return new CoreHunterObjective(CoreHunterObjectiveType.createFromAbbreviation(type),
                 CoreHunterMeasure.createFromAbbreviation(measure), weight);
     }
-
-    public static CoreHunterArguments createArguments(CoreHunterData data, int size, CoreHunterObjective[] objectives) {
-        return new CoreHunterArguments(data, size, Arrays.asList(objectives));
+    
+    public static CoreHunterArguments createArguments(CoreHunterData data, int size,
+                                                      CoreHunterObjective[] objectives,
+                                                      boolean normalizeMultiObjective){
+        return new CoreHunterArguments(data, size, Arrays.asList(objectives), normalizeMultiObjective);
     }
 
     /* --------- */
@@ -191,17 +361,15 @@ public class API {
     /**
      * Sample a core collection.
      * 
-     * @param args
-     *            Core Hunter arguments including data, objective and subset
-     *            size.
-     * @param mode
-     *            Execution mode, one of "default" or "fast".
-     * @param timeLimit
-     *            Absolute runtime limit in seconds.
-     * @param maxTimeWithoutImprovement
-     *            Maximum time without finding an improvement, in seconds.
-     * @param silent
-     *            If <code>true</code> no output is written to the console.
+     * @param args Core Hunter arguments including data, objective and subset size.
+     * @param mode Execution mode, one of "default" or "fast".
+     * @param timeLimit Absolute runtime limit in seconds.
+     *                  If set to a negative value no time limit is used.
+     * @param maxTimeWithoutImprovement Maximum time without finding an improvement, in seconds.
+     *                                  If set to a negative value, the default improvement time of
+     *                                  the chosen execution mode is used: 5 seconds in default mode,
+     *                                  1 second in fast mode.
+     * @param silent If <code>true</code> no output is written to the console.
      * @return Indices of selected items (zero-based).
      */
     public static int[] sampleCore(CoreHunterArguments args, String mode, int timeLimit, int maxTimeWithoutImprovement,
@@ -258,42 +426,36 @@ public class API {
     }
 
     /**
-     * Creates a list of default objectives, one for each type of data
-     * available.
+     * Creates a list of default objectives, one for each type of data available, with equal weights.
      * 
-     * @param coreHunterData
-     *            the data for which the objectives are required
-     * @return a list of default objectives, one for each type of data available
+     * @param coreHunterData the data for which the objectives are required
+     * @return list of default objectives
      */
     public static final List<CoreHunterObjective> createDefaultObjectives(CoreHunterData coreHunterData) {
         List<CoreHunterObjective> objectives = new ArrayList<>();
 
         if (coreHunterData != null) {
-            double count = 0.0;
-
-            if (coreHunterData.hasPhenotypes()) {
-                ++count;
-            }
-
+            int count = 0;
             if (coreHunterData.hasGenotypes()) {
                 ++count;
             }
-
-            if (coreHunterData.hasDistances()) {
+            if (coreHunterData.hasPhenotypes()) {
                 ++count;
             }
-
-            if (coreHunterData.hasPhenotypes()) {
-                objectives.add(new CoreHunterObjective(DEFAULT_OBJECTIVE, CoreHunterMeasure.GOWERS, 1.0 / count));
+            if (coreHunterData.hasDistances()) {
+                ++count;
             }
 
             if (coreHunterData.hasGenotypes()) {
                 objectives.add(new CoreHunterObjective(DEFAULT_OBJECTIVE, DEFAULT_GENOTYPE_MEASURE, 1.0 / count));
             }
-
+            if (coreHunterData.hasPhenotypes()) {
+                objectives.add(new CoreHunterObjective(DEFAULT_OBJECTIVE, CoreHunterMeasure.GOWERS, 1.0 / count));
+            }
             if (coreHunterData.hasDistances()) {
-                objectives.add(new CoreHunterObjective(DEFAULT_OBJECTIVE, CoreHunterMeasure.PRECOMPUTED_DISTANCE,
-                        1.0 / count));
+                objectives.add(new CoreHunterObjective(
+                        DEFAULT_OBJECTIVE, CoreHunterMeasure.PRECOMPUTED_DISTANCE, 1.0 / count
+                ));
             }
         }
 
@@ -301,28 +463,25 @@ public class API {
     }
 
     /**
-     * Creates a default allowed objective, the data. If the data contains
-     * phenotypic data, the default phenotypic data objective is returned. If no
-     * phenotypic data is available, then the default genotypic data objective
-     * is returned. Finally, if no phenotypic or genotypic data is available,
+     * Creates a default allowed objective for the data. If the data contains
+     * genotypic data, the default genotypic data objective is returned. If no
+     * genotypes are available, then the default phenotypic data objective
+     * is returned. Finally, if no genotypic or phenotypic data is available,
      * then the default distances data objective is returned.
      * 
-     * @param coreHunterData
-     *            the data for which the objective is required
-     * @return a default objective
+     * @param coreHunterData the data for which the objective is required
+     * @return a default objective (with weight 1.0)
      */
     public static CoreHunterObjective createDefaultObjective(CoreHunterData coreHunterData) {
 
         if (coreHunterData != null) {
 
-            if (coreHunterData.hasPhenotypes()) {
-                return new CoreHunterObjective(DEFAULT_OBJECTIVE, CoreHunterMeasure.GOWERS, 1.0);
-            }
-
             if (coreHunterData.hasGenotypes()) {
                 return new CoreHunterObjective(DEFAULT_OBJECTIVE, DEFAULT_GENOTYPE_MEASURE, 1.0);
             }
-
+            if (coreHunterData.hasPhenotypes()) {
+                return new CoreHunterObjective(DEFAULT_OBJECTIVE, CoreHunterMeasure.GOWERS, 1.0);
+            }
             if (coreHunterData.hasDistances()) {
                 return new CoreHunterObjective(DEFAULT_OBJECTIVE, CoreHunterMeasure.PRECOMPUTED_DISTANCE, 1.0);
             }
@@ -332,13 +491,10 @@ public class API {
     }
 
     /**
-     * Create a list of all possible CoreHunter objective types for a given data
-     * object
+     * Creates a list of all possible Core Hunter objective types for a given data object.
      * 
-     * @param coreHunterData
-     *            the data for which the objective types are required
-     * @return a list of all possible CoreHunter objective types for a given
-     *         data object
+     * @param coreHunterData  the data for which the objective types are required
+     * @return list of all possible Core Hunter objective types
      */
     public static final List<CoreHunterObjectiveType> getAllowedObjectives(CoreHunterData coreHunterData) {
         List<CoreHunterObjectiveType> objectives = new ArrayList<>();
@@ -361,52 +517,50 @@ public class API {
     }
 
     /**
-     * Create a list of all possible CoreHunter measures for a given data object
+     * Create a list of all possible Core Hunter measures for a given data object and objective type.
      * 
-     * @param coreHunterData
-     *            the data for which the measures are required
-     * @param objectiveType
-     *            the objective type for which the measures are required
-     * @return a list of all possible CoreHunter measures for a given data
-     *         object and objective type
+     * @param coreHunterData the data for which the measures are required
+     * @param objectiveType the objective type for which the measures are required
+     * @return list of all possible Core Hunter measures
      */
     public static final List<CoreHunterMeasure> getAllowedMeasures(CoreHunterData coreHunterData,
-            CoreHunterObjectiveType objectiveType) {
-        return getAllowedMeasures(coreHunterData.hasPhenotypes(), coreHunterData.hasGenotypes(),
-                coreHunterData.hasDistances(), objectiveType);
+                                                                   CoreHunterObjectiveType objectiveType) {
+        return getAllowedMeasures(
+                coreHunterData.hasPhenotypes(),
+                coreHunterData.hasGenotypes(),
+                coreHunterData.hasDistances(),
+                objectiveType
+        );
     }
 
     /**
-     * Create a list of all possible CoreHunter measures for a given data object
+     * Create a list of all possible Core Hunter measures for a given objective type
+     * taking into account whether genotypes, phenotypes and/or precomputed distances
+     * are available.
      * 
-     * @param hasPhenotypes
-     *            <code>true</code> if phenotypic data is present in the data
-     * @param hasGenotypes
-     *            <code>true</code> if genotypic data is present in the data
-     * @param hasDistances
-     *            <code>true</code> if distances data is present in the data
-     * @param objectiveType
-     *            the objective type for which the measures are required
-     * @return a list of all possible CoreHunter measures for a given data
-     *         types and objective type
+     * @param hasGenotypes <code>true</code> if genotypic data is present in the data
+     * @param hasPhenotypes <code>true</code> if phenotypic data is present in the data
+     * @param hasDistances <code>true</code> if distances data is present in the data
+     * @param objectiveType the objective type for which the measures are required
+     * @return list of all possible Core Hunter measures
      */
-    public static final List<CoreHunterMeasure> getAllowedMeasures(boolean hasPhenotypes, boolean hasGenotypes,
-            boolean hasDistances, CoreHunterObjectiveType objectiveType) {
+    public static final List<CoreHunterMeasure> getAllowedMeasures(boolean hasGenotypes,
+                                                                   boolean hasPhenotypes,
+                                                                   boolean hasDistances,
+                                                                   CoreHunterObjectiveType objectiveType) {
         List<CoreHunterMeasure> measures = new ArrayList<>();
 
         switch (objectiveType) {
             case AV_ACCESSION_TO_NEAREST_ENTRY:
             case AV_ENTRY_TO_ENTRY:
             case AV_ENTRY_TO_NEAREST_ENTRY:
-                if (hasPhenotypes) {
-                    measures.add(CoreHunterMeasure.GOWERS);
-                }
-
                 if (hasGenotypes) {
                     measures.add(CoreHunterMeasure.MODIFIED_ROGERS);
                     measures.add(CoreHunterMeasure.CAVALLI_SFORZA_EDWARDS);
                 }
-
+                if (hasPhenotypes) {
+                    measures.add(CoreHunterMeasure.GOWERS);
+                }
                 if (hasDistances) {
                     measures.add(CoreHunterMeasure.PRECOMPUTED_DISTANCE);
                 }
@@ -416,7 +570,6 @@ public class API {
             case SHANNON_DIVERSITY:
             default:
                 break;
-
         }
 
         return measures;
@@ -444,6 +597,41 @@ public class API {
             return FileType.CSV;
         }
         return null;
+    }
+    
+    private static SimpleEntity[] createHeaders(String[] ids, String[] names){
+        if(names == null){
+            names = ids;
+        }
+        int n = ids.length;
+        SimpleEntity[] headers = new SimpleEntity[n];
+        for(int i = 0; i < n; i++){
+            if(names[i] != null){
+                headers[i] = new SimpleEntityPojo(ids[i], names[i]);
+            } else {
+                headers[i] = new SimpleEntityPojo(ids[i]);
+            }
+        }
+        return headers;
+    }
+    
+    /**
+     * Convert primitive to Integer matrix.
+     * All occurrences of {@link Integer#MIN_VALUE} are replaced with <code>null</code>,
+     * which is used by rJava to encode missing values (NAs in R).
+     * 
+     * @param matrix primitive integer matrix
+     * @return Integer matrix
+     */
+    private static Integer[][] toIntegerMatrix(int[][] matrix){
+        Integer[][] conv = new Integer[matrix.length][];
+        for(int i = 0; i < conv.length; i++){
+            conv[i] = new Integer[matrix[i].length];
+            for(int j = 0; j < conv[i].length; j++){
+                conv[i][j] = (matrix[i][j] != Integer.MIN_VALUE ? matrix[i][j] : null);
+            }
+        }
+        return conv;
     }
 
 }

@@ -80,4 +80,9 @@ public class Shannon implements Objective<SubsetSolution, CoreHunterData> {
         return false;
     }
     
+    @Override
+    public String toString(){
+        return "Shannon";
+    }
+    
 }

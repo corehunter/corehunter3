@@ -242,5 +242,10 @@ public class GowerDistance extends AbstractDistanceMeasure {
         }
         return 1.0;
     }
+    
+    @Override
+    public String toString(){
+        return "Gower";
+    }
 
 }

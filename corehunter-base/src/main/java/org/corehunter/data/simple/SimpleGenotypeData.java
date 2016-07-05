@@ -19,17 +19,14 @@
 
 package org.corehunter.data.simple;
 
-
-import static uno.informatics.common.Constants.UNKNOWN_COUNT;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -60,7 +57,6 @@ public class SimpleGenotypeData extends DataPojo implements GenotypeData {
     private static final String IDENTIFIERS_HEADER = "ID";
     
     private final Double[][][] alleleFrequencies;   // null element means missing value
-    private final boolean[][] hasMissingValues;     // which individuals have missing values for which markers
     private final int numberOfMarkers;
     private final int[] numberOfAllelesForMarker;
     private final int totalNumberAlleles;
@@ -189,12 +185,10 @@ public class SimpleGenotypeData extends DataPojo implements GenotypeData {
         // set total number of alleles
         totalNumberAlleles = Arrays.stream(numberOfAllelesForMarker).sum();
         
-        // copy allele frequencies and detect missing values
+        // copy allele frequencies
         this.alleleFrequencies = new Double[n][m][];
-        hasMissingValues = new boolean[n][m];
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < m; j++) {
-                hasMissingValues[i][j] = Arrays.stream(alleleFrequencies[i][j]).anyMatch(Objects::isNull);
                 this.alleleFrequencies[i][j] = Arrays.copyOf(
                         alleleFrequencies[i][j], numberOfAllelesForMarker[j]
                 );
@@ -275,7 +269,7 @@ public class SimpleGenotypeData extends DataPojo implements GenotypeData {
     
     @Override
     public boolean hasMissingValues(int id, int markerIndex) {
-        return hasMissingValues[id][markerIndex];
+        return Arrays.stream(alleleFrequencies[id][markerIndex]).anyMatch(Objects::isNull);
     }
     
     /**
@@ -309,18 +303,15 @@ public class SimpleGenotypeData extends DataPojo implements GenotypeData {
      * respectively, identified with column/row header "ID". Optionally a second header column "NAME" can be
      * included to provide (not necessarily unique) item names in addition to the unique identifiers.
      * <p>
-     * Consecutive columns corresponding to the same marker should be tagged with the name of that marker, optionally
-     * followed by an arbitrary suffix starting with a dash, underscore or dot character. The latter allows to use
-     * column names such as "M1-1" and "M1-2", "M1.a" and "M1.b" or "M1_1" and "M1_2" for a marker named "M1" (in case
-     * of two columns per marker). The column name prefix up to before the last occurrence of any dash, underscore or
-     * dot character is taken to be the marker name.
+     * Consecutive columns corresponding to the same marker should have the same name, optionally extended with
+     * a suffix as described below.
      * 
      * <p>For {@link GenotypeDataFormat#FREQUENCY} the file contains allele frequencies following the
      * requirements as described in the constructor {@link #SimpleGenotypeData(String, SimpleEntity[], String[],
      * String[][], Double[][][])}. Missing frequencies are encoding as empty cells.
      * The file starts with a compulsory header row from which marker names and allele counts are inferred.
-     * All columns corresponding to the same marker occur consecutively in the file and are named after that marker.
-     * Marker names are required to be unique.
+     * All columns corresponding to the same marker occur consecutively in the file and are named after that marker,
+     * optionally including a suffix as described below. Marker names should be unique.
      * There is one compulsory header column "ID" containing unique item identifiers.
      * Optionally a second header column "NAME" can be included to provide (not necessarily unique)
      * item names in addition to the unique identifiers.
@@ -336,7 +327,10 @@ public class SimpleGenotypeData extends DataPojo implements GenotypeData {
      * In all formats leading and trailing whitespace is removed from names and unique identifiers and they are 
      * unquoted if wrapped in single or double quotes after whitespace removal. If it is intended to start or end a 
      * name/identifier with whitespace this whitespace should be contained within the quotes, as it will then not be 
-     * removed.
+     * removed. Also, column names may optionally include an arbitrary suffix added to the marker name, starting
+     * with a dash, underscore or dot character. The latter allows to use column names such as "M1-1" and "M1-2",
+     * "M1.a" and "M1.b" or "M1_1" and "M1_2" for a marker named "M1" with two columns. The column name prefix
+     * up to before the last occurrence of any dash, underscore or dot character is taken to be the marker name.
      * <p>
      * Trailing empty cells can be omitted from any row in the file.
      * <p>
@@ -428,40 +422,16 @@ public class SimpleGenotypeData extends DataPojo implements GenotypeData {
                                    .map(StringUtils::unquote)
                                    .toArray(n -> new String[n]);
             // extract/check names and infer number of alleles per marker
-            Set<String> markerNames = new LinkedHashSet<>(); // follows insertion order
-            List<Integer> allelesPerMarker = new ArrayList<>();
-            String prevName = null;
-            int curMarkerAlleleCount = UNKNOWN_COUNT;
-            for(String curName : markerNamesRow){
-                if(StringUtils.isBlank(curName)){
-                    throw new IOException("Some marker names are missing or empty.");
-                }
-                if(!curName.equals(prevName)){
-                    // start of new marker (check uniqueness)
-                    if(!markerNames.add(curName)){
-                        throw new IOException(String.format(
-                                "Marker names should be unique. Duplicate name: %s. "
-                              + "Columns with allele frequencies for the same marker "
-                              + "should occur consecutively in the file.", curName
-                        ));
-                    }
-                    // store allele count of previous marker
-                    if(prevName != null){
-                        allelesPerMarker.add(curMarkerAlleleCount);
-                    }
-                    // reset allele count
-                    curMarkerAlleleCount = 1;
-                } else {
-                    // increase allele count
-                    curMarkerAlleleCount++;
-                }
-                // update previous marker name
-                prevName = curName;
+            HashMap<String, Integer> markers;
+            try{
+                markers = inferMarkerNames(markerNamesRow);
+            } catch (IllegalArgumentException ex){
+                throw new IOException(ex);
             }
-            // store allele count of last marker
-            allelesPerMarker.add(curMarkerAlleleCount);
+            String[] markerNames = markers.keySet().toArray(new String[0]);
+            Integer[] alleleCounts = markers.values().toArray(new Integer[0]);
             // infer number of markers
-            int numMarkers = markerNames.size();
+            int numMarkers = markers.size();
             
             // 2: read data rows (and allele names header if provided)
             
@@ -492,7 +462,7 @@ public class SimpleGenotypeData extends DataPojo implements GenotypeData {
                     int aglob = numHeaderCols;
                     alleleNames = new String[numMarkers][];
                     for(int m = 0; m < numMarkers; m++){
-                        alleleNames[m] = new String[allelesPerMarker.get(m)];
+                        alleleNames[m] = new String[alleleCounts[m]];
                         for(int a = 0; a < alleleNames[m].length; a++){
                             alleleNames[m][a] = StringUtils.unquote(row[aglob]);
                             aglob++;
@@ -513,7 +483,7 @@ public class SimpleGenotypeData extends DataPojo implements GenotypeData {
                     Double[][] freqsPerMarker = new Double[numMarkers][];
                     int fglob = numHeaderCols;
                     for(int m = 0; m < numMarkers; m++){
-                        freqsPerMarker[m] = new Double[allelesPerMarker.get(m)];
+                        freqsPerMarker[m] = new Double[alleleCounts[m]];
                         for(int f = 0; f < freqsPerMarker[m].length; f++){
                             Double freq;
                             try {
@@ -557,13 +527,12 @@ public class SimpleGenotypeData extends DataPojo implements GenotypeData {
             }
             
             // convert collections to arrays
-            String[] markerNamesArray = markerNames.stream().toArray(k -> new String[k]);
             Double[][][] alleleFreqsArray = alleleFreqs.stream().toArray(k -> new Double[k][][]);
             
             try{
                 // create data
                 return new SimpleGenotypeData(filePath.getFileName().toString(),
-                                                     headers, markerNamesArray, alleleNames, alleleFreqsArray);
+                                                     headers, markerNames, alleleNames, alleleFreqsArray);
             } catch(IllegalArgumentException ex){
                 // convert to IO exception
                 throw new IOException(ex.getMessage());
@@ -650,25 +619,17 @@ public class SimpleGenotypeData extends DataPojo implements GenotypeData {
                 throw new IOException("No data columns.");
             }
             
-            LinkedList<String> markerNames = new LinkedList<>();
-            LinkedList<Integer> markerNumCols = new LinkedList<>();
             String[] headerRow = rows.get(0);
-            for(int c = numHeaderCols; c < numCols; c++){
-                String markerName = inferMarkerName(headerRow, c);
-                if(markerNames.isEmpty() || !markerName.equals(markerNames.getLast())){
-                    // first column for new marker
-                    if(markerNames.contains(markerName)){
-                        throw new IOException("Duplicate marker name: " + markerName + ". "
-                                + "Columns corresponding to same marker should occur consecutively in the file.");
-                    }
-                    markerNumCols.add(1);
-                    markerNames.add(markerName);
-                } else {
-                    // additional column for current marker
-                    markerNumCols.add(markerNumCols.removeLast() + 1);
-                }
+            String[] dataColumnNames = Arrays.copyOfRange(headerRow, numHeaderCols, numCols);
+            HashMap<String, Integer> markers;
+            try{
+                markers = inferMarkerNames(dataColumnNames);
+            } catch(IllegalArgumentException ex){
+                throw new IOException(ex);
             }
-            int numMarkers = markerNames.size();
+            int numMarkers = markers.size();
+            String[] markerNames = markers.keySet().toArray(new String[0]);
+            Integer[] markerNumCols = markers.values().toArray(new Integer[0]);
             
             // 2: extract item names/identifiers
 
@@ -687,7 +648,7 @@ public class SimpleGenotypeData extends DataPojo implements GenotypeData {
                 String[] row = rows.get(i+1);
                 int c = numHeaderCols;
                 for(int m = 0; m < numMarkers; m++){
-                    int nCol = markerNumCols.get(m);
+                    int nCol = markerNumCols[m];
                     observedAlleles[i][m] = new String[nCol];
                     for(int mc = 0; mc < nCol; mc++){
                         observedAlleles[i][m][mc] = row[c++];
@@ -695,91 +656,143 @@ public class SimpleGenotypeData extends DataPojo implements GenotypeData {
                 }
             }
             
-            // 4: infer and sort allele names per marker
-            String[][] alleleNames = new String[numMarkers][];
-            for(int m = 0; m < numMarkers; m++){
-                // infer set of observed alleles for marker m (sort)
-                Set<String> alleles = new TreeSet<>();
-                for(int i = 0; i < n; i++){
-                    for(String observed : observedAlleles[i][m]){
-                        if(observed != null){
-                            alleles.add(observed);
-                        }
-                    }
-                }
-                // check: at least one allele
-                if(alleles.isEmpty()){
-                    throw new IOException(String.format(
-                            "No data for marker %s.", markerNames.get(m)
-                    ));
-                }
-                // convert to array and store
-                alleleNames[m] = alleles.toArray(new String[alleles.size()]);
-            }
-            
-            // 5: infer frequencies
-            Double[][][] alleleFreqs = new Double[n][numMarkers][];
-            for(int i = 0; i < n; i++){
-                for(int m = 0; m < numMarkers; m++){
-                    String[] markerAlleleNames = alleleNames[m];
-                    int totalNumAlleles = markerAlleleNames.length;
-                    String[] observed = observedAlleles[i][m];
-                    Double[] freqs = new Double[totalNumAlleles];
-                    // check for missing values
-                    if(Arrays.stream(observed).noneMatch(Objects::isNull)){
-                        // no missing values
-                        Arrays.fill(freqs, 0.0);
-                    }
-                    // increase frequencies according to the observed alleles
-                    double incr = 1.0 / observed.length;
-                    for(int possibleAllele = 0; possibleAllele < totalNumAlleles; possibleAllele++){
-                        for(int observedAllele = 0; observedAllele < observed.length; observedAllele++){
-                            if(markerAlleleNames[possibleAllele].equals(observed[observedAllele])){
-                                increaseFrequency(freqs, possibleAllele, incr);
-                            }
-                        }
-                    }
-                    alleleFreqs[i][m] = freqs;
-                }
-            }
-            
-            // combine names and identifiers in headers
-            SimpleEntity[] headers = new SimpleEntity[n];
-            for(int i = 0; i < n; i++){
-                if (itemNames[i] != null) {
-                    headers[i] = new SimpleEntityPojo(itemIdentifiers[i], itemNames[i]);
-                } else {
-                    headers[i] = new SimpleEntityPojo(itemIdentifiers[i]);
-                }     
-            }
-            
-            try{
-                // create data
-                return new SimpleGenotypeData(filePath.getFileName().toString(),
-                                                     headers, markerNames.toArray(new String[0]),
-                                                     alleleNames, alleleFreqs);
-            } catch(IllegalArgumentException ex){
-                // convert to IO exception
-                throw new IOException(ex.getMessage());
+            // 4: create data (convert to frequencies)
+            try {
+                return createDefaultData(observedAlleles, itemIdentifiers, itemNames,
+                                         markerNames, filePath.getFileName().toString());
+            } catch (IllegalArgumentException ex){
+                throw new IOException(ex);
             }
             
         }
                 
     }
     
-    private static String inferMarkerName(String[] header, int c) throws IOException {
-        String columnName = header[c];
-        if(columnName == null){
-            throw new IOException("Missing column name for column " + c + ".");
+    public static SimpleGenotypeData createDefaultData(String[][][] data, String[] ids, String[] names,
+                                                       String[] markerNames){
+        return createDefaultData(data, ids, names, markerNames, null);
+    }
+    
+    public static SimpleGenotypeData createDefaultData(String[][][] data, String[] ids, String[] names,
+                                                       String[] markerNames, String dataName){
+        int n = data.length;
+        int numMarkers = data[0].length;
+        
+        // 1: infer and sort allele names per marker
+        String[][] alleleNames = new String[numMarkers][];
+        for(int m = 0; m < numMarkers; m++){
+            // infer set of observed alleles for marker m (sort)
+            Set<String> alleles = new TreeSet<>();
+            for(int i = 0; i < n; i++){
+                for(String observed : data[i][m]){
+                    if(observed != null){
+                        alleles.add(observed);
+                    }
+                }
+            }
+            // check: at least one allele
+            if(alleles.isEmpty()){
+                throw new IllegalArgumentException(String.format(
+                        "No data for marker %s.", markerNames[m]
+                ));
+            }
+            // convert to array and store
+            alleleNames[m] = alleles.toArray(new String[alleles.size()]);
         }
-        int i = Stream.of('-', '_', '.').mapToInt(suf -> columnName.indexOf(suf)).max().orElse(-1);
+
+        // 2: infer frequencies
+        Double[][][] alleleFreqs = new Double[n][numMarkers][];
+        for(int i = 0; i < n; i++){
+            for(int m = 0; m < numMarkers; m++){
+                String[] markerAlleleNames = alleleNames[m];
+                int totalNumAlleles = markerAlleleNames.length;
+                String[] observed = data[i][m];
+                Double[] freqs = new Double[totalNumAlleles];
+                // check for missing values
+                if(Arrays.stream(observed).noneMatch(Objects::isNull)){
+                    // no missing values
+                    Arrays.fill(freqs, 0.0);
+                }
+                // increase frequencies according to the observed alleles
+                double incr = 1.0 / observed.length;
+                for(int possibleAllele = 0; possibleAllele < totalNumAlleles; possibleAllele++){
+                    for(int observedAllele = 0; observedAllele < observed.length; observedAllele++){
+                        if(markerAlleleNames[possibleAllele].equals(observed[observedAllele])){
+                            increaseFrequency(freqs, possibleAllele, incr);
+                        }
+                    }
+                }
+                alleleFreqs[i][m] = freqs;
+            }
+        }
+
+        // combine names and identifiers in headers
+        SimpleEntity[] headers = new SimpleEntity[n];
+        for(int i = 0; i < n; i++){
+            if (names[i] != null) {
+                headers[i] = new SimpleEntityPojo(ids[i], names[i]);
+            } else {
+                headers[i] = new SimpleEntityPojo(ids[i]);
+            }     
+        }
+        
+        // create data
+        if(dataName != null){
+            return new SimpleGenotypeData(dataName, headers, markerNames, alleleNames, alleleFreqs);
+        } else {
+            return new SimpleGenotypeData(headers, markerNames, alleleNames, alleleFreqs);
+        }
+        
+    }
+    
+    private static String inferMarkerName(String columnName){
+        int i = Stream.of('-', '_', '.').mapToInt(suf -> columnName.lastIndexOf(suf)).max().orElse(-1);
         String markerName = (i >= 0 ? columnName.substring(0, i) : columnName);
-        if(markerName.equals("")){
-            throw new IOException(String.format(
-                    "Invalid marker name at column %d (%s).", c, columnName
-            ));
-        }
         return markerName;
+    }
+    
+    /**
+     * Infer marker names and number of columns per marker from column names.
+     * Any suffix after the last dot, dash or underscore character is
+     * removed from the column name to obtain the marker name.
+     * 
+     * @param columnNames column names
+     * @return Linked hash map that maps the inferred marker names on the
+     *         number of columns for that marker. The order of entries in
+     *         the map corresponds to the original column order and is
+     *         retained due to the behavior of a linked hash map.
+     */
+    public static LinkedHashMap<String, Integer> inferMarkerNames(String[] columnNames){
+        if(columnNames == null){
+            throw new IllegalArgumentException("Column names undefined.");
+        }
+        LinkedHashMap<String, Integer> markerNames = new LinkedHashMap<>();
+        String curName = null;
+        for(int c = 0; c < columnNames.length; c++){
+            String columnName = columnNames[c];
+            if(columnName == null){
+                throw new IllegalArgumentException("Missing column name for column " + c + ".");
+            }
+            String markerName = inferMarkerName(columnName);
+            if(markerName.equals("")){
+                throw new IllegalArgumentException(String.format(
+                        "Invalid marker name at column %d (%s).", c, columnName
+                ));
+            }
+            if(curName == null || !markerName.equals(curName)){
+                // first column for new marker
+                if(markerNames.containsKey(markerName)){
+                    throw new IllegalArgumentException("Duplicate marker name: " + markerName + ". "
+                                + "Columns corresponding to same marker should occur consecutively.");
+                }
+                markerNames.put(markerName, 1);
+                curName = markerName;
+            } else {
+                // additional column for current marker
+                markerNames.put(markerName, markerNames.get(markerName) + 1);
+            }
+        }
+        return markerNames;
     }
     
     private static void increaseFrequency(Double[] freqs, int a, double incr){

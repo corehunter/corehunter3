@@ -154,5 +154,10 @@ public class AverageEntryToEntry implements Objective<SubsetSolution, CoreHunter
     public boolean isMinimizing() {
         return false;
     }
+    
+    @Override
+    public String toString(){
+        return "Average entry to entry (" + distanceMeasure + ")";
+    }
 
 }

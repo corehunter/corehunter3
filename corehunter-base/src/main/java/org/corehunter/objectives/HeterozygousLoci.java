@@ -84,4 +84,9 @@ public class HeterozygousLoci implements Objective<SubsetSolution, CoreHunterDat
         return false;
     }
     
+    @Override
+    public String toString(){
+        return "Expected proportion of heterozygous loci";
+    }
+    
 }
