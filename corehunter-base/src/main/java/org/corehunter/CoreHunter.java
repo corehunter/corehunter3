@@ -22,6 +22,7 @@ package org.corehunter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -60,6 +61,7 @@ public class CoreHunter {
 
     private static final int DEFAULT_MAX_TIME_WITHOUT_IMPROVEMENT = 5;
     private static final int FAST_MAX_TIME_WITHOUT_IMPROVEMENT = 1;
+    private static final double RELATIVE_NORMALIZATION_TIME = 0.2;
     
     private static final int PT_NUM_REPLICAS = 10;
     private static final double PT_MIN_TEMP = 1e-8;
@@ -86,11 +88,11 @@ public class CoreHunter {
      * and {@link #setTimeLimit(long)}.
      * <p>
      * In case of a multi-objective configuration with normalization enabled, a preliminary
-     * random descent search is performed per objective to determine suitable bounds based
-     * on the Pareto minima/maxima. If a time limit has been set, 10% of the available time
-     * is reserved for normalization of all objectives in total (equally divided among objectives).
-     * The actual execution than takes up to the remaining 90% of time.
-     * When limiting the time without finding an improvement, one tenth of that limit is applied
+     * search is performed per objective to determine suitable bounds based  on the Pareto
+     * minima/maxima. If a time limit has been set, 20% of the available time is reserved
+     * for normalization of all objectives in total (equally divided among objectives).
+     * The actual execution than takes up to the remaining 80% of time.
+     * When limiting the time without finding an improvement, one fifth of that limit is applied
      * for each preliminary normalization search (i.e. per objective).
      * 
      * @param mode execution mode
@@ -117,7 +119,11 @@ public class CoreHunter {
         Search<SubsetSolution> search = createSearch(arguments);
 
         // set stop criteria
-        long remainingTime = arguments.isNormalized() ? (long) 900 * timeLimit : timeLimit; // in ms
+        long remainingTime = 1000 * timeLimit; // sec to ms
+        if(arguments.isNormalized()){
+            // subtract time taken for normalization
+            remainingTime -= RELATIVE_NORMALIZATION_TIME * remainingTime;
+        }
         if(remainingTime <= 0 && maxTimeWithoutImprovement <= 0){
             throw new IllegalStateException(
                     "Please specify time limit and/or maximum time without improvement before execution."
@@ -202,21 +208,22 @@ public class CoreHunter {
         SubsetProblem<CoreHunterData> problem = new SubsetProblem<>(arguments.getData(), objective, size);
         Neighbourhood<SubsetSolution> neigh = new SingleSwapNeighbourhood();
         
-        Search<SubsetSolution> search;
-        switch(mode){
-            case DEFAULT:
-                search = new ParallelTempering<>(problem, neigh, PT_NUM_REPLICAS, PT_MIN_TEMP, PT_MAX_TEMP);
-                break;
-            case FAST:
-                search = new RandomDescent<>(problem, neigh);
-                break;
-            default:
-                throw new CoreHunterException("Unknown execution mode " + mode + ".");
-
-        }
+        Search<SubsetSolution> search = createSearch(problem, neigh);
 
         return search;
 
+    }
+    
+    private Search<SubsetSolution> createSearch(SubsetProblem<CoreHunterData> problem,
+                                                Neighbourhood<SubsetSolution> neigh){
+        switch(mode){
+            case DEFAULT:
+                return new ParallelTempering<>(problem, neigh, PT_NUM_REPLICAS, PT_MIN_TEMP, PT_MAX_TEMP);
+            case FAST:
+                return new RandomDescent<>(problem, neigh);
+            default:
+                throw new CoreHunterException("Unknown execution mode " + mode + ".");
+        }
     }
 
     private Objective<SubsetSolution, CoreHunterData> createObjective(CoreHunterArguments arguments) {
@@ -358,16 +365,25 @@ public class CoreHunter {
         // through preliminary search per objective
         List<SubsetSolution> optimalSolutions = new ArrayList<>();
         objectives.forEach(obj -> {
-            SubsetProblem<CoreHunterData> problem = new SubsetProblem(data, obj, size);
-            Search<SubsetSolution> normalizationSearch = new RandomDescent<>(problem, new SingleSwapNeighbourhood());
-            // limit total normalization runtime to 10% of execution time limit
-            long normalizationTime = (long) (100.0 * timeLimit / objectives.size()); // in ms
-            if(normalizationTime > 0){
-                normalizationSearch.addStopCriterion(new MaxRuntime(normalizationTime, TimeUnit.MILLISECONDS));
+            // include other objectives as well with a very small weight to avoid
+            // weakly Pareto optimal solutions and improve stability of the normalization
+            WeightedIndex<SubsetSolution, CoreHunterData> index = new WeightedIndex<>();
+            index.addObjective(obj, 1.0);
+            objectives.forEach(otherObj -> {
+                if(!otherObj.equals(obj)){
+                    index.addObjective(otherObj, 1e-8);
+                }
+            });
+            SubsetProblem<CoreHunterData> problem = new SubsetProblem(data, index, size);
+            Search<SubsetSolution> normalizationSearch = createSearch(problem, new SingleSwapNeighbourhood());
+            // limit total normalization runtime to 20% of execution time limit (in ms)
+            long normTime = (long) (1000 * timeLimit * RELATIVE_NORMALIZATION_TIME / objectives.size());
+            if(normTime > 0){
+                normalizationSearch.addStopCriterion(new MaxRuntime(normTime, TimeUnit.MILLISECONDS));
             }
-            // set improvement time to 10% of that used for execution, per normalization search
-            long normalizationImprTime = 100 * maxTimeWithoutImprovement; // in ms
-            if(maxTimeWithoutImprovement > 0){
+            // set improvement time to one fifth of that used for execution, per normalization search (in ms)
+            long normalizationImprTime = (long) (1000 * maxTimeWithoutImprovement * RELATIVE_NORMALIZATION_TIME);
+            if(normalizationImprTime > 0){
                 normalizationSearch.addStopCriterion(
                         new MaxTimeWithoutImprovement(normalizationImprTime, TimeUnit.MILLISECONDS)
                 );
@@ -379,6 +395,7 @@ public class CoreHunter {
         });
         
         // normalize objective (lower-upper bound scaling with Pareto maxima/minima)
+        StringBuilder message = new StringBuilder();
         List<Objective<SubsetSolution, CoreHunterData>> normalizedObjectives = new ArrayList<>();
         for(int o = 0; o < objectives.size(); o++){
             Objective<SubsetSolution, CoreHunterData> obj = objectives.get(o);
@@ -403,10 +420,12 @@ public class CoreHunter {
             }
             // scale objective
             normalizedObjectives.add(new NormalizedObjective<>(obj, min, max));
+            message.append(String.format(Locale.ROOT, "%s: [%.3f, %.3f]%n", obj, min, max));
         }
         
+        message.append("Finished normalization.");
         if(listener != null){
-            listener.preprocessingStopped("Finished normalization.");
+            listener.preprocessingStopped(message.toString());
         }
         
         return normalizedObjectives;

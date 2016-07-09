@@ -172,4 +172,9 @@ public class AverageEntryToNearestEntry implements Objective<SubsetSolution, Cor
         return false;
     }
 
+    @Override
+    public String toString(){
+        return "Average entry to nearest entry (" + distanceMeasure + ")";
+    }
+    
 }

@@ -66,5 +66,10 @@ public class CavalliSforzaEdwardsDistance extends AbstractDistanceMeasure {
 
         return distance;
     }
+    
+    @Override
+    public String toString(){
+        return "Cavalli Sforza and Edwards";
+    }
 
 }
