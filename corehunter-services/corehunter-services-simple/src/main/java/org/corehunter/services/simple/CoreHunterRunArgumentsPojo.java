@@ -38,23 +38,17 @@ public class CoreHunterRunArgumentsPojo extends SimpleEntityPojo implements Core
     public CoreHunterRunArgumentsPojo(String name, int subsetSize, String datasetId,
             List<CoreHunterObjective> objectives) {
         super(UUID.randomUUID().toString(), name);
-        this.subsetSize = subsetSize;
-        this.datasetId = datasetId;
-        this.objectives = objectives;
+        setSubsetSize(subsetSize);
+        setDatasetId(datasetId);
+        setObjectives(objectives);
     }
 
     public CoreHunterRunArgumentsPojo(CoreHunterRunArguments arguments) {
         super(arguments.getUniqueIdentifier(), arguments.getName());
-        this.subsetSize = arguments.getSubsetSize();
-        this.datasetId = arguments.getDatasetId();
+        setSubsetSize(arguments.getSubsetSize());
+        setDatasetId(arguments.getDatasetId());
+        setObjectives(arguments.getObjectives()) ;
 
-        Iterator<CoreHunterObjective> iterator = arguments.getObjectives().iterator();
-        
-        this.objectives = new ArrayList<CoreHunterObjective>(arguments.getObjectives().size()) ;
-        
-        while (iterator.hasNext()) {
-            this.objectives.add(new CoreHunterObjective(iterator.next())) ; 
-        }
     }
 
     @Override
@@ -70,5 +64,27 @@ public class CoreHunterRunArgumentsPojo extends SimpleEntityPojo implements Core
     @Override
     public List<CoreHunterObjective> getObjectives() {
         return objectives;
+    }
+
+    protected final void setSubsetSize(int subsetSize) {
+        this.subsetSize = subsetSize;
+    }
+
+    protected final void setDatasetId(String datasetId) {
+        this.datasetId = datasetId;
+    }
+
+    protected final void setObjectives(List<CoreHunterObjective> objectives) {
+        if (objectives != null) {
+            Iterator<CoreHunterObjective> iterator = objectives.iterator();
+            
+            this.objectives = new ArrayList<CoreHunterObjective>(objectives.size()) ;
+            
+            while (iterator.hasNext()) {
+                this.objectives.add(new CoreHunterObjective(iterator.next())) ; 
+            }
+        } else {
+            this.objectives = new ArrayList<CoreHunterObjective>(0) ;
+        }
     }
 }
