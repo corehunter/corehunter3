@@ -97,21 +97,30 @@ public class SimpleCoreHunterRunServices implements CoreHunterRunServices {
     public boolean removeCoreHunterRun(String uniqueIdentifier) {
         CoreHunterRunnable corehunterRunnable = corehunterRunnableMap.get(uniqueIdentifier);
         
-        // TODO needs to try to stop run!
-
-        return corehunterRunnable != null;
+        if (corehunterRunnable != null) {
+            boolean stopped = corehunterRunnable.stop(); 
+            
+            if (stopped) {
+                corehunterRunnableMap.remove(uniqueIdentifier);
+                
+                return true ;
+            }
+        }
+        
+        return false ;
     }
     
     @Override
     public void deleteCoreHunterRun(String uniqueIdentifier) {
-        CoreHunterRunnable corehunterRunnable = corehunterRunnableMap.get(uniqueIdentifier);
-
-        // TODO needs to try to stop run or kill it
+        CoreHunterRunnable corehunterRunnable = corehunterRunnableMap.remove(uniqueIdentifier);
+        
+        if (corehunterRunnable != null) {
+            corehunterRunnable.stop(); 
+        }
     }
 
     @Override
     public List<CoreHunterRun> getAllCoreHunterRuns() {
-
 
         // iterates through all runnables can create new CoreHunterRun objects, which will be a snapshot 
         // of the current status of that runnable
@@ -170,6 +179,17 @@ public class SimpleCoreHunterRunServices implements CoreHunterRunServices {
         }
     }
     
+    @Override
+    public CoreHunterRunArguments getArguments(String uniqueIdentifier) {
+        CoreHunterRunnable corehunterRunnable = corehunterRunnableMap.get(uniqueIdentifier);
+
+        if (corehunterRunnable != null) {
+            return corehunterRunnable.getArguments();
+        } else {
+            return null;
+        }
+    }
+    
     public void shutdown() {
         if (!shuttingDown || shutDown) {
             shuttingDown = true ;
@@ -200,7 +220,7 @@ public class SimpleCoreHunterRunServices implements CoreHunterRunServices {
 
         public CoreHunterRunnable(CoreHunterRunArguments corehunterRunArguments) {
             super(createUniqueIdentifier(), corehunterRunArguments.getName());
-            this.corehunterRunArguments = corehunterRunArguments;
+            this.corehunterRunArguments = new CoreHunterRunArgumentsPojo(corehunterRunArguments);
 
             status = CoreHunterRunStatus.NOT_STARTED;
         }
@@ -237,8 +257,12 @@ public class SimpleCoreHunterRunServices implements CoreHunterRunServices {
             return endDate;
         }
 
-        public CoreHunterRunStatus getStatus() {
+        public synchronized CoreHunterRunStatus getStatus() {
             return status;
+        }
+
+        public final CoreHunterRunArguments getArguments() {
+            return corehunterRunArguments;
         }
 
         @Override
@@ -277,6 +301,11 @@ public class SimpleCoreHunterRunServices implements CoreHunterRunServices {
             endDate = new DateTime();
 
         }
+        
+        public boolean stop() {
+            return false ; // This simple implementation can not be stopped
+        }
+        
 
     }
 

@@ -21,6 +21,7 @@ package org.corehunter.services;
 
 import java.util.List;
 
+import org.corehunter.CoreHunterArguments;
 import org.jamesframework.core.subset.SubsetSolution;
 
 public interface CoreHunterRunServices {
@@ -49,7 +50,7 @@ public interface CoreHunterRunServices {
     /**
      * Removes the current CoreHunterRun and tries to stop the run if it is
      * still running, If the run can not be removed, the client will need to
-     * check at date or use the {@link #removeCoreHunterRun(String)} method
+     * check at later time or use the {@link #removeCoreHunterRun(String)} method
      * 
      * @param uniqueIdentifier
      *            the unique identifier of the run that was provided on
@@ -119,4 +120,14 @@ public interface CoreHunterRunServices {
      * @return the current error message provided by the run 
      */
     public SubsetSolution getSubsetSolution(String uniqueIdentifier);
+
+    /**
+     * Gets the arguments provided when the run was executed
+     * 
+     * @param uniqueIdentifier
+     *            the unique identifier of the run that was provided on
+     *            execution
+     * @return the arguments provided when the run was executed
+     */
+    CoreHunterRunArguments getArguments(String uniqueIdentifier);
 }

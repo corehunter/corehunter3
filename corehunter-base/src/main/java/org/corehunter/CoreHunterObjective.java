@@ -76,6 +76,17 @@ public class CoreHunterObjective {
         setMeasure(measure) ;
         setWeight(weight) ;
     }
+    
+    /**
+     * Creates a CoreHunter Objective from another objective. Copy Constructor.
+     * 
+     * @param objective the objective to be copied
+     */
+    public CoreHunterObjective(CoreHunterObjective objective) {
+        setObjectiveType(objective.getObjectiveType()) ;
+        setMeasure(objective.getMeasure()) ;
+        setWeight(objective.getWeight()) ;
+    }
 
     /**
      * Gets the objective type for this objective

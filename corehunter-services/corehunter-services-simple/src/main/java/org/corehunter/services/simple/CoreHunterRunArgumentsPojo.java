@@ -19,6 +19,8 @@
 
 package org.corehunter.services.simple;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 
@@ -39,6 +41,20 @@ public class CoreHunterRunArgumentsPojo extends SimpleEntityPojo implements Core
         this.subsetSize = subsetSize;
         this.datasetId = datasetId;
         this.objectives = objectives;
+    }
+
+    public CoreHunterRunArgumentsPojo(CoreHunterRunArguments arguments) {
+        super(arguments.getUniqueIdentifier(), arguments.getName());
+        this.subsetSize = arguments.getSubsetSize();
+        this.datasetId = arguments.getDatasetId();
+
+        Iterator<CoreHunterObjective> iterator = arguments.getObjectives().iterator();
+        
+        this.objectives = new ArrayList<CoreHunterObjective>(arguments.getObjectives().size()) ;
+        
+        while (iterator.hasNext()) {
+            this.objectives.add(new CoreHunterObjective(iterator.next())) ; 
+        }
     }
 
     @Override
