@@ -60,7 +60,7 @@ import org.jamesframework.ext.problems.objectives.WeightedIndex;
 public class CoreHunter {
 
     private static final int DEFAULT_MAX_TIME_WITHOUT_IMPROVEMENT = 10;
-    private static final int FAST_MAX_TIME_WITHOUT_IMPROVEMENT = 1;
+    private static final int FAST_MAX_TIME_WITHOUT_IMPROVEMENT = 2;
     private static final double RELATIVE_NORMALIZATION_TIME = 0.2;
     
     private static final int PT_NUM_REPLICAS = 10;
@@ -80,9 +80,9 @@ public class CoreHunter {
      * Create Core Hunter facade with the specified mode.
      * <p>
      * In {@link CoreHunterExecutionMode#DEFAULT} mode parallel tempering is applied
-     * and terminated when no improvement has been made for 10 seconds.
+     * and terminated when no improvement has been made for ten seconds.
      * In {@link CoreHunterExecutionMode#FAST} mode random descent is applied
-     * and terminated when no improvement has been made for 1 second.
+     * and terminated when no improvement has been made for two seconds.
      * By default no absolute time limit is set in any of the two modes.
      * Stop conditions can be altered with {@link #setMaxTimeWithoutImprovement(long)}
      * and {@link #setTimeLimit(long)}.
