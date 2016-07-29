@@ -41,6 +41,7 @@ import org.corehunter.data.DistanceMatrixData;
 import org.corehunter.data.GenotypeData;
 import org.corehunter.data.simple.SimpleDistanceMatrixData;
 import org.corehunter.data.simple.SimpleGenotypeData;
+import org.corehunter.listener.SimpleCoreHunterListener;
 import org.corehunter.objectives.AverageAccessionToNearestEntry;
 import org.corehunter.objectives.AverageEntryToEntry;
 import org.corehunter.objectives.HeterozygousLoci;
@@ -119,7 +120,6 @@ public class ITCorehunter {
         int size = 3;
         Objective<SubsetSolution, CoreHunterData> he = new HeterozygousLoci();
         Objective<SubsetSolution, CoreHunterData> ane = new AverageAccessionToNearestEntry(new GowerDistance());
-        List<Objective<SubsetSolution, CoreHunterData>> objs = Arrays.asList(he, ane);
         
         // determine optimal solution for each objective through exhaustive search
         SubsetSolution heOpt = getOptimalSolution(data, he, size);
