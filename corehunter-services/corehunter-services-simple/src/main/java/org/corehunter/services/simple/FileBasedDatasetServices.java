@@ -70,16 +70,15 @@ public class FileBasedDatasetServices implements DatasetServices {
 
     private Path path;
 
-    public FileBasedDatasetServices() throws IOException {
-        setPath(Paths.get(""));
-
-        initialise();
+    protected FileBasedDatasetServices() throws IOException {
+        datasetMap = new HashMap<String, DatasetPojo>();
+        dataCache = new HashMap<String, CoreHunterData>();
     }
 
     public FileBasedDatasetServices(Path path) throws IOException {
+        this() ;
+        
         setPath(path);
-
-        initialise();
     }
 
     public final Path getPath() {
@@ -394,6 +393,10 @@ public class FileBasedDatasetServices implements DatasetServices {
     @Override
     public Data getOriginalData(String datasetId, CoreHunterDataType dataType) throws DatasetException {
 
+        if (path == null) {
+            throw new DatasetException("Path not defined!");
+        }
+        
         if (datasetId == null) {
             throw new DatasetException("Dataset Id not defined!");
         }
@@ -558,9 +561,6 @@ public class FileBasedDatasetServices implements DatasetServices {
 
     @SuppressWarnings("unchecked")
     private void initialise() throws IOException {
-
-        datasetMap = new HashMap<String, DatasetPojo>();
-        dataCache = new HashMap<String, CoreHunterData>();
 
         if (!Files.exists(getPath())) {
             Files.createDirectories(getPath());
