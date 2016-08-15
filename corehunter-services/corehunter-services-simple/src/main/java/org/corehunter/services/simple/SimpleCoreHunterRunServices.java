@@ -41,11 +41,15 @@ import org.corehunter.services.CoreHunterRunStatus;
 import org.corehunter.services.DatasetServices;
 import org.jamesframework.core.subset.SubsetSolution;
 import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import uno.informatics.data.pojo.SimpleEntityPojo;
 
 public class SimpleCoreHunterRunServices implements CoreHunterRunServices {
 
+    Logger logger = LoggerFactory.getLogger(SimpleCoreHunterRunServices.class);
+    
     private DatasetServices datasetServices;
     private ExecutorService executor;
     private List<CoreHunterRun> corehunterRuns;
@@ -84,7 +88,7 @@ public class SimpleCoreHunterRunServices implements CoreHunterRunServices {
 
     @Override
     public CoreHunterRun getCoreHunterRun(String uniqueIdentifier) {
-        CoreHunterRunnable corehunterRunnable = corehunterRunnableMap.remove(uniqueIdentifier);
+        CoreHunterRunnable corehunterRunnable = corehunterRunnableMap.get(uniqueIdentifier);
 
         if (corehunterRunnable != null) {
             return new CoreHunterRunFromRunnable(corehunterRunnable);
@@ -101,7 +105,7 @@ public class SimpleCoreHunterRunServices implements CoreHunterRunServices {
             boolean stopped = corehunterRunnable.stop(); 
             
             if (stopped) {
-                corehunterRunnableMap.remove(uniqueIdentifier);
+                corehunterRunnableMap.remove(uniqueIdentifier); // only remove if it was stopped
                 
                 return true ;
             }
@@ -112,10 +116,13 @@ public class SimpleCoreHunterRunServices implements CoreHunterRunServices {
     
     @Override
     public void deleteCoreHunterRun(String uniqueIdentifier) {
-        CoreHunterRunnable corehunterRunnable = corehunterRunnableMap.remove(uniqueIdentifier);
-        
+        // remove regardless if it can not be stopped
+        CoreHunterRunnable corehunterRunnable = corehunterRunnableMap.remove(uniqueIdentifier); 
+
         if (corehunterRunnable != null) {
-            corehunterRunnable.stop(); 
+            if (!corehunterRunnable.stop()) {
+                logger.error("Can not stop runnable {}", corehunterRunnable.getName()); 
+            }
         }
     }
 
