@@ -393,8 +393,9 @@ public class API {
      * @param silent If <code>true</code> no output is written to the console.
      * @return Indices of selected items (zero-based).
      */
-    public static int[] sampleCore(CoreHunterArguments args, String mode, int timeLimit, int maxTimeWithoutImprovement,
-            boolean silent) {
+    public static int[] sampleCore(CoreHunterArguments args, String mode,
+                                   int timeLimit, int maxTimeWithoutImprovement,
+                                   boolean silent) {
         // interpret arguments
         CoreHunterExecutionMode exMode = CoreHunterExecutionMode.DEFAULT;
         if (mode.equals("fast")) {
@@ -403,10 +404,10 @@ public class API {
         // create Core Hunter executor
         CoreHunter ch = new CoreHunter(exMode);
         if (timeLimit > 0) {
-            ch.setTimeLimit(timeLimit);
+            ch.setTimeLimit(1000 * timeLimit); // convert to milliseconds
         }
         if (maxTimeWithoutImprovement > 0) {
-            ch.setMaxTimeWithoutImprovement(maxTimeWithoutImprovement);
+            ch.setMaxTimeWithoutImprovement(1000 * maxTimeWithoutImprovement); // convert to milliseconds
         }
         if (!silent) {
             ch.setListener(new SimpleCoreHunterListener());
