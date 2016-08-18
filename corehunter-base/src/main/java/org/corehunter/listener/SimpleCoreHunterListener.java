@@ -72,7 +72,7 @@ public class SimpleCoreHunterListener implements CoreHunterListener {
                                 SubsetSolution newBestSolution,
                                 Evaluation newBestSolutionEvaluation,
                                 Validation newBestSolutionValidation) {
-        printStream.format("%sValue: %f%n", prefix, newBestSolutionEvaluation.getValue());
+        printStream.format("%sCurrent value: %f%n", prefix, newBestSolutionEvaluation.getValue());
     }
 
     @Override
