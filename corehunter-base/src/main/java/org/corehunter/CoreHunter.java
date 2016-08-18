@@ -377,10 +377,6 @@ public class CoreHunter {
                         new MaxTimeWithoutImprovement(maxTimeWithoutImprovement, TimeUnit.SECONDS)
                 );
             }
-            // add search listener (if any)
-            if (listener != null) {
-                normSearch.addSearchListener(listener);
-            }
             // execute normalization search
             normSearch.run();
             // return best solution
