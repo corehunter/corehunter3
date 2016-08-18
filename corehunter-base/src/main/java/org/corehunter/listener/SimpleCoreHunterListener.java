@@ -77,11 +77,11 @@ public class SimpleCoreHunterListener implements CoreHunterListener {
 
     @Override
     public void preprocessingStarted(String message) {
-        printStream.format(prefix + message);
+        printStream.println(prefix + message);
     }
 
     @Override
     public void preprocessingStopped(String message) {
-        printStream.format(prefix + message);
+        printStream.println(prefix + message);
     }
 }
