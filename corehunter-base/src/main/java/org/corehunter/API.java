@@ -386,7 +386,7 @@ public class API {
      * the upper bound is set to the value of the best solution for that objective, while the lower
      * bound is set to the Pareto minimum, i.e. the minimum value obtained when evaluating all optimal
      * solutions with the considered objective. For an objective that is being minimized, the roles
-     * of minimum and maximum are interchanged.
+     * of upper and lower bound are interchanged, and the Pareto maximum is used instead.
      * 
      * @param args Core Hunter arguments including data, objectives and subset size.
      * @param mode Execution mode, one of "default" or "fast". Only affects the default
