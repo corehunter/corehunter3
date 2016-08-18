@@ -62,7 +62,9 @@ public class SimpleCoreHunterListener implements CoreHunterListener {
     public void searchStopped(Search<? extends SubsetSolution> search) {
         double t = search.getRuntime() / 1000;
         long s = search.getSteps();
-        printStream.println(prefix + "Search stopped (" + t + " sec, " + s + " steps)");
+        printStream.println(
+                prefix + "Search " + search.getName() + " stopped (" + t + " sec, " + s + " steps)"
+        );
     }
 
     @Override
@@ -70,16 +72,19 @@ public class SimpleCoreHunterListener implements CoreHunterListener {
                                 SubsetSolution newBestSolution,
                                 Evaluation newBestSolutionEvaluation,
                                 Validation newBestSolutionValidation) {
-        printStream.println(prefix + "New best solution: " + newBestSolutionEvaluation.getValue());
+        printStream.format(
+                "%s[%s]Value:%f%n",
+                prefix, search.getName(), newBestSolutionEvaluation.getValue()
+        );
     }
 
     @Override
     public void preprocessingStarted(String message) {
-        printStream.println(prefix + message);
+        printStream.format(prefix + message);
     }
 
     @Override
     public void preprocessingStopped(String message) {
-        printStream.println(prefix + message);
+        printStream.format(prefix + message);
     }
 }

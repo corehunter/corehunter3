@@ -37,7 +37,7 @@ public interface CoreHunterListener extends SearchListener<SubsetSolution> {
     default public void preprocessingStarted(String message) {}
 
     /**
-     * Fired when the pre-processing has stopped. Called only once prior to the search run
+     * Fired when the pre-processing has stopped. Called only once prior to the search run.
      *
      * @param message the message to be sent to the listener
      */

@@ -20,6 +20,7 @@
 package org.corehunter;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -41,7 +42,6 @@ import org.corehunter.objectives.distance.measures.ModifiedRogersDistance;
 import org.corehunter.objectives.distance.measures.PrecomputedDistance;
 import org.jamesframework.core.problems.objectives.Objective;
 import org.jamesframework.core.search.Search;
-import org.jamesframework.core.search.algo.BasicParallelSearch;
 import org.jamesframework.core.search.algo.ParallelTempering;
 import org.jamesframework.core.search.algo.RandomDescent;
 import org.jamesframework.core.search.neigh.Neighbourhood;
@@ -62,8 +62,7 @@ public class CoreHunter {
 
     private static final int DEFAULT_MAX_TIME_WITHOUT_IMPROVEMENT = 10;
     private static final int FAST_MAX_TIME_WITHOUT_IMPROVEMENT = 2;
-    private static final double RELATIVE_NORMALIZATION_TIME = 0.2;
-    private static final int NORMALIZATION_REPLICAS = 10;
+    private static final double RELATIVE_NORMALIZATION_TIME = 0.5;
     
     private static final int PT_NUM_REPLICAS = 10;
     private static final double PT_MIN_TEMP = 1e-8;
@@ -91,11 +90,10 @@ public class CoreHunter {
      * <p>
      * In case of a multi-objective configuration with normalization enabled, a preliminary
      * search is performed per objective to determine suitable bounds based  on the Pareto
-     * minima/maxima. If a time limit has been set, 20% of the available time is reserved
-     * for normalization of all objectives in total (equally divided among objectives).
-     * The actual execution than takes up to the remaining 80% of time.
-     * Similarly, when limiting the time without finding an improvement, one fifth of that limit
-     * divided by the number of objectives is applied for each preliminary normalization search.
+     * minima/maxima. If a time limit has been set, 50% of the available time is reserved
+     * for normalization of all objectives in total (executed in parallel).
+     * When limiting the time without finding an improvement, the same limit is applied
+     * in all normalization searches as well as the main multi-objective search.
      * 
      * @param mode execution mode
      */
@@ -362,77 +360,53 @@ public class CoreHunter {
         
         CoreHunterData data = arguments.getData();
         int size = arguments.getSubsetSize();
+        Neighbourhood<SubsetSolution> neigh = new SingleSwapNeighbourhood();
         
-        // for each objective separately, determine some close to optimal solutions
-        List<List<SubsetSolution>> closeToOptimalSolutions = new ArrayList<>();
-        List<Double> optimalValues = new ArrayList<>();
-        objectives.forEach(obj -> {
-            SubsetProblem<CoreHunterData> problem = new SubsetProblem(data, obj, size);
-            Neighbourhood<SubsetSolution> neigh = new SingleSwapNeighbourhood();
-            BasicParallelSearch<SubsetSolution> normalizationSearch = new BasicParallelSearch<>(problem);
-            for(int s = 0; s < NORMALIZATION_REPLICAS; s++){
-                normalizationSearch.addSearch(new RandomDescent<>(problem, neigh));
-            }
-            // limit total normalization runtime to 20% of execution time limit (in ms)
-            long normTime = (long) (1000 * timeLimit * RELATIVE_NORMALIZATION_TIME / objectives.size());
+        // optimize each objective separately (in parallel)
+        List<SubsetSolution> bestSolutions = objectives.parallelStream().map(obj -> {
+            // create normalization problem and search
+            SubsetProblem<CoreHunterData> problem = new SubsetProblem<>(data, obj, size);
+            RandomDescent<SubsetSolution> normSearch = new RandomDescent<>(problem, neigh);
+            // limit total runtime to 50% of total exeuction time (in ms)
+            long normTime = (long) (1000 * timeLimit * RELATIVE_NORMALIZATION_TIME);
             if(normTime > 0){
-                normalizationSearch.addStopCriterion(new MaxRuntime(normTime, TimeUnit.MILLISECONDS));
+                normSearch.addStopCriterion(new MaxRuntime(normTime, TimeUnit.MILLISECONDS));
             }
-            // set improvement time to one fifth of that used for execution,
-            // divided by the number of objectives, per normalization search (in ms)
-            long normalizationImprTime = (long) (1000 * maxTimeWithoutImprovement * RELATIVE_NORMALIZATION_TIME
-                                                 / objectives.size());
-            if(normalizationImprTime > 0){
-                normalizationSearch.addStopCriterion(
-                        new MaxTimeWithoutImprovement(normalizationImprTime, TimeUnit.MILLISECONDS)
+            // set same improvement time as for main search (in seconds)
+            if(maxTimeWithoutImprovement > 0){
+                normSearch.addStopCriterion(
+                        new MaxTimeWithoutImprovement(maxTimeWithoutImprovement, TimeUnit.SECONDS)
                 );
             }
             // execute normalization search
-            normalizationSearch.run();
-            // store best found value
-            optimalValues.add(normalizationSearch.getBestSolutionEvaluation().getValue());
-            // store close to optimal solutions for considered objective
-            closeToOptimalSolutions.add(
-                    normalizationSearch.getSearches().stream()
-                                                     .map(Search::getBestSolution)
-                                                     .collect(Collectors.toList())
-            );
-        });
+            normSearch.run();
+            // return best solution
+            return normSearch.getBestSolution();
+        })  .collect(Collectors.toList());
         
-        // normalize objective (lower-upper bound scaling with Pareto maxima/minima)
-        // NOTE: to improve stability of the normalization process we compute the Pareto extrema
-        //       based on the average value of the close optimal solutions in terms of the other objectives
+        // normalize objectives (lower-upper bound scaling with Pareto maxima/minima)
         StringBuilder message = new StringBuilder();
         List<Objective<SubsetSolution, CoreHunterData>> normalizedObjectives = new ArrayList<>();
         for(int o = 0; o < objectives.size(); o++){
             Objective<SubsetSolution, CoreHunterData> obj = objectives.get(o);
-            // determine value of best solution for this objective
-            double bestValue = optimalValues.get(o);
-            // determine average values of close to optimal solutions
-            // for the other objectives when evaluated with this objective
-            List<Double> otherOptAvg = new ArrayList<>();
-            for(int other = 0; other < objectives.size(); other++){
-                if(other != o){
-                    double avg = closeToOptimalSolutions.get(other)
-                                                        .stream()
-                                                        .mapToDouble(s -> obj.evaluate(s, data).getValue())
-                                                        .average()
-                                                        .getAsDouble();
-                    otherOptAvg.add(avg);
-                }
-            }
+            // evaluate all optimal solutions with this objective
+            List<Double> allValues = bestSolutions.stream().map(
+                sol -> obj.evaluate(sol, data).getValue()
+            ).collect(Collectors.toList());
+            // take best solution value for the considered objective
+            double bestValue = allValues.get(o);
             // set bounds taking into account whether the objective is minimized or maximized
             double min, max;
             if(obj.isMinimizing()){
                 // best solution value = lower bound
                 min = bestValue;
                 // max of all values = upper bound
-                max = Collections.max(otherOptAvg);
+                max = Collections.max(allValues);
             } else {
                 // best solution value = upper bound
                 max = bestValue;
                 // min of all values = lower bound
-                min = Collections.min(otherOptAvg);
+                min = Collections.min(allValues);
             }
             // scale objective
             normalizedObjectives.add(new NormalizedObjective<>(obj, min, max));
