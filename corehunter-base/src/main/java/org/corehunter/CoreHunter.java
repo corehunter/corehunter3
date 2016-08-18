@@ -20,7 +20,6 @@
 package org.corehunter;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -377,6 +376,10 @@ public class CoreHunter {
                 normSearch.addStopCriterion(
                         new MaxTimeWithoutImprovement(maxTimeWithoutImprovement, TimeUnit.SECONDS)
                 );
+            }
+            // add search listener (if any)
+            if (listener != null) {
+                normSearch.addSearchListener(listener);
             }
             // execute normalization search
             normSearch.run();
