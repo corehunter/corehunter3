@@ -364,15 +364,24 @@ public class API {
     /* Arguments */
     /* --------- */
 
+    public static CoreHunterObjective createObjective(String type, String measure, double weight) {
+        return createObjective(type, measure, weight, null);
+    }
+    
     public static CoreHunterObjective createObjective(String type, String measure,
                                                       double weight, double min, double max) {
+        return createObjective(type, measure, weight, new Range<>(min, max));
+    }
+    
+    private static CoreHunterObjective createObjective(String type, String measure,
+                                                       double weight, Range<Double> normalizationRange) {
         return new CoreHunterObjective(
                 CoreHunterObjectiveType.createFromAbbreviation(type),
                 CoreHunterMeasure.createFromAbbreviation(measure),
-                weight, new Range<>(min, max)
+                weight, normalizationRange
         );
     }
-    
+        
     public static CoreHunterArguments createArguments(CoreHunterData data, int size,
                                                       CoreHunterObjective[] objectives,
                                                       boolean normalizeMultiObjective){
