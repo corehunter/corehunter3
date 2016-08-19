@@ -364,9 +364,13 @@ public class API {
     /* Arguments */
     /* --------- */
 
-    public static CoreHunterObjective createObjective(String type, String measure, double weight) {
-        return new CoreHunterObjective(CoreHunterObjectiveType.createFromAbbreviation(type),
-                CoreHunterMeasure.createFromAbbreviation(measure), weight);
+    public static CoreHunterObjective createObjective(String type, String measure,
+                                                      double weight, double min, double max) {
+        return new CoreHunterObjective(
+                CoreHunterObjectiveType.createFromAbbreviation(type),
+                CoreHunterMeasure.createFromAbbreviation(measure),
+                weight, new Range<>(min, max)
+        );
     }
     
     public static CoreHunterArguments createArguments(CoreHunterData data, int size,
@@ -547,13 +551,13 @@ public class API {
         if (coreHunterData != null) {
 
             if (coreHunterData.hasGenotypes()) {
-                return new CoreHunterObjective(DEFAULT_OBJECTIVE, DEFAULT_GENOTYPE_MEASURE, 1.0);
+                return new CoreHunterObjective(DEFAULT_OBJECTIVE, DEFAULT_GENOTYPE_MEASURE);
             }
             if (coreHunterData.hasPhenotypes()) {
-                return new CoreHunterObjective(DEFAULT_OBJECTIVE, CoreHunterMeasure.GOWERS, 1.0);
+                return new CoreHunterObjective(DEFAULT_OBJECTIVE, CoreHunterMeasure.GOWERS);
             }
             if (coreHunterData.hasDistances()) {
-                return new CoreHunterObjective(DEFAULT_OBJECTIVE, CoreHunterMeasure.PRECOMPUTED_DISTANCE, 1.0);
+                return new CoreHunterObjective(DEFAULT_OBJECTIVE, CoreHunterMeasure.PRECOMPUTED_DISTANCE);
             }
         }
 

@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -450,7 +451,25 @@ public class CoreHunter {
         }
         
         // get normalization ranges
-        List<Range<Double>> ranges = normalize(arguments);
+        List<CoreHunterObjective> chObjectives = arguments.getObjectives();
+        List<Range<Double>> ranges;
+        if(chObjectives.stream()
+                       .map(CoreHunterObjective::getNormalizationRange)
+                       .anyMatch(Objects::isNull)){
+            // one or more objective do not have an explicit normalization range set: determine ranges
+            ranges = normalize(arguments);
+            // overwrite with explicit ranges where specified
+            for(int o = 0; o < chObjectives.size(); o++){
+                Range<Double> range = chObjectives.get(o).getNormalizationRange();
+                if(range != null){
+                    ranges.set(o, range);
+                }
+            }
+        } else {
+            // normalization range predefined for all objectives
+            ranges = chObjectives.stream().map(CoreHunterObjective::getNormalizationRange).collect(Collectors.toList());
+        }
+        
         // normalize objectives
         StringBuilder message = new StringBuilder();
         List<Objective<SubsetSolution, CoreHunterData>> normalizedObjectives = new ArrayList<>();
