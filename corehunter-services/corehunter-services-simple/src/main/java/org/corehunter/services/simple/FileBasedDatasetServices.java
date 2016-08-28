@@ -139,7 +139,7 @@ public class FileBasedDatasetServices implements DatasetServices {
         ArrayList<Dataset> datasets = new ArrayList<Dataset>(datasetMap.values());
 
         try {
-            writeToXml(Paths.get(getPath().toString(), DATASETS), datasets);
+            writeToFile(Paths.get(getPath().toString(), DATASETS), datasets);
         } catch (IOException e) {
             throw new DatasetException(e);
         }
@@ -213,7 +213,7 @@ public class FileBasedDatasetServices implements DatasetServices {
         Path copyPath;
         Path internalPath;
 
-        Path xmlPath;
+        Path originalPath;
 
         CoreHunterData coreHunterData = getCoreHunterData(internalDataset.getUniqueIdentifier());
 
@@ -268,12 +268,12 @@ public class FileBasedDatasetServices implements DatasetServices {
                     throw e;
                 }
 
-                xmlPath = Paths.get(getPath().toString(), ORIGINAL_FORMAT);
+                originalPath = Paths.get(getPath().toString(), ORIGINAL_FORMAT);
 
                 try {
-                    writeToXml(xmlPath, genotypeDataFormat);
+                    writeToFile(originalPath, genotypeDataFormat);
                 } catch (IOException e) {
-                    Files.deleteIfExists(xmlPath);
+                    Files.deleteIfExists(originalPath);
                     Files.deleteIfExists(copyPath);
                     throw e;
                 }
@@ -381,7 +381,7 @@ public class FileBasedDatasetServices implements DatasetServices {
         }
 
         try {
-            writeToXml(Paths.get(copyPath.getParent().toString(), DATA), new SimpleEntityPojo(dataId, dataName));
+            writeToFile(Paths.get(copyPath.getParent().toString(), DATA), new SimpleEntityPojo(dataId, dataName));
         } catch (IOException e) {
             throw new DatasetException(e);
         }
@@ -422,7 +422,7 @@ public class FileBasedDatasetServices implements DatasetServices {
 
                     originalPath = Paths.get(getPath().toString(), GENOTYPIC_PATH, datasetId + getSuffix(fileType));
 
-                    GenotypeDataFormat genotypeDataFormat = (GenotypeDataFormat) readFromXml(
+                    GenotypeDataFormat genotypeDataFormat = (GenotypeDataFormat) readFromFile(
                             Paths.get(getPath().toString(), ORIGINAL_FORMAT));
                     
                     GenotypeData genotypeData;
@@ -480,7 +480,7 @@ public class FileBasedDatasetServices implements DatasetServices {
         ArrayList<Dataset> datasets = new ArrayList<Dataset>(datasetMap.values());
 
         try {
-            writeToXml(Paths.get(getPath().toString(), DATASETS), datasets);
+            writeToFile(Paths.get(getPath().toString(), DATASETS), datasets);
         } catch (IOException e) {
             throw new DatasetException(e);
         }
@@ -560,6 +560,53 @@ public class FileBasedDatasetServices implements DatasetServices {
         return format;
     }
 
+    /**
+     * Reads an object from a file. The default implementation uses
+     * XStream. Override to use another way to read objects. Must be
+     * compatible with the {@link #writeToFile(Path, Object)} method
+     * 
+     * @param path the path of the file to be read 
+     * @return the object read from the file
+     * @throws IOException if the object can not be read from the file
+     */
+    protected Object readFromFile(Path path) throws IOException {
+        XStream xstream = createXStream();
+
+        InputStream inputStream = Files.newInputStream(path);
+
+        // TODO output to temp file and then copy
+
+        try {
+            return xstream.fromXML(inputStream);
+        } catch (XStreamException e) {
+            throw new IOException(e) ;
+        }
+    }
+
+    /**
+     * Write an object to a file. The default implementation uses
+     * XStream. Override to use another way to write objects. Must be
+     * compatible with the {@link #readFromFile(Path)} method
+     * @param path the path of the file to be written 
+     * @param object the object to be written
+     * @throws IOException if the object can not be write to the file
+     */
+    protected void writeToFile(Path path, Object object) throws IOException {
+        XStream xstream = createXStream();
+
+        OutputStream outputStream;
+
+        // TODO output to temp file and then copy
+
+        outputStream = Files.newOutputStream(path);
+        
+        try {
+            xstream.toXML(object, outputStream);
+        } catch (XStreamException e) {
+            throw new IOException(e) ;
+        }  
+    }
+    
     @SuppressWarnings("unchecked")
     private void initialise() throws IOException {
 
@@ -572,7 +619,7 @@ public class FileBasedDatasetServices implements DatasetServices {
         List<DatasetPojo> datasets;
         if (Files.exists(datasetsPath)) {
 
-            datasets = (List<DatasetPojo>) readFromXml(datasetsPath);
+            datasets = (List<DatasetPojo>) readFromFile(datasetsPath);
 
             Iterator<DatasetPojo> iterator = datasets.iterator();
 
@@ -597,7 +644,7 @@ public class FileBasedDatasetServices implements DatasetServices {
 
         if (Files.exists(path)) {
 
-            GenotypeDataFormat genotypeDataFormat = (GenotypeDataFormat) readFromXml(
+            GenotypeDataFormat genotypeDataFormat = (GenotypeDataFormat) readFromFile(
                     Paths.get(getPath().toString(), ORIGINAL_FORMAT));
 
             switch (genotypeDataFormat) {
@@ -635,7 +682,7 @@ public class FileBasedDatasetServices implements DatasetServices {
 
     private void updateData(Data data, Path path) throws IOException {
 
-        SimpleEntityPojo simpleEntityPojo = (SimpleEntityPojo) readFromXml(path);
+        SimpleEntityPojo simpleEntityPojo = (SimpleEntityPojo) readFromFile(path);
 
         if (data instanceof SimpleEntityPojo) {
             ((SimpleEntityPojo) data).setUniqueIdentifier(simpleEntityPojo.getUniqueIdentifier());
@@ -649,36 +696,6 @@ public class FileBasedDatasetServices implements DatasetServices {
         xstream.setClassLoader(getClass().getClassLoader());
 
         return xstream;
-    }
-
-    private Object readFromXml(Path path) throws IOException {
-        XStream xstream = createXStream();
-
-        InputStream inputStream = Files.newInputStream(path);
-
-        // TODO output to temp file and then copy
-
-        try {
-            return xstream.fromXML(inputStream);
-        } catch (XStreamException e) {
-            throw new IOException(e) ;
-        }
-    }
-
-    private void writeToXml(Path path, Object object) throws IOException {
-        XStream xstream = createXStream();
-
-        OutputStream outputStream;
-
-        // TODO output to temp file and then copy
-
-        outputStream = Files.newOutputStream(path);
-        
-        try {
-            xstream.toXML(object, outputStream);
-        } catch (XStreamException e) {
-            throw new IOException(e) ;
-        }  
     }
 
     private void removeDataInternal(String datasetId) throws DatasetException {
