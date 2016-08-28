@@ -41,6 +41,7 @@ import org.corehunter.data.simple.SimpleGenotypeData;
 import org.corehunter.services.DatasetServices;
 
 import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.XStreamException;
 import com.thoughtworks.xstream.io.xml.StaxDriver;
 
 import uno.informatics.data.Data;
@@ -657,7 +658,11 @@ public class FileBasedDatasetServices implements DatasetServices {
 
         // TODO output to temp file and then copy
 
-        return xstream.fromXML(inputStream);
+        try {
+            return xstream.fromXML(inputStream);
+        } catch (XStreamException e) {
+            throw new IOException(e) ;
+        }
     }
 
     private void writeToXml(Path path, Object object) throws IOException {
@@ -668,8 +673,12 @@ public class FileBasedDatasetServices implements DatasetServices {
         // TODO output to temp file and then copy
 
         outputStream = Files.newOutputStream(path);
-
-        xstream.toXML(object, outputStream);
+        
+        try {
+            xstream.toXML(object, outputStream);
+        } catch (XStreamException e) {
+            throw new IOException(e) ;
+        }  
     }
 
     private void removeDataInternal(String datasetId) throws DatasetException {
