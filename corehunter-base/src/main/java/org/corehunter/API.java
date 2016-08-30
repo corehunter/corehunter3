@@ -52,6 +52,9 @@ import uno.informatics.data.pojo.SimpleEntityPojo;
  */
 public class API {
 
+    // rJava encodes NA with a specific NaN value
+    private static final double NA = Double.longBitsToDouble(9218868437227407266L);
+    
     private static final CoreHunterObjectiveType DEFAULT_OBJECTIVE = 
             CoreHunterObjectiveType.AV_ENTRY_TO_NEAREST_ENTRY;
     private static final CoreHunterMeasure DEFAULT_GENOTYPE_MEASURE = 
@@ -314,6 +317,24 @@ public class API {
             markerNames[m] = data.getMarkerName(m);
         }
         return markerNames;
+    }
+    
+    public static double[][] getAlleleFrequencies(GenotypeData data){
+        int n = data.getSize();
+        int m = data.getNumberOfMarkers();
+        int numAlleles = data.getTotalNumberOfAlleles();
+        double[][] freqs = new double[n][numAlleles];
+        for(int i = 0; i < n; i++){
+            int a = 0;
+            for(int j = 0; j < m; j++){
+                for(int k = 0; k < data.getNumberOfAlleles(j); k++){
+                    Double freq = data.getAlleleFrequency(i, j, k);
+                    // convert missing values
+                    freqs[i][a++] = (freq == null ? NA : freq);
+                }
+            }
+        }
+        return freqs;
     }
     
     /* -------------- */
