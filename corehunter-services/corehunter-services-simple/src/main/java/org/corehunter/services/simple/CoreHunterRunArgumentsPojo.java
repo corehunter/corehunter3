@@ -31,24 +31,38 @@ import uno.informatics.data.pojo.SimpleEntityPojo;
 
 public class CoreHunterRunArgumentsPojo extends SimpleEntityPojo implements CoreHunterRunArguments {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+    
     private int subsetSize;
     private String datasetId;
     private List<CoreHunterObjective> objectives;
+    private long timeLimit;
+    private long maxTimeWithoutImprovement;
 
-    public CoreHunterRunArgumentsPojo(String name, int subsetSize, String datasetId,
-            List<CoreHunterObjective> objectives) {
+    public CoreHunterRunArgumentsPojo(String name, int subsetSize, String datasetId) {
         super(UUID.randomUUID().toString(), name);
         setSubsetSize(subsetSize);
         setDatasetId(datasetId);
+    }
+    
+    public CoreHunterRunArgumentsPojo(String name, int subsetSize, String datasetId,
+            CoreHunterObjective... objectives) {
+        this(name, subsetSize, datasetId);
+        setObjectives(objectives);
+    }
+
+    public CoreHunterRunArgumentsPojo(String name, int subsetSize, String datasetId,
+            List<CoreHunterObjective> objectives) {
+        this(name, subsetSize, datasetId);
         setObjectives(objectives);
     }
 
     public CoreHunterRunArgumentsPojo(CoreHunterRunArguments arguments) {
-        super(arguments.getUniqueIdentifier(), arguments.getName());
-        setSubsetSize(arguments.getSubsetSize());
-        setDatasetId(arguments.getDatasetId());
+        this(arguments.getName(), arguments.getSubsetSize(), arguments.getDatasetId());
         setObjectives(arguments.getObjectives()) ;
-
     }
 
     @Override
@@ -64,6 +78,24 @@ public class CoreHunterRunArgumentsPojo extends SimpleEntityPojo implements Core
     @Override
     public List<CoreHunterObjective> getObjectives() {
         return objectives;
+    }
+    
+    @Override
+    public final long getTimeLimit() {
+        return timeLimit;
+    }
+
+    public final void setTimeLimit(long timeLimit) {
+        this.timeLimit = timeLimit;
+    }
+    
+    @Override
+    public final long getMaxTimeWithoutImprovement() {
+        return maxTimeWithoutImprovement;
+    }
+
+    public final void setMaxTimeWithoutImprovement(long maxTimeWithoutImprovement) {
+        this.maxTimeWithoutImprovement = maxTimeWithoutImprovement;
     }
 
     protected final void setSubsetSize(int subsetSize) {
@@ -83,6 +115,20 @@ public class CoreHunterRunArgumentsPojo extends SimpleEntityPojo implements Core
             while (iterator.hasNext()) {
                 this.objectives.add(new CoreHunterObjective(iterator.next())) ; 
             }
+        } else {
+            this.objectives = new ArrayList<CoreHunterObjective>(0) ;
+        }
+    }
+    
+    protected final void setObjectives(CoreHunterObjective[] objectives) {
+        if (objectives != null) {
+
+            this.objectives = new ArrayList<CoreHunterObjective>(objectives.length) ;
+            
+            for (int i = 0 ; i < objectives.length ; ++i) {
+                this.objectives.add(new CoreHunterObjective(objectives[i])) ; 
+            }
+            
         } else {
             this.objectives = new ArrayList<CoreHunterObjective>(0) ;
         }
