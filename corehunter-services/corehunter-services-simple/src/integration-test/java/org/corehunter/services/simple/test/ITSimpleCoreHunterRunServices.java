@@ -16,8 +16,8 @@
 /* specific language governing permissions and limitations      */
 /* under the License.                                           */
 /*--------------------------------------------------------------*/
-package org.corehunter.services.simple.test;
 
+package org.corehunter.services.simple.test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -60,18 +60,17 @@ import uno.informatics.data.pojo.DatasetPojo;
  * @author Guy Davenport
  */
 public class ITSimpleCoreHunterRunServices {
-    
+
     private static final String DATASET_UID = "dataset1";
     private static final String DATASET_NAME = "dataset 1";
-    
+
     private static final String DISTANCES_DATA = "distances.csv";
     private static final String GENOTYPES_DATA = "genotypes.csv";
     private static final String PHENOTYPES_DATA = "phenotypes.csv";
 
     private static final String TARGET_DIRECTORY = "target";
-    private static final Path ROOT_DIRECTORY = Paths.get(TARGET_DIRECTORY, 
+    private static final Path ROOT_DIRECTORY = Paths.get(TARGET_DIRECTORY,
             ITSimpleCoreHunterRunServices.class.getSimpleName());
-    
 
     private Path createTempDirectory() throws IOException {
 
@@ -89,119 +88,124 @@ public class ITSimpleCoreHunterRunServices {
      */
     @Test
     public void testExecuteDistanceMatrix() {
-        
+
         DatasetServices databaseServices = null;
         try {
             databaseServices = new FileBasedDatasetServices(createTempDirectory());
         } catch (IOException e) {
             e.printStackTrace();
-            fail(e.getMessage()) ;
-        }  
-        CoreHunterRunServices coreHunterRunServices = new SimpleCoreHunterRunServices(databaseServices) ;
-        
-        Dataset dataset = new DatasetPojo(DATASET_UID, DATASET_NAME); 
-        
+            fail(e.getMessage());
+        }
+        CoreHunterRunServices coreHunterRunServices = new SimpleCoreHunterRunServices(databaseServices);
+
+        Dataset dataset = new DatasetPojo(DATASET_UID, DATASET_NAME);
+
         try {
             databaseServices.addDataset(dataset);
         } catch (DatasetException e) {
             e.printStackTrace();
-            fail(e.getMessage()) ;
+            fail(e.getMessage());
         }
 
-        int size = 2 ;
+        int size = 2;
 
         try {
             Path distancesDataPath = Paths.get(ClassLoader.getSystemResource(DISTANCES_DATA).toURI());
-            
+
             databaseServices.loadData(dataset, distancesDataPath, FileType.CSV, CoreHunterDataType.DISTANCES);
         } catch (IOException e) {
             e.printStackTrace();
-            fail(e.getMessage()) ;
+            fail(e.getMessage());
         } catch (DatasetException e) {
             e.printStackTrace();
-            fail(e.getMessage()) ;
+            fail(e.getMessage());
         } catch (URISyntaxException e) {
             e.printStackTrace();
-            fail(e.getMessage()) ;
+            fail(e.getMessage());
         }
-        
-        CoreHunterRunArgumentsPojo arguments = 
-                new CoreHunterRunArgumentsPojo(DISTANCES_DATA, size, DATASET_UID, 
-                        new CoreHunterObjective(CoreHunterObjectiveType.AV_ENTRY_TO_ENTRY, CoreHunterMeasure.PRECOMPUTED_DISTANCE)) ;
-        
+
+        CoreHunterRunArgumentsPojo arguments = new CoreHunterRunArgumentsPojo(DISTANCES_DATA, size, DATASET_UID,
+                new CoreHunterObjective(CoreHunterObjectiveType.AV_ENTRY_TO_ENTRY,
+                        CoreHunterMeasure.PRECOMPUTED_DISTANCE));
+
         arguments.setTimeLimit(2);
-        
+
         // run Core Hunter
-        
-        CoreHunterRun run = coreHunterRunServices.executeCoreHunter(arguments) ;
-        
-        boolean finished = false ;
+
+        CoreHunterRun run = coreHunterRunServices.executeCoreHunter(arguments);
+
+        boolean finished = false;
 
         while (!finished) {
-            
+
             switch (coreHunterRunServices.getCoreHunterRun(run.getUniqueIdentifier()).getStatus()) {
                 case FAILED:
-                    finished = true ;
+                    finished = true;
                     break;
                 case FINISHED:
-                    finished = true ;
+                    finished = true;
                     break;
                 case NOT_STARTED:
                 case RUNNING:
                 default:
                     break;
-                
+
             }
-            
+
             try {
                 Thread.sleep(100);
             } catch (InterruptedException e) {
                 e.printStackTrace();
-                fail(e.getMessage()) ;
+                fail(e.getMessage());
             }
         }
 
         switch (coreHunterRunServices.getCoreHunterRun(run.getUniqueIdentifier()).getStatus()) {
             case FAILED:
-                assertNotNull("Failed with no error message!", coreHunterRunServices.getErrorMessage(run.getUniqueIdentifier())) ;
-                assertNotNull("Failed with no error stream!", coreHunterRunServices.getErrorStream(run.getUniqueIdentifier())) ;
-                
-                fail(coreHunterRunServices.getErrorMessage(run.getUniqueIdentifier())) ;
+                assertNotNull("Failed with no error message!",
+                        coreHunterRunServices.getErrorMessage(run.getUniqueIdentifier()));
+                assertNotNull("Failed with no error stream!",
+                        coreHunterRunServices.getErrorStream(run.getUniqueIdentifier()));
+
+                fail(coreHunterRunServices.getErrorMessage(run.getUniqueIdentifier()));
                 break;
             case FINISHED:
-                Objective<SubsetSolution, CoreHunterData> objective = new AverageEntryToEntry(new PrecomputedDistance());
+                Objective<SubsetSolution, CoreHunterData> objective = new AverageEntryToEntry(
+                        new PrecomputedDistance());
 
-                SubsetSolution result = coreHunterRunServices.getSubsetSolution(run.getUniqueIdentifier()) ;
-                
-                assertNotNull("Result is null!", result) ;
-                assertNotNull("Success but with no output stream!", coreHunterRunServices.getOutputStream(run.getUniqueIdentifier())) ;
-                assertNull("Success with error message!", coreHunterRunServices.getErrorMessage(run.getUniqueIdentifier())) ;
-                assertNull("Success with error stream!", coreHunterRunServices.getErrorStream(run.getUniqueIdentifier())) ;
+                SubsetSolution result = coreHunterRunServices.getSubsetSolution(run.getUniqueIdentifier());
+
+                assertNotNull("Result is null!", result);
+                assertNotNull("Success but with no output stream!",
+                        coreHunterRunServices.getOutputStream(run.getUniqueIdentifier()));
+                assertNull("Success with error message!",
+                        coreHunterRunServices.getErrorMessage(run.getUniqueIdentifier()));
+                assertNull("Success with error stream!",
+                        coreHunterRunServices.getErrorStream(run.getUniqueIdentifier()));
                 try {
                     // compare with optimal solution
-                    assertEquals(getOptimalSolution(databaseServices.getCoreHunterData(DATASET_UID), objective, size), result);
+                    assertEquals(getOptimalSolution(databaseServices.getCoreHunterData(DATASET_UID), objective, size),
+                            result);
                 } catch (DatasetException e) {
                     e.printStackTrace();
-                    fail(e.getMessage()) ;
+                    fail(e.getMessage());
                 }
                 break;
             case NOT_STARTED:
-                fail("Not started!") ;
-                break ;
+                fail("Not started!");
+                break;
             case RUNNING:
-                fail("Still running") ;
-                break ;
+                fail("Still running");
+                break;
             default:
-                fail("No status") ;
-                break ;
+                fail("No status");
+                break;
         }
     }
-    
-    
+
     // get best solution through exhaustive search
-    private SubsetSolution getOptimalSolution(CoreHunterData data,
-                                              Objective<SubsetSolution, CoreHunterData> obj,
-                                              int size){
+    private SubsetSolution getOptimalSolution(CoreHunterData data, Objective<SubsetSolution, CoreHunterData> obj,
+            int size) {
         SubsetProblem<CoreHunterData> problem = new SubsetProblem<>(data, obj, size);
         Search<SubsetSolution> exh = new ExhaustiveSearch<>(problem, new SubsetSolutionIterator(data.getIDs(), size));
         exh.run();
