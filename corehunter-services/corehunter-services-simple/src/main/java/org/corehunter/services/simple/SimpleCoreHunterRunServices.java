@@ -234,19 +234,27 @@ public class SimpleCoreHunterRunServices implements CoreHunterRunServices {
         }
 
         public final String getOutputStream() {
-            try {
-                return outputStream.toString(charsetName);
-            } catch (UnsupportedEncodingException e) {
-                return outputStream.toString();
-            }
+            if (outputStream != null) {
+                try {
+                    return outputStream.toString(charsetName);
+                } catch (UnsupportedEncodingException e) {
+                    return outputStream.toString();
+                }
+            } else {
+                return null ;
+            }     
         }
 
         public final String getErrorStream() {
-            try {
-                return errorStream.toString(charsetName);
-            } catch (UnsupportedEncodingException e) {
-                return errorStream.toString();
-            }
+            if (errorStream != null) {
+                try {
+                    return errorStream.toString(charsetName);
+                } catch (UnsupportedEncodingException e) {
+                    return errorStream.toString();
+                }
+            } else {
+                return null ;
+            }     
         }
 
         public synchronized final String getErrorMessage() {

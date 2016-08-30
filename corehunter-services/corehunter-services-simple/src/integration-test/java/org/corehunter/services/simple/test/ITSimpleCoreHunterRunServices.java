@@ -21,6 +21,7 @@ package org.corehunter.services.simple.test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
 
 import java.io.IOException;
@@ -162,8 +163,8 @@ public class ITSimpleCoreHunterRunServices {
 
         switch (coreHunterRunServices.getCoreHunterRun(run.getUniqueIdentifier()).getStatus()) {
             case FAILED:
-                System.out.println("Error Stream = " + coreHunterRunServices.getErrorStream(run.getUniqueIdentifier())) ;
                 assertNotNull("Failed with no error message!", coreHunterRunServices.getErrorMessage(run.getUniqueIdentifier())) ;
+                assertNotNull("Failed with no error stream!", coreHunterRunServices.getErrorStream(run.getUniqueIdentifier())) ;
                 
                 fail(coreHunterRunServices.getErrorMessage(run.getUniqueIdentifier())) ;
                 break;
@@ -173,6 +174,9 @@ public class ITSimpleCoreHunterRunServices {
                 SubsetSolution result = coreHunterRunServices.getSubsetSolution(run.getUniqueIdentifier()) ;
                 
                 assertNotNull("Result is null!", result) ;
+                assertNotNull("Success but with no output stream!", coreHunterRunServices.getOutputStream(run.getUniqueIdentifier())) ;
+                assertNull("Success with error message!", coreHunterRunServices.getErrorMessage(run.getUniqueIdentifier())) ;
+                assertNull("Success with error stream!", coreHunterRunServices.getErrorStream(run.getUniqueIdentifier())) ;
                 try {
                     // compare with optimal solution
                     assertEquals(getOptimalSolution(databaseServices.getCoreHunterData(DATASET_UID), objective, size), result);
