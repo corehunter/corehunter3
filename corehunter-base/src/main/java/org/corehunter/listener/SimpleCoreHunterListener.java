@@ -55,14 +55,16 @@ public class SimpleCoreHunterListener implements CoreHunterListener {
 
     @Override
     public void searchStarted(Search<? extends SubsetSolution> search) {
-        printStream.println(prefix + "Search started: " + search.getName());
+        printStream.println(String.format("%sSearch : %s started.", prefix, search.getName()));
     }
 
     @Override
     public void searchStopped(Search<? extends SubsetSolution> search) {
         double t = search.getRuntime() / 1000;
         long s = search.getSteps();
-        printStream.println(prefix + "Search stopped (" + t + " sec, " + s + " steps)");
+        printStream.println(String.format("%sSearch : %s stopped after %f seconds and %d steps", prefix, search.getName(), t, s));
+        printStream.println(String.format("%sBest solution with evaluation : %f", prefix, search.getBestSolutionEvaluation().getValue()));
+        printStream.println(String.format("%sBest solution with evaluation : %s", prefix, search.getBestSolution()));
     }
 
     @Override
@@ -70,16 +72,16 @@ public class SimpleCoreHunterListener implements CoreHunterListener {
                                 SubsetSolution newBestSolution,
                                 Evaluation newBestSolutionEvaluation,
                                 Validation newBestSolutionValidation) {
-        printStream.println(prefix + "New best solution: " + newBestSolutionEvaluation.getValue());
+        printStream.println(String.format("%sNew best solution with evaluation : %f", prefix, newBestSolutionEvaluation.getValue()));
     }
 
     @Override
     public void preprocessingStarted(String message) {
-        printStream.println(prefix + message);
+        printStream.println(String.format("%s%s", prefix, message));
     }
 
     @Override
     public void preprocessingStopped(String message) {
-        printStream.println(prefix + message);
+        printStream.println(String.format("%s%s", prefix, message));
     }
 }
