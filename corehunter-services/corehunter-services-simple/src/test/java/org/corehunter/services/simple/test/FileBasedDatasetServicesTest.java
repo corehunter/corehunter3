@@ -68,7 +68,8 @@ public class FileBasedDatasetServicesTest {
 
     private static final String DATA_UID = "dataset1";
     private static final String DATASET_NAME = "dataset 1";
-    private static final Path ROOT_DIRECTORY = Paths.get("target", "datasetServicesTests");
+    private static final String TARGET_DIRECTORY = "target";
+    private static final Path ROOT_DIRECTORY = Paths.get(TARGET_DIRECTORY, FileBasedDatasetServicesTest.class.getSimpleName());
     private static final double PRECISION = 0.0000000001;
     private static final int DATASET_SIZE = 1000;
 
