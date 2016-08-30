@@ -24,6 +24,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -47,18 +48,29 @@ public class SimpleCoreHunterRunServicesTest {
     private static final String PHENOTYPIC_FILE = "phenotypic_data.csv";
     private static final String NAME1 = "phenotypic_data.csv";
     private static final int SUBSET_SIZE1 = 10;
-    private static final String UNIQUE_IDENTIFIER1 = "phenotypic_data.csv";
-    private static final String DESCRIPTION1 = "Dataset loading from ";
-    private static final String ABBREVIATION1 = null;
-    private static final String DATA_UID = "dataset1";
+    private static final String DATASET_UID = "dataset1";
     private static final String DATASET_NAME = "dataset 1";
+    private static final String TARGET_DIRECTORY = "target";
+    private static final Path ROOT_DIRECTORY = Paths.get(TARGET_DIRECTORY, 
+            SimpleCoreHunterRunServicesTest.class.getSimpleName());
+    
+    private Path createTempDirectory() throws IOException {
 
+        Files.createDirectories(ROOT_DIRECTORY);
+
+        Path path = Files.createTempDirectory(ROOT_DIRECTORY, null);
+
+        Files.createDirectories(path);
+
+        return path;
+    }
+    
     @Test
     public void testSimpleCoreHunterRunServices() {
 
         try {
             FileBasedDatasetServices fileBasedDatasetServices = new FileBasedDatasetServices(
-                    Files.createTempDirectory(null));
+                    createTempDirectory());
 
             new SimpleCoreHunterRunServices(fileBasedDatasetServices);
         } catch (Exception e) {
@@ -74,9 +86,9 @@ public class SimpleCoreHunterRunServicesTest {
 
         try {
             FileBasedDatasetServices fileBasedDatasetServices = new FileBasedDatasetServices(
-                    Files.createTempDirectory(null));
+                    createTempDirectory());
             
-            Dataset dataset = new DatasetPojo(DATA_UID, DATASET_NAME);
+            Dataset dataset = new DatasetPojo(DATASET_UID, DATASET_NAME);
             
             String datasetId = dataset.getUniqueIdentifier() ;
 
@@ -90,7 +102,7 @@ public class SimpleCoreHunterRunServicesTest {
             SimpleCoreHunterRunServices simpleCoreHunterRunServices = new SimpleCoreHunterRunServices(
                     fileBasedDatasetServices);
 
-            CoreHunterRunArguments arguments = new CoreHunterRunArgumentsPojo(NAME1, SUBSET_SIZE1, datasetId, null);
+            CoreHunterRunArguments arguments = new CoreHunterRunArgumentsPojo(NAME1, SUBSET_SIZE1, datasetId);
 
             CoreHunterRun startCoreHunterRun = simpleCoreHunterRunServices.executeCoreHunter(arguments);
         
