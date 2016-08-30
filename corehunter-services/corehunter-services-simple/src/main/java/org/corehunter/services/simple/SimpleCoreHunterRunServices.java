@@ -230,6 +230,7 @@ public class SimpleCoreHunterRunServices implements CoreHunterRunServices {
             this.corehunterRunArguments = new CoreHunterRunArgumentsPojo(corehunterRunArguments);
 
             status = CoreHunterRunStatus.NOT_STARTED;
+            outputStream = new ByteArrayOutputStream() ;
         }
 
         public final String getOutputStream() {
