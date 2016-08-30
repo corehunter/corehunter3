@@ -89,7 +89,7 @@ public interface CoreHunterRunServices {
     public String getOutputStream(String uniqueIdentifier);
 
     /**
-     * Gets the current error stream provides by the run 
+     * Gets the current error stream provided by the run 
      * 
      * @param uniqueIdentifier
      *            the unique identifier of the run that was provided on
@@ -99,7 +99,7 @@ public interface CoreHunterRunServices {
     public String getErrorStream(String uniqueIdentifier);
 
     /**
-     * Gets the current error message provides by the run 
+     * Gets the current error message provided by the run 
      * 
      * @param uniqueIdentifier
      *            the unique identifier of the run that was provided on
