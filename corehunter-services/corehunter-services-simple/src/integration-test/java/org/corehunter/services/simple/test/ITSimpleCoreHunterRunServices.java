@@ -20,6 +20,7 @@
 package org.corehunter.services.simple.test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
@@ -178,6 +179,9 @@ public class ITSimpleCoreHunterRunServices {
                 assertNotNull("Result is null!", result);
                 assertNotNull("Success but with no output stream!",
                         coreHunterRunServices.getOutputStream(run.getUniqueIdentifier()));
+                assertFalse("Success but with empty output stream!",
+                        coreHunterRunServices.getOutputStream(run.getUniqueIdentifier()).isEmpty());
+                System.out.println(coreHunterRunServices.getOutputStream(run.getUniqueIdentifier()));
                 assertNull("Success with error message!",
                         coreHunterRunServices.getErrorMessage(run.getUniqueIdentifier()));
                 assertNull("Success with error stream!",

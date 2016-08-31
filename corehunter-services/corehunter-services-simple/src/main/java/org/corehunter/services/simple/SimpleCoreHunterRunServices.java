@@ -20,6 +20,7 @@
 package org.corehunter.services.simple;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
@@ -215,6 +216,11 @@ public class SimpleCoreHunterRunServices implements CoreHunterRunServices {
     }
 
     private class CoreHunterRunnable extends SimpleEntityPojo implements Runnable {
+        /**
+         * 
+         */
+        private static final long serialVersionUID = 1L;
+        
         private CoreHunterRunArguments corehunterRunArguments;
         private CoreHunter corehunter;
         private ByteArrayOutputStream outputStream;
@@ -235,10 +241,14 @@ public class SimpleCoreHunterRunServices implements CoreHunterRunServices {
 
         public final String getOutputStream() {
             if (outputStream != null) {
+                
                 try {
+                    outputStream.flush();
                     return outputStream.toString(charsetName);
                 } catch (UnsupportedEncodingException e) {
                     return outputStream.toString();
+                } catch (IOException e) {
+                    return "Output stream can not flushed!" ;
                 }
             } else {
                 return null ;
@@ -248,9 +258,12 @@ public class SimpleCoreHunterRunServices implements CoreHunterRunServices {
         public final String getErrorStream() {
             if (errorStream != null) {
                 try {
+                    errorStream.flush();
                     return errorStream.toString(charsetName);
                 } catch (UnsupportedEncodingException e) {
                     return errorStream.toString();
+                } catch (IOException e) {
+                    return "Error stream can not flushed!" ;
                 }
             } else {
                 return null ;
@@ -283,25 +296,25 @@ public class SimpleCoreHunterRunServices implements CoreHunterRunServices {
 
         @Override
         public void run() {
+            
+            outputStream = new ByteArrayOutputStream();
+            PrintStream outputPrintStream = new PrintStream(outputStream);
 
             try {
                 startDate = new DateTime();
+                
+                outputPrintStream.println(String.format("Starting run : %s at ", getName(), startDate));
 
                 CoreHunterArguments arguments = new CoreHunterArguments(
                         datasetServices.getCoreHunterData(corehunterRunArguments.getDatasetId()),
                         corehunterRunArguments.getSubsetSize(), corehunterRunArguments.getObjectives());
 
-                PrintStream printStream = new PrintStream(outputStream);
-
                 status = CoreHunterRunStatus.RUNNING;
 
                 corehunter = new CoreHunter();
-                corehunter.setListener(new SimpleCoreHunterListener(printStream));
-
-                outputStream = new ByteArrayOutputStream();
+                corehunter.setListener(new SimpleCoreHunterListener(outputPrintStream));
 
                 subsetSolution = corehunter.execute(arguments);
-                printStream.close();
 
                 status = CoreHunterRunStatus.FINISHED;
             } catch (Exception e) {
@@ -310,12 +323,16 @@ public class SimpleCoreHunterRunServices implements CoreHunterRunServices {
                 errorStream = new ByteArrayOutputStream();
                 PrintStream printStream = new PrintStream(errorStream);
                 e.printStackTrace(printStream);
-
+                
+                outputPrintStream.println(String.format("Error in run : %s at due to %s. See error log for more details", getName(), errorMessage));
+                
                 printStream.close();
             }
 
             endDate = new DateTime();
-
+            outputPrintStream.println(String.format("Ending run : %s at ", getName(), endDate));
+            
+            outputPrintStream.close();
         }
         
         public boolean stop() {
@@ -326,6 +343,11 @@ public class SimpleCoreHunterRunServices implements CoreHunterRunServices {
     }
 
     private class CoreHunterRunFromRunnable extends CoreHunterRunPojo {
+
+        /**
+         * 
+         */
+        private static final long serialVersionUID = 1L;
 
         public CoreHunterRunFromRunnable(CoreHunterRunnable corehunterRunnable) {
             super(corehunterRunnable.getUniqueIdentifier(), corehunterRunnable.getName());
