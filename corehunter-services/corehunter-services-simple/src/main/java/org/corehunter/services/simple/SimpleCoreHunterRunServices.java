@@ -50,7 +50,7 @@ import uno.informatics.data.pojo.SimpleEntityPojo;
 public class SimpleCoreHunterRunServices implements CoreHunterRunServices {
 
     Logger logger = LoggerFactory.getLogger(SimpleCoreHunterRunServices.class);
-    
+
     private DatasetServices datasetServices;
     private ExecutorService executor;
     private List<CoreHunterRun> corehunterRuns;
@@ -71,13 +71,13 @@ public class SimpleCoreHunterRunServices implements CoreHunterRunServices {
     public CoreHunterRun executeCoreHunter(CoreHunterRunArguments arguments) {
 
         if (shuttingDown) {
-            throw new IllegalStateException("Can not accept any new runs, in the process of shutting down!") ;
+            throw new IllegalStateException("Can not accept any new runs, in the process of shutting down!");
         }
-        
+
         if (shutDown) {
-            throw new IllegalStateException("Can not accept any new runs, service is not running!") ;
+            throw new IllegalStateException("Can not accept any new runs, service is not running!");
         }
-        
+
         CoreHunterRunnable corehunterRunnable = new CoreHunterRunnable(arguments);
 
         corehunterRunnableMap.put(corehunterRunnable.getUniqueIdentifier(), corehunterRunnable);
@@ -101,28 +101,29 @@ public class SimpleCoreHunterRunServices implements CoreHunterRunServices {
     @Override
     public boolean removeCoreHunterRun(String uniqueIdentifier) {
         CoreHunterRunnable corehunterRunnable = corehunterRunnableMap.get(uniqueIdentifier);
-        
+
         if (corehunterRunnable != null) {
-            boolean stopped = corehunterRunnable.stop(); 
-            
+            boolean stopped = corehunterRunnable.stop();
+
             if (stopped) {
-                corehunterRunnableMap.remove(uniqueIdentifier); // only remove if it was stopped
-                
-                return true ;
+                // only remove if it was stopped
+                corehunterRunnableMap.remove(uniqueIdentifier); 
+
+                return true;
             }
         }
-        
-        return false ;
+
+        return false;
     }
-    
+
     @Override
     public void deleteCoreHunterRun(String uniqueIdentifier) {
         // remove regardless if it can not be stopped
-        CoreHunterRunnable corehunterRunnable = corehunterRunnableMap.remove(uniqueIdentifier); 
+        CoreHunterRunnable corehunterRunnable = corehunterRunnableMap.remove(uniqueIdentifier);
 
         if (corehunterRunnable != null) {
             if (!corehunterRunnable.stop()) {
-                logger.error("Can not stop runnable {}", corehunterRunnable.getName()); 
+                logger.error("Can not stop runnable {}", corehunterRunnable.getName());
             }
         }
     }
@@ -130,7 +131,8 @@ public class SimpleCoreHunterRunServices implements CoreHunterRunServices {
     @Override
     public List<CoreHunterRun> getAllCoreHunterRuns() {
 
-        // iterates through all runnables can create new CoreHunterRun objects, which will be a snapshot 
+        // iterates through all runnables can create new CoreHunterRun objects,
+        // which will be a snapshot
         // of the current status of that runnable
         Iterator<CoreHunterRunnable> iterator = corehunterRunnableMap.values().iterator();
 
@@ -186,7 +188,7 @@ public class SimpleCoreHunterRunServices implements CoreHunterRunServices {
             return null;
         }
     }
-    
+
     @Override
     public CoreHunterRunArguments getArguments(String uniqueIdentifier) {
         CoreHunterRunnable corehunterRunnable = corehunterRunnableMap.get(uniqueIdentifier);
@@ -197,12 +199,12 @@ public class SimpleCoreHunterRunServices implements CoreHunterRunServices {
             return null;
         }
     }
-    
+
     public void shutdown() {
         if (!shuttingDown || shutDown) {
-            shuttingDown = true ;
-            executor.shutdown(); 
-            shutDown = true ;
+            shuttingDown = true;
+            executor.shutdown();
+            shutDown = true;
         }
     }
 
@@ -220,7 +222,7 @@ public class SimpleCoreHunterRunServices implements CoreHunterRunServices {
          * 
          */
         private static final long serialVersionUID = 1L;
-        
+
         private CoreHunterRunArguments corehunterRunArguments;
         private CoreHunter corehunter;
         private ByteArrayOutputStream outputStream;
@@ -236,23 +238,23 @@ public class SimpleCoreHunterRunServices implements CoreHunterRunServices {
             this.corehunterRunArguments = new CoreHunterRunArgumentsPojo(corehunterRunArguments);
 
             status = CoreHunterRunStatus.NOT_STARTED;
-            outputStream = new ByteArrayOutputStream() ;
+            outputStream = new ByteArrayOutputStream();
         }
 
         public final String getOutputStream() {
             if (outputStream != null) {
-                
+
                 try {
                     outputStream.flush();
                     return outputStream.toString(charsetName);
                 } catch (UnsupportedEncodingException e) {
                     return outputStream.toString();
                 } catch (IOException e) {
-                    return "Output stream can not flushed!" ;
+                    return "Output stream can not flushed!";
                 }
             } else {
-                return null ;
-            }     
+                return null;
+            }
         }
 
         public final String getErrorStream() {
@@ -263,11 +265,11 @@ public class SimpleCoreHunterRunServices implements CoreHunterRunServices {
                 } catch (UnsupportedEncodingException e) {
                     return errorStream.toString();
                 } catch (IOException e) {
-                    return "Error stream can not flushed!" ;
+                    return "Error stream can not flushed!";
                 }
             } else {
-                return null ;
-            }     
+                return null;
+            }
         }
 
         public synchronized final String getErrorMessage() {
@@ -296,13 +298,13 @@ public class SimpleCoreHunterRunServices implements CoreHunterRunServices {
 
         @Override
         public void run() {
-            
+
             outputStream = new ByteArrayOutputStream();
             PrintStream outputPrintStream = new PrintStream(outputStream);
 
             try {
                 startDate = new DateTime();
-                
+
                 outputPrintStream.println(String.format("Starting run : %s at ", getName(), startDate));
 
                 CoreHunterArguments arguments = new CoreHunterArguments(
@@ -323,22 +325,22 @@ public class SimpleCoreHunterRunServices implements CoreHunterRunServices {
                 errorStream = new ByteArrayOutputStream();
                 PrintStream printStream = new PrintStream(errorStream);
                 e.printStackTrace(printStream);
-                
-                outputPrintStream.println(String.format("Error in run : %s at due to %s. See error log for more details", getName(), errorMessage));
-                
+
+                outputPrintStream.println(String.format(
+                        "Error in run : %s at due to %s. See error log for more details", getName(), errorMessage));
+
                 printStream.close();
             }
 
             endDate = new DateTime();
             outputPrintStream.println(String.format("Ending run : %s at ", getName(), endDate));
-            
+
             outputPrintStream.close();
         }
-        
+
         public boolean stop() {
-            return false ; // This simple implementation can not be stopped
+            return false; // This simple implementation can not be stopped
         }
-        
 
     }
 
