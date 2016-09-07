@@ -19,28 +19,28 @@
 
 package org.corehunter;
 
-import org.jamesframework.core.search.listeners.SearchListener;
-import org.jamesframework.core.subset.SubsetSolution;
-
 /**
- * Extends SearchListener with CoreHunter specific steps.
- *
- * @author Guy Davenport, Herman De Beukelaer
+ * A closed range with a given lower and upper bound. Ranges are immutable.
+ * 
+ * @param <T> Range type (extending {@link Number})
+ * @author Herman De Beukelaer
  */
-public interface CoreHunterListener extends SearchListener<SubsetSolution> {
+public class Range<T extends Number> {
 
-    /**
-     * Fired when the pre-processing has started. Called only once prior to the search run.
-     *
-     * @param message the message to be sent to the listener
-     */
-    default public void preprocessingStarted(String message) {}
+    private final T lower;
+    private final T upper;
 
-    /**
-     * Fired when the pre-processing has stopped. Called only once prior to the search run.
-     *
-     * @param message the message to be sent to the listener
-     */
-    default public void preprocessingStopped(String message) {}
+    public Range(T lower, T upper) {
+        this.lower = lower;
+        this.upper = upper;
+    }
+
+    public T getLower() {
+        return lower;
+    }
+
+    public T getUpper() {
+        return upper;
+    }
     
 }

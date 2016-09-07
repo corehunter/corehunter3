@@ -28,22 +28,23 @@ package org.corehunter;
  */
 public class CoreHunterObjective {
     
-    private CoreHunterObjectiveType objectiveType ;
-    private CoreHunterMeasure measure ;
-    private double weight ;
+    private CoreHunterObjectiveType objectiveType;
+    private CoreHunterMeasure measure;
+    private double weight;
+    private Range<Double> normalizationRange;
     
     /**
-     * Creates a CoreHunter Objective with for specific object type with no defined measure. 
+     * Creates a Core Hunter objective with for specific object type with no defined measure. 
      * A measure is required for some data type / objective type combinations
      * 
      * @param objectiveType the objective type to be used
      */
     public CoreHunterObjective(CoreHunterObjectiveType objectiveType) {
-        this(objectiveType, null, 1.0);
+        this(objectiveType, null);
     }
     
     /**
-     * Creates a CoreHunter Objective with for specific object type and measure.
+     * Creates a Core Hunter objective with for specific object type and measure.
      * 
      * @param objectiveType the objective type to be used
      * @param measure the measure to be used for this objective type
@@ -53,7 +54,7 @@ public class CoreHunterObjective {
     }
     
     /**
-     * Creates a CoreHunter Objective with for specific object type and weight with no defined measure. 
+     * Creates a Core Hunter objective with for specific object type and weight with no defined measure. 
      * A measure is required for some data type / objective type combinations
      * 
      * @param objectiveType the objective type to be used
@@ -64,7 +65,7 @@ public class CoreHunterObjective {
     }
 
     /**
-     * Creates a CoreHunter Objective with for specific object type, measure and weight. 
+     * Creates a Core Hunter objective with for specific object type, measure and weight. 
      * The weight is ignored if the objective is not used with any other objectives.
      * 
      * @param objectiveType the objective type to be used
@@ -72,9 +73,36 @@ public class CoreHunterObjective {
      * @param weight the relative weight of this objective when used in conjunction with another objective
      */
     public CoreHunterObjective(CoreHunterObjectiveType objectiveType, CoreHunterMeasure measure, double weight) {
-        setObjectiveType(objectiveType) ;
-        setMeasure(measure) ;
-        setWeight(weight) ;
+        this(objectiveType, measure, weight, null);
+    }
+    
+    /**
+     * Creates a Core Hunter objective with for specific object type, weight and normalization range.
+     * The weight and normalization range are ignored if the objective is not used in a multi-objective configuration.
+     * 
+     * @param objectiveType the objective type to be used
+     * @param weight the relative weight of this objective when used in conjunction with another objective
+     * @param normalizationRange the normalization range of this objective in a multi-objective configuration
+     */
+    public CoreHunterObjective(CoreHunterObjectiveType objectiveType, double weight, Range<Double> normalizationRange) {
+        this(objectiveType, null, weight, normalizationRange);
+    }
+    
+    /**
+     * Creates a Core Hunter objective with for specific object type, measure, weight and normalization range.
+     * The weight and normalization range are ignored if the objective is not used in a multi-objective configuration.
+     * 
+     * @param objectiveType the objective type to be used
+     * @param measure the measure to be used for this objective type
+     * @param weight the relative weight of this objective when used in conjunction with another objective
+     * @param normalizationRange the normalization range of this objective in a multi-objective configuration
+     */
+    public CoreHunterObjective(CoreHunterObjectiveType objectiveType, CoreHunterMeasure measure,
+                               double weight, Range<Double> normalizationRange) {
+        setObjectiveType(objectiveType);
+        setMeasure(measure);
+        setWeight(weight);
+        setNormalizationRange(normalizationRange);
     }
 
     /**
@@ -129,5 +157,25 @@ public class CoreHunterObjective {
      */
     public final void setWeight(double weight) {
         this.weight = weight;
-    }     
+    }
+    
+    /**
+     * Gets the normalization range of this objective when used in a multi-objective configuration.
+     * Returns <code>null</code> if no normalization range has been set.
+     * 
+     * @return normalization range of this objective
+     */
+    public final Range<Double> getNormalizationRange(){
+        return normalizationRange;
+    }
+    
+    /**
+     * Sets the normalization range of this objective when used in a multi-objective configuration.
+     * 
+     * @param range normalization range of this objective
+     */
+    public final void setNormalizationRange(Range<Double> range){
+        this.normalizationRange = range;
+    }
+    
 }
