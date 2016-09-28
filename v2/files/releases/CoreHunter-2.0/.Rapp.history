@@ -1,0 +1,89 @@
+2*4
+x = true
+x = TRUE
+if(x) 1
+y = FALSE
+if(y) 1
+x = 1
+x
+if(x) 1
+clc
+cls
+clear
+function to calculate n and some testscalc.n <- function (p,gamma) (log(1-gamma))/(log(1-p)) calc.n(gamma=0.95,p=0.001) calc.n(gamma=0.95,p=0.1)# function to calculate overall succes and some testscalc.p <- function(pa,pb,n) 1-((1-pa)**n + (1-pb)**n - (1-pa-pb)**n) calc.p(pa=0.1,pb=0.001,n=2995)calc.p(pa=0.1,pb=0.1,n=29)calc.p(pa=0.001,pb=0.001,n=2995)# for checks see this function?dmultinom
+calc.n <- function (p,gamma) (log(1-gamma))/(log(1-p))calc.n(gamma=0.95,p=0.001) calc.n(gamma=0.95,p=0.1)# function to calculate overall succes and some testscalc.p <- function(pa,pb,n) 1-((1-pa)**n + (1-pb)**n - (1-pa-pb)**n) calc.p(pa=0.1,pb=0.001,n=2995)calc.p(pa=0.1,pb=0.1,n=29)calc.p(pa=0.001,pb=0.001,n=2995)# for checks see this function?dmultinom
+calc.n <- function (p,gamma) (log(1-gamma))/(log(1-p))
+calc.n(gamma=0.95,p=0.001)
+calc.n(gamma=0.95,p=0.1)
+calc.p <- function(pa,pb,n) 1-((1-pa)**n + (1-pb)**n - (1-pa-pb)**n)
+calc.p(pa=0.1,pb=0.001,n=2995)
+calc.p(pa=0.1,pb=0.1,n=29)
+calc.p(pa=0.001,pb=0.001,n=2995)
+?dmultinom
+calc.p(pa=0.5,pb=0.5,n=2)
+calc.n(gamma=0.95,p=0.5)
+calc.n(gamma=0.90,p=0.5)
+calc.n(gamma=0.85,p=0.5)
+(1-1/8)(1-1/8)
+(1-1/8)*(1-1/8)
+calc.n(gamma=sqrt(0.85),p=0.5)
+calc.n(gamma=sqrt(0.8),p=0.5)
+calc.n(gamma=sqrt(0.85),p=0.5)
+(1-1/16)*(1-1/16)
+calc.p(pa=0.5,pb=0.5,n=4)
+calc.n(gamma=sqrt(0.55),p=0.5)
+(1-1/4)*(1-1/4)
+calc.p(pa=0.5,pb=0.5,n=2)
+sqrt(0.55)
+calc.n
+calc.n(gamma=sqrt(0.55),p=0.5)
+0.75^2
+2*(0.5)^2
+0.75*0.25
+0.25^2
+calc.p(pa=0.001,pb=0.001,n=2995)
+(1-(1-0.001)^2995)*(1-(1-0.001)^2995)
+(1-(1-0.1)^2)*(1-(1-0.1)^2)
+calc.p(pa=0.1,pb=0.1,n=2)
+calc.p(pa=0.1,pb=0.1,n=5)
+(1-(1-0.1)^5)*(1-(1-0.1)^5)
+(1-(1-0.1)^50)*(1-(1-0.1)^50)
+(1-(1-0.1)^30)*(1-(1-0.1)^30)
+calc.p(pa=0.1,pb=0.1,n=30)
+0.9164556+0.0161
+sum(i,i=1..10)
+sum(i,i=[1,..,10])
+0.25^2
+par()$mar
+par(mar=c(5,5,5,5))
+par()$mar
+barplot(rand)
+barplot()
+core
+barplot(bul[10:100,1])
+barplot(bul[10:100,2])
+par(new=TRUE)
+barplot(bul[10:100,2])
+par()$mar
+par(mar=c(5,5,5,5))
+barplot(bul[10:100,2])
+setwd("Documents/doctoraat/CoreHunter/website/files/releases/CoreHunter-2.0/")
+source("corehunter.R")
+coreanalyser.run("data/examples/bul.csv")
+eval = coreanalyser.run("data/examples/bul.csv")
+eval
+coreanalyser.run("data/examples/bul.csv"):
+coreanalyser.run("data/examples/bul.csv");
+coreanalyser.run("data/examples/bul.csv data/examples/bul.csv");
+eval = coreanalyser.run("data/examples/bul.csv data/examples/bul.csv");
+eval
+eval = coreanalyser.run("data/examples/bul.csv data/examples/bul2.csv");
+eval = coreanalyser.run("data/examples/bul2.csv");
+eval = coreanalyser.run("data/examples/bul2.csv");
+eval
+eval = coreanalyser.run("data/examples/bul2.csv data/examples/bul.csv");
+eval
+eval = coreanalyser.run("data/examples/bul.csv data/examples/bul.csv");
+eval
+eval = coreanalyser.run("data/examples/bul.csv data/examples/bul2.csv");
+eval
