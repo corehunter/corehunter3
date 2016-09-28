@@ -40,11 +40,6 @@ Gower's distance is used to compute distances from phenotypic traits, and both t
 
 - Shannon's index
 - Expected heterozygosity
-
-For genetic marker data only.
-
-#### Auxiliary measures
-
 - Allele coverage
 
 For genetic marker data only
