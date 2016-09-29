@@ -16,12 +16,18 @@ Core Hunter 3 is a flexible tool for multi-purpose core subset selection. Versio
 Running Core Hunter
 -------------------
 
-...
+Core Hunter 3 is available as an [R package](https://github.com/corehunter/corehunter3-r) `corehunter` that can be installed from CRAN with
+
+```R
+> install.packages("corehunter")
+```
+
+A graphical interface is also being developed. For more information, see http://www.corehunter.org.
 
 Supported data types
 --------------------
 
-...
+Core Hunter 3 supports multiple types of genetic marker data, phenotypic traits and precomputed distance matrices. See http://www.corehunter.org for more details.
 
 Evaluation measures
 -------------------
@@ -42,7 +48,7 @@ Gower's distance is used to compute distances from phenotypic traits, and both t
 - Expected heterozygosity
 - Allele coverage
 
-For genetic marker data only
+Available for genetic marker data only.
 
 
 
