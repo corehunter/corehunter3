@@ -4,11 +4,35 @@
 
     <groupId>org.corehunter</groupId>
     <artifactId>corehunter</artifactId>
-    <version>3.0.0-SNAPSHOT</version>
+    <version>3.0.0</version>
     <packaging>pom</packaging>
 
-    <name>Corehunter parent project</name>
-    <url>http://corehunter.org</url>
+    <name>Core Hunter parent project</name>
+    <url>http://www.corehunter.org</url>
+    <description>Core Hunter 3 is a fast and flexible tool for multi-purpose core subset selection.</description>
+    <licenses>
+        <license>
+            <name>The Apache License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+        </license>
+    </licenses>
+    
+    <developers>
+        <developer>
+            <name>Herman De Beukelaer</name>
+            <email>herman.debeukelaer@gmail.com</email>
+        </developer>
+        <developer>
+            <name>Guy Davenport</name>
+            <email>daveneti@gmail.com</email>
+        </developer>
+    </developers>
+    
+    <scm>
+        <connection>scm:git:git://github.com/corehunter/corehunter3.git</connection>
+        <developerConnection>scm:git:ssh://github.com:corehunter/corehunter3.git</developerConnection>
+        <url>http://github.com/corehunter/corehunter3/tree/master</url>
+    </scm>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -56,12 +80,12 @@
             <dependency>
                 <groupId>org.corehunter</groupId>
                 <artifactId>corehunter-base</artifactId>
-                <version>3.0.0-SNAPSHOT</version>
+                <version>3.0.0</version>
             </dependency>
             <dependency>
                 <groupId>org.corehunter</groupId>
                 <artifactId>corehunter-services-api</artifactId>
-                <version>3.0.0-SNAPSHOT</version>
+                <version>3.0.0</version>
             </dependency>
             <dependency>
                 <groupId>org.jamesframework</groupId>
@@ -117,8 +141,10 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>2.19.1</version>
                 <configuration>
+                    <forkCount>3</forkCount>
+                    <reuseForks>true</reuseForks>
                     <!-- Enable JaCoCo agent when unit tests are run -->
-                    <argLine>${jacocoSurefireArgLine} -Xmx1024m</argLine>
+                    <argLine>${jacocoSurefireArgLine} -Xmx1024m -XX:MaxPermSize=256m</argLine>
                 </configuration>
             </plugin>
             
@@ -409,7 +435,7 @@
                         <dependency>
                             <groupId>org.corehunter</groupId>
                             <artifactId>build-tools</artifactId>
-                            <version>3.0.0-SNAPSHOT</version>
+                            <version>3.0.0</version>
                         </dependency>
                     </dependencies>
                     <configuration>
