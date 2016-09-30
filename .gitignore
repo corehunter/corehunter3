@@ -1,12 +1,10 @@
-/bin
-/target
-/.settings
-.project
-.classpath
-
+**/*.iml
+**/.idea/
 **/bin
 **/target
 **/.settings
 **/.project
 **/.classpath
-.DS_Store
+**/.checkstyle
+**/.DS_Store
+**/.Rhistory

@@ -1,0 +1,9 @@
+ID  , feature1, feature2, feature3, feature4, feature5
+TYPE, I       , R       , N       , NB      , OS
+MIN , 0       , 0
+MAX , 5       , 5
+row1, 1       , 1.0     , 1       , true    , b
+row2, 2       , 3.0     , 2       , true    , x
+row3, 3       , 3.0     , 1       , false   , a
+row4, 4       , 5.0     , 2       , false   , c
+row5, 5       , 4.0     , 1       , true    , a

@@ -1,0 +1,7 @@
+ID , trait 1, trait 2, trait 3, trait 4, trait 5
+TYPE , N      , O      , I      , R      , NB
+Alice, A      , 3      , 4      , 1.4    , false
+Dave , B      , 1      , 5      , 0.5    , true
+Bob  , A      , 0      , 6      , 0.5    , true
+Carol, C      , 2      , 9      , 0.5    , false
+Eve  , B      , 2      , 1      , 1.3    , true
