@@ -32,7 +32,7 @@ Core Hunter 3 supports multiple types of genetic marker data, phenotypic traits 
 Evaluation measures
 -------------------
 
-Core Hunter 3 can optimize the following measures, either separately or simultaneously as part of a weighted index.
+One of the main strengths of Core Hunter is that it can directly optimize a number of different evaluation measures. If desired, multiple measures can be simultaneously optimized as part of a weighted index. The measures included in Core Hunter 3 are listed below.
 
 #### Distance based measures
 
