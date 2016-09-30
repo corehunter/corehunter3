@@ -142,7 +142,7 @@
                 <version>2.19.1</version>
                 <configuration>
                     <!-- Enable JaCoCo agent when unit tests are run -->
-                    <argLine>${jacocoSurefireArgLine} -Xmx512m</argLine>
+                    <argLine>${jacocoSurefireArgLine} -Xmx2048m</argLine>
                 </configuration>
             </plugin>
             
