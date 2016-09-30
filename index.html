@@ -22,6 +22,11 @@
       <p>Looking for the old Core Hunter 2 website? It's <a href="v2/">here</a>.</p>
 
 <h2>
+<a id="what-is-core-hunter" class="anchor" href="#what-is-core-hunter" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>What is Core Hunter?</h2>
+
+<p>Core Hunter is a flexible tool for multi-purpose core subset selection. Version 3 has been recoded from scratch using the <a href="http://www.jamesframework.org">JAMES framework</a> which provides the applied optimization algorithms. A lot of new features have been added such as the ability to sample cores based on multiple types of genetic marker data, phenotypic traits or a precomputed distance matrix. New and improved evaluation measures were also included, that can be separately or simultaneously optimized.</p>
+
+<h2>
 <a id="getting-started-with-core-hunter" class="anchor" href="#getting-started-with-core-hunter" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Getting started with Core Hunter</h2>
 
 <p>Core Hunter is implemented in Java and can be executed from R or using the graphical interface. In both cases you will need to have installed a <a href="http://www.oracle.com/technetwork/java/javase/downloads/jre8-downloads-2133155.html">Java Runtime Environment (JRE)</a> version 8 or later.</p>
@@ -29,24 +34,71 @@
 <h4>
 <a id="r-package" class="anchor" href="#r-package" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>R Package</h4>
 
-<p>The R package <code>corehunter</code> is available on CRAN and can be installed with</p>
+<p>The package <code>corehunter</code> is available on CRAN and can be installed with</p>
 
 <div class="highlight highlight-source-r"><pre><span class="pl-k">&gt;</span> install.packages(<span class="pl-s"><span class="pl-pds">"</span>corehunter<span class="pl-pds">"</span></span>)</pre></div>
+
+<p>Afterwards, load the package</p>
+
+<div class="highlight highlight-source-r"><pre><span class="pl-k">&gt;</span> library(<span class="pl-smi">corehunter</span>)</pre></div>
+
+<p>and add your data, e.g.</p>
+
+<div class="highlight highlight-source-r"><pre><span class="pl-k">&gt;</span> <span class="pl-smi">my.genotypes</span> <span class="pl-k">&lt;-</span> genotypes(<span class="pl-v">file</span> <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">"</span>path/to/file<span class="pl-pds">"</span></span>)</pre></div>
+
+<p>Sampling a core collection is then as easy as</p>
+
+<div class="highlight highlight-source-r"><pre><span class="pl-k">&gt;</span> sampleCore(<span class="pl-smi">my.genotypes</span>)</pre></div>
+
+<p>There are numerous options when sampling a core. For example, you can change the size of the core (defaults to 20%), optimize a specific measure (defaults to average entry-to-nearest-entry distance), maximize a weighted index including multiple measures, change stop conditions (by default, the algorithm stops when it was unable to further improve the core during the last 10 seconds), etc. All functions have detailed documentation, for example try</p>
+
+<div class="highlight highlight-source-r"><pre><span class="pl-k">&gt;</span> ?<span class="pl-smi">sampleCore</span>
+<span class="pl-k">&gt;</span> ?<span class="pl-smi">objective</span>
+<span class="pl-k">&gt;</span> ?<span class="pl-smi">genotypes</span>
+<span class="pl-k">&gt;</span> ?<span class="pl-smi">phenotypes</span>
+<span class="pl-k">&gt;</span> ?<span class="pl-smi">distances</span>
+<span class="pl-k">&gt;</span> ?<span class="pl-smi">coreHunterData</span></pre></div>
+
+<p>Many examples are included in the R package as well.</p>
 
 <h4>
 <a id="graphical-interface" class="anchor" href="#graphical-interface" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Graphical interface</h4>
 
-<p>The graphical interface of Core Hunter is under development. More information will be posted here soon.</p>
+<p>A simple graphical interface is under development. More information will be posted here soon.</p>
 
 <h2>
 <a id="supported-data-types" class="anchor" href="#supported-data-types" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Supported data types</h2>
 
-<p>...</p>
+<p>Core Hunter 3 supports multiple types of genetic marker data, phenotypic traits and precomputed distance matrices. Data can be loaded from files, or from data frames and matrices when using the R package. More information and examples will be posted here soon.</p>
 
 <h2>
 <a id="evaluation-measures" class="anchor" href="#evaluation-measures" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Evaluation measures</h2>
 
-<p>...</p>
+<p>One of the main strengths of Core Hunter is that it can directly optimize a number of different evaluation measures.
+If desired, multiple measures can be simultaneously optimized as part of a weighted index.
+The measures included in Core Hunter 3 are listed below.</p>
+
+<h4>
+<a id="distance-based-measures" class="anchor" href="#distance-based-measures" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Distance based measures</h4>
+
+<ul>
+<li>Average entry-to-nearest-entry distance (diversity)</li>
+<li>Average accession-to-nearest-entry distance (representativeness)</li>
+<li>Average entry-to-entry distance (provided for historical reasons, not preferred)</li>
+</ul>
+
+<p>Gower's distance is used to compute distances from phenotypic traits, and both the Modified Roger's as well as Cavalli-Sforza &amp; Edwards distances are supported for genetic marker data. Alternatively, a precomputed distance matrix can be used.</p>
+
+<h4>
+<a id="allelic-richness" class="anchor" href="#allelic-richness" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Allelic richness</h4>
+
+<ul>
+<li>Shannon's index</li>
+<li>Expected heterozygosity</li>
+<li>Allele coverage</li>
+</ul>
+
+<p>Available for genetic marker data only.</p>
 
       <footer class="site-footer">
         <span class="site-footer-owner"><a href="https://github.com/corehunter/corehunter3">Core Hunter 3</a> is maintained by <a href="https://github.com/corehunter">corehunter</a>.</span>
