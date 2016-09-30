@@ -4,7 +4,7 @@
 
     <groupId>org.corehunter</groupId>
     <artifactId>corehunter</artifactId>
-    <version>3.0.0</version>
+    <version>3.1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>Core Hunter parent project</name>
@@ -80,12 +80,12 @@
             <dependency>
                 <groupId>org.corehunter</groupId>
                 <artifactId>corehunter-base</artifactId>
-                <version>3.0.0</version>
+                <version>3.1.0-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.corehunter</groupId>
                 <artifactId>corehunter-services-api</artifactId>
-                <version>3.0.0</version>
+                <version>3.1.0-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>org.jamesframework</groupId>
@@ -141,10 +141,8 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>2.19.1</version>
                 <configuration>
-                    <forkCount>3</forkCount>
-                    <reuseForks>true</reuseForks>
                     <!-- Enable JaCoCo agent when unit tests are run -->
-                    <argLine>${jacocoSurefireArgLine} -Xmx1024m -XX:MaxPermSize=256m</argLine>
+                    <argLine>${jacocoSurefireArgLine} -Xmx2048m</argLine>
                 </configuration>
             </plugin>
             
@@ -435,7 +433,7 @@
                         <dependency>
                             <groupId>org.corehunter</groupId>
                             <artifactId>build-tools</artifactId>
-                            <version>3.0.0</version>
+                            <version>3.1.0-SNAPSHOT</version>
                         </dependency>
                     </dependencies>
                     <configuration>
