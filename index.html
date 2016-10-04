@@ -31,8 +31,8 @@
 
 <p>Core Hunter is implemented in Java and can be executed from R or using the graphical interface. In both cases you will need to have installed a <a href="http://www.oracle.com/technetwork/java/javase/downloads/jre8-downloads-2133155.html">Java Runtime Environment (JRE)</a> version 8 or later.</p>
 
-<h4>
-<a id="r-package" class="anchor" href="#r-package" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>R Package</h4>
+<h3>
+<a id="r-package" class="anchor" href="#r-package" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>R Package</h3>
 
 <p>The package <code>corehunter</code> is available on CRAN and can be installed with</p>
 
@@ -61,15 +61,47 @@
 
 <p>Many examples are included in the R package as well.</p>
 
-<h4>
-<a id="graphical-interface" class="anchor" href="#graphical-interface" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Graphical interface</h4>
+<h3>
+<a id="graphical-interface" class="anchor" href="#graphical-interface" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Graphical interface</h3>
 
 <p>A simple graphical interface is under development. More information will be posted here soon.</p>
 
 <h2>
 <a id="supported-data-types" class="anchor" href="#supported-data-types" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Supported data types</h2>
 
-<p>Core Hunter 3 supports multiple types of genetic marker data, phenotypic traits and precomputed distance matrices. Data can be loaded from files, or from data frames and matrices when using the R package. More information and examples will be posted here soon.</p>
+<p>Core Hunter 3 supports multiple types of genetic marker data, phenotypic traits and precomputed distance matrices. Data can be loaded from files and, when using the R package, from data frames and matrices.</p>
+
+<h3>
+<a id="genetic-marker-data" class="anchor" href="#genetic-marker-data" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Genetic marker data</h3>
+
+<p>Genotypes can be provided in various formats.</p>
+
+<h4>
+<a id="default-format" class="anchor" href="#default-format" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Default format</h4>
+
+<p>The default format contains one row per accession and one or more columns per marker. It is suited for data with a fixed number of allele observations per specific marker in each individual. The values are allele names or numbers, or in fact any token used to identify the detected alleles. Common cases are those with one or two columns per marker, e.g. suited for homozygous/haploid and diploid data, respectively. The number of observed alleles may vary across markers.</p>
+
+<p>There is one compulsory header column <code>ID</code> specifying unique accession identifiers. Optionally, a second header column <code>NAME</code> can be included to provide names as well, which need not be unique nor defined for all accessions. The single header row contains marker names which are repeated for each column corresponding to the same marker. Optionally, column names may include a suffix added to the marker name, starting with a <code>.</code>, <code>-</code> or <code>_</code> character. For example, in the case of diploid data, it is allowed that the two columns corresponding to the same marker have names like <code>M5.1</code> &amp; <code>M5.2</code>, <code>M17-a</code> &amp; <code>M17-b</code> or  <code>X_1</code> &amp; <code>X_2</code>, for markers named <code>M5</code>, <code>M17</code> and <code>X</code>, respectively. The column name prefix up to before the last occurrence of any <code>.</code>, <code>-</code> or <code>_</code> character is taken to be the marker name.</p>
+
+<p>This format can not be used for bulk samples. For such data the frequency format should be used instead.</p>
+
+<h4>
+<a id="frequency-data" class="anchor" href="#frequency-data" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Frequency data</h4>
+
+<p>This is the original format from Core Hunter 1 and 2, but it has been transposed to follow the convention that rows are observations (accessions) and columns are variables (marker alleles). This format contains one row per accession and one column per combination of marker and allele. The values are allele frequencies. At least one column (allele) is provided per marker and the number of alleles per marker may vary.</p>
+
+<p>There is one compulsory header column <code>ID</code> specifying unique accession identifiers. Optionally, a second header column <code>NAME</code> can be included to provide names as well, which need not be unique nor defined for all accessions. The first, compulsory header row contains marker names, which are repeated for each consecutive column corresponding to the same marker. An optional second header row <code>ALLELE</code> can be included to provide allele names per marker.</p>
+
+<p>This format is suitable for entries of individual or bulk samples.</p>
+
+<h4>
+<a id="biparental-data" class="anchor" href="#biparental-data" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Biparental data</h4>
+
+<p>This format describes genetic marker data with two alleles per marker. It contains one row per accession and one column per marker with values <code>0</code>, <code>1</code> and <code>2</code> denoting the number of detected occurrences of an arbitrary reference allele. Thus, the values <code>0</code> and <code>2</code> indicate homozygotes of the two alleles, respectively, while <code>1</code> is used for a heterozygote.</p>
+
+<p>There is one compulsory header column <code>ID</code> specifying unique accession identifiers. Optionally, a second header column <code>NAME</code> can be included to provide names as well, which need not be unique nor defined for all accessions. The single header row may optionally provide marker names.</p>
+
+<p>This format is only suited for data where each marker has (at most) two possible alleles and can not be used to describe bulked data.</p>
 
 <h2>
 <a id="evaluation-measures" class="anchor" href="#evaluation-measures" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Evaluation measures</h2>
@@ -78,8 +110,8 @@
 If desired, multiple measures can be simultaneously optimized as part of a weighted index.
 The measures included in Core Hunter 3 are listed below.</p>
 
-<h4>
-<a id="distance-based-measures" class="anchor" href="#distance-based-measures" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Distance based measures</h4>
+<h3>
+<a id="distance-based-measures" class="anchor" href="#distance-based-measures" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Distance based measures</h3>
 
 <ul>
 <li>Average entry-to-nearest-entry distance (diversity)</li>
@@ -89,8 +121,8 @@ The measures included in Core Hunter 3 are listed below.</p>
 
 <p>Gower's distance is used to compute distances from phenotypic traits, and both the Modified Roger's as well as Cavalli-Sforza &amp; Edwards distances are supported for genetic marker data. Alternatively, a precomputed distance matrix can be used.</p>
 
-<h4>
-<a id="allelic-richness" class="anchor" href="#allelic-richness" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Allelic richness</h4>
+<h3>
+<a id="allelic-richness" class="anchor" href="#allelic-richness" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Allelic richness</h3>
 
 <ul>
 <li>Shannon's index</li>
