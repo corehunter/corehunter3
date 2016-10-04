@@ -83,7 +83,7 @@
 
 <p>There is one compulsory header column <code>ID</code> specifying unique accession identifiers. Optionally, a second header column <code>NAME</code> can be included to provide names as well, which need not be unique nor defined for all accessions. The single header row contains marker names which are repeated for each column corresponding to the same marker. Optionally, column names may include a suffix added to the marker name, starting with a <code>.</code>, <code>-</code> or <code>_</code> character. For example, in the case of diploid data, it is allowed that the two columns corresponding to the same marker have names like <code>M5.1</code> &amp; <code>M5.2</code>, <code>M17-a</code> &amp; <code>M17-b</code> or  <code>X_1</code> &amp; <code>X_2</code>, for markers named <code>M5</code>, <code>M17</code> and <code>X</code>, respectively. The column name prefix up to before the last occurrence of any <code>.</code>, <code>-</code> or <code>_</code> character is taken to be the marker name.</p>
 
-<p>This format can not be used for bulk samples. For such data the frequency format should be used instead.</p>
+<p>This format can not be used for bulk samples. For such data the frequency format should be used.</p>
 
 <h4>
 <a id="frequency-data" class="anchor" href="#frequency-data" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Frequency data</h4>
@@ -102,6 +102,119 @@
 <p>There is one compulsory header column <code>ID</code> specifying unique accession identifiers. Optionally, a second header column <code>NAME</code> can be included to provide names as well, which need not be unique nor defined for all accessions. The single header row may optionally provide marker names.</p>
 
 <p>This format is only suited for data where each marker has (at most) two possible alleles and can not be used to describe bulked data.</p>
+
+<h3>
+<a id="precomputed-distance-matrix" class="anchor" href="#precomputed-distance-matrix" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Precomputed distance matrix</h3>
+
+<p>Core Hunter can load an arbitrary distance matrix computed from any type of data using any distance measure. The matrix contains one row and one column per accession, in the same order, which effectively means that the matrix should be symmetric.</p>
+
+<p>There is one compulsory header column <code>ID</code> which provides unique accession identifiers. Optionally, a second header column <code>NAME</code> can be included to provide names as well, which need not be unique nor defined for all items. Accession identifiers can optionally be repeated on the single header row.</p>
+
+<p>Any row in the matrix can be truncated at or after the diagonal. The diagonal values should always be zero, when included. If some or all entries of the upper triangular part of the matrix are included, it is verified whether they match the lower triangular part, i.e. whether the matrix is effectively symmetric. Truncated values in the upper triangular part are copied from the lower triangular part.</p>
+
+<p>This data type is particularly interesting when dealing with genetic marker data having a very large number of markers, as precomputing the distance matrix is then also an effective way to compress the data. It can also be used to run Core Hunter with data types and/or distance measures that are otherwise not supported.</p>
+
+<h3>
+<a id="phenotypic-trait-data" class="anchor" href="#phenotypic-trait-data" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Phenotypic trait data</h3>
+
+<p>This data describes observed phenotypic traits and can accommodate several variable types. The format used by Core Hunter includes one row per accession and one column per trait.</p>
+
+<p>There must be one compulsory header column <code>ID</code> with unique accession identifiers. A second optional column <code>NAME</code> can be added to provide names as well, which need not be unique nor defined for all items. The first row contains the trait names, which need not be unique, but should be unique for later identification. Optionally, a second header row with header <code>TYPE</code> can be added which specifies the variable type of each trait (nominal, ordinal, interval, ratio) and optionally the data type. Please refer to the tables below. If this row is not included in the file, variable types are automatically inferred or can be set manually when using the R package, but will default to nominal strings when using the GUI. It is recommended to always specify variable types.</p>
+
+<p>Two more optional rows can be added for ordinal, interval and ratio data to provide indicative minimum and maximum values, with the row headers <code>MIN</code> and <code>MAX</code>, respectively. If indicative minimum and maximum values are not provided these are calculated from the data. If the data exceed these minimum and maximum values, the actual minimum and maximum values are adjusted accordingly.</p>
+
+<h4>
+<a id="variable-types" class="anchor" href="#variable-types" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Variable types</h4>
+
+<table>
+<thead>
+<tr>
+<th>Variable type</th>
+<th>Code</th>
+<th>Default data type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Nominal</td>
+<td>N</td>
+<td>String</td>
+</tr>
+<tr>
+<td>Ordinal</td>
+<td>O</td>
+<td>Integer</td>
+</tr>
+<tr>
+<td>Interval</td>
+<td>I</td>
+<td>Integer</td>
+</tr>
+<tr>
+<td>Ratio</td>
+<td>R</td>
+<td>Double</td>
+</tr>
+</tbody>
+</table>
+
+<h4>
+<a id="data-types" class="anchor" href="#data-types" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Data types</h4>
+
+<table>
+<thead>
+<tr>
+<th>Data type</th>
+<th>Code</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Boolean</td>
+<td>B</td>
+</tr>
+<tr>
+<td>Short</td>
+<td>T</td>
+</tr>
+<tr>
+<td>Integer</td>
+<td>I</td>
+</tr>
+<tr>
+<td>Long</td>
+<td>L</td>
+</tr>
+<tr>
+<td>Float</td>
+<td>F</td>
+</tr>
+<tr>
+<td>Double</td>
+<td>D</td>
+</tr>
+<tr>
+<td>Big Integer</td>
+<td>R</td>
+</tr>
+<tr>
+<td>Big Decimal</td>
+<td>M</td>
+</tr>
+<tr>
+<td>Date</td>
+<td>A</td>
+</tr>
+<tr>
+<td>String</td>
+<td>S</td>
+</tr>
+<tr>
+<td>None</td>
+<td>X</td>
+</tr>
+</tbody>
+</table>
 
 <h2>
 <a id="evaluation-measures" class="anchor" href="#evaluation-measures" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Evaluation measures</h2>
