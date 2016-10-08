@@ -365,10 +365,23 @@ public class API {
     /* --------- */
 
     public static CoreHunterObjective createObjective(String type, String measure, double weight) {
-        return new CoreHunterObjective(CoreHunterObjectiveType.createFromAbbreviation(type),
-                CoreHunterMeasure.createFromAbbreviation(measure), weight);
+        return createObjective(type, measure, weight, null);
     }
     
+    public static CoreHunterObjective createObjective(String type, String measure,
+                                                      double weight, double min, double max) {
+        return createObjective(type, measure, weight, new Range<>(min, max));
+    }
+    
+    private static CoreHunterObjective createObjective(String type, String measure,
+                                                       double weight, Range<Double> normalizationRange) {
+        return new CoreHunterObjective(
+                CoreHunterObjectiveType.createFromAbbreviation(type),
+                CoreHunterMeasure.createFromAbbreviation(measure),
+                weight, normalizationRange
+        );
+    }
+        
     public static CoreHunterArguments createArguments(CoreHunterData data, int size,
                                                       CoreHunterObjective[] objectives,
                                                       boolean normalizeMultiObjective){
@@ -380,21 +393,28 @@ public class API {
     /* --------- */
 
     /**
-     * Sample a core collection.
+     * Get normalization ranges of all objectives in a multi-objective configuration.
+     * Executes a preliminary random descent search per objective (in parallel) to approximate the
+     * best solution in terms of each included objective. For an objective that is being maximized,
+     * the upper bound is set to the value of the best solution for that objective, while the lower
+     * bound is set to the Pareto minimum, i.e. the minimum value obtained when evaluating all optimal
+     * solutions with the considered objective. For an objective that is being minimized, the roles
+     * of upper and lower bound are interchanged, and the Pareto maximum is used instead.
      * 
-     * @param args Core Hunter arguments including data, objective and subset size.
-     * @param mode Execution mode, one of "default" or "fast".
+     * @param args Core Hunter arguments including data, objectives and subset size.
+     * @param mode Execution mode, one of "default" or "fast". Only affects the default
+     *             stop conditions, not the used algorithm (always random descent).
      * @param timeLimit Absolute runtime limit in seconds.
      *                  If set to a negative value no time limit is used.
      * @param maxTimeWithoutImprovement Maximum time without finding an improvement, in seconds.
      *                                  If set to a negative value, the default improvement time of
-     *                                  the chosen execution mode is used: 5 seconds in default mode,
-     *                                  1 second in fast mode.
-     * @param silent If <code>true</code> no output is written to the console.
-     * @return Indices of selected items (zero-based).
+     *                                  the chosen execution mode is used: 10 seconds in default mode,
+     *                                  2 seconds in fast mode.
+     * @return Matrix containing normalization ranges.
+     *         One row per objective, and two columns with lower and upper bound, respectively.
      */
-    public static int[] sampleCore(CoreHunterArguments args, String mode, int timeLimit, int maxTimeWithoutImprovement,
-            boolean silent) {
+    public static double[][] getNormalizationRanges(CoreHunterArguments args, String mode,
+                                                    int timeLimit, int maxTimeWithoutImprovement){
         // interpret arguments
         CoreHunterExecutionMode exMode = CoreHunterExecutionMode.DEFAULT;
         if (mode.equals("fast")) {
@@ -403,10 +423,52 @@ public class API {
         // create Core Hunter executor
         CoreHunter ch = new CoreHunter(exMode);
         if (timeLimit > 0) {
-            ch.setTimeLimit(timeLimit);
+            ch.setTimeLimit(1000 * timeLimit); // convert to milliseconds
         }
         if (maxTimeWithoutImprovement > 0) {
-            ch.setMaxTimeWithoutImprovement(maxTimeWithoutImprovement);
+            ch.setMaxTimeWithoutImprovement(1000 * maxTimeWithoutImprovement); // convert to milliseconds
+        }
+        // determine ranges
+        List<Range<Double>> rangeList = ch.normalize(args);
+        // convert result
+        double[][] ranges = new double[rangeList.size()][2];
+        for(int o = 0; o < rangeList.size(); o++){
+            Range<Double> range = rangeList.get(o);
+            ranges[o][0] = range.getLower();
+            ranges[o][1] = range.getUpper();
+        }
+        return ranges;
+    }
+    
+    /**
+     * Sample a core collection.
+     * 
+     * @param args Core Hunter arguments including data, objective and subset size.
+     * @param mode Execution mode, one of "default" or "fast".
+     * @param timeLimit Absolute runtime limit in seconds.
+     *                  If set to a negative value no time limit is used.
+     * @param maxTimeWithoutImprovement Maximum time without finding an improvement, in seconds.
+     *                                  If set to a negative value, the default improvement time of
+     *                                  the chosen execution mode is used: 10 seconds in default mode,
+     *                                  2 seconds in fast mode.
+     * @param silent If <code>true</code> no output is written to the console.
+     * @return Indices of selected items (zero-based).
+     */
+    public static int[] sampleCore(CoreHunterArguments args, String mode,
+                                   int timeLimit, int maxTimeWithoutImprovement,
+                                   boolean silent) {
+        // interpret arguments
+        CoreHunterExecutionMode exMode = CoreHunterExecutionMode.DEFAULT;
+        if (mode.equals("fast")) {
+            exMode = CoreHunterExecutionMode.FAST;
+        }
+        // create Core Hunter executor
+        CoreHunter ch = new CoreHunter(exMode);
+        if (timeLimit > 0) {
+            ch.setTimeLimit(1000 * timeLimit); // convert to milliseconds
+        }
+        if (maxTimeWithoutImprovement > 0) {
+            ch.setMaxTimeWithoutImprovement(1000 * maxTimeWithoutImprovement); // convert to milliseconds
         }
         if (!silent) {
             ch.setListener(new SimpleCoreHunterListener());
@@ -498,13 +560,13 @@ public class API {
         if (coreHunterData != null) {
 
             if (coreHunterData.hasGenotypes()) {
-                return new CoreHunterObjective(DEFAULT_OBJECTIVE, DEFAULT_GENOTYPE_MEASURE, 1.0);
+                return new CoreHunterObjective(DEFAULT_OBJECTIVE, DEFAULT_GENOTYPE_MEASURE);
             }
             if (coreHunterData.hasPhenotypes()) {
-                return new CoreHunterObjective(DEFAULT_OBJECTIVE, CoreHunterMeasure.GOWERS, 1.0);
+                return new CoreHunterObjective(DEFAULT_OBJECTIVE, CoreHunterMeasure.GOWERS);
             }
             if (coreHunterData.hasDistances()) {
-                return new CoreHunterObjective(DEFAULT_OBJECTIVE, CoreHunterMeasure.PRECOMPUTED_DISTANCE, 1.0);
+                return new CoreHunterObjective(DEFAULT_OBJECTIVE, CoreHunterMeasure.PRECOMPUTED_DISTANCE);
             }
         }
 
