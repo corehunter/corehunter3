@@ -19,6 +19,12 @@
 
 package org.corehunter.services;
 
+/**
+ * Enumeration of CoreHunter run status
+ * 
+ * @author daveneti
+ *
+ */
 public enum CoreHunterRunStatus {
 
     NOT_STARTED("Not Started"), RUNNING("Running"), FAILED("Failed"), FINISHED("Finished");

@@ -40,7 +40,6 @@ import org.corehunter.data.GenotypeDataFormat;
 import org.corehunter.data.simple.SimpleBiAllelicGenotypeData;
 import org.corehunter.data.simple.SimpleDistanceMatrixData;
 import org.corehunter.data.simple.SimpleGenotypeData;
-import org.corehunter.data.CoreHunterDataType;
 import org.corehunter.services.simple.FileBasedDatasetServices;
 import org.junit.Test;
 

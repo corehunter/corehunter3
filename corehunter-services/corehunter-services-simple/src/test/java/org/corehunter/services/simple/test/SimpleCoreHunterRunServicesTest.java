@@ -54,17 +54,6 @@ public class SimpleCoreHunterRunServicesTest {
     private static final Path ROOT_DIRECTORY = Paths.get(TARGET_DIRECTORY, 
             SimpleCoreHunterRunServicesTest.class.getSimpleName());
     
-    private Path createTempDirectory() throws IOException {
-
-        Files.createDirectories(ROOT_DIRECTORY);
-
-        Path path = Files.createTempDirectory(ROOT_DIRECTORY, null);
-
-        Files.createDirectories(path);
-
-        return path;
-    }
-    
     @Test
     public void testSimpleCoreHunterRunServices() {
 
@@ -72,7 +61,7 @@ public class SimpleCoreHunterRunServicesTest {
             FileBasedDatasetServices fileBasedDatasetServices = new FileBasedDatasetServices(
                     createTempDirectory());
 
-            new SimpleCoreHunterRunServices(fileBasedDatasetServices);
+            new SimpleCoreHunterRunServices(createTempDirectory(), fileBasedDatasetServices);
         } catch (Exception e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -80,13 +69,14 @@ public class SimpleCoreHunterRunServicesTest {
             fail(e.getMessage());
         }
     }
-
+    
     //@Test
     public void testExecuteCoreHunter() {
 
         try {
-            FileBasedDatasetServices fileBasedDatasetServices = new FileBasedDatasetServices(
-                    createTempDirectory());
+            Path path = createTempDirectory() ;
+            
+            FileBasedDatasetServices fileBasedDatasetServices = new FileBasedDatasetServices(path);
             
             Dataset dataset = new DatasetPojo(DATASET_UID, DATASET_NAME);
             
@@ -99,7 +89,7 @@ public class SimpleCoreHunterRunServicesTest {
             fileBasedDatasetServices.loadData(dataset, phenotypicDataPath, FileType.CSV,
                     CoreHunterDataType.PHENOTYPIC);
 
-            SimpleCoreHunterRunServices simpleCoreHunterRunServices = new SimpleCoreHunterRunServices(
+            SimpleCoreHunterRunServices simpleCoreHunterRunServices = new SimpleCoreHunterRunServices(path, 
                     fileBasedDatasetServices);
 
             CoreHunterRunArguments arguments = new CoreHunterRunArgumentsPojo(NAME1, SUBSET_SIZE1, datasetId);
@@ -140,5 +130,16 @@ public class SimpleCoreHunterRunServicesTest {
 
             fail(e.getMessage());
         }
+    }
+    
+    private Path createTempDirectory() throws IOException {
+
+        Files.createDirectories(ROOT_DIRECTORY);
+
+        Path path = Files.createTempDirectory(ROOT_DIRECTORY, null);
+
+        Files.createDirectories(path);
+
+        return path;
     }
 }

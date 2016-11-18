@@ -25,6 +25,12 @@ import org.corehunter.CoreHunterObjective;
 
 import uno.informatics.data.SimpleEntity;
 
+/**
+ * Provides the arguments for a CoreHunter run
+ * 
+ * @author daveneti
+ *
+ */
 public interface CoreHunterRunArguments extends SimpleEntity {
    
     /** 

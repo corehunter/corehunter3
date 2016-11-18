@@ -27,12 +27,16 @@ import org.corehunter.data.CoreHunterData;
 import org.corehunter.data.CoreHunterDataType;
 
 import uno.informatics.data.Data;
-import uno.informatics.data.DataType;
 import uno.informatics.data.Dataset;
 import uno.informatics.data.dataset.DatasetException;
-import uno.informatics.data.dataset.MatrixData;
 import uno.informatics.data.io.FileType;
 
+/**
+ * Services for managing datasets
+ * 
+ * @author daveneti
+ *
+ */
 public interface DatasetServices {
 
     /**

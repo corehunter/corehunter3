@@ -21,9 +21,14 @@ package org.corehunter.services;
 
 import java.util.List;
 
-import org.corehunter.CoreHunterArguments;
 import org.jamesframework.core.subset.SubsetSolution;
 
+/**
+ * Services for running CoreHunter
+ * 
+ * @author daveneti
+ *
+ */
 public interface CoreHunterRunServices {
 
     /**

@@ -25,8 +25,17 @@ import org.joda.time.DateTime;
 
 import uno.informatics.data.pojo.SimpleEntityPojo;
 
-
+/**
+ * Basic Pojo for CoreHunterRun
+ * @author daveneti
+ *
+ */
 public class CoreHunterRunPojo extends SimpleEntityPojo implements CoreHunterRun {
+    
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
     
     private DateTime startDate;
     private DateTime endDate;

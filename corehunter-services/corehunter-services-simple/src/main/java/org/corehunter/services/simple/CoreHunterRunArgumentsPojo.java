@@ -29,6 +29,12 @@ import org.corehunter.services.CoreHunterRunArguments;
 
 import uno.informatics.data.pojo.SimpleEntityPojo;
 
+/**
+ * Basic Pojo for CoreHunterRunArguments
+ * 
+ * @author daveneti
+ *
+ */
 public class CoreHunterRunArgumentsPojo extends SimpleEntityPojo implements CoreHunterRunArguments {
 
     /**

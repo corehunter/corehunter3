@@ -30,6 +30,7 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 
 import org.corehunter.CoreHunterMeasure;
 import org.corehunter.CoreHunterObjective;
@@ -90,14 +91,24 @@ public class ITSimpleCoreHunterRunServices {
     @Test
     public void testExecuteDistanceMatrix() {
 
+        Path path = null ;
+        
         DatasetServices databaseServices = null;
         try {
-            databaseServices = new FileBasedDatasetServices(createTempDirectory());
+            path = createTempDirectory() ;
+            databaseServices = new FileBasedDatasetServices(path);
         } catch (IOException e) {
             e.printStackTrace();
             fail(e.getMessage());
         }
-        CoreHunterRunServices coreHunterRunServices = new SimpleCoreHunterRunServices(databaseServices);
+        
+        CoreHunterRunServices coreHunterRunServices = null ;
+        try {
+            coreHunterRunServices = new SimpleCoreHunterRunServices(path, databaseServices);
+        } catch (IOException e) {
+            e.printStackTrace();
+            fail(e.getMessage());
+        }
 
         Dataset dataset = new DatasetPojo(DATASET_UID, DATASET_NAME);
 
@@ -205,6 +216,20 @@ public class ITSimpleCoreHunterRunServices {
                 fail("No status");
                 break;
         }
+        
+        //close
+        ///coreHunterRunServices.
+        
+        try {
+            coreHunterRunServices = new SimpleCoreHunterRunServices(path, databaseServices);
+        } catch (IOException e) {
+            e.printStackTrace();
+            fail(e.getMessage());
+        }
+
+        List<CoreHunterRun> coreHunterRuns = coreHunterRunServices.getAllCoreHunterRuns() ;
+        
+        assertEquals("Number of results is not 1", 1, coreHunterRuns.size()) ;
     }
 
     // get best solution through exhaustive search

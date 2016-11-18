@@ -21,8 +21,13 @@ package org.corehunter.services.simple;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -37,6 +42,7 @@ import org.corehunter.CoreHunterArguments;
 import org.corehunter.listener.SimpleCoreHunterListener;
 import org.corehunter.services.CoreHunterRun;
 import org.corehunter.services.CoreHunterRunArguments;
+import org.corehunter.services.CoreHunterRunResult;
 import org.corehunter.services.CoreHunterRunServices;
 import org.corehunter.services.CoreHunterRunStatus;
 import org.corehunter.services.DatasetServices;
@@ -45,26 +51,50 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.XStreamException;
+import com.thoughtworks.xstream.io.xml.StaxDriver;
+
 import uno.informatics.data.pojo.SimpleEntityPojo;
 
 public class SimpleCoreHunterRunServices implements CoreHunterRunServices {
 
     Logger logger = LoggerFactory.getLogger(SimpleCoreHunterRunServices.class);
+    
+    private static final String RESULTS_PATH = "RESULTS_PATH";
 
     private DatasetServices datasetServices;
     private ExecutorService executor;
     private List<CoreHunterRun> corehunterRuns;
-    private Map<String, CoreHunterRunnable> corehunterRunnableMap;
+    private Map<String, CoreHunterRunResult> corehunterResultsMap;
     public String charsetName = "utf-8";
     private boolean shuttingDown;
     private boolean shutDown;
+    
+    private Path path;
 
-    public SimpleCoreHunterRunServices(DatasetServices datasetServices) {
+    public SimpleCoreHunterRunServices(Path path, DatasetServices datasetServices) throws IOException {
         this.datasetServices = datasetServices;
 
         executor = createExecutorService();
 
-        corehunterRunnableMap = new HashMap<>();
+        corehunterResultsMap = new HashMap<>();
+        
+        setPath(path);
+    }
+    
+    public final Path getPath() {
+        return path;
+    }
+
+    public synchronized final void setPath(Path path) throws IOException {
+        if (path == null) {
+            throw new IOException("Path must be defined!");
+        }
+
+        this.path = path;
+
+        initialise();
     }
 
     @Override
@@ -80,7 +110,7 @@ public class SimpleCoreHunterRunServices implements CoreHunterRunServices {
 
         CoreHunterRunnable corehunterRunnable = new CoreHunterRunnable(arguments);
 
-        corehunterRunnableMap.put(corehunterRunnable.getUniqueIdentifier(), corehunterRunnable);
+        corehunterResultsMap.put(corehunterRunnable.getUniqueIdentifier(), corehunterRunnable);
 
         executor.submit(corehunterRunnable);
 
@@ -89,10 +119,10 @@ public class SimpleCoreHunterRunServices implements CoreHunterRunServices {
 
     @Override
     public CoreHunterRun getCoreHunterRun(String uniqueIdentifier) {
-        CoreHunterRunnable corehunterRunnable = corehunterRunnableMap.get(uniqueIdentifier);
+        CoreHunterRunResult coreHunterRunResult = corehunterResultsMap.get(uniqueIdentifier);
 
-        if (corehunterRunnable != null) {
-            return new CoreHunterRunFromRunnable(corehunterRunnable);
+        if (coreHunterRunResult != null) {
+            return new CoreHunterRunFromRunnable(coreHunterRunResult);
         } else {
             return null;
         }
@@ -100,14 +130,14 @@ public class SimpleCoreHunterRunServices implements CoreHunterRunServices {
 
     @Override
     public boolean removeCoreHunterRun(String uniqueIdentifier) {
-        CoreHunterRunnable corehunterRunnable = corehunterRunnableMap.get(uniqueIdentifier);
+        CoreHunterRunResult coreHunterRunResult = corehunterResultsMap.get(uniqueIdentifier);
 
-        if (corehunterRunnable != null) {
-            boolean stopped = corehunterRunnable.stop();
+        if (coreHunterRunResult != null && coreHunterRunResult instanceof CoreHunterRunnable) {
+            boolean stopped = ((CoreHunterRunnable)coreHunterRunResult).stop();
 
             if (stopped) {
                 // only remove if it was stopped
-                corehunterRunnableMap.remove(uniqueIdentifier); 
+                corehunterResultsMap.remove(uniqueIdentifier); 
 
                 return true;
             }
@@ -119,11 +149,11 @@ public class SimpleCoreHunterRunServices implements CoreHunterRunServices {
     @Override
     public void deleteCoreHunterRun(String uniqueIdentifier) {
         // remove regardless if it can not be stopped
-        CoreHunterRunnable corehunterRunnable = corehunterRunnableMap.remove(uniqueIdentifier);
+        CoreHunterRunResult coreHunterRunResult = corehunterResultsMap.remove(uniqueIdentifier);
 
-        if (corehunterRunnable != null) {
-            if (!corehunterRunnable.stop()) {
-                logger.error("Can not stop runnable {}", corehunterRunnable.getName());
+        if (coreHunterRunResult != null && coreHunterRunResult instanceof CoreHunterRunnable) {
+            if (!((CoreHunterRunnable)coreHunterRunResult).stop()) {
+                logger.error("Can not stop runnable {}", coreHunterRunResult.getName());
             }
         }
     }
@@ -134,9 +164,9 @@ public class SimpleCoreHunterRunServices implements CoreHunterRunServices {
         // iterates through all runnables can create new CoreHunterRun objects,
         // which will be a snapshot
         // of the current status of that runnable
-        Iterator<CoreHunterRunnable> iterator = corehunterRunnableMap.values().iterator();
+        Iterator<CoreHunterRunResult> iterator = corehunterResultsMap.values().iterator();
 
-        corehunterRuns = new ArrayList<>(corehunterRunnableMap.size());
+        corehunterRuns = new ArrayList<>(corehunterResultsMap.size());
 
         while (iterator.hasNext()) {
             corehunterRuns.add(new CoreHunterRunFromRunnable(iterator.next()));
@@ -147,7 +177,7 @@ public class SimpleCoreHunterRunServices implements CoreHunterRunServices {
 
     @Override
     public String getOutputStream(String uniqueIdentifier) {
-        CoreHunterRunnable corehunterRunnable = corehunterRunnableMap.get(uniqueIdentifier);
+        CoreHunterRunResult corehunterRunnable = corehunterResultsMap.get(uniqueIdentifier);
 
         if (corehunterRunnable != null) {
             return corehunterRunnable.getOutputStream();
@@ -158,7 +188,7 @@ public class SimpleCoreHunterRunServices implements CoreHunterRunServices {
 
     @Override
     public String getErrorStream(String uniqueIdentifier) {
-        CoreHunterRunnable corehunterRunnable = corehunterRunnableMap.get(uniqueIdentifier);
+        CoreHunterRunResult corehunterRunnable = corehunterResultsMap.get(uniqueIdentifier);
 
         if (corehunterRunnable != null) {
             return corehunterRunnable.getErrorStream();
@@ -169,7 +199,7 @@ public class SimpleCoreHunterRunServices implements CoreHunterRunServices {
 
     @Override
     public String getErrorMessage(String uniqueIdentifier) {
-        CoreHunterRunnable corehunterRunnable = corehunterRunnableMap.get(uniqueIdentifier);
+        CoreHunterRunResult corehunterRunnable = corehunterResultsMap.get(uniqueIdentifier);
 
         if (corehunterRunnable != null) {
             return corehunterRunnable.getErrorMessage();
@@ -180,7 +210,7 @@ public class SimpleCoreHunterRunServices implements CoreHunterRunServices {
 
     @Override
     public SubsetSolution getSubsetSolution(String uniqueIdentifier) {
-        CoreHunterRunnable corehunterRunnable = corehunterRunnableMap.get(uniqueIdentifier);
+        CoreHunterRunResult corehunterRunnable = corehunterResultsMap.get(uniqueIdentifier);
 
         if (corehunterRunnable != null) {
             return corehunterRunnable.getSubsetSolution();
@@ -191,7 +221,7 @@ public class SimpleCoreHunterRunServices implements CoreHunterRunServices {
 
     @Override
     public CoreHunterRunArguments getArguments(String uniqueIdentifier) {
-        CoreHunterRunnable corehunterRunnable = corehunterRunnableMap.get(uniqueIdentifier);
+        CoreHunterRunResult corehunterRunnable = corehunterResultsMap.get(uniqueIdentifier);
 
         if (corehunterRunnable != null) {
             return corehunterRunnable.getArguments();
@@ -217,7 +247,104 @@ public class SimpleCoreHunterRunServices implements CoreHunterRunServices {
         return UUID.randomUUID().toString();
     }
 
-    private class CoreHunterRunnable extends SimpleEntityPojo implements Runnable {
+    private void initialise() throws IOException {
+
+        Path resultsPath = Paths.get(getPath().toString(), RESULTS_PATH);
+        
+        if (!Files.exists(resultsPath)) {
+            Files.createDirectories(resultsPath);
+        }
+        
+        Iterator<Path> iterator = Files.list(resultsPath).iterator() ;
+        
+        while (iterator.hasNext()) {
+            loadResult(iterator.next()) ;
+        }
+    }
+    
+    private void loadResult(Path path) {
+        
+        try {
+            CoreHunterRunResult result = (CoreHunterRunResult)readFromFile(path) ;
+            
+            corehunterResultsMap.put(result.getUniqueIdentifier(), result);
+            
+        } catch (IOException e) {
+            logger.error("Can not load result from path {} due to {}", path, e.getMessage());
+            logger.error("Full error ", e);
+        }
+
+    }
+
+    private void saveResult(CoreHunterRunnable corehunterRunnable) {
+        
+        Path path = Paths.get(getPath().toString(), RESULTS_PATH, corehunterRunnable.getUniqueIdentifier());
+        
+        
+        try {
+            writeToFile(path, corehunterRunnable) ;
+        } catch (IOException e) {
+            logger.error("Can not save result to path {} due to {}", path, e.getMessage());
+            logger.error("Full error ", e);
+        } 
+    }
+    
+    /**
+     * Reads an object from a file. The default implementation uses
+     * XStream. Override to use another way to read objects. Must be
+     * compatible with the {@link #writeToFile(Path, Object)} method
+     * 
+     * @param path the path of the file to be read 
+     * @return the object read from the file
+     * @throws IOException if the object can not be read from the file
+     */
+    protected Object readFromFile(Path path) throws IOException {
+        XStream xstream = createXStream();
+
+        InputStream inputStream = Files.newInputStream(path);
+
+        // TODO output to temp file and then copy
+
+        try {
+            return xstream.fromXML(inputStream);
+        } catch (XStreamException e) {
+            throw new IOException(e) ;
+        }
+    }
+
+    /**
+     * Write an object to a file. The default implementation uses
+     * XStream. Override to use another way to write objects. Must be
+     * compatible with the {@link #readFromFile(Path)} method
+     * @param path the path of the file to be written 
+     * @param object the object to be written
+     * @throws IOException if the object can not be write to the file
+     */
+    protected void writeToFile(Path path, Object object) throws IOException {
+        XStream xstream = createXStream();
+
+        OutputStream outputStream;
+
+        // TODO output to temp file and then copy
+
+        outputStream = Files.newOutputStream(path);
+        
+        try {
+            xstream.toXML(object, outputStream);
+        } catch (XStreamException e) {
+            throw new IOException(e) ;
+        }  
+    }
+    
+    private XStream createXStream() {
+        XStream xstream = new XStream(new StaxDriver());
+
+        xstream.setClassLoader(getClass().getClassLoader());
+
+        return xstream;
+    }
+    
+    private class CoreHunterRunnable extends SimpleEntityPojo implements Runnable, CoreHunterRunResult {
         /**
          * 
          */
@@ -241,6 +368,10 @@ public class SimpleCoreHunterRunServices implements CoreHunterRunServices {
             outputStream = new ByteArrayOutputStream();
         }
 
+        /* (non-Javadoc)
+         * @see org.corehunter.services.simple.CoreHunterResult#getOutputStream()
+         */
+        @Override
         public final String getOutputStream() {
             if (outputStream != null) {
 
@@ -257,6 +388,10 @@ public class SimpleCoreHunterRunServices implements CoreHunterRunServices {
             }
         }
 
+        /* (non-Javadoc)
+         * @see org.corehunter.services.simple.CoreHunterResult#getErrorStream()
+         */
+        @Override
         public final String getErrorStream() {
             if (errorStream != null) {
                 try {
@@ -272,26 +407,50 @@ public class SimpleCoreHunterRunServices implements CoreHunterRunServices {
             }
         }
 
+        /* (non-Javadoc)
+         * @see org.corehunter.services.simple.CoreHunterResult#getErrorMessage()
+         */
+        @Override
         public synchronized final String getErrorMessage() {
             return errorMessage;
         }
 
+        /* (non-Javadoc)
+         * @see org.corehunter.services.simple.CoreHunterResult#getSubsetSolution()
+         */
+        @Override
         public synchronized final SubsetSolution getSubsetSolution() {
             return subsetSolution;
         }
 
+        /* (non-Javadoc)
+         * @see org.corehunter.services.simple.CoreHunterResult#getStartDate()
+         */
+        @Override
         public synchronized final DateTime getStartDate() {
             return startDate;
         }
 
+        /* (non-Javadoc)
+         * @see org.corehunter.services.simple.CoreHunterResult#getEndDate()
+         */
+        @Override
         public synchronized final DateTime getEndDate() {
             return endDate;
         }
 
+        /* (non-Javadoc)
+         * @see org.corehunter.services.simple.CoreHunterResult#getStatus()
+         */
+        @Override
         public synchronized CoreHunterRunStatus getStatus() {
             return status;
         }
 
+        /* (non-Javadoc)
+         * @see org.corehunter.services.simple.CoreHunterResult#getArguments()
+         */
+        @Override
         public final CoreHunterRunArguments getArguments() {
             return corehunterRunArguments;
         }
@@ -334,6 +493,8 @@ public class SimpleCoreHunterRunServices implements CoreHunterRunServices {
 
             endDate = new DateTime();
             outputPrintStream.println(String.format("Ending run : %s at ", getName(), endDate));
+            
+            saveResult(this) ;
 
             outputPrintStream.close();
         }
@@ -351,12 +512,12 @@ public class SimpleCoreHunterRunServices implements CoreHunterRunServices {
          */
         private static final long serialVersionUID = 1L;
 
-        public CoreHunterRunFromRunnable(CoreHunterRunnable corehunterRunnable) {
-            super(corehunterRunnable.getUniqueIdentifier(), corehunterRunnable.getName());
+        public CoreHunterRunFromRunnable(CoreHunterRunResult coreHunterRunResult) {
+            super(coreHunterRunResult.getUniqueIdentifier(), coreHunterRunResult.getName());
 
-            setStartDate(corehunterRunnable.getStartDate());
-            setEndDate(corehunterRunnable.getEndDate());
-            setStatus(corehunterRunnable.getStatus());
+            setStartDate(coreHunterRunResult.getStartDate());
+            setEndDate(coreHunterRunResult.getEndDate());
+            setStatus(coreHunterRunResult.getStatus());
         }
 
     }
