@@ -32,7 +32,7 @@ import org.jamesframework.core.subset.SubsetSolution;
 public interface CoreHunterRunServices {
 
     /**
-     * Executes a Core Hunter run with the given arguments
+     * Starts the execution of a Core Hunter run with the given arguments
      * 
      * @param arguments
      *            the Core Hunter Run Arguments

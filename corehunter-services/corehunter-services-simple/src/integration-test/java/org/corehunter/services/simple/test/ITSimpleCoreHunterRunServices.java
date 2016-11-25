@@ -41,6 +41,7 @@ import org.corehunter.objectives.AverageEntryToEntry;
 import org.corehunter.objectives.distance.measures.PrecomputedDistance;
 import org.corehunter.services.CoreHunterRun;
 import org.corehunter.services.CoreHunterRunServices;
+import org.corehunter.services.CoreHunterRunStatus;
 import org.corehunter.services.DatasetServices;
 import org.corehunter.services.simple.CoreHunterRunArgumentsPojo;
 import org.corehunter.services.simple.FileBasedDatasetServices;
@@ -147,10 +148,15 @@ public class ITSimpleCoreHunterRunServices {
         CoreHunterRun run = coreHunterRunServices.executeCoreHunter(arguments);
 
         boolean finished = false;
+        
+        CoreHunterRunStatus status = CoreHunterRunStatus.NOT_STARTED ;
 
         while (!finished) {
-
-            switch (coreHunterRunServices.getCoreHunterRun(run.getUniqueIdentifier()).getStatus()) {
+            status = coreHunterRunServices.getCoreHunterRun(run.getUniqueIdentifier()).getStatus() ;
+            
+            System.out.println("Running status = " + status) ;
+            
+            switch (status) {
                 case FAILED:
                     finished = true;
                     break;
@@ -171,6 +177,8 @@ public class ITSimpleCoreHunterRunServices {
                 fail(e.getMessage());
             }
         }
+        
+        System.out.println("End Status = " + status) ;
 
         switch (coreHunterRunServices.getCoreHunterRun(run.getUniqueIdentifier()).getStatus()) {
             case FAILED:

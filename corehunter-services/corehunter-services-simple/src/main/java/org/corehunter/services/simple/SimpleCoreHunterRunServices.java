@@ -19,10 +19,12 @@
 
 package org.corehunter.services.simple;
 
+import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
 import java.nio.file.Files;
@@ -53,6 +55,7 @@ import org.slf4j.LoggerFactory;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.XStreamException;
+import com.thoughtworks.xstream.io.xml.PrettyPrintWriter;
 import com.thoughtworks.xstream.io.xml.StaxDriver;
 
 import uno.informatics.data.pojo.SimpleEntityPojo;
@@ -271,21 +274,27 @@ public class SimpleCoreHunterRunServices implements CoreHunterRunServices {
             
         } catch (IOException e) {
             logger.error("Can not load result from path {} due to {}", path, e.getMessage());
-            logger.error("Full error ", e);
+            logger.error("Full error ", e) ;
+            
+            e.printStackTrace();
         }
 
     }
 
-    private void saveResult(CoreHunterRunnable corehunterRunnable) {
+    private void saveResult(CoreHunterRunResultPojo coreHunterRunResult) {
         
-        Path path = Paths.get(getPath().toString(), RESULTS_PATH, corehunterRunnable.getUniqueIdentifier());
+        Path path = Paths.get(getPath().toString(), RESULTS_PATH, coreHunterRunResult.getUniqueIdentifier());
         
+        logger.info("Writing result for {} with id {} to path {}", coreHunterRunResult.getName(), 
+                coreHunterRunResult.getUniqueIdentifier(), path.toString()); 
         
         try {
-            writeToFile(path, corehunterRunnable) ;
+            writeToFile(path, coreHunterRunResult) ;
         } catch (IOException e) {
             logger.error("Can not save result to path {} due to {}", path, e.getMessage());
             logger.error("Full error ", e);
+            
+            e.printStackTrace();
         } 
     }
     
@@ -308,6 +317,8 @@ public class SimpleCoreHunterRunServices implements CoreHunterRunServices {
         try {
             return xstream.fromXML(inputStream);
         } catch (XStreamException e) {
+            e.printStackTrace();
+            
             throw new IOException(e) ;
         }
     }
@@ -330,7 +341,7 @@ public class SimpleCoreHunterRunServices implements CoreHunterRunServices {
         outputStream = Files.newOutputStream(path);
         
         try {
-            xstream.toXML(object, outputStream);
+            xstream.marshal(object, new PrettyPrintWriter(new OutputStreamWriter(outputStream)));
         } catch (XStreamException e) {
             throw new IOException(e) ;
         }  
@@ -351,11 +362,11 @@ public class SimpleCoreHunterRunServices implements CoreHunterRunServices {
         private static final long serialVersionUID = 1L;
 
         private CoreHunterRunArguments corehunterRunArguments;
-        private CoreHunter corehunter;
-        private ByteArrayOutputStream outputStream;
-        private ByteArrayOutputStream errorStream;
+        private transient CoreHunter corehunter;
+        private transient ByteArrayOutputStream outputStream;
+        private transient ByteArrayOutputStream errorStream;
         private String errorMessage;
-        private SubsetSolution subsetSolution;
+        private transient SubsetSolution subsetSolution;
         private DateTime startDate;
         private DateTime endDate;
         private CoreHunterRunStatus status;
@@ -463,14 +474,13 @@ public class SimpleCoreHunterRunServices implements CoreHunterRunServices {
 
             try {
                 startDate = new DateTime();
+                status = CoreHunterRunStatus.RUNNING;
 
-                outputPrintStream.println(String.format("Starting run : %s at ", getName(), startDate));
+                outputPrintStream.println(String.format("Starting run : %s at %s", getName(), startDate.toString()));
 
                 CoreHunterArguments arguments = new CoreHunterArguments(
                         datasetServices.getCoreHunterData(corehunterRunArguments.getDatasetId()),
                         corehunterRunArguments.getSubsetSize(), corehunterRunArguments.getObjectives());
-
-                status = CoreHunterRunStatus.RUNNING;
 
                 corehunter = new CoreHunter();
                 corehunter.setListener(new SimpleCoreHunterListener(outputPrintStream));
@@ -492,9 +502,9 @@ public class SimpleCoreHunterRunServices implements CoreHunterRunServices {
             }
 
             endDate = new DateTime();
-            outputPrintStream.println(String.format("Ending run : %s at ", getName(), endDate));
+            outputPrintStream.println(String.format("Ending run : %s at %s", getName(), endDate.toString()));
             
-            saveResult(this) ;
+            saveResult(new CoreHunterRunResultPojo(this)) ;
 
             outputPrintStream.close();
         }
