@@ -1,3 +1,4 @@
+
 package org.corehunter.services.simple;
 
 import org.corehunter.services.CoreHunterRunArguments;
@@ -14,30 +15,29 @@ public class CoreHunterRunResultPojo extends SimpleEntityPojo implements CoreHun
      * 
      */
     private static final long serialVersionUID = 1L;
-    
-    private String outputStream ;
-    private String errorStream ;
-    private String errorMessage ;
-    private SubsetSolution subsetSolution ;
-    private DateTime startDate ;
-    private DateTime endDate ;
-    private CoreHunterRunStatus status ;
-    private CoreHunterRunArguments arguments ;
-    
-    public CoreHunterRunResultPojo(CoreHunterRunResult result)
-    {
-        super (result) ;
-        
-        outputStream = result.getOutputStream() ;
-        errorStream = result.getErrorStream() ;
-        errorMessage = result.getErrorMessage() ;
-        subsetSolution = new SubsetSolution(result.getSubsetSolution()) ;
-        startDate = result.getStartDate() ;
-        endDate = result.getEndDate() ;
-        status = result.getStatus() ;
-        arguments = result.getArguments() ;  
+
+    private String outputStream;
+    private String errorStream;
+    private String errorMessage;
+    private SubsetSolution subsetSolution;
+    private DateTime startDate;
+    private DateTime endDate;
+    private CoreHunterRunStatus status;
+    private CoreHunterRunArguments arguments;
+
+    public CoreHunterRunResultPojo(CoreHunterRunResult result) {
+        super(result);
+
+        outputStream = result.getOutputStream();
+        errorStream = result.getErrorStream();
+        errorMessage = result.getErrorMessage();
+        subsetSolution = new SubsetSolution(result.getSubsetSolution());
+        startDate = result.getStartDate();
+        endDate = result.getEndDate();
+        status = result.getStatus();
+        arguments = result.getArguments();
     }
-    
+
     @Override
     public String getOutputStream() {
         return outputStream;
