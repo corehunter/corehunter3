@@ -153,9 +153,7 @@ public class ITSimpleCoreHunterRunServices {
 
         while (!finished) {
             status = coreHunterRunServices.getCoreHunterRun(run.getUniqueIdentifier()).getStatus() ;
-            
-            System.out.println("Running status = " + status) ;
-            
+    
             switch (status) {
                 case FAILED:
                     finished = true;
@@ -178,8 +176,6 @@ public class ITSimpleCoreHunterRunServices {
             }
         }
         
-        System.out.println("End Status = " + status) ;
-
         switch (coreHunterRunServices.getCoreHunterRun(run.getUniqueIdentifier()).getStatus()) {
             case FAILED:
                 assertNotNull("Failed with no error message!",
