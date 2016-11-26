@@ -52,6 +52,7 @@ public class CoreHunterRunArgumentsPojo extends SimpleEntityPojo implements Core
         super(UUID.randomUUID().toString(), name);
         setSubsetSize(subsetSize);
         setDatasetId(datasetId);
+        this.objectives = new ArrayList<CoreHunterObjective>(0) ;
     }
     
     public CoreHunterRunArgumentsPojo(String name, int subsetSize, String datasetId,
