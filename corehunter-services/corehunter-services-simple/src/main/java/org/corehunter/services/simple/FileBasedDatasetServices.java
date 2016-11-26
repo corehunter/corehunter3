@@ -52,6 +52,16 @@ import uno.informatics.data.io.FileType;
 import uno.informatics.data.pojo.DatasetPojo;
 import uno.informatics.data.pojo.SimpleEntityPojo;
 
+/**
+ * A simple FileBasedDatasetServices implementation that persists datasets
+ * on the file system. Sub-classes, can use the 
+ * {@link #SimpleCoreHunterRunServices(DatasetServices) constructor} 
+ * provided the path is defined in the overloaded constructor using the
+ * {@link #setPath(Path)} method 
+ * 
+ * @author daveneti
+ *
+ */
 public class FileBasedDatasetServices implements DatasetServices {
     private static final String DATASETS = "datasets.xml";
     private static final String DATA = "data.xml";
@@ -71,11 +81,25 @@ public class FileBasedDatasetServices implements DatasetServices {
 
     private Path path;
 
+    /**
+     * Constructor that can be used by sub-classes
+     * provided the path is defined in the overloaded constructor using the
+     * {@link #setPath(Path)} method 
+     * 
+     * @throws IOException if the path can not be set or is invalid
+     */
     protected FileBasedDatasetServices() throws IOException {
         datasetMap = new HashMap<String, DatasetPojo>();
         dataCache = new HashMap<String, CoreHunterData>();
     }
 
+    /**
+     * Constructor that is a path to defined the location of
+     * the datasets
+     * 
+     * @param path the location of the datasets
+     * @throws IOException if the path can not be set or is invalid
+     */
     public FileBasedDatasetServices(Path path) throws IOException {
         this() ;
         

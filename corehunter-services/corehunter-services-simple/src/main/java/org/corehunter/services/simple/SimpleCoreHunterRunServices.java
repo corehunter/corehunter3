@@ -19,7 +19,6 @@
 
 package org.corehunter.services.simple;
 
-import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -41,6 +40,7 @@ import java.util.concurrent.Executors;
 
 import org.corehunter.CoreHunter;
 import org.corehunter.CoreHunterArguments;
+import org.corehunter.data.CoreHunterData;
 import org.corehunter.listener.SimpleCoreHunterListener;
 import org.corehunter.services.CoreHunterRun;
 import org.corehunter.services.CoreHunterRunArguments;
@@ -58,8 +58,18 @@ import com.thoughtworks.xstream.XStreamException;
 import com.thoughtworks.xstream.io.xml.PrettyPrintWriter;
 import com.thoughtworks.xstream.io.xml.StaxDriver;
 
+import uno.informatics.data.pojo.DatasetPojo;
 import uno.informatics.data.pojo.SimpleEntityPojo;
 
+/**
+ * A simple CoreHunterRunServices implementation. Sub-classes,
+ * can use the {@link #SimpleCoreHunterRunServices(DatasetServices) constructor} 
+ * provided path is defined in the overloaded constructor using the
+ * {@link #setPath(Path)} method 
+ * 
+ * @author daveneti
+ *
+ */
 public class SimpleCoreHunterRunServices implements CoreHunterRunServices {
 
     Logger logger = LoggerFactory.getLogger(SimpleCoreHunterRunServices.class);
@@ -75,13 +85,35 @@ public class SimpleCoreHunterRunServices implements CoreHunterRunServices {
     private boolean shutDown;
     
     private Path path;
-
-    public SimpleCoreHunterRunServices(Path path, DatasetServices datasetServices) throws IOException {
+    
+    /**
+     * Constructor that can be used by sub-classes
+     * provided the path is defined in the overloaded constructor using the
+     * {@link #setPath(Path)} method 
+     * 
+     * @param datasetServices the dataset services in to be used 
+     * by these services
+     * @throws IOException if the path can not be set or is invalid
+     */
+    protected SimpleCoreHunterRunServices(DatasetServices datasetServices) throws IOException {
         this.datasetServices = datasetServices;
 
         executor = createExecutorService();
 
         corehunterResultsMap = new HashMap<>();
+    }
+
+    /**
+     * Constructor that is a path to defined the location of
+     * the datasets
+     * 
+     * @param path the location of the datasets
+     * @param datasetServices the dataset services in to be used 
+     * by these services
+     * @throws IOException if the path can not be set or is invalid
+     */
+    public SimpleCoreHunterRunServices(Path path, DatasetServices datasetServices) throws IOException {
+        this(datasetServices) ;
         
         setPath(path);
     }
@@ -102,7 +134,7 @@ public class SimpleCoreHunterRunServices implements CoreHunterRunServices {
 
     @Override
     public CoreHunterRun executeCoreHunter(CoreHunterRunArguments arguments) {
-
+        
         if (shuttingDown) {
             throw new IllegalStateException("Can not accept any new runs, in the process of shutting down!");
         }

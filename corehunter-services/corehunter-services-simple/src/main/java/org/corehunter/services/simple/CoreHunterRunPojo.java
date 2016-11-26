@@ -27,6 +27,7 @@ import uno.informatics.data.pojo.SimpleEntityPojo;
 
 /**
  * Basic Pojo for CoreHunterRun
+ * 
  * @author daveneti
  *
  */

@@ -9,6 +9,12 @@ import org.joda.time.DateTime;
 
 import uno.informatics.data.pojo.SimpleEntityPojo;
 
+/**
+ * Basic Pojo for CoreHunterRunResult
+ * 
+ * @author daveneti
+ *
+ */
 public class CoreHunterRunResultPojo extends SimpleEntityPojo implements CoreHunterRunResult {
 
     /**
