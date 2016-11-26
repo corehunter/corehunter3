@@ -55,7 +55,7 @@ import uno.informatics.data.pojo.SimpleEntityPojo;
 /**
  * A simple FileBasedDatasetServices implementation that persists datasets
  * on the file system. Sub-classes, can use the 
- * {@link #SimpleCoreHunterRunServices(DatasetServices) constructor} 
+ * {@link #FileBasedDatasetServices() constructor} 
  * provided the path is defined in the overloaded constructor using the
  * {@link #setPath(Path)} method 
  * 
