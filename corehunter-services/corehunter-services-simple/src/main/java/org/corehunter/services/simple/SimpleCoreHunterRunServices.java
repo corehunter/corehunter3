@@ -40,7 +40,6 @@ import java.util.concurrent.Executors;
 
 import org.corehunter.CoreHunter;
 import org.corehunter.CoreHunterArguments;
-import org.corehunter.data.CoreHunterData;
 import org.corehunter.listener.SimpleCoreHunterListener;
 import org.corehunter.services.CoreHunterRun;
 import org.corehunter.services.CoreHunterRunArguments;
@@ -58,7 +57,6 @@ import com.thoughtworks.xstream.XStreamException;
 import com.thoughtworks.xstream.io.xml.PrettyPrintWriter;
 import com.thoughtworks.xstream.io.xml.StaxDriver;
 
-import uno.informatics.data.pojo.DatasetPojo;
 import uno.informatics.data.pojo.SimpleEntityPojo;
 
 /**

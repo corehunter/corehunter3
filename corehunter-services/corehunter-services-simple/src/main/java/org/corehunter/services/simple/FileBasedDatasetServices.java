@@ -32,8 +32,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.corehunter.data.CoreHunterData;
-import org.corehunter.data.GenotypeData;
 import org.corehunter.data.CoreHunterDataType;
+import org.corehunter.data.GenotypeData;
 import org.corehunter.data.GenotypeDataFormat;
 import org.corehunter.data.simple.SimpleBiAllelicGenotypeData;
 import org.corehunter.data.simple.SimpleDistanceMatrixData;
