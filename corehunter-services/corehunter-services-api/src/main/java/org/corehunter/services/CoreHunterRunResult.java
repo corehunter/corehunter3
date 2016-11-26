@@ -2,7 +2,7 @@
 package org.corehunter.services;
 
 import org.jamesframework.core.subset.SubsetSolution;
-import org.joda.time.DateTime;
+import java.time.Instant;
 
 import uno.informatics.data.SimpleEntity;
 
@@ -22,9 +22,9 @@ public interface CoreHunterRunResult extends SimpleEntity {
 
     SubsetSolution getSubsetSolution();
 
-    DateTime getStartDate();
+    Instant getStartInstant();
 
-    DateTime getEndDate();
+    Instant getEndInstant();
 
     CoreHunterRunStatus getStatus();
 

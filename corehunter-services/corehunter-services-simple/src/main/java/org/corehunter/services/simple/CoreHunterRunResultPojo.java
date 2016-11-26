@@ -1,6 +1,8 @@
 
 package org.corehunter.services.simple;
 
+import java.time.Instant;
+
 import org.corehunter.services.CoreHunterRunArguments;
 import org.corehunter.services.CoreHunterRunResult;
 import org.corehunter.services.CoreHunterRunStatus;
@@ -26,8 +28,8 @@ public class CoreHunterRunResultPojo extends SimpleEntityPojo implements CoreHun
     private String errorStream;
     private String errorMessage;
     private SubsetSolution subsetSolution;
-    private DateTime startDate;
-    private DateTime endDate;
+    private Instant startInstant;
+    private Instant endInstant;
     private CoreHunterRunStatus status;
     private CoreHunterRunArguments arguments;
 
@@ -38,8 +40,8 @@ public class CoreHunterRunResultPojo extends SimpleEntityPojo implements CoreHun
         errorStream = result.getErrorStream();
         errorMessage = result.getErrorMessage();
         subsetSolution = new SubsetSolution(result.getSubsetSolution());
-        startDate = result.getStartDate();
-        endDate = result.getEndDate();
+        startInstant = result.getStartInstant();
+        endInstant = result.getEndInstant();
         status = result.getStatus();
         arguments = result.getArguments();
     }
@@ -65,13 +67,13 @@ public class CoreHunterRunResultPojo extends SimpleEntityPojo implements CoreHun
     }
 
     @Override
-    public DateTime getStartDate() {
-        return startDate;
+    public Instant getStartInstant() {
+        return startInstant;
     }
 
     @Override
-    public DateTime getEndDate() {
-        return endDate;
+    public Instant getEndInstant() {
+        return endInstant;
     }
 
     @Override

@@ -19,7 +19,7 @@
 
 package org.corehunter.services;
 
-import org.joda.time.DateTime;
+import java.time.Instant;
 
 import uno.informatics.data.SimpleEntity;
 
@@ -35,13 +35,13 @@ public interface CoreHunterRun extends SimpleEntity {
      * Gets the start date of the run
      * @return the start date of the run
      */
-    public DateTime getStartDate();
+    public Instant getStartDate();
 
     /**
      * Gets the end date of the run
      * @return the end date of the run
      */
-    public DateTime getEndDate();
+    public Instant getEndDate();
 
     /**
      * Gets the status of the run

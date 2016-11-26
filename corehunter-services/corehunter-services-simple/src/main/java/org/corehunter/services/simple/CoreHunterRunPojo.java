@@ -21,7 +21,7 @@ package org.corehunter.services.simple;
 
 import org.corehunter.services.CoreHunterRun;
 import org.corehunter.services.CoreHunterRunStatus;
-import org.joda.time.DateTime;
+import java.time.Instant ;
 
 import uno.informatics.data.pojo.SimpleEntityPojo;
 
@@ -38,14 +38,14 @@ public class CoreHunterRunPojo extends SimpleEntityPojo implements CoreHunterRun
      */
     private static final long serialVersionUID = 1L;
     
-    private DateTime startDate;
-    private DateTime endDate;
+    private Instant startDate;
+    private Instant endDate;
     private CoreHunterRunStatus status;
 
     public CoreHunterRunPojo(String name) {
         super(name);
         
-        startDate = new DateTime() ;
+        startDate = Instant.now() ;
         endDate = null ;
         status = CoreHunterRunStatus.NOT_STARTED ;
     }
@@ -53,27 +53,27 @@ public class CoreHunterRunPojo extends SimpleEntityPojo implements CoreHunterRun
     public CoreHunterRunPojo(String uniqueIdentifier, String name) {
         super(uniqueIdentifier, name);
         
-        startDate = new DateTime() ;
+        startDate = Instant.now() ;
         endDate = null ;
         status = CoreHunterRunStatus.NOT_STARTED ;
     }
 
     @Override
-    public DateTime getStartDate() {
+    public Instant getStartDate() {
         return startDate;
     }
 
-    public final void setStartDate(DateTime startDate) {
+    public final void setStartDate(Instant startDate) {
         
         this.startDate = startDate;
     }
 
     @Override
-    public DateTime getEndDate() {
+    public Instant getEndDate() {
         return endDate;
     }
 
-    public final void setEndDate(DateTime endDate) {
+    public final void setEndDate(Instant endDate) {
         this.endDate = endDate;
     }
 

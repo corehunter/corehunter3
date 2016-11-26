@@ -29,6 +29,7 @@ import java.io.UnsupportedEncodingException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -48,7 +49,6 @@ import org.corehunter.services.CoreHunterRunServices;
 import org.corehunter.services.CoreHunterRunStatus;
 import org.corehunter.services.DatasetServices;
 import org.jamesframework.core.subset.SubsetSolution;
-import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -404,8 +404,8 @@ public class SimpleCoreHunterRunServices implements CoreHunterRunServices {
         private transient ByteArrayOutputStream errorStream;
         private String errorMessage;
         private transient SubsetSolution subsetSolution;
-        private DateTime startDate;
-        private DateTime endDate;
+        private Instant startInstant;
+        private Instant endInstant;
         private CoreHunterRunStatus status;
 
         public CoreHunterRunnable(CoreHunterRunArguments corehunterRunArguments) {
@@ -488,8 +488,8 @@ public class SimpleCoreHunterRunServices implements CoreHunterRunServices {
          * @see org.corehunter.services.simple.CoreHunterResult#getStartDate()
          */
         @Override
-        public synchronized final DateTime getStartDate() {
-            return startDate;
+        public synchronized final Instant getStartInstant() {
+            return startInstant;
         }
 
         /*
@@ -498,8 +498,8 @@ public class SimpleCoreHunterRunServices implements CoreHunterRunServices {
          * @see org.corehunter.services.simple.CoreHunterResult#getEndDate()
          */
         @Override
-        public synchronized final DateTime getEndDate() {
-            return endDate;
+        public synchronized final Instant getEndInstant() {
+            return endInstant;
         }
 
         /*
@@ -529,10 +529,10 @@ public class SimpleCoreHunterRunServices implements CoreHunterRunServices {
             PrintStream outputPrintStream = new PrintStream(outputStream);
 
             try {
-                startDate = new DateTime();
+                startInstant = Instant.now() ;
                 status = CoreHunterRunStatus.RUNNING;
 
-                outputPrintStream.println(String.format("Starting run : %s at %s", getName(), startDate.toString()));
+                outputPrintStream.println(String.format("Starting run : %s at %s", getName(), startInstant.toString()));
 
                 CoreHunterArguments arguments = new CoreHunterArguments(
                         datasetServices.getCoreHunterData(corehunterRunArguments.getDatasetId()),
@@ -557,8 +557,8 @@ public class SimpleCoreHunterRunServices implements CoreHunterRunServices {
                 printStream.close();
             }
 
-            endDate = new DateTime();
-            outputPrintStream.println(String.format("Ending run : %s at %s", getName(), endDate.toString()));
+            endInstant = Instant.now() ;
+            outputPrintStream.println(String.format("Ending run : %s at %s", getName(), endInstant.toString()));
 
             saveResult(new CoreHunterRunResultPojo(this));
 
@@ -581,8 +581,8 @@ public class SimpleCoreHunterRunServices implements CoreHunterRunServices {
         public CoreHunterRunFromRunnable(CoreHunterRunResult coreHunterRunResult) {
             super(coreHunterRunResult.getUniqueIdentifier(), coreHunterRunResult.getName());
 
-            setStartDate(coreHunterRunResult.getStartDate());
-            setEndDate(coreHunterRunResult.getEndDate());
+            setStartDate(coreHunterRunResult.getStartInstant());
+            setEndDate(coreHunterRunResult.getEndInstant());
             setStatus(coreHunterRunResult.getStatus());
         }
 
