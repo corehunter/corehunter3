@@ -485,7 +485,7 @@ public class SimpleCoreHunterRunServices implements CoreHunterRunServices {
         /*
          * (non-Javadoc)
          * 
-         * @see org.corehunter.services.simple.CoreHunterResult#getStartDate()
+         * @see org.corehunter.services.simple.CoreHunterResult#getStartInstant()
          */
         @Override
         public synchronized final Instant getStartInstant() {
@@ -495,7 +495,7 @@ public class SimpleCoreHunterRunServices implements CoreHunterRunServices {
         /*
          * (non-Javadoc)
          * 
-         * @see org.corehunter.services.simple.CoreHunterResult#getEndDate()
+         * @see org.corehunter.services.simple.CoreHunterResult#getEndInstant()
          */
         @Override
         public synchronized final Instant getEndInstant() {
@@ -581,8 +581,8 @@ public class SimpleCoreHunterRunServices implements CoreHunterRunServices {
         public CoreHunterRunFromRunnable(CoreHunterRunResult coreHunterRunResult) {
             super(coreHunterRunResult.getUniqueIdentifier(), coreHunterRunResult.getName());
 
-            setStartDate(coreHunterRunResult.getStartInstant());
-            setEndDate(coreHunterRunResult.getEndInstant());
+            setStartInstant(coreHunterRunResult.getStartInstant());
+            setEndInstant(coreHunterRunResult.getEndInstant());
             setStatus(coreHunterRunResult.getStatus());
         }
 

@@ -38,43 +38,43 @@ public class CoreHunterRunPojo extends SimpleEntityPojo implements CoreHunterRun
      */
     private static final long serialVersionUID = 1L;
     
-    private Instant startDate;
-    private Instant endDate;
+    private Instant startInstant;
+    private Instant endInstant;
     private CoreHunterRunStatus status;
 
     public CoreHunterRunPojo(String name) {
         super(name);
         
-        startDate = Instant.now() ;
-        endDate = null ;
+        startInstant = Instant.now() ;
+        endInstant = null ;
         status = CoreHunterRunStatus.NOT_STARTED ;
     }
     
     public CoreHunterRunPojo(String uniqueIdentifier, String name) {
         super(uniqueIdentifier, name);
         
-        startDate = Instant.now() ;
-        endDate = null ;
+        startInstant = Instant.now() ;
+        endInstant = null ;
         status = CoreHunterRunStatus.NOT_STARTED ;
     }
 
     @Override
-    public Instant getStartDate() {
-        return startDate;
+    public Instant getStartInstant() {
+        return startInstant;
     }
 
-    public final void setStartDate(Instant startDate) {
+    public final void setStartInstant(Instant startInstant) {
         
-        this.startDate = startDate;
+        this.startInstant = startInstant;
     }
 
     @Override
-    public Instant getEndDate() {
-        return endDate;
+    public Instant getEndInstant() {
+        return endInstant;
     }
 
-    public final void setEndDate(Instant endDate) {
-        this.endDate = endDate;
+    public final void setEndInstant(Instant endInstant) {
+        this.endInstant = endInstant;
     }
 
     @Override

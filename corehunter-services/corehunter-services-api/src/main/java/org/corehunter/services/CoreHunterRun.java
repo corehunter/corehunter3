@@ -35,13 +35,13 @@ public interface CoreHunterRun extends SimpleEntity {
      * Gets the start date of the run
      * @return the start date of the run
      */
-    public Instant getStartDate();
+    public Instant getStartInstant();
 
     /**
      * Gets the end date of the run
      * @return the end date of the run
      */
-    public Instant getEndDate();
+    public Instant getEndInstant();
 
     /**
      * Gets the status of the run
