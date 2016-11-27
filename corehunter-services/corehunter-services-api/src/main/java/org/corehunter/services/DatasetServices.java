@@ -78,6 +78,19 @@ public interface DatasetServices {
     public boolean removeDataset(String datasetId) throws DatasetException;
     
     /**
+     * Updates a dataset with information in the supplied dataset, based 
+     * on the identifier of the dataset
+     * 
+     * @param dataset
+     *            the dataset to be updated
+     * @return <code>true</code> if the dataset was present and was updated,
+     *         (at least one field was changed) <code>false</code> otherwise.
+     * @throws DatasetException
+     *             if the dataset does not exist or can not be updated
+     */
+    public boolean updateDataset(Dataset dataset) throws DatasetException;
+    
+    /**
      * Gets the CoreHunter data associated with a dataset by unique dataset identifier
      * 
      * @param datasetId

@@ -30,7 +30,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
+import org.apache.commons.lang3.ObjectUtils;
 import org.corehunter.data.CoreHunterData;
 import org.corehunter.data.CoreHunterDataType;
 import org.corehunter.data.GenotypeData;
@@ -127,7 +129,6 @@ public class FileBasedDatasetServices implements DatasetServices {
 
     @Override
     public Dataset getDataset(String datasetId) {
-
         return datasetMap.get(datasetId);
     }
 
@@ -135,20 +136,45 @@ public class FileBasedDatasetServices implements DatasetServices {
     public void addDataset(Dataset dataset) throws DatasetException {
 
         if (dataset == null) {
-            throw new DatasetException("Dataset undefined");
+            throw new DatasetException("Dataset undefined!");
+        }
+        
+        if (dataset.getName() == null || dataset.getName().trim().isEmpty()) {
+            throw new DatasetException("Dataset name must be provided and not blank text!");
+        }
+        
+        if (dataset.getStudy() != null) {
+            throw new DatasetException("Study not supported yet!");
+        }
+        
+        if (dataset.getType() != null) {
+            throw new DatasetException("Type not supported yet!");
+        }
+        
+        if (dataset.getSize() != 0) {
+            throw new DatasetException("No data has been associated so size must be 0!");
+        }
+        
+        DatasetPojo datasetToBeAdded = new DatasetPojo(dataset) ;
+        
+        // create an ID if not given
+        if (datasetToBeAdded.getUniqueIdentifier() == null) {
+            datasetToBeAdded.setUniqueIdentifier(UUID.randomUUID().toString());
         }
 
-        if (!datasetMap.containsKey(dataset.getUniqueIdentifier())) {
-            datasetMap.put(dataset.getUniqueIdentifier(), new DatasetPojo(dataset));
-        } else {
-            throw new DatasetException("Dataset already added : " + dataset.getUniqueIdentifier());
-        }
-
-        writeDatasets();
+        synchronized (datasetMap) {     
+            if (!datasetMap.containsKey(dataset.getUniqueIdentifier())) {
+                datasetMap.put(dataset.getUniqueIdentifier(), new DatasetPojo(dataset));
+            } else {
+                throw new DatasetException("Dataset already added : " + dataset.getUniqueIdentifier());
+            }
+            
+            writeDatasets();
+        }    
     }
 
     @Override
-    public boolean removeDataset(String datasetId) throws DatasetException {
+    public synchronized boolean removeDataset(String datasetId) throws DatasetException {
 
         Dataset dataset = getDataset(datasetId);
 
@@ -158,17 +184,84 @@ public class FileBasedDatasetServices implements DatasetServices {
 
         removeDataInternal(datasetId);
 
-        boolean removedDataset = datasetMap.remove(datasetId, dataset);
+        boolean removedDataset = false ;
+        
+        synchronized (datasetMap) {
+            removedDataset = datasetMap.remove(datasetId, dataset);
+    
+            writeDatasets() ;
+        }
+        
+        return removedDataset;
+    }
 
-        ArrayList<Dataset> datasets = new ArrayList<Dataset>(datasetMap.values());
+    @Override
+    public synchronized boolean updateDataset(Dataset dataset) throws DatasetException {
 
-        try {
-            writeToFile(Paths.get(getPath().toString(), DATASETS), datasets);
-        } catch (IOException e) {
-            throw new DatasetException(e);
+        if (dataset == null) {
+            throw new DatasetException("Dataset not defined!");
+        }
+        
+        if (dataset.getUniqueIdentifier() == null) {
+            throw new DatasetException("Dataset identifier not defined!");
+        }
+        
+        Dataset currentDataset = getDataset(dataset.getUniqueIdentifier());
+        
+        if (currentDataset == null) {
+            throw new DatasetException("Unknown dataset with datasetId : " + dataset.getUniqueIdentifier());
+        }
+        
+        // copy of the updated dataset
+        DatasetPojo updatedDataset = new DatasetPojo(dataset) ;
+        
+        // copy of the current dataset
+        DatasetPojo currentDatasetCopy = new DatasetPojo(currentDataset);
+        
+        boolean datasetUpdated = false ;
+        
+        if (!ObjectUtils.equals(currentDatasetCopy.getName(), updatedDataset.getName())) {
+            
+            if (updatedDataset.getName() == null || updatedDataset.getName().trim().isEmpty()) {
+                throw new DatasetException("Dataset name must be provided and not blank text!");
+            }
+            
+            currentDatasetCopy.setName(updatedDataset.getName());
+            datasetUpdated = true ;
+        }
+        
+        if (!ObjectUtils.equals(currentDatasetCopy.getDescription(), updatedDataset.getDescription())) {
+            currentDatasetCopy.setDescription(updatedDataset.getDescription());
+            datasetUpdated = true ;
+        }
+        
+        if (!ObjectUtils.equals(currentDatasetCopy.getAbbreviation(), updatedDataset.getAbbreviation())) {
+            currentDatasetCopy.setAbbreviation(updatedDataset.getAbbreviation());
+            datasetUpdated = true ;
+        }
+        
+        if (currentDatasetCopy.getSize() != updatedDataset.getSize()) {
+            throw new DatasetException("Can not update size on dataset!");
         }
 
-        return removedDataset;
+        if (!ObjectUtils.equals(currentDatasetCopy.getStudy(), updatedDataset.getStudy())) {
+            throw new DatasetException("Study not supported yet!");
+        }
+        
+        if (!ObjectUtils.equals(currentDatasetCopy.getType(), updatedDataset.getType())) {
+            throw new DatasetException("Type not supported yet!");
+        }
+
+        // save the new version of the current dataset
+        synchronized (datasetMap) {
+            if (datasetUpdated) {
+                datasetMap.put(currentDatasetCopy.getUniqueIdentifier(), currentDatasetCopy);
+            }
+
+            writeDatasets() ;
+        }
+
+        return datasetUpdated;
     }
 
     @Override
