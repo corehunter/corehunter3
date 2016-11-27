@@ -63,7 +63,6 @@ import uno.informatics.data.pojo.SimpleEntityPojo;
  */
 public class FileBasedDatasetServices implements DatasetServices {
     private static final String DATASETS = "datasets.xml";
-    private static final String DATA = "data.xml";
     private static final String ORIGINAL_FORMAT_SUFFIX = ".original";
 
     private static final String GENOTYPIC_PATH = "GENOTYPIC_PATH";
@@ -74,6 +73,7 @@ public class FileBasedDatasetServices implements DatasetServices {
 
     private static final String TXT_SUFFIX = ".txt";
     private static final String SUFFIX = ".corehunter";
+    private static final String DATA_SUFFIX = ".data";
 
     private static Map<String, DatasetPojo> datasetMap;
     private static Map<String, CoreHunterData> dataCache;
@@ -238,6 +238,7 @@ public class FileBasedDatasetServices implements DatasetServices {
         Path internalPath;
 
         Path originalFormatPath;
+        Path dataPath ;
 
         CoreHunterData coreHunterData = getCoreHunterData(internalDataset.getUniqueIdentifier());
 
@@ -250,6 +251,9 @@ public class FileBasedDatasetServices implements DatasetServices {
 
                 originalFormatPath = Paths.get(getPath().toString(), GENOTYPIC_PATH,
                         datasetId + ORIGINAL_FORMAT_SUFFIX);
+                
+                dataPath = Paths.get(getPath().toString(), GENOTYPIC_PATH,
+                        datasetId + DATA_SUFFIX);
 
                 if (coreHunterData != null && (coreHunterData.getGenotypicData() != null || Files.exists(copyPath))) {
                     throw new DatasetException(
@@ -318,6 +322,9 @@ public class FileBasedDatasetServices implements DatasetServices {
                 copyPath = Paths.get(getPath().toString(), PHENOTYPIC_PATH, datasetId + getSuffix(fileType));
 
                 internalPath = Paths.get(getPath().toString(), PHENOTYPIC_PATH, datasetId + SUFFIX);
+                
+                dataPath = Paths.get(getPath().toString(), PHENOTYPIC_PATH,
+                        datasetId + DATA_SUFFIX);
 
                 if (coreHunterData != null && (coreHunterData.getPhenotypicData() != null || Files.exists(copyPath))) {
                     throw new DatasetException(
@@ -363,6 +370,9 @@ public class FileBasedDatasetServices implements DatasetServices {
                 copyPath = Paths.get(getPath().toString(), DISTANCES_PATH, datasetId + getSuffix(fileType));
 
                 internalPath = Paths.get(getPath().toString(), DISTANCES_PATH, datasetId + SUFFIX);
+                
+                dataPath = Paths.get(getPath().toString(), DISTANCES_PATH,
+                        datasetId + DATA_SUFFIX);
 
                 if (coreHunterData != null && (coreHunterData.getDistancesData() != null || Files.exists(copyPath))) {
                     throw new DatasetException(
@@ -406,7 +416,7 @@ public class FileBasedDatasetServices implements DatasetServices {
         }
 
         try {
-            writeToFile(Paths.get(copyPath.getParent().toString(), DATA), new SimpleEntityPojo(dataId, dataName));
+            writeToFile(dataPath, new SimpleEntityPojo(dataId, dataName));
         } catch (IOException e) {
             throw new DatasetException(e);
         }
@@ -474,8 +484,6 @@ public class FileBasedDatasetServices implements DatasetServices {
 
                     originalPath = Paths.get(getPath().toString(), PHENOTYPIC_PATH, datasetId + getSuffix(fileType));
 
-                    originalPath = Paths.get(getPath().toString(), PHENOTYPIC_PATH, datasetId + getSuffix(fileType));
-
                     ArrayFeatureData arrayFeatureData = ArrayFeatureData.readData(originalPath, fileType);
 
                     return arrayFeatureData;
@@ -486,8 +494,6 @@ public class FileBasedDatasetServices implements DatasetServices {
                     if (fileType == null) {
                         return null;
                     }
-
-                    originalPath = Paths.get(getPath().toString(), DISTANCES_PATH, datasetId + getSuffix(fileType));
 
                     originalPath = Paths.get(getPath().toString(), DISTANCES_PATH, datasetId + getSuffix(fileType));
 
@@ -674,9 +680,10 @@ public class FileBasedDatasetServices implements DatasetServices {
         SimpleDistanceMatrixData distance = null;
 
         Path path = Paths.get(getPath().toString(), GENOTYPIC_PATH, datasetId + SUFFIX);
-
+        Path dataPath ;
+        
         if (Files.exists(path)) {
-
+  
             Path originalFormatPath = Paths.get(getPath().toString(), GENOTYPIC_PATH,
                     datasetId + ORIGINAL_FORMAT_SUFFIX);
 
@@ -690,22 +697,33 @@ public class FileBasedDatasetServices implements DatasetServices {
                     genotypicData = SimpleGenotypeData.readData(path, FileType.TXT);
                     break;
             }
+            
+            dataPath = Paths.get(getPath().toString(), GENOTYPIC_PATH,
+                    datasetId + DATA_SUFFIX);
+
+            updateData(phenotypicData, dataPath);
         }
 
         path = Paths.get(getPath().toString(), PHENOTYPIC_PATH, datasetId + SUFFIX);
 
         if (Files.exists(path)) {
             phenotypicData = ArrayFeatureData.readData(path, FileType.TXT);
+            
+            dataPath = Paths.get(getPath().toString(), PHENOTYPIC_PATH,
+                    datasetId + DATA_SUFFIX);
 
-            updateData(phenotypicData, Paths.get(path.getParent().toString(), DATA));
+            updateData(phenotypicData, dataPath);
         }
 
         path = Paths.get(getPath().toString(), DISTANCES_PATH, datasetId + SUFFIX);
 
         if (Files.exists(path)) {
             distance = SimpleDistanceMatrixData.readData(path, FileType.TXT);
-
-            updateData(distance, Paths.get(path.getParent().toString(), DATA));
+            
+            dataPath = Paths.get(getPath().toString(), DISTANCES_PATH,
+                    datasetId + DATA_SUFFIX);
+            
+            updateData(distance, dataPath);
         }
 
         if (genotypicData != null || phenotypicData != null || distance != null) {
