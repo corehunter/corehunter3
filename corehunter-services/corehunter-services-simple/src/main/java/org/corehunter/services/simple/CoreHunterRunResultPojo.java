@@ -7,7 +7,6 @@ import org.corehunter.services.CoreHunterRunArguments;
 import org.corehunter.services.CoreHunterRunResult;
 import org.corehunter.services.CoreHunterRunStatus;
 import org.jamesframework.core.subset.SubsetSolution;
-import org.joda.time.DateTime;
 
 import uno.informatics.data.pojo.SimpleEntityPojo;
 
