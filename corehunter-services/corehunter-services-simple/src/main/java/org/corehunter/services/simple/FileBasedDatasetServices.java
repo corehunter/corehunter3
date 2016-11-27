@@ -65,7 +65,7 @@ import uno.informatics.data.pojo.SimpleEntityPojo;
 public class FileBasedDatasetServices implements DatasetServices {
     private static final String DATASETS = "datasets.xml";
     private static final String DATA = "data.xml";
-    private static final String ORIGINAL_FORMAT = "originalFormat.xml";
+    private static final String ORIGINAL_FORMAT_SUFFIX = ".original";
 
     private static final String GENOTYPIC_PATH = "GENOTYPIC_PATH";
 
@@ -237,7 +237,7 @@ public class FileBasedDatasetServices implements DatasetServices {
         Path copyPath;
         Path internalPath;
 
-        Path originalPath;
+        Path originalFormatPath;
 
         CoreHunterData coreHunterData = getCoreHunterData(internalDataset.getUniqueIdentifier());
 
@@ -247,6 +247,8 @@ public class FileBasedDatasetServices implements DatasetServices {
                 copyPath = Paths.get(getPath().toString(), GENOTYPIC_PATH, datasetId + getSuffix(fileType));
 
                 internalPath = Paths.get(getPath().toString(), GENOTYPIC_PATH, datasetId + SUFFIX);
+
+                originalFormatPath = Paths.get(getPath().toString(), GENOTYPIC_PATH, datasetId + ORIGINAL_FORMAT_SUFFIX);
 
                 if (coreHunterData != null && (coreHunterData.getGenotypicData() != null || Files.exists(copyPath))) {
                     throw new DatasetException(
@@ -292,12 +294,10 @@ public class FileBasedDatasetServices implements DatasetServices {
                     throw e;
                 }
 
-                originalPath = Paths.get(getPath().toString(), ORIGINAL_FORMAT);
-
                 try {
-                    writeToFile(originalPath, genotypeDataFormat);
+                    writeToFile(originalFormatPath, genotypeDataFormat);
                 } catch (IOException e) {
-                    Files.deleteIfExists(originalPath);
+                    Files.deleteIfExists(originalFormatPath);
                     Files.deleteIfExists(copyPath);
                     throw e;
                 }
@@ -431,6 +431,7 @@ public class FileBasedDatasetServices implements DatasetServices {
         }
 
         Path originalPath;
+        Path originalFormatPath;
 
         FileType fileType;
 
@@ -445,9 +446,9 @@ public class FileBasedDatasetServices implements DatasetServices {
                     }
 
                     originalPath = Paths.get(getPath().toString(), GENOTYPIC_PATH, datasetId + getSuffix(fileType));
+                    originalFormatPath = Paths.get(getPath().toString(), GENOTYPIC_PATH, datasetId + ORIGINAL_FORMAT_SUFFIX);
 
-                    GenotypeDataFormat genotypeDataFormat = (GenotypeDataFormat) readFromFile(
-                            Paths.get(getPath().toString(), ORIGINAL_FORMAT));
+                    GenotypeDataFormat genotypeDataFormat = (GenotypeDataFormat) readFromFile(originalFormatPath);
                     
                     GenotypeData genotypeData;
 
@@ -667,9 +668,11 @@ public class FileBasedDatasetServices implements DatasetServices {
         Path path = Paths.get(getPath().toString(), GENOTYPIC_PATH, datasetId + SUFFIX);
 
         if (Files.exists(path)) {
+            
+            Path originalFormatPath = Paths.get(getPath().toString(), GENOTYPIC_PATH, datasetId + ORIGINAL_FORMAT_SUFFIX);
 
-            GenotypeDataFormat genotypeDataFormat = (GenotypeDataFormat) readFromFile(
-                    Paths.get(getPath().toString(), ORIGINAL_FORMAT));
+
+            GenotypeDataFormat genotypeDataFormat = (GenotypeDataFormat) readFromFile(originalFormatPath);
 
             switch (genotypeDataFormat) {
                 case BIPARENTAL:
