@@ -41,8 +41,9 @@ public class MockCoreHunterRunResultPojo extends SimpleEntityPojo implements Cor
     public SubsetSolution getSubsetSolution() {
         TreeSet<Integer> set = new TreeSet<Integer>() ;
         
-        for (int i = 0 ; i < 10 ; ++i)
+        for (int i = 0 ; i < 10 ; ++i) {
             set.add(i) ;
+        }
         
         return new SubsetSolution(set);
     }

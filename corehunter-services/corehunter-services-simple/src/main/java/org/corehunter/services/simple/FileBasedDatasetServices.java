@@ -53,11 +53,10 @@ import uno.informatics.data.pojo.DatasetPojo;
 import uno.informatics.data.pojo.SimpleEntityPojo;
 
 /**
- * A simple FileBasedDatasetServices implementation that persists datasets
- * on the file system. Sub-classes, can use the 
- * {@link #FileBasedDatasetServices() constructor} 
- * provided the path is defined in the overloaded constructor using the
- * {@link #setPath(Path)} method 
+ * A simple FileBasedDatasetServices implementation that persists datasets on
+ * the file system. Sub-classes, can use the {@link #FileBasedDatasetServices()
+ * constructor} provided the path is defined in the overloaded constructor using
+ * the {@link #setPath(Path)} method
  * 
  * @author daveneti
  *
@@ -82,11 +81,11 @@ public class FileBasedDatasetServices implements DatasetServices {
     private Path path;
 
     /**
-     * Constructor that can be used by sub-classes
-     * provided the path is defined in the overloaded constructor using the
-     * {@link #setPath(Path)} method 
+     * Constructor that can be used by sub-classes provided the path is defined
+     * in the overloaded constructor using the {@link #setPath(Path)} method
      * 
-     * @throws IOException if the path can not be set or is invalid
+     * @throws IOException
+     *             if the path can not be set or is invalid
      */
     protected FileBasedDatasetServices() throws IOException {
         datasetMap = new HashMap<String, DatasetPojo>();
@@ -94,15 +93,16 @@ public class FileBasedDatasetServices implements DatasetServices {
     }
 
     /**
-     * Constructor that is a path to defined the location of
-     * the datasets
+     * Constructor that is a path to defined the location of the datasets
      * 
-     * @param path the location of the datasets
-     * @throws IOException if the path can not be set or is invalid
+     * @param path
+     *            the location of the datasets
+     * @throws IOException
+     *             if the path can not be set or is invalid
      */
     public FileBasedDatasetServices(Path path) throws IOException {
-        this() ;
-        
+        this();
+
         setPath(path);
     }
 
@@ -143,8 +143,8 @@ public class FileBasedDatasetServices implements DatasetServices {
         } else {
             throw new DatasetException("Dataset already added : " + dataset.getUniqueIdentifier());
         }
-        
-        writeDatasets() ;
+
+        writeDatasets();
     }
 
     @Override
@@ -248,7 +248,8 @@ public class FileBasedDatasetServices implements DatasetServices {
 
                 internalPath = Paths.get(getPath().toString(), GENOTYPIC_PATH, datasetId + SUFFIX);
 
-                originalFormatPath = Paths.get(getPath().toString(), GENOTYPIC_PATH, datasetId + ORIGINAL_FORMAT_SUFFIX);
+                originalFormatPath = Paths.get(getPath().toString(), GENOTYPIC_PATH,
+                        datasetId + ORIGINAL_FORMAT_SUFFIX);
 
                 if (coreHunterData != null && (coreHunterData.getGenotypicData() != null || Files.exists(copyPath))) {
                     throw new DatasetException(
@@ -409,10 +410,10 @@ public class FileBasedDatasetServices implements DatasetServices {
         } catch (IOException e) {
             throw new DatasetException(e);
         }
-        
+
         internalDataset.setSize(coreHunterData.getSize());
-        
-        writeDatasets() ;
+
+        writeDatasets();
     }
 
     @Override
@@ -421,7 +422,7 @@ public class FileBasedDatasetServices implements DatasetServices {
         if (path == null) {
             throw new DatasetException("Path not defined!");
         }
-        
+
         if (datasetId == null) {
             throw new DatasetException("Dataset Id not defined!");
         }
@@ -442,14 +443,15 @@ public class FileBasedDatasetServices implements DatasetServices {
                     fileType = getFileType(path, GENOTYPIC_PATH, datasetId);
 
                     if (fileType == null) {
-                        return null ;
+                        return null;
                     }
 
                     originalPath = Paths.get(getPath().toString(), GENOTYPIC_PATH, datasetId + getSuffix(fileType));
-                    originalFormatPath = Paths.get(getPath().toString(), GENOTYPIC_PATH, datasetId + ORIGINAL_FORMAT_SUFFIX);
+                    originalFormatPath = Paths.get(getPath().toString(), GENOTYPIC_PATH,
+                            datasetId + ORIGINAL_FORMAT_SUFFIX);
 
                     GenotypeDataFormat genotypeDataFormat = (GenotypeDataFormat) readFromFile(originalFormatPath);
-                    
+
                     GenotypeData genotypeData;
 
                     switch (genotypeDataFormat) {
@@ -467,9 +469,9 @@ public class FileBasedDatasetServices implements DatasetServices {
                     fileType = getFileType(path, PHENOTYPIC_PATH, datasetId);
 
                     if (fileType == null) {
-                        return null ;
+                        return null;
                     }
-                    
+
                     originalPath = Paths.get(getPath().toString(), PHENOTYPIC_PATH, datasetId + getSuffix(fileType));
 
                     originalPath = Paths.get(getPath().toString(), PHENOTYPIC_PATH, datasetId + getSuffix(fileType));
@@ -480,11 +482,11 @@ public class FileBasedDatasetServices implements DatasetServices {
                 case DISTANCES:
 
                     fileType = getFileType(path, DISTANCES_PATH, datasetId);
-                    
+
                     if (fileType == null) {
-                        return null ;
+                        return null;
                     }
-                    
+
                     originalPath = Paths.get(getPath().toString(), DISTANCES_PATH, datasetId + getSuffix(fileType));
 
                     originalPath = Paths.get(getPath().toString(), DISTANCES_PATH, datasetId + getSuffix(fileType));
@@ -497,10 +499,10 @@ public class FileBasedDatasetServices implements DatasetServices {
 
             }
         } catch (IOException e) {
-            throw new DatasetException("Can not reload original data!", e) ;
+            throw new DatasetException("Can not reload original data!", e);
         }
     }
-    
+
     private void writeDatasets() throws DatasetException {
         ArrayList<Dataset> datasets = new ArrayList<Dataset>(datasetMap.values());
 
@@ -586,13 +588,15 @@ public class FileBasedDatasetServices implements DatasetServices {
     }
 
     /**
-     * Reads an object from a file. The default implementation uses
-     * XStream. Override to use another way to read objects. Must be
-     * compatible with the {@link #writeToFile(Path, Object)} method
+     * Reads an object from a file. The default implementation uses XStream.
+     * Override to use another way to read objects. Must be compatible with the
+     * {@link #writeToFile(Path, Object)} method
      * 
-     * @param path the path of the file to be read 
+     * @param path
+     *            the path of the file to be read
      * @return the object read from the file
-     * @throws IOException if the object can not be read from the file
+     * @throws IOException
+     *             if the object can not be read from the file
      */
     protected Object readFromFile(Path path) throws IOException {
         XStream xstream = createXStream();
@@ -604,17 +608,21 @@ public class FileBasedDatasetServices implements DatasetServices {
         try {
             return xstream.fromXML(inputStream);
         } catch (XStreamException e) {
-            throw new IOException(e) ;
+            throw new IOException(e);
         }
     }
 
     /**
-     * Write an object to a file. The default implementation uses
-     * XStream. Override to use another way to write objects. Must be
-     * compatible with the {@link #readFromFile(Path)} method
-     * @param path the path of the file to be written 
-     * @param object the object to be written
-     * @throws IOException if the object can not be write to the file
+     * Write an object to a file. The default implementation uses XStream.
+     * Override to use another way to write objects. Must be compatible with the
+     * {@link #readFromFile(Path)} method
+     * 
+     * @param path
+     *            the path of the file to be written
+     * @param object
+     *            the object to be written
+     * @throws IOException
+     *             if the object can not be write to the file
      */
     protected void writeToFile(Path path, Object object) throws IOException {
         XStream xstream = createXStream();
@@ -624,14 +632,14 @@ public class FileBasedDatasetServices implements DatasetServices {
         // TODO output to temp file and then copy
 
         outputStream = Files.newOutputStream(path);
-        
+
         try {
             xstream.toXML(object, outputStream);
         } catch (XStreamException e) {
-            throw new IOException(e) ;
-        }  
+            throw new IOException(e);
+        }
     }
-    
+
     @SuppressWarnings("unchecked")
     private void initialise() throws IOException {
 
@@ -668,9 +676,9 @@ public class FileBasedDatasetServices implements DatasetServices {
         Path path = Paths.get(getPath().toString(), GENOTYPIC_PATH, datasetId + SUFFIX);
 
         if (Files.exists(path)) {
-            
-            Path originalFormatPath = Paths.get(getPath().toString(), GENOTYPIC_PATH, datasetId + ORIGINAL_FORMAT_SUFFIX);
 
+            Path originalFormatPath = Paths.get(getPath().toString(), GENOTYPIC_PATH,
+                    datasetId + ORIGINAL_FORMAT_SUFFIX);
 
             GenotypeDataFormat genotypeDataFormat = (GenotypeDataFormat) readFromFile(originalFormatPath);
 

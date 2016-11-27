@@ -1,6 +1,7 @@
 package org.corehunter.services.simple.test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 import org.corehunter.services.CoreHunterRunStatus;
 import org.corehunter.services.simple.CoreHunterRunResultPojo;
