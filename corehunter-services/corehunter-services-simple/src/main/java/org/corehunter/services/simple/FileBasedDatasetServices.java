@@ -48,6 +48,7 @@ import com.thoughtworks.xstream.io.xml.StaxDriver;
 
 import uno.informatics.data.Data;
 import uno.informatics.data.Dataset;
+import uno.informatics.data.SimpleEntity;
 import uno.informatics.data.dataset.DatasetException;
 import uno.informatics.data.feature.array.ArrayFeatureData;
 import uno.informatics.data.io.FileType;
@@ -262,6 +263,23 @@ public class FileBasedDatasetServices implements DatasetServices {
         }
 
         return datasetUpdated;
+    }
+    
+    @Override
+    public SimpleEntity[] getHeaders(String datasetId) throws DatasetException {
+        CoreHunterData data = getCoreHunterData(datasetId) ;
+        
+        if (data == null) {
+            throw new DatasetException("No data associated with datasetId : " + datasetId);
+        }
+        
+        SimpleEntity[] headers = new SimpleEntity[data.getSize()] ;
+        
+        for (int i = 0 ; i < headers.length ; ++i) {
+            headers[i] = data.getHeader(i) ;
+        }
+        
+        return headers ;
     }
 
     @Override

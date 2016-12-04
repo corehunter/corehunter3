@@ -28,6 +28,7 @@ import org.corehunter.data.CoreHunterDataType;
 
 import uno.informatics.data.Data;
 import uno.informatics.data.Dataset;
+import uno.informatics.data.SimpleEntity;
 import uno.informatics.data.dataset.DatasetException;
 import uno.informatics.data.io.FileType;
 
@@ -89,6 +90,17 @@ public interface DatasetServices {
      *             if the dataset does not exist or can not be updated
      */
     public boolean updateDataset(Dataset dataset) throws DatasetException;
+    
+    /**
+     * Gets the entry headers associated with a dataset by unique dataset identifier
+     * 
+     * @param datasetId
+     *            the identifier of the dataset
+     * @return the entry headers associated with a dataset by unique dataset identifier
+     * @throws DatasetException
+     *             if the data can not be accessed or the dataset does not exist
+     */
+    public SimpleEntity[] getHeaders(String datasetId) throws DatasetException;
     
     /**
      * Gets the CoreHunter data associated with a dataset by unique dataset identifier

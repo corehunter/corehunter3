@@ -19,6 +19,7 @@
 
 package org.corehunter.services.simple.test;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -46,6 +47,7 @@ import org.junit.Test;
 import uno.informatics.data.Data;
 import uno.informatics.data.Dataset;
 import uno.informatics.data.Feature;
+import uno.informatics.data.SimpleEntity;
 import uno.informatics.data.dataset.FeatureData;
 import uno.informatics.data.dataset.FeatureDataRow;
 import uno.informatics.data.feature.array.ArrayFeatureData;
@@ -1796,6 +1798,38 @@ public class FileBasedDatasetServicesTest {
 
         } catch (Exception e) {
             ;
+        }
+    }
+    
+    @Test
+    public void testGetHeaders() {
+        try {
+            FileBasedDatasetServices fileBasedDatasetServices = new FileBasedDatasetServices(createTempDirectory());
+
+            Dataset dataset = new DatasetPojo(DATA_UID, DATASET_NAME);
+
+            fileBasedDatasetServices.addDataset(dataset);
+
+            Dataset addedDataset = fileBasedDatasetServices.getDataset(dataset.getUniqueIdentifier());
+
+            Path dataPath = Paths.get(ClassLoader.getSystemResource(PHENOTYPIC_FILE).toURI());
+
+            fileBasedDatasetServices.loadData(addedDataset, dataPath, FileType.CSV, CoreHunterDataType.PHENOTYPIC);
+
+            CoreHunterData addedData = fileBasedDatasetServices.getCoreHunterData(dataset.getUniqueIdentifier());
+            
+            SimpleEntity[] expectedHeaders = new SimpleEntity[addedData.getSize()] ;
+            
+            for (int i = 0 ; i < expectedHeaders.length ; ++i) {
+                expectedHeaders[i] = addedData.getHeader(i) ;
+            }
+
+            assertArrayEquals("Headers not correct!", expectedHeaders, fileBasedDatasetServices.getHeaders(dataset.getUniqueIdentifier()));
+
+        } catch (Exception e) {
+            e.printStackTrace();
+
+            fail(e.getMessage());
         }
     }
 
