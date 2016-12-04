@@ -35,10 +35,12 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import org.apache.commons.lang3.ObjectUtils;
 import org.corehunter.CoreHunter;
 import org.corehunter.CoreHunterArguments;
 import org.corehunter.listener.SimpleCoreHunterListener;
@@ -153,6 +155,11 @@ public class SimpleCoreHunterRunServices implements CoreHunterRunServices {
 
     @Override
     public CoreHunterRun getCoreHunterRun(String uniqueIdentifier) {
+
+        if (uniqueIdentifier == null) {
+            throw new NullPointerException("Can not find a run with out an id!");
+        }
+
         CoreHunterRunResult coreHunterRunResult = corehunterResultsMap.get(uniqueIdentifier);
 
         if (coreHunterRunResult != null) {
@@ -163,31 +170,94 @@ public class SimpleCoreHunterRunServices implements CoreHunterRunServices {
     }
 
     @Override
-    public boolean removeCoreHunterRun(String uniqueIdentifier) {
-        CoreHunterRunResult coreHunterRunResult = corehunterResultsMap.get(uniqueIdentifier);
+    public synchronized boolean removeCoreHunterRun(String uniqueIdentifier) {
 
-        if (coreHunterRunResult != null && coreHunterRunResult instanceof CoreHunterRunnable) {
-            boolean stopped = ((CoreHunterRunnable) coreHunterRunResult).stop();
-
-            if (stopped) {
-                // only remove if it was stopped
-                corehunterResultsMap.remove(uniqueIdentifier);
-
-                return true;
-            }
+        if (uniqueIdentifier == null) {
+            throw new NullPointerException("Can not remove a run with out an id!");
         }
 
-        return false;
+        CoreHunterRunResult coreHunterRunResult = corehunterResultsMap.remove(uniqueIdentifier);
+
+        if (coreHunterRunResult == null) {
+            throw new NoSuchElementException(String.format("Can not find a run with id %s", uniqueIdentifier));
+        }
+
+        // can not be stopped
+        /*if (coreHunterRunResult instanceof CoreHunterRunnable) {
+            boolean stopped = ((CoreHunterRunnable) coreHunterRunResult).stop();
+
+            return stopped;
+        }*/
+
+        return true;
     }
 
     @Override
-    public void deleteCoreHunterRun(String uniqueIdentifier) {
+    public synchronized void deleteCoreHunterRun(String uniqueIdentifier) {
+
+        if (uniqueIdentifier == null) {
+            throw new NullPointerException("Can not delete a run with out an id!");
+        }
+
         // remove regardless if it can not be stopped
         CoreHunterRunResult coreHunterRunResult = corehunterResultsMap.remove(uniqueIdentifier);
 
-        if (coreHunterRunResult != null && coreHunterRunResult instanceof CoreHunterRunnable) {
+        if (coreHunterRunResult == null) {
+            throw new NoSuchElementException(String.format("Can not find a run with id %s", uniqueIdentifier));
+        }
+        
+        removeResult((CoreHunterRunResultPojo) coreHunterRunResult);
+
+        /*if (coreHunterRunResult instanceof CoreHunterRunnable) {
             if (!((CoreHunterRunnable) coreHunterRunResult).stop()) {
                 logger.error("Can not stop runnable {}", coreHunterRunResult.getName());
+            }
+        }*/
+    }
+
+    @Override
+    public synchronized void updateCoreHunterRun(CoreHunterRun coreHunterRun) {
+
+        if (coreHunterRun == null || coreHunterRun.getUniqueIdentifier() == null) {
+            throw new NullPointerException("Can not find a run with out an id!");
+        }
+
+        if (coreHunterRun.getName() == null) {
+            throw new NullPointerException("Name is a required field");
+        }
+
+        CoreHunterRunResult coreHunterRunResult = corehunterResultsMap.get(coreHunterRun.getUniqueIdentifier());
+
+        if (coreHunterRunResult == null) {
+            throw new NoSuchElementException(
+                    String.format("Can not find a run with id %s", coreHunterRun.getUniqueIdentifier()));
+        }
+
+        if (ObjectUtils.notEqual(coreHunterRun.getName(), coreHunterRunResult.getName())) {
+            // update and save completed runs
+            if (coreHunterRunResult instanceof CoreHunterRunResultPojo) {
+                ((CoreHunterRunResultPojo) coreHunterRunResult).setName(coreHunterRun.getName());
+
+                saveResult((CoreHunterRunResultPojo) coreHunterRunResult);
+            } else {
+                // update in memory incomplete runs
+                if (coreHunterRunResult instanceof CoreHunterRunnable) {
+                    ((CoreHunterRunnable) coreHunterRunResult).setName(coreHunterRun.getName());
+                    
+                    switch (coreHunterRunResult.getStatus()) {
+                        case FAILED:
+                        case FINISHED:
+                            saveResult(new CoreHunterRunResultPojo(coreHunterRunResult));
+                            break;
+                        case NOT_STARTED:
+                        case RUNNING:
+                        default:
+                            break;  
+                    }
+                } else {
+                    throw new UnsupportedOperationException(
+                            String.format("Unknown class in use : %s", coreHunterRunResult.getClass().getName()));
+                }
             }
         }
     }
@@ -313,7 +383,7 @@ public class SimpleCoreHunterRunServices implements CoreHunterRunServices {
     }
 
     private void saveResult(CoreHunterRunResultPojo coreHunterRunResult) {
-
+       
         Path path = Paths.get(getPath().toString(), RESULTS_PATH, coreHunterRunResult.getUniqueIdentifier());
 
         logger.info("Writing result for {} with id {} to path {}", coreHunterRunResult.getName(),
@@ -323,6 +393,23 @@ public class SimpleCoreHunterRunServices implements CoreHunterRunServices {
             writeToFile(path, coreHunterRunResult);
         } catch (IOException e) {
             logger.error("Can not save result to path {} due to {}", path, e.getMessage());
+            logger.error("Full error ", e);
+
+            e.printStackTrace();
+        }
+    }
+    
+    private void removeResult(CoreHunterRunResultPojo coreHunterRunResult) {
+        
+        Path path = Paths.get(getPath().toString(), RESULTS_PATH, coreHunterRunResult.getUniqueIdentifier());
+
+        logger.info("Removing result for {} with id {} to path {}", coreHunterRunResult.getName(),
+                coreHunterRunResult.getUniqueIdentifier(), path.toString());
+
+        try {
+            Files.deleteIfExists(path) ;
+        } catch (IOException e) {
+            logger.error("Can not remove result to path {} due to {}", path, e.getMessage());
             logger.error("Full error ", e);
 
             e.printStackTrace();
@@ -485,7 +572,8 @@ public class SimpleCoreHunterRunServices implements CoreHunterRunServices {
         /*
          * (non-Javadoc)
          * 
-         * @see org.corehunter.services.simple.CoreHunterResult#getStartInstant()
+         * @see
+         * org.corehunter.services.simple.CoreHunterResult#getStartInstant()
          */
         @Override
         public synchronized final Instant getStartInstant() {
@@ -529,7 +617,7 @@ public class SimpleCoreHunterRunServices implements CoreHunterRunServices {
             PrintStream outputPrintStream = new PrintStream(outputStream);
 
             try {
-                startInstant = Instant.now() ;
+                startInstant = Instant.now();
                 status = CoreHunterRunStatus.RUNNING;
 
                 outputPrintStream.println(String.format("Starting run : %s at %s", getName(), startInstant.toString()));
@@ -557,7 +645,7 @@ public class SimpleCoreHunterRunServices implements CoreHunterRunServices {
                 printStream.close();
             }
 
-            endInstant = Instant.now() ;
+            endInstant = Instant.now();
             outputPrintStream.println(String.format("Ending run : %s at %s", getName(), endInstant.toString()));
 
             saveResult(new CoreHunterRunResultPojo(this));
@@ -568,7 +656,6 @@ public class SimpleCoreHunterRunServices implements CoreHunterRunServices {
         public boolean stop() {
             return false; // This simple implementation can not be stopped
         }
-
     }
 
     private class CoreHunterRunFromRunnable extends CoreHunterRunPojo {

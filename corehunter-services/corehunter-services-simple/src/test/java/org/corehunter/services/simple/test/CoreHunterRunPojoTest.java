@@ -59,6 +59,25 @@ public class CoreHunterRunPojoTest {
     }
 
     @Test
+    public void testCoreHunterRunPojoCoreHunterRun() {
+        CoreHunterRunPojo pojo = new CoreHunterRunPojo("id", "name");
+        
+        assertEquals("id", pojo.getUniqueIdentifier());
+        assertEquals("name", pojo.getName());
+        assertNotNull(pojo.getStartInstant());
+        assertNull(pojo.getEndInstant());
+        assertEquals(CoreHunterRunStatus.NOT_STARTED, pojo.getStatus());
+        
+        CoreHunterRunPojo copy = new CoreHunterRunPojo(pojo);
+
+        assertEquals("id", copy.getUniqueIdentifier());
+        assertEquals("name", copy.getName());
+        assertEquals(pojo.getStartInstant(), copy.getStartInstant());
+        assertEquals(pojo.getEndInstant(), copy.getEndInstant());
+        assertEquals(pojo.getStatus(), copy.getStatus());
+    }
+    
+    @Test
     public void testSetStartInstant() {
         CoreHunterRunPojo pojo = new CoreHunterRunPojo("id", "name");
 

@@ -57,6 +57,14 @@ public class CoreHunterRunPojo extends SimpleEntityPojo implements CoreHunterRun
         endInstant = null ;
         status = CoreHunterRunStatus.NOT_STARTED ;
     }
+    
+    public CoreHunterRunPojo(CoreHunterRun run) {
+        super(run.getUniqueIdentifier(), run.getName());
+        
+        startInstant = run.getStartInstant() != null ? Instant.from(run.getStartInstant()) : null;
+        endInstant = run.getEndInstant() != null ? Instant.from(run.getEndInstant()) : null;
+        status = run.getStatus() ;
+    }
 
     @Override
     public Instant getStartInstant() {

@@ -1800,7 +1800,7 @@ public class FileBasedDatasetServicesTest {
             ;
         }
     }
-    
+
     @Test
     public void testGetHeaders() {
         try {
@@ -1817,14 +1817,15 @@ public class FileBasedDatasetServicesTest {
             fileBasedDatasetServices.loadData(addedDataset, dataPath, FileType.CSV, CoreHunterDataType.PHENOTYPIC);
 
             CoreHunterData addedData = fileBasedDatasetServices.getCoreHunterData(dataset.getUniqueIdentifier());
-            
-            SimpleEntity[] expectedHeaders = new SimpleEntity[addedData.getSize()] ;
-            
-            for (int i = 0 ; i < expectedHeaders.length ; ++i) {
-                expectedHeaders[i] = addedData.getHeader(i) ;
+
+            SimpleEntity[] expectedHeaders = new SimpleEntity[addedData.getSize()];
+
+            for (int i = 0; i < expectedHeaders.length; ++i) {
+                expectedHeaders[i] = addedData.getHeader(i);
             }
 
-            assertArrayEquals("Headers not correct!", expectedHeaders, fileBasedDatasetServices.getHeaders(dataset.getUniqueIdentifier()));
+            assertArrayEquals("Headers not correct!", expectedHeaders,
+                    fileBasedDatasetServices.getHeaders(dataset.getUniqueIdentifier()));
 
         } catch (Exception e) {
             e.printStackTrace();
