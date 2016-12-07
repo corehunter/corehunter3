@@ -31,7 +31,7 @@
 <h2>
 <a id="getting-started-with-core-hunter" class="anchor" href="#getting-started-with-core-hunter" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Getting started with Core Hunter</h2>
 
-<p>Core Hunter is implemented in Java and can be executed from R or using the graphical interface. In both cases you will need to have installed a <a href="http://www.oracle.com/technetwork/java/javase/downloads/jre8-downloads-2133155.html">Java Runtime Environment (JRE)</a> version 8 or later.</p>
+<p>Core Hunter is implemented in Java and can be executed in R or using the graphical interface. In both cases you will need to have installed a <a href="http://www.oracle.com/technetwork/java/javase/downloads/jre8-downloads-2133155.html">Java Runtime Environment (JRE)</a> version 8 or later.</p>
 
 <h3>
 <a id="r-package" class="anchor" href="#r-package" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>R Package</h3>
@@ -62,6 +62,22 @@
 <span class="pl-k">&gt;</span> ?<span class="pl-smi">coreHunterData</span></pre></div>
 
 <p>Many examples are included in the R package as well.</p>
+
+<h4>
+<a id="memory-limits" class="anchor" href="#memory-limits" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Memory limits</h4>
+
+<p>Core Hunter uses the <code>rJava</code> package to execute Java code from R. By default, only part of the available memory is reserved for the Java Virtual Machine. To sample cores from large datasets you may need to increase the memory limit to several gigabytes. For example, to use 8 GB, assuming that your computer has at least that much RAM memory, set the option</p>
+
+<pre><code>&gt; options(java.parameters = "-Xmx8G")
+</code></pre>
+
+<p><em>before</em> <code>rJava</code> is loaded (or any other package using this library, like Core Hunter). It is preferred to set this option in your R profile. To verify whether the memory limit was successfully increased, you may retrieve runtime value while Core Hunter is loaded, with</p>
+
+<pre><code>&gt; library(corehunter)
+&gt; J("java.lang.Runtime")$getRuntime()$maxMemory() / (1024^3)
+</code></pre>
+
+<p>This should print a value close to that which you specified using the "-Xmx..." option. If it prints a much lower value <code>rJava</code> was probably already loaded when you tried to increase the memory, which does not work. If you are sure that you set the option before <code>rJava</code> was first loaded, consider shutting down any other Java applications that may be running on your computer before loading Core Hunter in R.</p>
 
 <h3>
 <a id="graphical-interface" class="anchor" href="#graphical-interface" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Graphical interface</h3>
