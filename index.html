@@ -71,13 +71,15 @@
 <pre><code>&gt; options(java.parameters = "-Xmx8G")
 </code></pre>
 
-<p><em>before</em> <code>rJava</code> is loaded (or any other package using this library, like Core Hunter). It is preferred to set this option in your R profile. To verify whether the memory limit was successfully increased, you may retrieve runtime value while Core Hunter is loaded, with</p>
+<p><em>before</em> <code>rJava</code> is loaded (or any other package using this library, like Core Hunter). It is preferred to set this option in your R profile. To verify whether the memory limit was successfully increased, you may retrieve the runtime value while Core Hunter is loaded, with</p>
 
 <pre><code>&gt; library(corehunter)
 &gt; J("java.lang.Runtime")$getRuntime()$maxMemory() / (1024^3)
 </code></pre>
 
-<p>This should print a value close to that which you specified using the "-Xmx..." option. If it prints a much lower value <code>rJava</code> was probably already loaded when you tried to increase the memory, which does not work. If you are sure that you set the option before <code>rJava</code> was first loaded, consider shutting down any other Java applications that may be running on your computer before loading Core Hunter in R.</p>
+<p>This should print a value close to what you specified using the <code>-Xmx...</code> option. If it prints a much lower value <code>rJava</code> was probably already loaded when you tried to increase the memory, which does not work. If you are sure that you set the option before <code>rJava</code> was loaded, consider shutting down any other Java applications that may be running on your computer before loading Core Hunter in R.</p>
+
+<p>When dealing with genetic marker datasets having many more markers than individuals, an alternative option to reduce the memory pressure is to precompute a distance matrix for analysis in Core Hunter. This solution however restricts the analysis to distance-based measures, since allelic richness can only be computed and maximized if full marker data is available.</p>
 
 <h3>
 <a id="graphical-interface" class="anchor" href="#graphical-interface" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Graphical interface</h3>
