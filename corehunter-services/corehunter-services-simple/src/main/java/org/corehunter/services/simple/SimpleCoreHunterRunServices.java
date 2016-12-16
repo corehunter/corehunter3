@@ -489,7 +489,7 @@ public class SimpleCoreHunterRunServices implements CoreHunterRunServices {
         private transient CoreHunter corehunter;
         private transient ByteArrayOutputStream outputStream;
         private transient ByteArrayOutputStream errorStream;
-        private String errorMessage;
+        private transient String errorMessage;
         private transient SubsetSolution subsetSolution;
         private Instant startInstant;
         private Instant endInstant;
