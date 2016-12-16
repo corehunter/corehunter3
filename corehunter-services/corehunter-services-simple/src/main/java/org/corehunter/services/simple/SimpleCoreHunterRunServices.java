@@ -627,6 +627,9 @@ public class SimpleCoreHunterRunServices implements CoreHunterRunServices {
                         corehunterRunArguments.getSubsetSize(), corehunterRunArguments.getObjectives());
 
                 corehunter = new CoreHunter();
+                corehunter.setMaxTimeWithoutImprovement(corehunterRunArguments.getMaxTimeWithoutImprovement()); 
+                corehunter.setTimeLimit(corehunterRunArguments.getTimeLimit());
+                
                 corehunter.setListener(new SimpleCoreHunterListener(outputPrintStream));
 
                 subsetSolution = corehunter.execute(arguments);

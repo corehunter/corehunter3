@@ -45,8 +45,8 @@ public class CoreHunterRunArgumentsPojo extends SimpleEntityPojo implements Core
     private int subsetSize;
     private String datasetId;
     private List<CoreHunterObjective> objectives;
-    private long timeLimit;
-    private long maxTimeWithoutImprovement;
+    private long timeLimit = -1 ;
+    private long maxTimeWithoutImprovement = -1 ;
 
     public CoreHunterRunArgumentsPojo(String name, int subsetSize, String datasetId) {
         super(UUID.randomUUID().toString(), name);
