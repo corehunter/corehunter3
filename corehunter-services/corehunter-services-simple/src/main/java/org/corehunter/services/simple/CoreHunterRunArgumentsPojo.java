@@ -70,6 +70,9 @@ public class CoreHunterRunArgumentsPojo extends SimpleEntityPojo implements Core
     public CoreHunterRunArgumentsPojo(CoreHunterRunArguments arguments) {
         this(arguments.getName(), arguments.getSubsetSize(), arguments.getDatasetId());
         setObjectives(arguments.getObjectives()) ;
+        
+        setTimeLimit(arguments.getTimeLimit());
+        setMaxTimeWithoutImprovement(arguments.getMaxTimeWithoutImprovement());
     }
 
     @Override
