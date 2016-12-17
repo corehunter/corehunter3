@@ -110,7 +110,7 @@ public class CoreHunterRunPojoTest {
 
         for (int i = 0; i < VALID_FORMATS.length; ++i) {
             try {
-                System.out.println(VALID_FORMATS[i].format(pojo.getStartInstant()));
+                //System.out.println(VALID_FORMATS[i].format(pojo.getStartInstant()));
             } catch (Exception e) {
                 fail(String.format("Format failed {} {}", (i + 1), VALID_FORMATS[i].toFormat().toString()));
             }

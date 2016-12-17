@@ -23,8 +23,8 @@ public class CoreHunterRunArgumentsPojoTest {
         assertEquals("name", pojo.getName()) ;
         assertEquals(10, pojo.getSubsetSize()) ;
         assertEquals("dataset", pojo.getDatasetId()) ;
-        assertEquals(0, pojo.getMaxTimeWithoutImprovement()) ;
-        assertEquals(0, pojo.getTimeLimit()) ;
+        assertEquals(-1, pojo.getMaxTimeWithoutImprovement()) ;
+        assertEquals(-1, pojo.getTimeLimit()) ;
         assertNotNull(pojo.getObjectives()) ;
         assertTrue(pojo.getObjectives().isEmpty()) ;
     }
@@ -39,8 +39,8 @@ public class CoreHunterRunArgumentsPojoTest {
         assertEquals("name", pojo.getName()) ;
         assertEquals(10, pojo.getSubsetSize()) ;
         assertEquals("dataset", pojo.getDatasetId()) ;
-        assertEquals(0, pojo.getMaxTimeWithoutImprovement()) ;
-        assertEquals(0, pojo.getTimeLimit()) ;
+        assertEquals(-1, pojo.getMaxTimeWithoutImprovement()) ;
+        assertEquals(-1, pojo.getTimeLimit()) ;
         assertNotNull(pojo.getObjectives()) ;
         assertEquals(1, pojo.getObjectives().size()) ;
     }
@@ -56,8 +56,8 @@ public class CoreHunterRunArgumentsPojoTest {
         assertEquals("name", pojo.getName()) ;
         assertEquals(10, pojo.getSubsetSize()) ;
         assertEquals("dataset", pojo.getDatasetId()) ;
-        assertEquals(0, pojo.getMaxTimeWithoutImprovement()) ;
-        assertEquals(0, pojo.getTimeLimit()) ;
+        assertEquals(-1, pojo.getMaxTimeWithoutImprovement()) ;
+        assertEquals(-1, pojo.getTimeLimit()) ;
         assertNotNull(pojo.getObjectives()) ;
         assertEquals(1, pojo.getObjectives().size()) ;
     }
@@ -72,8 +72,22 @@ public class CoreHunterRunArgumentsPojoTest {
         assertEquals("name", pojo.getName()) ;
         assertEquals(10, pojo.getSubsetSize()) ;
         assertEquals("dataset", pojo.getDatasetId()) ;
-        assertEquals(0, pojo.getMaxTimeWithoutImprovement()) ;
-        assertEquals(0, pojo.getTimeLimit()) ;
+        assertEquals(-1, pojo.getMaxTimeWithoutImprovement()) ;
+        assertEquals(-1, pojo.getTimeLimit()) ;
+        assertNotNull(pojo.getObjectives()) ;
+        assertTrue(pojo.getObjectives().isEmpty()) ;
+        
+        pojo.setTimeLimit(3);
+        pojo.setMaxTimeWithoutImprovement(4);
+        
+        pojo =  new CoreHunterRunArgumentsPojo(pojo) ;
+        
+        assertNotNull(pojo.getUniqueIdentifier()) ;
+        assertEquals("name", pojo.getName()) ;
+        assertEquals(10, pojo.getSubsetSize()) ;
+        assertEquals("dataset", pojo.getDatasetId()) ;
+        assertEquals(4, pojo.getMaxTimeWithoutImprovement()) ;
+        assertEquals(3, pojo.getTimeLimit()) ;
         assertNotNull(pojo.getObjectives()) ;
         assertTrue(pojo.getObjectives().isEmpty()) ;
     }
@@ -83,7 +97,7 @@ public class CoreHunterRunArgumentsPojoTest {
         
         CoreHunterRunArgumentsPojo pojo = new CoreHunterRunArgumentsPojo("name", 10, "dataset") ;
         
-        assertEquals(0, pojo.getTimeLimit()) ;
+        assertEquals(-1, pojo.getTimeLimit()) ;
         pojo.setTimeLimit(3);
         assertEquals(3, pojo.getTimeLimit()) ;     
     }
@@ -92,7 +106,7 @@ public class CoreHunterRunArgumentsPojoTest {
     public void testSetMaxTimeWithoutImprovement() {
         CoreHunterRunArgumentsPojo pojo = new CoreHunterRunArgumentsPojo("name", 10, "dataset") ;
         
-        assertEquals(0, pojo.getMaxTimeWithoutImprovement()) ;
+        assertEquals(-1, pojo.getMaxTimeWithoutImprovement()) ;
         pojo.setMaxTimeWithoutImprovement(3);
         assertEquals(3, pojo.getMaxTimeWithoutImprovement()) ;   
     }
