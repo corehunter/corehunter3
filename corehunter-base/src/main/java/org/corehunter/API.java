@@ -609,8 +609,8 @@ public class API {
     public static final List<CoreHunterMeasure> getAllowedMeasures(CoreHunterData coreHunterData,
                                                                    CoreHunterObjectiveType objectiveType) {
         return getAllowedMeasures(
-                coreHunterData.hasPhenotypes(),
                 coreHunterData.hasGenotypes(),
+                coreHunterData.hasPhenotypes(),
                 coreHunterData.hasDistances(),
                 objectiveType
         );
