@@ -222,9 +222,14 @@ public class ITSimpleCoreHunterRunServices {
                 fail("No status");
                 break;
         }
-
-        // shutdown
-        coreHunterRunServices.shutdown();
+        
+        try {
+            // try shutdown
+            coreHunterRunServices.shutdown();
+        } catch (Throwable e) {
+            e.printStackTrace();
+            fail("Failed shutdown due to + "+ e.getMessage());
+        }
 
         try {
             coreHunterRunServices = new SimpleCoreHunterRunServices(path, databaseServices);
@@ -328,8 +333,13 @@ public class ITSimpleCoreHunterRunServices {
             }
         }
 
-        // shutdown
-        coreHunterRunServices.shutdown();
+        try {
+            // try shutdown
+            coreHunterRunServices.shutdown();
+        } catch (Throwable e) {
+            e.printStackTrace();
+            fail("Failed shutdown due to + "+ e.getMessage());
+        }
 
         try {
             coreHunterRunServices = new SimpleCoreHunterRunServices(path, databaseServices);
@@ -344,8 +354,13 @@ public class ITSimpleCoreHunterRunServices {
 
         assertEquals("Run not persisted", run, coreHunterRunServices.getCoreHunterRun(run.getUniqueIdentifier()));
 
-        // shutdown
-        coreHunterRunServices.shutdown();
+        try {
+            // try shutdown
+            coreHunterRunServices.shutdown();
+        } catch (Throwable e) {
+            e.printStackTrace();
+            fail("Failed shutdown due to + "+ e.getMessage());
+        }
     }
 
     /**
@@ -455,8 +470,13 @@ public class ITSimpleCoreHunterRunServices {
             //fail("Update name test was not run!");
         }
 
-        // shutdown
-        coreHunterRunServices.shutdown();
+        try {
+            // try shutdown
+            coreHunterRunServices.shutdown();
+        } catch (Throwable e) {
+            e.printStackTrace();
+            fail("Failed shutdown due to + "+ e.getMessage());
+        }
 
         try {
             coreHunterRunServices = new SimpleCoreHunterRunServices(path, databaseServices);
@@ -472,8 +492,13 @@ public class ITSimpleCoreHunterRunServices {
             //fail("Update name test was not run!");
         }
         
-        // shutdown
-        coreHunterRunServices.shutdown();
+        try {
+            // try shutdown
+            coreHunterRunServices.shutdown();
+        } catch (Throwable e) {
+            e.printStackTrace();
+            fail("Failed shutdown due to + "+ e.getMessage());
+        }
     }
 
     /**
@@ -577,8 +602,13 @@ public class ITSimpleCoreHunterRunServices {
             }
         }
 
-        // shutdown
-        coreHunterRunServices.shutdown();
+        try {
+            // try shutdown
+            coreHunterRunServices.shutdown();
+        } catch (Throwable e) {
+            e.printStackTrace();
+            fail("Failed shutdown due to + "+ e.getMessage());
+        }
 
         if (removed) {
 
@@ -593,8 +623,13 @@ public class ITSimpleCoreHunterRunServices {
 
             assertEquals("Number of results is not 0", 0, coreHunterRuns.size());
 
-            // shutdown
-            coreHunterRunServices.shutdown();
+            try {
+                // try shutdown
+                coreHunterRunServices.shutdown();
+            } catch (Throwable e) {
+                e.printStackTrace();
+                fail("Failed shutdown due to + "+ e.getMessage());
+            }
         } else {
             fail("Remove run will running noy tested!");
         }
@@ -698,8 +733,13 @@ public class ITSimpleCoreHunterRunServices {
         assertEquals("Run name not updated during run", updatedRun.getName(),
                 coreHunterRunServices.getCoreHunterRun(updatedRun.getUniqueIdentifier()).getName());
 
-        // shutdown
-        coreHunterRunServices.shutdown();
+        try {
+            // try shutdown
+            coreHunterRunServices.shutdown();
+        } catch (Throwable e) {
+            e.printStackTrace();
+            fail("Failed shutdown due to + "+ e.getMessage());
+        }
 
         try {
             coreHunterRunServices = new SimpleCoreHunterRunServices(path, databaseServices);
@@ -711,9 +751,117 @@ public class ITSimpleCoreHunterRunServices {
         assertEquals("Updated run name not persisted", updatedRun.getName(),
                 coreHunterRunServices.getCoreHunterRun(updatedRun.getUniqueIdentifier()).getName());
 
-        // shutdown
-        coreHunterRunServices.shutdown();
+        try {
+            // try shutdown
+            coreHunterRunServices.shutdown();
+        } catch (Throwable e) {
+            e.printStackTrace();
+            fail("Failed shutdown due to + "+ e.getMessage());
+        }
     }
+    
+    /**
+     * Test failed executions
+     */
+    @Test
+    public void testFailedExecutions() {
+
+        Path path = null;
+
+        DatasetServices databaseServices = null;
+        try {
+            path = createTempDirectory();
+            databaseServices = new FileBasedDatasetServices(path);
+        } catch (IOException e) {
+            e.printStackTrace();
+            fail(e.getMessage());
+        }
+
+        SimpleCoreHunterRunServices coreHunterRunServices = null;
+        try {
+            coreHunterRunServices = new SimpleCoreHunterRunServices(path, databaseServices);
+        } catch (IOException e) {
+            e.printStackTrace();
+            fail(e.getMessage());
+        }
+
+        Dataset dataset = new DatasetPojo(DATASET_UID, DATASET_NAME);
+
+        try {
+            databaseServices.addDataset(dataset);
+        } catch (DatasetException e) {
+            e.printStackTrace();
+            fail(e.getMessage());
+        }
+
+        int size = 2;
+
+        try {
+            Path distancesDataPath = Paths.get(ClassLoader.getSystemResource(DISTANCES_DATA).toURI());
+
+            databaseServices.loadData(dataset, distancesDataPath, FileType.CSV, CoreHunterDataType.DISTANCES);
+        } catch (IOException e) {
+            e.printStackTrace();
+            fail(e.getMessage());
+        } catch (DatasetException e) {
+            e.printStackTrace();
+            fail(e.getMessage());
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+            fail(e.getMessage());
+        }
+
+        CoreHunterRunArgumentsPojo arguments = new CoreHunterRunArgumentsPojo(DISTANCES_DATA, size, DATASET_UID,
+                new CoreHunterObjective(CoreHunterObjectiveType.AV_ENTRY_TO_ENTRY,
+                        CoreHunterMeasure.PRECOMPUTED_DISTANCE));
+
+        // run Core Hunter with out limits
+
+        CoreHunterRun run = coreHunterRunServices.executeCoreHunter(arguments);
+
+        boolean finished = false;
+
+        CoreHunterRunStatus status = CoreHunterRunStatus.NOT_STARTED;
+
+        while (!finished) {
+            status = coreHunterRunServices.getCoreHunterRun(run.getUniqueIdentifier()).getStatus();
+
+            switch (status) {
+                case FAILED:
+                    finished = true;
+                    break;
+                case FINISHED:
+                    finished = true;
+                    break;
+                case NOT_STARTED:
+                case RUNNING:
+                default:
+                    break;
+            }
+
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+                fail(e.getMessage());
+            }
+        }
+
+        run = coreHunterRunServices.getCoreHunterRun(run.getUniqueIdentifier());
+        
+        assertEquals("Should have failed with error", CoreHunterRunStatus.FAILED, run.getStatus()) ;
+        assertNotNull("Should have error message", coreHunterRunServices.getErrorMessage(run.getUniqueIdentifier())) ;
+        assertNotNull("Should have error stream", coreHunterRunServices.getErrorStream(run.getUniqueIdentifier())) ;
+        
+        try {
+            // try shutdown
+            coreHunterRunServices.shutdown();
+        } catch (Throwable e) {
+            e.printStackTrace();
+            fail("Failed shutdown due to + "+ e.getMessage());
+        }
+    }
+
 
     // get best solution through exhaustive search
     private SubsetSolution getOptimalSolution(CoreHunterData data, Objective<SubsetSolution, CoreHunterData> obj,
