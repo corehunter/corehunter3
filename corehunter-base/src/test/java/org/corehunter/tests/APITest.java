@@ -193,49 +193,49 @@ public class APITest {
     @Test
     public void testGetAllowedObjectives() {
         assertArrayEquals("Allowed objectives for genotypes data not correct", new CoreHunterObjectiveType[] {
-                CoreHunterObjectiveType.AV_ACCESSION_TO_NEAREST_ENTRY, CoreHunterObjectiveType.AV_ENTRY_TO_ENTRY,
-                CoreHunterObjectiveType.AV_ENTRY_TO_NEAREST_ENTRY, CoreHunterObjectiveType.COVERAGE,
-                CoreHunterObjectiveType.HETEROZYGOUS_LOCI, CoreHunterObjectiveType.SHANNON_DIVERSITY
+            CoreHunterObjectiveType.AV_ACCESSION_TO_NEAREST_ENTRY, CoreHunterObjectiveType.AV_ENTRY_TO_ENTRY,
+            CoreHunterObjectiveType.AV_ENTRY_TO_NEAREST_ENTRY, CoreHunterObjectiveType.COVERAGE,
+            CoreHunterObjectiveType.HETEROZYGOUS_LOCI, CoreHunterObjectiveType.SHANNON_DIVERSITY
         }, API.getAllowedObjectives(GENOTYPES_DATA).toArray());
 
         assertArrayEquals("Allowed objectives for phenotypes data not correct", new CoreHunterObjectiveType[] {
-                CoreHunterObjectiveType.AV_ACCESSION_TO_NEAREST_ENTRY, CoreHunterObjectiveType.AV_ENTRY_TO_ENTRY,
-                CoreHunterObjectiveType.AV_ENTRY_TO_NEAREST_ENTRY
+            CoreHunterObjectiveType.AV_ACCESSION_TO_NEAREST_ENTRY, CoreHunterObjectiveType.AV_ENTRY_TO_ENTRY,
+            CoreHunterObjectiveType.AV_ENTRY_TO_NEAREST_ENTRY
         }, API.getAllowedObjectives(PHENOTYPES_DATA).toArray());
 
         assertArrayEquals("Allowed objectives for distance data not correct", new CoreHunterObjectiveType[] {
-                CoreHunterObjectiveType.AV_ACCESSION_TO_NEAREST_ENTRY, CoreHunterObjectiveType.AV_ENTRY_TO_ENTRY,
-                CoreHunterObjectiveType.AV_ENTRY_TO_NEAREST_ENTRY
+            CoreHunterObjectiveType.AV_ACCESSION_TO_NEAREST_ENTRY, CoreHunterObjectiveType.AV_ENTRY_TO_ENTRY,
+            CoreHunterObjectiveType.AV_ENTRY_TO_NEAREST_ENTRY
         }, API.getAllowedObjectives(DISTANCES_DATA).toArray());
 
         assertArrayEquals("Allowed objectives for genotypes and phenotypes data not correct",
                 new CoreHunterObjectiveType[] {
-                        CoreHunterObjectiveType.AV_ACCESSION_TO_NEAREST_ENTRY,
-                        CoreHunterObjectiveType.AV_ENTRY_TO_ENTRY, CoreHunterObjectiveType.AV_ENTRY_TO_NEAREST_ENTRY,
-                        CoreHunterObjectiveType.COVERAGE, CoreHunterObjectiveType.HETEROZYGOUS_LOCI,
-                        CoreHunterObjectiveType.SHANNON_DIVERSITY
+                    CoreHunterObjectiveType.AV_ACCESSION_TO_NEAREST_ENTRY,
+                    CoreHunterObjectiveType.AV_ENTRY_TO_ENTRY, CoreHunterObjectiveType.AV_ENTRY_TO_NEAREST_ENTRY,
+                    CoreHunterObjectiveType.COVERAGE, CoreHunterObjectiveType.HETEROZYGOUS_LOCI,
+                    CoreHunterObjectiveType.SHANNON_DIVERSITY
                 }, API.getAllowedObjectives(GENOTYPES_AND_PHENOTYPES_DATA).toArray());
 
         assertArrayEquals("Allowed objectives for genotypes and distance data not correct",
                 new CoreHunterObjectiveType[] {
-                        CoreHunterObjectiveType.AV_ACCESSION_TO_NEAREST_ENTRY,
-                        CoreHunterObjectiveType.AV_ENTRY_TO_ENTRY, CoreHunterObjectiveType.AV_ENTRY_TO_NEAREST_ENTRY,
-                        CoreHunterObjectiveType.COVERAGE, CoreHunterObjectiveType.HETEROZYGOUS_LOCI,
-                        CoreHunterObjectiveType.SHANNON_DIVERSITY
+                    CoreHunterObjectiveType.AV_ACCESSION_TO_NEAREST_ENTRY,
+                    CoreHunterObjectiveType.AV_ENTRY_TO_ENTRY, CoreHunterObjectiveType.AV_ENTRY_TO_NEAREST_ENTRY,
+                    CoreHunterObjectiveType.COVERAGE, CoreHunterObjectiveType.HETEROZYGOUS_LOCI,
+                    CoreHunterObjectiveType.SHANNON_DIVERSITY
                 }, API.getAllowedObjectives(GENOTYPES_AND_DISTANCES_DATA).toArray());
 
         assertArrayEquals("Allowed objectives for phenotypes and distance data not correct",
                 new CoreHunterObjectiveType[] {
-                        CoreHunterObjectiveType.AV_ACCESSION_TO_NEAREST_ENTRY,
-                        CoreHunterObjectiveType.AV_ENTRY_TO_ENTRY, CoreHunterObjectiveType.AV_ENTRY_TO_NEAREST_ENTRY
+                    CoreHunterObjectiveType.AV_ACCESSION_TO_NEAREST_ENTRY,
+                    CoreHunterObjectiveType.AV_ENTRY_TO_ENTRY, CoreHunterObjectiveType.AV_ENTRY_TO_NEAREST_ENTRY
                 }, API.getAllowedObjectives(PHENOTYPES_AND_DISTANCES_DATA).toArray());
 
         assertArrayEquals("Allowed objectives for genotypes, phenotypes and distance data not correct",
                 new CoreHunterObjectiveType[] {
-                        CoreHunterObjectiveType.AV_ACCESSION_TO_NEAREST_ENTRY,
-                        CoreHunterObjectiveType.AV_ENTRY_TO_ENTRY, CoreHunterObjectiveType.AV_ENTRY_TO_NEAREST_ENTRY,
-                        CoreHunterObjectiveType.COVERAGE, CoreHunterObjectiveType.HETEROZYGOUS_LOCI,
-                        CoreHunterObjectiveType.SHANNON_DIVERSITY
+                    CoreHunterObjectiveType.AV_ACCESSION_TO_NEAREST_ENTRY,
+                    CoreHunterObjectiveType.AV_ENTRY_TO_ENTRY, CoreHunterObjectiveType.AV_ENTRY_TO_NEAREST_ENTRY,
+                    CoreHunterObjectiveType.COVERAGE, CoreHunterObjectiveType.HETEROZYGOUS_LOCI,
+                    CoreHunterObjectiveType.SHANNON_DIVERSITY
                 }, API.getAllowedObjectives(GENOTYPES_PHENOTYPES_AND_DISTANCES_DATA).toArray());
     }
 
@@ -245,22 +245,24 @@ public class APITest {
         // GENOTYPES_DATA
 
         assertArrayEquals(
-                "Allowed objectives for genotypes data and average accession entry to nearest entry not correct",
+                "Allowed objectives for genotypes data and av. accession entry to nearest entry not correct",
                 new CoreHunterMeasure[] {
-                        CoreHunterMeasure.MODIFIED_ROGERS, CoreHunterMeasure.CAVALLI_SFORZA_EDWARDS
-                }, API.getAllowedMeasures(GENOTYPES_DATA, CoreHunterObjectiveType.AV_ACCESSION_TO_NEAREST_ENTRY).toArray());
+                    CoreHunterMeasure.MODIFIED_ROGERS, CoreHunterMeasure.CAVALLI_SFORZA_EDWARDS
+                }, API.getAllowedMeasures(GENOTYPES_DATA, 
+                        CoreHunterObjectiveType.AV_ACCESSION_TO_NEAREST_ENTRY).toArray());
 
-        assertArrayEquals("Allowed measures for genotypes data and average entry to entry not correct",
+        assertArrayEquals("Allowed measures for genotypes data and av. entry to entry not correct",
                 new CoreHunterMeasure[] {
-                        CoreHunterMeasure.MODIFIED_ROGERS, CoreHunterMeasure.CAVALLI_SFORZA_EDWARDS
+                    CoreHunterMeasure.MODIFIED_ROGERS, CoreHunterMeasure.CAVALLI_SFORZA_EDWARDS
                 }, API.getAllowedMeasures(GENOTYPES_DATA, CoreHunterObjectiveType.AV_ENTRY_TO_ENTRY).toArray());
 
-        assertArrayEquals("Allowed measures for genotypes data and average entry to nearest entry not correct",
+        assertArrayEquals("Allowed measures for genotypes data and av. entry to nearest entry not correct",
                 new CoreHunterMeasure[] {
-                        CoreHunterMeasure.MODIFIED_ROGERS, CoreHunterMeasure.CAVALLI_SFORZA_EDWARDS
-                }, API.getAllowedMeasures(GENOTYPES_DATA, CoreHunterObjectiveType.AV_ENTRY_TO_NEAREST_ENTRY).toArray());
+                    CoreHunterMeasure.MODIFIED_ROGERS, CoreHunterMeasure.CAVALLI_SFORZA_EDWARDS
+                }, API.getAllowedMeasures(GENOTYPES_DATA, 
+                        CoreHunterObjectiveType.AV_ENTRY_TO_NEAREST_ENTRY).toArray());
 
-        assertArrayEquals("Allowed measures for genotypes data and coverage to not correct", new CoreHunterMeasure[0],
+        assertArrayEquals("Allowed measures for genotypes data and coverage not correct", new CoreHunterMeasure[0],
                 API.getAllowedMeasures(GENOTYPES_DATA, CoreHunterObjectiveType.COVERAGE).toArray());
 
         assertArrayEquals("Allowed measures for genotypes data and hetrozygous loci not correct",
@@ -273,22 +275,24 @@ public class APITest {
 
         // PHENOTYPES_DATA
 
-        assertArrayEquals("Allowed measures for phenotypes data and average accession to nearest entry to not correct",
+        assertArrayEquals("Allowed measures for phenotypes data and av. accession to nearest entry not correct",
                 new CoreHunterMeasure[] {
-                        CoreHunterMeasure.GOWERS
-                }, API.getAllowedMeasures(PHENOTYPES_DATA, CoreHunterObjectiveType.AV_ACCESSION_TO_NEAREST_ENTRY).toArray());
+                    CoreHunterMeasure.GOWERS
+                }, API.getAllowedMeasures(PHENOTYPES_DATA, 
+                        CoreHunterObjectiveType.AV_ACCESSION_TO_NEAREST_ENTRY).toArray());
 
-        assertArrayEquals("Allowed measures for phenotypes data and average entry to nearest entry not correct",
+        assertArrayEquals("Allowed measures for phenotypes data and av. entry to nearest entry not correct",
                 new CoreHunterMeasure[] {
-                        CoreHunterMeasure.GOWERS
+                    CoreHunterMeasure.GOWERS
                 }, API.getAllowedMeasures(PHENOTYPES_DATA, CoreHunterObjectiveType.AV_ENTRY_TO_ENTRY).toArray());
 
-        assertArrayEquals("Allowed measures for phenotypes data and average entry to nearest entry not correct",
+        assertArrayEquals("Allowed measures for phenotypes data and av. entry to nearest entry not correct",
                 new CoreHunterMeasure[] {
-                        CoreHunterMeasure.GOWERS
-                }, API.getAllowedMeasures(PHENOTYPES_DATA, CoreHunterObjectiveType.AV_ACCESSION_TO_NEAREST_ENTRY).toArray());
+                    CoreHunterMeasure.GOWERS
+                }, API.getAllowedMeasures(PHENOTYPES_DATA, 
+                        CoreHunterObjectiveType.AV_ACCESSION_TO_NEAREST_ENTRY).toArray());
 
-        assertArrayEquals("Allowed measures for phenotypes data and coverage to not correct", new CoreHunterMeasure[0],
+        assertArrayEquals("Allowed measures for phenotypes data and coverage not correct", new CoreHunterMeasure[0],
                 API.getAllowedMeasures(PHENOTYPES_DATA, CoreHunterObjectiveType.COVERAGE).toArray());
 
         assertArrayEquals("Allowed measures for phenotypes data and hetrozygous loci not correct",
@@ -301,22 +305,24 @@ public class APITest {
 
         // DISTANCES_DATA
 
-        assertArrayEquals("Allowed measures for distance data and average accession to nearest entry to not correct",
+        assertArrayEquals("Allowed measures for distance data and av. accession to nearest entry not correct",
                 new CoreHunterMeasure[] {
-                        CoreHunterMeasure.PRECOMPUTED_DISTANCE
-                }, API.getAllowedMeasures(DISTANCES_DATA, CoreHunterObjectiveType.AV_ACCESSION_TO_NEAREST_ENTRY).toArray());
+                    CoreHunterMeasure.PRECOMPUTED_DISTANCE
+                }, API.getAllowedMeasures(DISTANCES_DATA, 
+                        CoreHunterObjectiveType.AV_ACCESSION_TO_NEAREST_ENTRY).toArray());
 
-        assertArrayEquals("Allowed measures for distance data and average entry to nearest entry not correct",
+        assertArrayEquals("Allowed measures for distance data and av. entry to nearest entry not correct",
                 new CoreHunterMeasure[] {
-                        CoreHunterMeasure.PRECOMPUTED_DISTANCE
+                    CoreHunterMeasure.PRECOMPUTED_DISTANCE
                 }, API.getAllowedMeasures(DISTANCES_DATA, CoreHunterObjectiveType.AV_ENTRY_TO_ENTRY).toArray());
 
-        assertArrayEquals("Allowed measures for distance data and average nearest entry to entry not correct",
+        assertArrayEquals("Allowed measures for distance data and av. nearest entry to entry not correct",
                 new CoreHunterMeasure[] {
-                        CoreHunterMeasure.PRECOMPUTED_DISTANCE
-                }, API.getAllowedMeasures(DISTANCES_DATA, CoreHunterObjectiveType.AV_ACCESSION_TO_NEAREST_ENTRY).toArray());
+                    CoreHunterMeasure.PRECOMPUTED_DISTANCE
+                }, API.getAllowedMeasures(DISTANCES_DATA, 
+                        CoreHunterObjectiveType.AV_ACCESSION_TO_NEAREST_ENTRY).toArray());
 
-        assertArrayEquals("Allowed measures for distance data and coverage to not correct", new CoreHunterMeasure[0],
+        assertArrayEquals("Allowed measures for distance data and coverage not correct", new CoreHunterMeasure[0],
                 API.getAllowedMeasures(DISTANCES_DATA, CoreHunterObjectiveType.COVERAGE).toArray());
 
         assertArrayEquals("Allowed measures for distance data and hetrozygous loci not correct",
@@ -330,26 +336,29 @@ public class APITest {
         // GENOTYPES_AND_PHENOTYPES_DATA
 
         assertArrayEquals(
-                "Allowed measures for genotypes and phenotypes data and average accession to nearest entry not correct",
+                "Allowed measures for genotypes and phenotypes data and av. accession to nearest entry not correct",
                 new CoreHunterMeasure[] {
-                        CoreHunterMeasure.MODIFIED_ROGERS, CoreHunterMeasure.CAVALLI_SFORZA_EDWARDS,
-                        CoreHunterMeasure.GOWERS
-                }, API.getAllowedMeasures(GENOTYPES_AND_PHENOTYPES_DATA, CoreHunterObjectiveType.AV_ACCESSION_TO_NEAREST_ENTRY).toArray());
+                    CoreHunterMeasure.MODIFIED_ROGERS, CoreHunterMeasure.CAVALLI_SFORZA_EDWARDS,
+                    CoreHunterMeasure.GOWERS
+                }, API.getAllowedMeasures(GENOTYPES_AND_PHENOTYPES_DATA, 
+                        CoreHunterObjectiveType.AV_ACCESSION_TO_NEAREST_ENTRY).toArray());
 
-        assertArrayEquals("Allowed measures for genotypes and phenotypes data and average entry to entry not correct",
+        assertArrayEquals("Allowed measures for genotypes and phenotypes data and av. entry to entry not correct",
                 new CoreHunterMeasure[] {
-                        CoreHunterMeasure.MODIFIED_ROGERS, CoreHunterMeasure.CAVALLI_SFORZA_EDWARDS,
-                        CoreHunterMeasure.GOWERS
-                }, API.getAllowedMeasures(GENOTYPES_AND_PHENOTYPES_DATA, CoreHunterObjectiveType.AV_ENTRY_TO_ENTRY).toArray());
+                    CoreHunterMeasure.MODIFIED_ROGERS, CoreHunterMeasure.CAVALLI_SFORZA_EDWARDS,
+                    CoreHunterMeasure.GOWERS
+                }, API.getAllowedMeasures(GENOTYPES_AND_PHENOTYPES_DATA, 
+                        CoreHunterObjectiveType.AV_ENTRY_TO_ENTRY).toArray());
 
         assertArrayEquals(
-                "Allowed measures for genotypes and phenotypes data and average entry to nearest entry not correct",
+                "Allowed measures for genotypes and phenotypes data and av. entry to nearest entry not correct",
                 new CoreHunterMeasure[] {
-                        CoreHunterMeasure.MODIFIED_ROGERS, CoreHunterMeasure.CAVALLI_SFORZA_EDWARDS,
-                        CoreHunterMeasure.GOWERS
-                }, API.getAllowedMeasures(GENOTYPES_AND_PHENOTYPES_DATA, CoreHunterObjectiveType.AV_ENTRY_TO_NEAREST_ENTRY).toArray());
+                    CoreHunterMeasure.MODIFIED_ROGERS, CoreHunterMeasure.CAVALLI_SFORZA_EDWARDS,
+                    CoreHunterMeasure.GOWERS
+                }, API.getAllowedMeasures(GENOTYPES_AND_PHENOTYPES_DATA, 
+                        CoreHunterObjectiveType.AV_ENTRY_TO_NEAREST_ENTRY).toArray());
 
-        assertArrayEquals("Allowed measures for genotypes and phenotypes data and coverage to not correct",
+        assertArrayEquals("Allowed measures for genotypes and phenotypes data and coverage not correct",
                 new CoreHunterMeasure[0],
                 API.getAllowedMeasures(GENOTYPES_AND_PHENOTYPES_DATA, CoreHunterObjectiveType.COVERAGE).toArray());
 
@@ -366,27 +375,30 @@ public class APITest {
         // GENOTYPES_AND_DISTANCES_DATA
 
         assertArrayEquals(
-                "Allowed measures for phenotypes and distances data and average accession to nearest entry to not correct",
+                "Allowed measures for phenotypes and distances data and av acc to nearest entry not correct",
                 new CoreHunterMeasure[] {
-                        CoreHunterMeasure.MODIFIED_ROGERS, CoreHunterMeasure.CAVALLI_SFORZA_EDWARDS,
-                        CoreHunterMeasure.PRECOMPUTED_DISTANCE
-                }, API.getAllowedMeasures(GENOTYPES_AND_DISTANCES_DATA, CoreHunterObjectiveType.AV_ACCESSION_TO_NEAREST_ENTRY).toArray());
+                    CoreHunterMeasure.MODIFIED_ROGERS, CoreHunterMeasure.CAVALLI_SFORZA_EDWARDS,
+                    CoreHunterMeasure.PRECOMPUTED_DISTANCE
+                }, API.getAllowedMeasures(GENOTYPES_AND_DISTANCES_DATA, 
+                        CoreHunterObjectiveType.AV_ACCESSION_TO_NEAREST_ENTRY).toArray());
 
         assertArrayEquals(
-                "Allowed measures for phenotypes and distances data and average entry to nearest entry not correct",
+                "Allowed measures for phenotypes and distances data and av. entry to nearest entry not correct",
                 new CoreHunterMeasure[] {
-                        CoreHunterMeasure.MODIFIED_ROGERS, CoreHunterMeasure.CAVALLI_SFORZA_EDWARDS,
-                        CoreHunterMeasure.PRECOMPUTED_DISTANCE
-                }, API.getAllowedMeasures(GENOTYPES_AND_DISTANCES_DATA, CoreHunterObjectiveType.AV_ENTRY_TO_ENTRY).toArray());
+                    CoreHunterMeasure.MODIFIED_ROGERS, CoreHunterMeasure.CAVALLI_SFORZA_EDWARDS,
+                    CoreHunterMeasure.PRECOMPUTED_DISTANCE
+                }, API.getAllowedMeasures(GENOTYPES_AND_DISTANCES_DATA, 
+                        CoreHunterObjectiveType.AV_ENTRY_TO_ENTRY).toArray());
 
         assertArrayEquals(
-                "Allowed measures for phenotypes and distances data and average entry to nearest entry not correct",
+                "Allowed measures for phenotypes and distances data and av. entry to nearest entry not correct",
                 new CoreHunterMeasure[] {
-                        CoreHunterMeasure.MODIFIED_ROGERS, CoreHunterMeasure.CAVALLI_SFORZA_EDWARDS,
-                        CoreHunterMeasure.PRECOMPUTED_DISTANCE
-                }, API.getAllowedMeasures(GENOTYPES_AND_DISTANCES_DATA, CoreHunterObjectiveType.AV_ENTRY_TO_NEAREST_ENTRY).toArray());
+                    CoreHunterMeasure.MODIFIED_ROGERS, CoreHunterMeasure.CAVALLI_SFORZA_EDWARDS,
+                    CoreHunterMeasure.PRECOMPUTED_DISTANCE
+                }, API.getAllowedMeasures(GENOTYPES_AND_DISTANCES_DATA, 
+                        CoreHunterObjectiveType.AV_ENTRY_TO_NEAREST_ENTRY).toArray());
 
-        assertArrayEquals("Allowed measures for phenotypes and distances data and coverage to not correct",
+        assertArrayEquals("Allowed measures for phenotypes and distances data and coverage not correct",
                 new CoreHunterMeasure[0],
                 API.getAllowedMeasures(GENOTYPES_AND_DISTANCES_DATA, CoreHunterObjectiveType.COVERAGE).toArray());
 
@@ -403,23 +415,26 @@ public class APITest {
         // PHENOTYPES_AND_DISTANCES_DATA
 
         assertArrayEquals(
-                "Allowed measures for phenotypes and distance data and average accession to nearest entry to not correct",
+                "Allowed measures for phenotypes and distance data and av. accession to nearest entry not correct",
                 new CoreHunterMeasure[] {
-                        CoreHunterMeasure.GOWERS, CoreHunterMeasure.PRECOMPUTED_DISTANCE
-                }, API.getAllowedMeasures(PHENOTYPES_AND_DISTANCES_DATA, CoreHunterObjectiveType.AV_ACCESSION_TO_NEAREST_ENTRY).toArray());
+                    CoreHunterMeasure.GOWERS, CoreHunterMeasure.PRECOMPUTED_DISTANCE
+                }, API.getAllowedMeasures(PHENOTYPES_AND_DISTANCES_DATA, 
+                        CoreHunterObjectiveType.AV_ACCESSION_TO_NEAREST_ENTRY).toArray());
 
-        assertArrayEquals("Allow measures for phenotypes and distance data and average entry to entry not correct",
+        assertArrayEquals("Allow measures for phenotypes and distance data and av. entry to entry not correct",
                 new CoreHunterMeasure[] {
-                        CoreHunterMeasure.GOWERS, CoreHunterMeasure.PRECOMPUTED_DISTANCE
-                }, API.getAllowedMeasures(PHENOTYPES_AND_DISTANCES_DATA, CoreHunterObjectiveType.AV_ENTRY_TO_ENTRY).toArray());
+                    CoreHunterMeasure.GOWERS, CoreHunterMeasure.PRECOMPUTED_DISTANCE
+                }, API.getAllowedMeasures(PHENOTYPES_AND_DISTANCES_DATA, 
+                        CoreHunterObjectiveType.AV_ENTRY_TO_ENTRY).toArray());
 
         assertArrayEquals(
-                "Allowed measures for phenotypes and distance data and average entry to nearest entry not correct",
+                "Allowed measures for phenotypes and distance data and av. entry to nearest entry not correct",
                 new CoreHunterMeasure[] {
-                        CoreHunterMeasure.GOWERS, CoreHunterMeasure.PRECOMPUTED_DISTANCE
-                }, API.getAllowedMeasures(PHENOTYPES_AND_DISTANCES_DATA, CoreHunterObjectiveType.AV_ENTRY_TO_NEAREST_ENTRY).toArray());
+                    CoreHunterMeasure.GOWERS, CoreHunterMeasure.PRECOMPUTED_DISTANCE
+                }, API.getAllowedMeasures(PHENOTYPES_AND_DISTANCES_DATA, 
+                        CoreHunterObjectiveType.AV_ENTRY_TO_NEAREST_ENTRY).toArray());
 
-        assertArrayEquals("Allowed measures for phenotypes and distance data and coverage to not correct",
+        assertArrayEquals("Allowed measures for phenotypes and distance data and coverage not correct",
                 new CoreHunterMeasure[0],
                 API.getAllowedMeasures(PHENOTYPES_AND_DISTANCES_DATA, CoreHunterObjectiveType.COVERAGE).toArray());
 
@@ -436,27 +451,30 @@ public class APITest {
         // GENOTYPES_PHENOTYPES_AND_DISTANCES_DATA
 
         assertArrayEquals(
-                "Allowed measures for genotypes, phenotypes and distance data and average accession to nearest entry to not correct",
+                "Allowed measures for genotypes, phenotypes and distance data and av. acc. to near entry not correct",
                 new CoreHunterMeasure[] {
-                        CoreHunterMeasure.MODIFIED_ROGERS, CoreHunterMeasure.CAVALLI_SFORZA_EDWARDS,
-                        CoreHunterMeasure.GOWERS, CoreHunterMeasure.PRECOMPUTED_DISTANCE
-                }, API.getAllowedMeasures(GENOTYPES_PHENOTYPES_AND_DISTANCES_DATA, CoreHunterObjectiveType.AV_ACCESSION_TO_NEAREST_ENTRY).toArray());
+                    CoreHunterMeasure.MODIFIED_ROGERS, CoreHunterMeasure.CAVALLI_SFORZA_EDWARDS,
+                    CoreHunterMeasure.GOWERS, CoreHunterMeasure.PRECOMPUTED_DISTANCE
+                }, API.getAllowedMeasures(GENOTYPES_PHENOTYPES_AND_DISTANCES_DATA, 
+                        CoreHunterObjectiveType.AV_ACCESSION_TO_NEAREST_ENTRY).toArray());
 
         assertArrayEquals(
-                "Allowed measures for genotypes, phenotypes and distance data and average entry to nearest entry not correct",
+                "Allowed measures for genotypes, phenotypes and distance data and av. entry to near entry not correct",
                 new CoreHunterMeasure[] {
-                        CoreHunterMeasure.MODIFIED_ROGERS, CoreHunterMeasure.CAVALLI_SFORZA_EDWARDS,
-                        CoreHunterMeasure.GOWERS, CoreHunterMeasure.PRECOMPUTED_DISTANCE
-                }, API.getAllowedMeasures(GENOTYPES_PHENOTYPES_AND_DISTANCES_DATA, CoreHunterObjectiveType.AV_ENTRY_TO_ENTRY).toArray());
+                    CoreHunterMeasure.MODIFIED_ROGERS, CoreHunterMeasure.CAVALLI_SFORZA_EDWARDS,
+                    CoreHunterMeasure.GOWERS, CoreHunterMeasure.PRECOMPUTED_DISTANCE
+                }, API.getAllowedMeasures(GENOTYPES_PHENOTYPES_AND_DISTANCES_DATA, 
+                        CoreHunterObjectiveType.AV_ENTRY_TO_ENTRY).toArray());
 
         assertArrayEquals(
-                "Allowed measures for genotypes, phenotypes and distance data and average entry to nearest entry not correct",
+                "Allowed measures for genotypes, phenotypes and distance data and av. entry to near entry not correct",
                 new CoreHunterMeasure[] {
-                        CoreHunterMeasure.MODIFIED_ROGERS, CoreHunterMeasure.CAVALLI_SFORZA_EDWARDS,
-                        CoreHunterMeasure.GOWERS, CoreHunterMeasure.PRECOMPUTED_DISTANCE
-                }, API.getAllowedMeasures(GENOTYPES_PHENOTYPES_AND_DISTANCES_DATA, CoreHunterObjectiveType.AV_ENTRY_TO_NEAREST_ENTRY).toArray());
+                    CoreHunterMeasure.MODIFIED_ROGERS, CoreHunterMeasure.CAVALLI_SFORZA_EDWARDS,
+                    CoreHunterMeasure.GOWERS, CoreHunterMeasure.PRECOMPUTED_DISTANCE
+                }, API.getAllowedMeasures(GENOTYPES_PHENOTYPES_AND_DISTANCES_DATA, 
+                        CoreHunterObjectiveType.AV_ENTRY_TO_NEAREST_ENTRY).toArray());
 
-        assertArrayEquals("Allowed measures for genotypes, phenotypes and distance data and coverage to not correct",
+        assertArrayEquals("Allowed measures for genotypes, phenotypes and distance data and coverage not correct",
                 new CoreHunterMeasure[0],
                 API.getAllowedMeasures(GENOTYPES_PHENOTYPES_AND_DISTANCES_DATA, CoreHunterObjectiveType.COVERAGE)
                         .toArray());
@@ -464,12 +482,12 @@ public class APITest {
         assertArrayEquals(
                 "Allowed measures for genotypes, phenotypes and distance data and hetrozygous loci not correct",
                 new CoreHunterMeasure[0], API.getAllowedMeasures(GENOTYPES_PHENOTYPES_AND_DISTANCES_DATA,
-                        CoreHunterObjectiveType.HETEROZYGOUS_LOCI).toArray());
+                    CoreHunterObjectiveType.HETEROZYGOUS_LOCI).toArray());
 
         assertArrayEquals(
                 "Allowed measures for genotypes, phenotypes and distance data and shannon diversity not correct",
                 new CoreHunterMeasure[0], API.getAllowedMeasures(GENOTYPES_PHENOTYPES_AND_DISTANCES_DATA,
-                        CoreHunterObjectiveType.SHANNON_DIVERSITY).toArray());
+                    CoreHunterObjectiveType.SHANNON_DIVERSITY).toArray());
     }
 
     @Test
@@ -477,22 +495,24 @@ public class APITest {
         // GENOTYPES_DATA
 
         assertArrayEquals(
-                "Allowed objectives for genotypes data and average accession entry to nearest entry not correct",
+                "Allowed objectives for genotypes data and av. accession entry to nearest entry not correct",
                 new CoreHunterMeasure[] {
-                        CoreHunterMeasure.MODIFIED_ROGERS, CoreHunterMeasure.CAVALLI_SFORZA_EDWARDS
-                }, API.getAllowedMeasures(true, false, false, CoreHunterObjectiveType.AV_ACCESSION_TO_NEAREST_ENTRY).toArray());
+                    CoreHunterMeasure.MODIFIED_ROGERS, CoreHunterMeasure.CAVALLI_SFORZA_EDWARDS
+                }, API.getAllowedMeasures(true, false, false, 
+                        CoreHunterObjectiveType.AV_ACCESSION_TO_NEAREST_ENTRY).toArray());
 
-        assertArrayEquals("Allowed measures for genotypes data and average entry to entry not correct",
+        assertArrayEquals("Allowed measures for genotypes data and av. entry to entry not correct",
                 new CoreHunterMeasure[] {
-                        CoreHunterMeasure.MODIFIED_ROGERS, CoreHunterMeasure.CAVALLI_SFORZA_EDWARDS
+                    CoreHunterMeasure.MODIFIED_ROGERS, CoreHunterMeasure.CAVALLI_SFORZA_EDWARDS
                 }, API.getAllowedMeasures(true, false, false, CoreHunterObjectiveType.AV_ENTRY_TO_ENTRY).toArray());
 
-        assertArrayEquals("Allowed measures for genotypes data and average entry to nearest entry not correct",
+        assertArrayEquals("Allowed measures for genotypes data and av. entry to nearest entry not correct",
                 new CoreHunterMeasure[] {
-                        CoreHunterMeasure.MODIFIED_ROGERS, CoreHunterMeasure.CAVALLI_SFORZA_EDWARDS
-                }, API.getAllowedMeasures(true, false, false, CoreHunterObjectiveType.AV_ENTRY_TO_NEAREST_ENTRY).toArray());
+                    CoreHunterMeasure.MODIFIED_ROGERS, CoreHunterMeasure.CAVALLI_SFORZA_EDWARDS
+                }, API.getAllowedMeasures(true, false, false, 
+                        CoreHunterObjectiveType.AV_ENTRY_TO_NEAREST_ENTRY).toArray());
 
-        assertArrayEquals("Allowed measures for genotypes data and coverage to not correct", new CoreHunterMeasure[0],
+        assertArrayEquals("Allowed measures for genotypes data and coverage not correct", new CoreHunterMeasure[0],
                 API.getAllowedMeasures(true, false, false, CoreHunterObjectiveType.COVERAGE).toArray());
 
         assertArrayEquals("Allowed measures for genotypes data and hetrozygous loci not correct",
@@ -505,22 +525,24 @@ public class APITest {
 
         // PHENOTYPES_DATA
 
-        assertArrayEquals("Allowed measures for phenotypes data and average accession to nearest entry to not correct",
+        assertArrayEquals("Allowed measures for phenotypes data and av. accession to nearest entry not correct",
                 new CoreHunterMeasure[] {
-                        CoreHunterMeasure.GOWERS
-                }, API.getAllowedMeasures(false, true, false, CoreHunterObjectiveType.AV_ACCESSION_TO_NEAREST_ENTRY).toArray());
+                    CoreHunterMeasure.GOWERS
+                }, API.getAllowedMeasures(false, true, false, 
+                        CoreHunterObjectiveType.AV_ACCESSION_TO_NEAREST_ENTRY).toArray());
 
-        assertArrayEquals("Allowed measures for phenotypes data and average entry to nearest entry not correct",
+        assertArrayEquals("Allowed measures for phenotypes data and av. entry to nearest entry not correct",
                 new CoreHunterMeasure[] {
-                        CoreHunterMeasure.GOWERS
+                    CoreHunterMeasure.GOWERS
                 }, API.getAllowedMeasures(false, true, false, CoreHunterObjectiveType.AV_ENTRY_TO_ENTRY).toArray());
 
-        assertArrayEquals("Allowed measures for phenotypes data and average entry to nearest entry not correct",
+        assertArrayEquals("Allowed measures for phenotypes data and av. entry to nearest entry not correct",
                 new CoreHunterMeasure[] {
-                        CoreHunterMeasure.GOWERS
-                }, API.getAllowedMeasures(false, true, false,  CoreHunterObjectiveType.AV_ACCESSION_TO_NEAREST_ENTRY).toArray());
+                    CoreHunterMeasure.GOWERS
+                }, API.getAllowedMeasures(false, true, false, 
+                        CoreHunterObjectiveType.AV_ACCESSION_TO_NEAREST_ENTRY).toArray());
 
-        assertArrayEquals("Allowed measures for phenotypes data and coverage to not correct", new CoreHunterMeasure[0],
+        assertArrayEquals("Allowed measures for phenotypes data and coverage not correct", new CoreHunterMeasure[0],
                 API.getAllowedMeasures(false, true, false, CoreHunterObjectiveType.COVERAGE).toArray());
 
         assertArrayEquals("Allowed measures for phenotypes data and hetrozygous loci not correct",
@@ -533,22 +555,24 @@ public class APITest {
 
         // DISTANCES_DATA
 
-        assertArrayEquals("Allowed measures for distance data and average accession to nearest entry to not correct",
+        assertArrayEquals("Allowed measures for distance data and av. accession to nearest entry not correct",
                 new CoreHunterMeasure[] {
-                        CoreHunterMeasure.PRECOMPUTED_DISTANCE
-                }, API.getAllowedMeasures(false, false, true, CoreHunterObjectiveType.AV_ACCESSION_TO_NEAREST_ENTRY).toArray());
+                    CoreHunterMeasure.PRECOMPUTED_DISTANCE
+                }, API.getAllowedMeasures(false, false, true, 
+                        CoreHunterObjectiveType.AV_ACCESSION_TO_NEAREST_ENTRY).toArray());
 
-        assertArrayEquals("Allowed measures for distance data and average entry to nearest entry not correct",
+        assertArrayEquals("Allowed measures for distance data and av. entry to nearest entry not correct",
                 new CoreHunterMeasure[] {
-                        CoreHunterMeasure.PRECOMPUTED_DISTANCE
+                    CoreHunterMeasure.PRECOMPUTED_DISTANCE
                 }, API.getAllowedMeasures(false, false, true, CoreHunterObjectiveType.AV_ENTRY_TO_ENTRY).toArray());
 
-        assertArrayEquals("Allowed measures for distance data and average nearest entry to entry not correct",
+        assertArrayEquals("Allowed measures for distance data and av. nearest entry to entry not correct",
                 new CoreHunterMeasure[] {
-                        CoreHunterMeasure.PRECOMPUTED_DISTANCE
-                }, API.getAllowedMeasures(false, false, true, CoreHunterObjectiveType.AV_ACCESSION_TO_NEAREST_ENTRY).toArray());
+                    CoreHunterMeasure.PRECOMPUTED_DISTANCE
+                }, API.getAllowedMeasures(false, false, true, 
+                        CoreHunterObjectiveType.AV_ACCESSION_TO_NEAREST_ENTRY).toArray());
 
-        assertArrayEquals("Allowed measures for distance data and coverage to not correct", new CoreHunterMeasure[0],
+        assertArrayEquals("Allowed measures for distance data and coverage not correct", new CoreHunterMeasure[0],
                 API.getAllowedMeasures(false, false, true, CoreHunterObjectiveType.COVERAGE).toArray());
 
         assertArrayEquals("Allowed measures for distance data and hetrozygous loci not correct",
@@ -562,146 +586,149 @@ public class APITest {
         // GENOTYPES_AND_PHENOTYPES_DATA
 
         assertArrayEquals(
-                "Allowed measures for genotypes and phenotypes data and average accession to nearest entry not correct",
+                "Allowed measures for genotypes and phenotypes data and av. accession to nearest entry not correct",
                 new CoreHunterMeasure[] {
-                        CoreHunterMeasure.MODIFIED_ROGERS, CoreHunterMeasure.CAVALLI_SFORZA_EDWARDS,
-                        CoreHunterMeasure.GOWERS
-                }, API.getAllowedMeasures(true, true, false, CoreHunterObjectiveType.AV_ACCESSION_TO_NEAREST_ENTRY).toArray());
+                    CoreHunterMeasure.MODIFIED_ROGERS, CoreHunterMeasure.CAVALLI_SFORZA_EDWARDS,
+                    CoreHunterMeasure.GOWERS
+                }, API.getAllowedMeasures(true, true, false, 
+                        CoreHunterObjectiveType.AV_ACCESSION_TO_NEAREST_ENTRY).toArray());
 
-        assertArrayEquals("Allowed measures for genotypes and phenotypes data and average entry to entry not correct",
+        assertArrayEquals("Allowed measures for genotypes and phenotypes data and av. entry to entry not correct",
                 new CoreHunterMeasure[] {
-                        CoreHunterMeasure.MODIFIED_ROGERS, CoreHunterMeasure.CAVALLI_SFORZA_EDWARDS,
-                        CoreHunterMeasure.GOWERS
+                    CoreHunterMeasure.MODIFIED_ROGERS, CoreHunterMeasure.CAVALLI_SFORZA_EDWARDS,
+                    CoreHunterMeasure.GOWERS
                 }, API.getAllowedMeasures(true, true, false, CoreHunterObjectiveType.AV_ENTRY_TO_ENTRY).toArray());
 
         assertArrayEquals(
-                "Allowed measures for genotypes and phenotypes data and average entry to nearest entry not correct",
+                "Allowed measures for genotypes and phenotypes data and av. entry to nearest entry not correct",
                 new CoreHunterMeasure[] {
-                        CoreHunterMeasure.MODIFIED_ROGERS, CoreHunterMeasure.CAVALLI_SFORZA_EDWARDS,
-                        CoreHunterMeasure.GOWERS
-                }, API.getAllowedMeasures(true, true, false, CoreHunterObjectiveType.AV_ENTRY_TO_NEAREST_ENTRY).toArray());
+                    CoreHunterMeasure.MODIFIED_ROGERS, CoreHunterMeasure.CAVALLI_SFORZA_EDWARDS,
+                    CoreHunterMeasure.GOWERS
+                }, API.getAllowedMeasures(true, true, false, 
+                        CoreHunterObjectiveType.AV_ENTRY_TO_NEAREST_ENTRY).toArray());
 
-        assertArrayEquals("Allowed measures for genotypes and phenotypes data and coverage to not correct",
+        assertArrayEquals("Allowed measures for genotypes and phenotypes data and coverage not correct",
                 new CoreHunterMeasure[0],
                 API.getAllowedMeasures(true, true, false, CoreHunterObjectiveType.COVERAGE).toArray());
 
         assertArrayEquals("Allowed measures for genotypes and phenotypes data and hetrozygous loci not correct",
                 new CoreHunterMeasure[0],
-                API.getAllowedMeasures(true, true, false, CoreHunterObjectiveType.HETEROZYGOUS_LOCI)
-                        .toArray());
+                API.getAllowedMeasures(true, true, false, CoreHunterObjectiveType.HETEROZYGOUS_LOCI).toArray());
 
         assertArrayEquals("Allowed measures for genotypes and phenotypes data and shannon diversity not correct",
                 new CoreHunterMeasure[0],
-                API.getAllowedMeasures(true, true, false, CoreHunterObjectiveType.SHANNON_DIVERSITY)
-                        .toArray());
+                API.getAllowedMeasures(true, true, false, CoreHunterObjectiveType.SHANNON_DIVERSITY).toArray());
 
         // GENOTYPES_AND_DISTANCES_DATA
 
         assertArrayEquals(
-                "Allowed measures for phenotypes and distances data and average accession to nearest entry to not correct",
+                "Allowed measures for phenotypes and distances data and av. accession to nearest entry not correct",
                 new CoreHunterMeasure[] {
-                        CoreHunterMeasure.MODIFIED_ROGERS, CoreHunterMeasure.CAVALLI_SFORZA_EDWARDS,
-                        CoreHunterMeasure.PRECOMPUTED_DISTANCE
-                }, API.getAllowedMeasures(true, false, true, CoreHunterObjectiveType.AV_ACCESSION_TO_NEAREST_ENTRY).toArray());
+                    CoreHunterMeasure.MODIFIED_ROGERS, CoreHunterMeasure.CAVALLI_SFORZA_EDWARDS,
+                    CoreHunterMeasure.PRECOMPUTED_DISTANCE
+                }, API.getAllowedMeasures(true, false, true, 
+                        CoreHunterObjectiveType.AV_ACCESSION_TO_NEAREST_ENTRY).toArray());
 
         assertArrayEquals(
-                "Allowed measures for phenotypes and distances data and average entry to nearest entry not correct",
+                "Allowed measures for phenotypes and distances data and av. entry to nearest entry not correct",
                 new CoreHunterMeasure[] {
-                        CoreHunterMeasure.MODIFIED_ROGERS, CoreHunterMeasure.CAVALLI_SFORZA_EDWARDS,
-                        CoreHunterMeasure.PRECOMPUTED_DISTANCE
+                    CoreHunterMeasure.MODIFIED_ROGERS, CoreHunterMeasure.CAVALLI_SFORZA_EDWARDS,
+                    CoreHunterMeasure.PRECOMPUTED_DISTANCE
                 }, API.getAllowedMeasures(true, false, true, CoreHunterObjectiveType.AV_ENTRY_TO_ENTRY).toArray());
 
         assertArrayEquals(
-                "Allowed measures for phenotypes and distances data and average entry to nearest entry not correct",
+                "Allowed measures for phenotypes and distances data and av. entry to nearest entry not correct",
                 new CoreHunterMeasure[] {
-                        CoreHunterMeasure.MODIFIED_ROGERS, CoreHunterMeasure.CAVALLI_SFORZA_EDWARDS,
-                        CoreHunterMeasure.PRECOMPUTED_DISTANCE
-                }, API.getAllowedMeasures(true, false, true, CoreHunterObjectiveType.AV_ENTRY_TO_NEAREST_ENTRY).toArray());
+                    CoreHunterMeasure.MODIFIED_ROGERS, CoreHunterMeasure.CAVALLI_SFORZA_EDWARDS,
+                    CoreHunterMeasure.PRECOMPUTED_DISTANCE
+                }, API.getAllowedMeasures(true, false, true, 
+                        CoreHunterObjectiveType.AV_ENTRY_TO_NEAREST_ENTRY).toArray());
 
-        assertArrayEquals("Allowed measures for phenotypes and distances data and coverage to not correct",
+        assertArrayEquals("Allowed measures for phenotypes and distances data and coverage not correct",
                 new CoreHunterMeasure[0],
                 API.getAllowedMeasures(true, false, true, CoreHunterObjectiveType.COVERAGE).toArray());
 
         assertArrayEquals("Allowed measures for phenotypes and distances data and hetrozygous loci not correct",
                 new CoreHunterMeasure[0],
-                API.getAllowedMeasures(true, false, true, CoreHunterObjectiveType.HETEROZYGOUS_LOCI)
-                        .toArray());
+                API.getAllowedMeasures(true, false, true, CoreHunterObjectiveType.HETEROZYGOUS_LOCI).toArray());
 
         assertArrayEquals("Allowed measures for phenotypes and distances data and shannon diversity not correct",
                 new CoreHunterMeasure[0],
-                API.getAllowedMeasures(true, false, true, CoreHunterObjectiveType.SHANNON_DIVERSITY)
-                        .toArray());
+                API.getAllowedMeasures(true, false, true, CoreHunterObjectiveType.SHANNON_DIVERSITY).toArray());
 
         // PHENOTYPES_AND_DISTANCES_DATA
 
         assertArrayEquals(
-                "Allowed measures for phenotypes and distance data and average accession to nearest entry to not correct",
+                "Allowed measures for phenotypes and distance data and av. accession to nearest entry not correct",
                 new CoreHunterMeasure[] {
-                        CoreHunterMeasure.GOWERS, CoreHunterMeasure.PRECOMPUTED_DISTANCE
-                }, API.getAllowedMeasures(false, true, true,  CoreHunterObjectiveType.AV_ACCESSION_TO_NEAREST_ENTRY).toArray());
+                    CoreHunterMeasure.GOWERS, CoreHunterMeasure.PRECOMPUTED_DISTANCE
+                }, API.getAllowedMeasures(false, true, true, 
+                        CoreHunterObjectiveType.AV_ACCESSION_TO_NEAREST_ENTRY).toArray());
 
-        assertArrayEquals("Allow measures for phenotypes and distance data and average entry to entry not correct",
+        assertArrayEquals("Allow measures for phenotypes and distance data and av. entry to entry not correct",
                 new CoreHunterMeasure[] {
-                        CoreHunterMeasure.GOWERS, CoreHunterMeasure.PRECOMPUTED_DISTANCE
-                }, API.getAllowedMeasures(false, true, true,  CoreHunterObjectiveType.AV_ENTRY_TO_ENTRY).toArray());
+                    CoreHunterMeasure.GOWERS, CoreHunterMeasure.PRECOMPUTED_DISTANCE
+                }, API.getAllowedMeasures(false, true, true, CoreHunterObjectiveType.AV_ENTRY_TO_ENTRY).toArray());
 
         assertArrayEquals(
-                "Allowed measures for phenotypes and distance data and average entry to nearest entry not correct",
+                "Allowed measures for phenotypes and distance data and av. entry to nearest entry not correct",
                 new CoreHunterMeasure[] {
-                        CoreHunterMeasure.GOWERS, CoreHunterMeasure.PRECOMPUTED_DISTANCE
-                }, API.getAllowedMeasures(false, true, true,  CoreHunterObjectiveType.AV_ENTRY_TO_NEAREST_ENTRY).toArray());
+                    CoreHunterMeasure.GOWERS, CoreHunterMeasure.PRECOMPUTED_DISTANCE
+                }, API.getAllowedMeasures(false, true, true, 
+                        CoreHunterObjectiveType.AV_ENTRY_TO_NEAREST_ENTRY).toArray());
 
-        assertArrayEquals("Allowed measures for phenotypes and distance data and coverage to not correct",
+        assertArrayEquals("Allowed measures for phenotypes and distance data and coverage not correct",
                 new CoreHunterMeasure[0],
-                API.getAllowedMeasures(false, true, true,  CoreHunterObjectiveType.COVERAGE).toArray());
+                API.getAllowedMeasures(false, true, true, CoreHunterObjectiveType.COVERAGE).toArray());
 
         assertArrayEquals("Allowed measures for phenotypes and distance data and hetrozygous loci not correct",
                 new CoreHunterMeasure[0],
-                API.getAllowedMeasures(false, true, true,  CoreHunterObjectiveType.HETEROZYGOUS_LOCI)
-                        .toArray());
+                API.getAllowedMeasures(false, true, true, CoreHunterObjectiveType.HETEROZYGOUS_LOCI).toArray());
 
         assertArrayEquals("Allowed measures for phenotypes and distance data and shannon diversity not correct",
                 new CoreHunterMeasure[0],
-                API.getAllowedMeasures(false, true, true, CoreHunterObjectiveType.SHANNON_DIVERSITY)
-                        .toArray());
+                API.getAllowedMeasures(false, true, true, CoreHunterObjectiveType.SHANNON_DIVERSITY).toArray());
 
         // GENOTYPES_PHENOTYPES_AND_DISTANCES_DATA
 
         assertArrayEquals(
-                "Allowed measures for genotypes, phenotypes and distance data and average accession to nearest entry to not correct",
+                "Allowed measures for genotypes, phenotypes and distance data and av. acc. to near entry not correct",
                 new CoreHunterMeasure[] {
-                        CoreHunterMeasure.MODIFIED_ROGERS, CoreHunterMeasure.CAVALLI_SFORZA_EDWARDS,
-                        CoreHunterMeasure.GOWERS, CoreHunterMeasure.PRECOMPUTED_DISTANCE
-                }, API.getAllowedMeasures(true, true, true, CoreHunterObjectiveType.AV_ACCESSION_TO_NEAREST_ENTRY).toArray());
+                    CoreHunterMeasure.MODIFIED_ROGERS, CoreHunterMeasure.CAVALLI_SFORZA_EDWARDS,
+                    CoreHunterMeasure.GOWERS, CoreHunterMeasure.PRECOMPUTED_DISTANCE
+                }, API.getAllowedMeasures(true, true, true, 
+                        CoreHunterObjectiveType.AV_ACCESSION_TO_NEAREST_ENTRY).toArray());
 
         assertArrayEquals(
-                "Allowed measures for genotypes, phenotypes and distance data and average entry to nearest entry not correct",
+                "Allowed measures for genotypes, phenotypes and distance data and av. entry to near entry not correct",
                 new CoreHunterMeasure[] {
-                        CoreHunterMeasure.MODIFIED_ROGERS, CoreHunterMeasure.CAVALLI_SFORZA_EDWARDS,
-                        CoreHunterMeasure.GOWERS, CoreHunterMeasure.PRECOMPUTED_DISTANCE
-                }, API.getAllowedMeasures(true, true, true, CoreHunterObjectiveType.AV_ENTRY_TO_ENTRY).toArray());
+                    CoreHunterMeasure.MODIFIED_ROGERS, CoreHunterMeasure.CAVALLI_SFORZA_EDWARDS,
+                    CoreHunterMeasure.GOWERS, CoreHunterMeasure.PRECOMPUTED_DISTANCE
+                }, API.getAllowedMeasures(true, true, true, 
+                        
+                        CoreHunterObjectiveType.AV_ENTRY_TO_ENTRY).toArray());
 
         assertArrayEquals(
-                "Allowed measures for genotypes, phenotypes and distance data and average entry to nearest entry not correct",
+                "Allowed measures for genotypes, phenotypes and distance data and av. entry to near entry not correct",
                 new CoreHunterMeasure[] {
-                        CoreHunterMeasure.MODIFIED_ROGERS, CoreHunterMeasure.CAVALLI_SFORZA_EDWARDS,
-                        CoreHunterMeasure.GOWERS, CoreHunterMeasure.PRECOMPUTED_DISTANCE
-                }, API.getAllowedMeasures(true, true, true, CoreHunterObjectiveType.AV_ENTRY_TO_NEAREST_ENTRY).toArray());
+                    CoreHunterMeasure.MODIFIED_ROGERS, CoreHunterMeasure.CAVALLI_SFORZA_EDWARDS,
+                    CoreHunterMeasure.GOWERS, CoreHunterMeasure.PRECOMPUTED_DISTANCE
+                }, API.getAllowedMeasures(true, true, true, 
+                        CoreHunterObjectiveType.AV_ENTRY_TO_NEAREST_ENTRY).toArray());
 
-        assertArrayEquals("Allowed measures for genotypes, phenotypes and distance data and coverage to not correct",
+        assertArrayEquals("Allowed measures for genotypes, phenotypes and distance data and coverage not correct",
                 new CoreHunterMeasure[0],
-                API.getAllowedMeasures(true, true, true, CoreHunterObjectiveType.COVERAGE)
-                        .toArray());
+                API.getAllowedMeasures(true, true, true, CoreHunterObjectiveType.COVERAGE).toArray());
 
         assertArrayEquals(
                 "Allowed measures for genotypes, phenotypes and distance data and hetrozygous loci not correct",
-                new CoreHunterMeasure[0], API.getAllowedMeasures(true, true, true,
-                        CoreHunterObjectiveType.HETEROZYGOUS_LOCI).toArray());
+                new CoreHunterMeasure[0],
+                API.getAllowedMeasures(true, true, true, CoreHunterObjectiveType.HETEROZYGOUS_LOCI).toArray());
 
         assertArrayEquals(
                 "Allowed measures for genotypes, phenotypes and distance data and shannon diversity not correct",
-                new CoreHunterMeasure[0], API.getAllowedMeasures(true, true, true,
-                        CoreHunterObjectiveType.SHANNON_DIVERSITY).toArray());
+                new CoreHunterMeasure[0],
+                API.getAllowedMeasures(true, true, true, CoreHunterObjectiveType.SHANNON_DIVERSITY).toArray());
     }
 
 }
