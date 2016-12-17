@@ -403,7 +403,7 @@ public class ITSimpleCoreHunterRunServices {
                 new CoreHunterObjective(CoreHunterObjectiveType.AV_ENTRY_TO_ENTRY,
                         CoreHunterMeasure.PRECOMPUTED_DISTANCE));
 
-        arguments.setTimeLimit(1);
+        arguments.setTimeLimit(10);
 
         // run Core Hunter
 
@@ -448,8 +448,12 @@ public class ITSimpleCoreHunterRunServices {
             }
         }
 
-        assertEquals("Run name not updated during run", updatedRun.getName(),
-                coreHunterRunServices.getCoreHunterRun(updatedRun.getUniqueIdentifier()).getName());
+        if (updated) {
+            assertEquals("Run name not updated during run", updatedRun.getName(),
+                    coreHunterRunServices.getCoreHunterRun(updatedRun.getUniqueIdentifier()).getName());
+        } else {
+            fail("Update name test was not run!");
+        }
 
         // shutdown
         coreHunterRunServices.shutdown();
@@ -572,19 +576,24 @@ public class ITSimpleCoreHunterRunServices {
         // shutdown
         coreHunterRunServices.shutdown();
 
-        try {
-            coreHunterRunServices = new SimpleCoreHunterRunServices(path, databaseServices);
-        } catch (IOException e) {
-            e.printStackTrace();
-            fail(e.getMessage());
+        if (removed) {
+
+            try {
+                coreHunterRunServices = new SimpleCoreHunterRunServices(path, databaseServices);
+            } catch (IOException e) {
+                e.printStackTrace();
+                fail(e.getMessage());
+            }
+
+            List<CoreHunterRun> coreHunterRuns = coreHunterRunServices.getAllCoreHunterRuns();
+
+            assertEquals("Number of results is not 0", 0, coreHunterRuns.size());
+
+            // shutdown
+            coreHunterRunServices.shutdown();
+        } else {
+            fail("Remove run will running noy tested!");
         }
-
-        List<CoreHunterRun> coreHunterRuns = coreHunterRunServices.getAllCoreHunterRuns();
-
-        assertEquals("Number of results is not 0", 0, coreHunterRuns.size());
-
-        // shutdown
-        coreHunterRunServices.shutdown();
     }
 
     /**
