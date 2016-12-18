@@ -39,6 +39,7 @@ import java.util.NoSuchElementException;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.ObjectUtils;
 import org.corehunter.CoreHunter;
@@ -181,6 +182,8 @@ public class SimpleCoreHunterRunServices implements CoreHunterRunServices {
         if (coreHunterRunResult == null) {
             throw new NoSuchElementException(String.format("Can not find a run with id %s", uniqueIdentifier));
         }
+        
+        removeResult(coreHunterRunResult);
 
         // can not be stopped
         /*if (coreHunterRunResult instanceof CoreHunterRunnable) {
@@ -206,7 +209,7 @@ public class SimpleCoreHunterRunServices implements CoreHunterRunServices {
             throw new NoSuchElementException(String.format("Can not find a run with id %s", uniqueIdentifier));
         }
         
-        removeResult((CoreHunterRunResultPojo) coreHunterRunResult);
+        removeResult(coreHunterRunResult);
 
         /*if (coreHunterRunResult instanceof CoreHunterRunnable) {
             if (!((CoreHunterRunnable) coreHunterRunResult).stop()) {
@@ -399,7 +402,7 @@ public class SimpleCoreHunterRunServices implements CoreHunterRunServices {
         }
     }
     
-    private void removeResult(CoreHunterRunResultPojo coreHunterRunResult) {
+    private void removeResult(CoreHunterRunResult coreHunterRunResult) {
         
         Path path = Paths.get(getPath().toString(), RESULTS_PATH, coreHunterRunResult.getUniqueIdentifier());
 
@@ -627,8 +630,9 @@ public class SimpleCoreHunterRunServices implements CoreHunterRunServices {
                         corehunterRunArguments.getSubsetSize(), corehunterRunArguments.getObjectives());
 
                 corehunter = new CoreHunter();
-                corehunter.setMaxTimeWithoutImprovement(corehunterRunArguments.getMaxTimeWithoutImprovement()); 
-                corehunter.setTimeLimit(corehunterRunArguments.getTimeLimit());
+                corehunter.setMaxTimeWithoutImprovement(
+                        TimeUnit.SECONDS.toMillis(corehunterRunArguments.getMaxTimeWithoutImprovement())); 
+                corehunter.setTimeLimit(TimeUnit.SECONDS.toMillis(corehunterRunArguments.getTimeLimit()));
                 
                 corehunter.setListener(new SimpleCoreHunterListener(outputPrintStream));
 
