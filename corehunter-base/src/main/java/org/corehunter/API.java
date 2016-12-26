@@ -24,6 +24,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 
 import org.corehunter.data.CoreHunterData;
@@ -553,9 +554,9 @@ public class API {
      * then the default distances data objective is returned.
      * 
      * @param coreHunterData the data for which the objective is required
-     * @return a default objective (with weight 1.0)
+     * @return a default objective (with weight 1.0) or null if the data is not defined
      */
-    public static CoreHunterObjective createDefaultObjective(CoreHunterData coreHunterData) {
+    public static final CoreHunterObjective createDefaultObjective(CoreHunterData coreHunterData) {
 
         if (coreHunterData != null) {
 
@@ -572,6 +573,98 @@ public class API {
 
         return null;
     }
+    
+    /**
+     * Creates a default allowed objective for the data given a list existing
+     * objectives.
+     * 
+     * @param coreHunterData
+     *            the data for which the objective is required
+     * @param currentObjectives
+     *            a list existing objectives
+     * @return a default objective (with weight 1.0), or null if all possible
+     *         objectives used or the data is not defined
+     */
+    public static final CoreHunterObjective createDefaultObjective(CoreHunterData coreHunterData, 
+        List<CoreHunterObjective> currentObjectives) {
+
+        if (coreHunterData != null) {
+             
+            Iterator<CoreHunterObjective> possibleObjectives = getAllAllowedObjectives(coreHunterData).iterator() ;
+            
+            boolean found = false ;
+            
+            CoreHunterObjective objective = null ;
+            CoreHunterObjective currentObjective ;
+            Iterator<CoreHunterObjective> iterator ;
+            
+            while (!found && possibleObjectives.hasNext()) {
+                objective = possibleObjectives.next() ;
+                
+                iterator = currentObjectives.iterator() ;
+                
+                boolean alreadyUsed = false ;
+                
+                while (!alreadyUsed && iterator.hasNext()) {
+                    currentObjective = iterator.next() ;
+                    
+                    alreadyUsed = objective.isSameObjective(currentObjective) ;
+                }
+                
+                found = !alreadyUsed ;
+            }
+
+            return objective ;
+        }
+
+        return null;
+    }
+    
+    /**
+     * Creates a list of all possible Core Hunter objectives for a given data object, with equal weights.
+     * 
+     * @param coreHunterData  the data for which the objectives are required
+     * @return list of all possible Core Hunter objectives for the data
+     */
+    public static final List<CoreHunterObjective> getAllAllowedObjectives(CoreHunterData coreHunterData) {
+
+        List<CoreHunterObjective> objectives = new ArrayList<>();
+
+        if (coreHunterData != null) {
+            if (coreHunterData.hasGenotypes()) {
+                objectives.add(new CoreHunterObjective(CoreHunterObjectiveType.AV_ACCESSION_TO_NEAREST_ENTRY,
+                        CoreHunterMeasure.MODIFIED_ROGERS, 1.0));
+                objectives.add(new CoreHunterObjective(CoreHunterObjectiveType.AV_ACCESSION_TO_NEAREST_ENTRY,
+                        CoreHunterMeasure.CAVALLI_SFORZA_EDWARDS, 1.0));
+                objectives.add(new CoreHunterObjective(CoreHunterObjectiveType.AV_ENTRY_TO_ENTRY,
+                        CoreHunterMeasure.MODIFIED_ROGERS, 1.0));
+                objectives.add(new CoreHunterObjective(CoreHunterObjectiveType.AV_ENTRY_TO_ENTRY,
+                        CoreHunterMeasure.CAVALLI_SFORZA_EDWARDS, 1.0));
+                objectives.add(new CoreHunterObjective(CoreHunterObjectiveType.AV_ENTRY_TO_NEAREST_ENTRY,
+                        CoreHunterMeasure.MODIFIED_ROGERS, 1.0));
+                objectives.add(new CoreHunterObjective(CoreHunterObjectiveType.AV_ENTRY_TO_NEAREST_ENTRY,
+                        CoreHunterMeasure.CAVALLI_SFORZA_EDWARDS, 1.0));
+            }
+            if (coreHunterData.hasPhenotypes()) {
+                objectives.add(new CoreHunterObjective(CoreHunterObjectiveType.AV_ACCESSION_TO_NEAREST_ENTRY,
+                        CoreHunterMeasure.GOWERS, 1.0));
+                objectives.add(new CoreHunterObjective(CoreHunterObjectiveType.AV_ENTRY_TO_ENTRY,
+                        CoreHunterMeasure.GOWERS, 1.0));
+                objectives.add(new CoreHunterObjective(CoreHunterObjectiveType.AV_ENTRY_TO_NEAREST_ENTRY,
+                        CoreHunterMeasure.GOWERS, 1.0));
+            }
+            if (coreHunterData.hasDistances()) {
+                objectives.add(new CoreHunterObjective(CoreHunterObjectiveType.AV_ACCESSION_TO_NEAREST_ENTRY,
+                        CoreHunterMeasure.PRECOMPUTED_DISTANCE, 1.0));
+                objectives.add(new CoreHunterObjective(CoreHunterObjectiveType.AV_ENTRY_TO_ENTRY,
+                        CoreHunterMeasure.PRECOMPUTED_DISTANCE, 1.0));
+                objectives.add(new CoreHunterObjective(CoreHunterObjectiveType.AV_ENTRY_TO_NEAREST_ENTRY,
+                        CoreHunterMeasure.PRECOMPUTED_DISTANCE, 1.0));
+            }
+        }
+
+        return objectives;
+    }
 
     /**
      * Creates a list of all possible Core Hunter objective types for a given data object.
@@ -579,7 +672,7 @@ public class API {
      * @param coreHunterData  the data for which the objective types are required
      * @return list of all possible Core Hunter objective types
      */
-    public static final List<CoreHunterObjectiveType> getAllowedObjectives(CoreHunterData coreHunterData) {
+    public static final List<CoreHunterObjectiveType> getAllowedObjectiveTypes(CoreHunterData coreHunterData) {
         List<CoreHunterObjectiveType> objectives = new ArrayList<>();
 
         if (coreHunterData != null

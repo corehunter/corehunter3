@@ -37,7 +37,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <informatics-common.version>1.0.4</informatics-common.version>
+        <informatics-common.version>1.1.1</informatics-common.version>
     </properties>
 
     <distributionManagement>
@@ -116,11 +116,6 @@
                 <groupId>uno.informatics.common</groupId>
                 <artifactId>informatics-data-impl</artifactId>
                 <version>${informatics-common.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>joda-time</groupId>
-                <artifactId>joda-time</artifactId>
-                <version>2.9.2</version>
             </dependency>
             <dependency>
                 <groupId>junit</groupId>

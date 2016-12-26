@@ -104,6 +104,17 @@ public class CoreHunterObjective {
         setWeight(weight);
         setNormalizationRange(normalizationRange);
     }
+    
+    /**
+     * Creates a CoreHunter Objective from another objective. Copy Constructor.
+     * 
+     * @param objective the objective to be copied
+     */
+    public CoreHunterObjective(CoreHunterObjective objective) {
+        setObjectiveType(objective.getObjectiveType()) ;
+        setMeasure(objective.getMeasure()) ;
+        setWeight(objective.getWeight()) ;
+    }
 
     /**
      * Gets the objective type for this objective
@@ -178,4 +189,76 @@ public class CoreHunterObjective {
         this.normalizationRange = range;
     }
     
+    /**
+     * Determines if this objective is the same except for the weights and
+     * normalizationRange, which can any be value
+     * 
+     * @param objective
+     *            the objective to tested against this objective
+     * @return <code>true</code> if the objective type and measure are the
+     *         equal, <code>true</code> otherwise
+     */
+    public final boolean isSameObjective(CoreHunterObjective objective) {
+        return objective != null && getObjectiveType().equals(objective.getObjectiveType())
+                && getMeasure().equals(objective.getMeasure());
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((measure == null) ? 0 : measure.hashCode());
+        result = prime * result + ((normalizationRange == null) ? 0 : normalizationRange.hashCode());
+        result = prime * result + ((objectiveType == null) ? 0 : objectiveType.hashCode());
+        long temp;
+        temp = Double.doubleToLongBits(weight);
+        result = prime * result + (int) (temp ^ (temp >>> 32));
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        
+        if (obj == null) {
+            return false;
+        }
+        
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        
+        CoreHunterObjective other = (CoreHunterObjective) obj;
+        if (measure != other.measure) {
+            return false;
+        }
+        
+        if (normalizationRange == null) {
+            if (other.normalizationRange != null) {
+                return false;
+            }
+                
+        } else {
+            if (!normalizationRange.equals(other.normalizationRange)) {
+                return false;
+            }
+        }
+
+        if (objectiveType != other.objectiveType) {
+            return false;
+        }
+        
+        if (Double.doubleToLongBits(weight) != Double.doubleToLongBits(other.weight)) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        return "CoreHunterObjective [objectiveType=" + objectiveType + ", measure=" + measure + ", weight=" + weight
+                + ", normalizationRange=" + normalizationRange + "]";
+    }
 }

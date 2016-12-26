@@ -21,50 +21,68 @@ package org.corehunter.services.simple;
 
 import org.corehunter.services.CoreHunterRun;
 import org.corehunter.services.CoreHunterRunStatus;
-import org.joda.time.DateTime;
+import java.time.Instant ;
 
 import uno.informatics.data.pojo.SimpleEntityPojo;
 
-
+/**
+ * Basic Pojo for CoreHunterRun
+ * 
+ * @author daveneti
+ *
+ */
 public class CoreHunterRunPojo extends SimpleEntityPojo implements CoreHunterRun {
     
-    private DateTime startDate;
-    private DateTime endDate;
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+    
+    private Instant startInstant;
+    private Instant endInstant;
     private CoreHunterRunStatus status;
 
     public CoreHunterRunPojo(String name) {
         super(name);
         
-        startDate = new DateTime() ;
-        endDate = null ;
+        startInstant = Instant.now() ;
+        endInstant = null ;
         status = CoreHunterRunStatus.NOT_STARTED ;
     }
     
     public CoreHunterRunPojo(String uniqueIdentifier, String name) {
         super(uniqueIdentifier, name);
         
-        startDate = new DateTime() ;
-        endDate = null ;
+        startInstant = Instant.now() ;
+        endInstant = null ;
         status = CoreHunterRunStatus.NOT_STARTED ;
     }
-
-    @Override
-    public DateTime getStartDate() {
-        return startDate;
-    }
-
-    public final void setStartDate(DateTime startDate) {
+    
+    public CoreHunterRunPojo(CoreHunterRun run) {
+        super(run.getUniqueIdentifier(), run.getName());
         
-        this.startDate = startDate;
+        startInstant = run.getStartInstant() != null ? Instant.from(run.getStartInstant()) : null;
+        endInstant = run.getEndInstant() != null ? Instant.from(run.getEndInstant()) : null;
+        status = run.getStatus() ;
     }
 
     @Override
-    public DateTime getEndDate() {
-        return endDate;
+    public Instant getStartInstant() {
+        return startInstant;
     }
 
-    public final void setEndDate(DateTime endDate) {
-        this.endDate = endDate;
+    public final void setStartInstant(Instant startInstant) {
+        
+        this.startInstant = startInstant;
+    }
+
+    @Override
+    public Instant getEndInstant() {
+        return endInstant;
+    }
+
+    public final void setEndInstant(Instant endInstant) {
+        this.endInstant = endInstant;
     }
 
     @Override

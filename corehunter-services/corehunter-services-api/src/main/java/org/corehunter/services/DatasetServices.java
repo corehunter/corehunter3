@@ -27,12 +27,17 @@ import org.corehunter.data.CoreHunterData;
 import org.corehunter.data.CoreHunterDataType;
 
 import uno.informatics.data.Data;
-import uno.informatics.data.DataType;
 import uno.informatics.data.Dataset;
+import uno.informatics.data.SimpleEntity;
 import uno.informatics.data.dataset.DatasetException;
-import uno.informatics.data.dataset.MatrixData;
 import uno.informatics.data.io.FileType;
 
+/**
+ * Services for managing datasets
+ * 
+ * @author daveneti
+ *
+ */
 public interface DatasetServices {
 
     /**
@@ -72,6 +77,30 @@ public interface DatasetServices {
      *             if the dataset does not exist
      */
     public boolean removeDataset(String datasetId) throws DatasetException;
+    
+    /**
+     * Updates a dataset with information in the supplied dataset, based 
+     * on the identifier of the dataset
+     * 
+     * @param dataset
+     *            the dataset to be updated
+     * @return <code>true</code> if the dataset was present and was updated,
+     *         (at least one field was changed) <code>false</code> otherwise.
+     * @throws DatasetException
+     *             if the dataset does not exist or can not be updated
+     */
+    public boolean updateDataset(Dataset dataset) throws DatasetException;
+    
+    /**
+     * Gets the entry headers associated with a dataset by unique dataset identifier
+     * 
+     * @param datasetId
+     *            the identifier of the dataset
+     * @return the entry headers associated with a dataset by unique dataset identifier
+     * @throws DatasetException
+     *             if the data can not be accessed or the dataset does not exist
+     */
+    public SimpleEntity[] getHeaders(String datasetId) throws DatasetException;
     
     /**
      * Gets the CoreHunter data associated with a dataset by unique dataset identifier
