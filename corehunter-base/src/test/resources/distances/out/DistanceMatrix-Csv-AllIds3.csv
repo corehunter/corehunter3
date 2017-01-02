@@ -1,0 +1,6 @@
+ID,NAME,Alice,Dave,Bob,Carol,Eve,SELECTED
+Eve,Eve,0.8,0.6,0.4,0.2,0.0,true
+Carol,Carol,0.6,0.4,0.1,0.0,0.2,true
+Bob,Bob,0.4,0.2,0.0,0.1,0.4,false
+Dave,Dave,0.2,0.0,0.2,0.4,0.6,true
+Alice,Alice,0.0,0.2,0.4,0.6,0.8,false
