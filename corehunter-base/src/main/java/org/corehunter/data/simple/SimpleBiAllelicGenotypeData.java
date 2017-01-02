@@ -582,7 +582,7 @@ public class SimpleBiAllelicGenotypeData extends SimpleGenotypeData implements B
             // write data rows
             SimpleEntity header;
 
-            Iterator<Integer> iterator = allIDs.iterator();
+            Iterator<Integer> iterator = null ;
 
             if (includeSelected && includeUnselected) {
                 iterator = allIDs.iterator();

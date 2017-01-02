@@ -491,7 +491,7 @@ public class SimpleDistanceMatrixData extends DataPojo implements DistanceMatrix
                 writer.writeCell(SELECTED_HEADER);
             }
 
-            Iterator<Integer> iterator = allIDs.iterator();
+            Iterator<Integer> iterator = null ;
 
             if (includeSelected && includeUnselected) {
                 iterator = allIDs.iterator();

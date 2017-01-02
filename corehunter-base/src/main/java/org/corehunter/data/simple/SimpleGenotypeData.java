@@ -1079,7 +1079,7 @@ public class SimpleGenotypeData extends DataPojo implements GenotypeData {
 
             SimpleEntity header;
 
-            Iterator<Integer> iterator = allIDs.iterator();
+            Iterator<Integer> iterator = null ;
 
             if (includeSelected && includeUnselected) {
                 iterator = allIDs.iterator();
