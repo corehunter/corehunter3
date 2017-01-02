@@ -25,6 +25,7 @@ import static org.corehunter.tests.TestData.ALLELE_FREQUENCIES_HOMOZYGOUS;
 import static org.corehunter.tests.TestData.ALLELE_NAMES;
 import static org.corehunter.tests.TestData.ALLELE_NAMES_DIPLOID;
 import static org.corehunter.tests.TestData.ALLELE_NAMES_HOMOZYGOUS;
+import static org.corehunter.tests.TestData.DISTANCES;
 import static org.corehunter.tests.TestData.HEADERS_NON_UNIQUE_NAMES;
 import static org.corehunter.tests.TestData.HEADERS_UNIQUE_NAMES;
 import static org.corehunter.tests.TestData.MARKER_NAMES;
@@ -33,15 +34,22 @@ import static org.corehunter.tests.TestData.PRECISION;
 import static org.corehunter.tests.TestData.SET;
 import static org.corehunter.tests.TestData.UNDEFINED_ALLELE_NAMES;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
+import java.util.TreeSet;
 
 import org.corehunter.data.GenotypeDataFormat;
+import org.corehunter.data.simple.SimpleDistanceMatrixData;
 import org.corehunter.data.simple.SimpleGenotypeData;
+import org.jamesframework.core.subset.SubsetSolution;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -49,6 +57,7 @@ import org.junit.Test;
 import uno.informatics.data.io.FileType;
 import uno.informatics.data.SimpleEntity;
 
+import org.apache.commons.io.FileUtils;
 import org.corehunter.data.GenotypeData;
 
 import static org.corehunter.tests.TestData.MARKER_NAMES_DEFAULT;
@@ -78,6 +87,10 @@ public class SimpleGenotypeDataTest {
     private static final String ERRONEOUS_FILES_DIR = "/frequency_genotypes/err/";
     private static final String DIPLOID_ERRONEOUS_FILES_DIR = "/diploid_genotypes/err/";
     private static final String TEST_OUTPUT = "target/testoutput";
+    
+    private static final int[] SOLUTION = new int[] {
+        1, 3, 4
+    };
     
     private SimpleEntity[] expectedHeaders;
     private String[] expectedMarkerNames;
@@ -224,6 +237,301 @@ public class SimpleGenotypeDataTest {
         testDataFrequencies(SimpleGenotypeData.readData(path, FileType.CSV));
     }
     
+    @Test
+    public void toCsvFileWithAllIds() throws IOException {
+        dataName = "out.csv";
+        expectedHeaders = HEADERS_UNIQUE_NAMES;
+        expectedMarkerNames = MARKER_NAMES;
+        expectedAlleleNames = ALLELE_NAMES;
+        
+        SimpleGenotypeData genotypicData = new SimpleGenotypeData(expectedHeaders, 
+                expectedMarkerNames, expectedAlleleNames, ALLELE_FREQUENCIES) ;
+        
+        List<Integer> ids = new ArrayList<Integer>(genotypicData.getIDs());
+
+        Path dirPath = Paths.get(TEST_OUTPUT);
+
+        Files.createDirectories(dirPath);
+
+        dirPath = Files.createTempDirectory(dirPath, "GenoFreqs-CsvAlleleNames-AllIds");
+
+        // solution in natural order
+        SubsetSolution solution = new SubsetSolution(new TreeSet<Integer>(ids));
+
+        for (int i = 0; i < SOLUTION.length; ++i) {
+            solution.select(SOLUTION[i]);
+        }
+
+        dataName = "out1.csv";
+
+        Path path = Paths.get(dirPath.toString(), dataName);
+
+        Files.deleteIfExists(path);
+
+        System.out.println(" |- Write frequency genotypes File (with solution) " + dataName);
+
+        genotypicData.writeData(path, FileType.CSV, GenotypeDataFormat.FREQUENCY, solution, false, true, true);
+
+        assertTrue("Output 1 is not correct!",
+            FileUtils
+                .contentEquals(
+                    new File(SimpleDistanceMatrixDataTest.class
+                        .getResource("/frequency_genotypes/out/GenoFreqs-CsvAlleleNames-AllIds1.csv").getPath()),
+                    path.toFile()));
+
+        dataName = "out2.csv";
+
+        path = Paths.get(dirPath.toString(), dataName);
+
+        Files.deleteIfExists(path);
+
+        System.out.println(" |- Write frequency genotypes File (with solution) " + dataName);
+
+        genotypicData.writeData(path, FileType.CSV, GenotypeDataFormat.FREQUENCY, solution, true, true, true);
+
+        assertTrue("Output 2 is not correct!",
+            FileUtils
+                .contentEquals(
+                    new File(SimpleDistanceMatrixDataTest.class
+                        .getResource("/frequency_genotypes/out/GenoFreqs-CsvAlleleNames-AllIds2.csv").getPath()),
+                    path.toFile()));
+        
+        // solution in reverse natural order
+        solution = new SubsetSolution(new TreeSet<Integer>(ids), Comparator.reverseOrder());
+        
+        for (int i = 0; i < SOLUTION.length; ++i) {
+            solution.select(SOLUTION[i]);
+        }
+        
+        dataName = "out3.csv";
+
+        path = Paths.get(dirPath.toString(), dataName);
+
+        Files.deleteIfExists(path);
+
+        System.out.println(" |- Write frequency genotypes File (with solution reverse order) " + dataName);
+
+        genotypicData.writeData(path, FileType.CSV, GenotypeDataFormat.FREQUENCY, solution, false, true, true);
+
+        assertTrue("Output 3 is not correct!",
+            FileUtils
+                .contentEquals(
+                    new File(SimpleDistanceMatrixDataTest.class
+                        .getResource("/frequency_genotypes/out/GenoFreqs-CsvAlleleNames-AllIds3.csv").getPath()),
+                    path.toFile()));
+
+        dataName = "out4.csv";
+
+        path = Paths.get(dirPath.toString(), dataName);
+
+        Files.deleteIfExists(path);
+
+        System.out.println(" |- Write frequency genotypes File (with solution reverse order) " + dataName);
+
+        genotypicData.writeData(path, FileType.CSV, GenotypeDataFormat.FREQUENCY, solution, true, true, true);
+
+        assertTrue("Output 4 is not correct!",
+            FileUtils
+                .contentEquals(
+                    new File(SimpleDistanceMatrixDataTest.class
+                        .getResource("/frequency_genotypes/out/GenoFreqs-CsvAlleleNames-AllIds4.csv").getPath()),
+                    path.toFile()));
+    }
+
+    @Test
+    public void toCsvFileWithSelectedlIds() throws IOException {
+        dataName = "out.csv";
+        expectedHeaders = HEADERS_UNIQUE_NAMES;
+        expectedMarkerNames = MARKER_NAMES;
+        expectedAlleleNames = ALLELE_NAMES;
+        
+        SimpleGenotypeData genotypicData = new SimpleGenotypeData(expectedHeaders, 
+                expectedMarkerNames, expectedAlleleNames, ALLELE_FREQUENCIES) ;
+
+        List<Integer> ids = new ArrayList<Integer>(genotypicData.getIDs());
+
+        Path dirPath = Paths.get(TEST_OUTPUT);
+
+        Files.createDirectories(dirPath);
+
+        dirPath = Files.createTempDirectory(dirPath, "GenoFreqs-CsvAlleleNames-SelectedlIds");
+
+        // solution in natural order
+        SubsetSolution solution = new SubsetSolution(new TreeSet<Integer>(ids));
+
+        for (int i = 0; i < SOLUTION.length; ++i) {
+            solution.select(SOLUTION[i]);
+        }
+
+        dataName = "out1.csv";
+
+        Path path = Paths.get(dirPath.toString(), dataName);
+
+        Files.deleteIfExists(path);
+
+        System.out.println(" |- Write frequency genotypes File (with selected) " + dataName);
+
+        genotypicData.writeData(path, FileType.CSV, GenotypeDataFormat.FREQUENCY, solution, false, true, false);
+
+        assertTrue("Output 1 is not correct!",
+            FileUtils.contentEquals(
+                new File(SimpleDistanceMatrixDataTest.class
+                    .getResource("/frequency_genotypes/out/GenoFreqs-CsvAlleleNames-SelectedlIds1.csv").getPath()),
+                path.toFile()));
+
+        dataName = "out2.csv";
+
+        path = Paths.get(dirPath.toString(), dataName);
+
+        Files.deleteIfExists(path);
+
+        System.out.println(" |- Write frequency genotypes File (with selected and index) " + dataName);
+
+        genotypicData.writeData(path, FileType.CSV, GenotypeDataFormat.FREQUENCY, solution, true, true, false);
+
+        assertTrue("Output 2 is not correct!",
+            FileUtils.contentEquals(
+                new File(SimpleDistanceMatrixDataTest.class
+                    .getResource("/frequency_genotypes/out/GenoFreqs-CsvAlleleNames-SelectedlIds2.csv").getPath()),
+                path.toFile()));
+        
+        // solution in reverse natural order
+        solution = new SubsetSolution(new TreeSet<Integer>(ids), Comparator.reverseOrder());
+        
+        for (int i = 0; i < SOLUTION.length; ++i) {
+            solution.select(SOLUTION[i]);
+        }
+       
+        dataName = "out3.csv";
+
+        path = Paths.get(dirPath.toString(), dataName);
+
+        Files.deleteIfExists(path);
+
+        System.out.println(" |- Write frequency genotypes File (with selected reverse order) " + dataName);
+
+        genotypicData.writeData(path, FileType.CSV, GenotypeDataFormat.FREQUENCY, solution, false, true, false);
+
+        assertTrue("Output 3 is not correct!",
+            FileUtils.contentEquals(
+                new File(SimpleDistanceMatrixDataTest.class
+                    .getResource("/frequency_genotypes/out/GenoFreqs-CsvAlleleNames-SelectedlIds3.csv").getPath()),
+                path.toFile()));
+
+        dataName = "out4.csv";
+
+        path = Paths.get(dirPath.toString(), dataName);
+
+        Files.deleteIfExists(path);
+
+        System.out.println(" |- Write frequency genotypes File (with selected reverse order and index) " + dataName);
+
+        genotypicData.writeData(path, FileType.CSV, GenotypeDataFormat.FREQUENCY, solution, true, true, false);
+
+        assertTrue("Output 4 is not correct!",
+            FileUtils.contentEquals(
+                new File(SimpleDistanceMatrixDataTest.class
+                    .getResource("/frequency_genotypes/out/GenoFreqs-CsvAlleleNames-SelectedlIds4.csv").getPath()),
+                path.toFile()));
+    }
+
+    @Test
+    public void toCsvFileWithUnselectedlIds() throws IOException {
+        dataName = "out.csv";
+        expectedHeaders = HEADERS_UNIQUE_NAMES;
+        expectedMarkerNames = MARKER_NAMES;
+        expectedAlleleNames = ALLELE_NAMES;
+        
+        SimpleGenotypeData genotypicData = new SimpleGenotypeData(expectedHeaders, 
+                expectedMarkerNames, expectedAlleleNames, ALLELE_FREQUENCIES) ;
+
+        List<Integer> ids = new ArrayList<Integer>(genotypicData.getIDs());
+
+        Path dirPath = Paths.get(TEST_OUTPUT);
+
+        Files.createDirectories(dirPath);
+
+        dirPath = Files.createTempDirectory(dirPath, "GenoFreqs-CsvAlleleNames-UnselectedlIds");
+
+        // solution in natural order
+        SubsetSolution solution = new SubsetSolution(new TreeSet<Integer>(ids));
+
+        for (int i = 0; i < SOLUTION.length; ++i) {
+            solution.select(SOLUTION[i]);
+        }
+
+        dataName = "out1.csv";
+
+        Path path = Paths.get(dirPath.toString(), dataName);
+
+        Files.deleteIfExists(path);
+
+        System.out.println(" |- Write frequency genotypes File (with unselected) " + dataName);
+
+        genotypicData.writeData(path, FileType.CSV, GenotypeDataFormat.FREQUENCY, solution, false, false, true);
+
+        assertTrue("Output 1 is not correct!",
+            FileUtils.contentEquals(
+                new File(SimpleDistanceMatrixDataTest.class
+                    .getResource("/frequency_genotypes/out/GenoFreqs-CsvAlleleNames-UnselectedlIds1.csv").getPath()),
+                path.toFile()));
+
+        dataName = "out2.csv";
+
+        path = Paths.get(dirPath.toString(), dataName);
+
+        Files.deleteIfExists(path);
+
+        System.out.println(" |- Write frequency genotypes File (with unselected and index) " + dataName);
+
+        genotypicData.writeData(path, FileType.CSV, GenotypeDataFormat.FREQUENCY, solution, true, false, true);
+
+        assertTrue("Output 2 is not correct!",
+            FileUtils.contentEquals(
+                new File(SimpleDistanceMatrixDataTest.class
+                    .getResource("/frequency_genotypes/out/GenoFreqs-CsvAlleleNames-UnselectedlIds2.csv").getPath()),
+                path.toFile()));
+        
+        // solution in reverse natural order
+        solution = new SubsetSolution(new TreeSet<Integer>(ids), Comparator.reverseOrder());
+        
+        for (int i = 0; i < SOLUTION.length; ++i) {
+            solution.select(SOLUTION[i]);
+        }
+        
+        dataName = "out3.csv";
+
+        path = Paths.get(dirPath.toString(), dataName);
+
+        Files.deleteIfExists(path);
+
+        System.out.println(" |- Write frequency genotypes File (with unselected reverse order) " + dataName);
+
+        genotypicData.writeData(path, FileType.CSV, GenotypeDataFormat.FREQUENCY, solution, false, false, true);
+
+        assertTrue("Output 3 is not correct!",
+            FileUtils.contentEquals(
+                new File(SimpleDistanceMatrixDataTest.class
+                    .getResource("/frequency_genotypes/out/GenoFreqs-CsvAlleleNames-UnselectedlIds3.csv").getPath()),
+                path.toFile()));
+
+        dataName = "out4.csv";
+
+        path = Paths.get(dirPath.toString(), dataName);
+
+        Files.deleteIfExists(path);
+
+        System.out.println(" |- Write frequency genotypes File (with unselected reverse order and index) " + dataName);
+
+        genotypicData.writeData(path, FileType.CSV, GenotypeDataFormat.FREQUENCY, solution, true, false, true);
+
+        assertTrue("Output 4 is not correct!",
+            FileUtils.contentEquals(
+                new File(SimpleDistanceMatrixDataTest.class
+                    .getResource("/frequency_genotypes/out/GenoFreqs-CsvAlleleNames-UnselectedlIds4.csv").getPath()),
+                path.toFile()));
+    }
+
     @Test
     public void erroneousFiles() throws IOException {
         System.out.println(" |- Test erroneous files:");

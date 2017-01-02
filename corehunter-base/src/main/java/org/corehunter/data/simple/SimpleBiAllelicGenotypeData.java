@@ -24,11 +24,15 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
+import java.util.TreeSet;
 
 import org.corehunter.data.GenotypeDataFormat;
 import org.corehunter.util.StringUtils;
+import org.jamesframework.core.subset.SubsetSolution;
 
 import uno.informatics.data.io.FileType;
 import uno.informatics.common.io.IOUtilities;
@@ -42,24 +46,34 @@ import org.corehunter.data.BiAllelicGenotypeData;
 /**
  * @author Guy Davenport, Herman De Beukelaer
  */
-public class SimpleBiAllelicGenotypeData extends SimpleGenotypeData
-                                                implements BiAllelicGenotypeData {
+public class SimpleBiAllelicGenotypeData extends SimpleGenotypeData implements BiAllelicGenotypeData {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+    private static final String ID_HEADER = "X";
     private static final String NAMES_HEADER = "NAME";
     private static final String IDENTIFIERS_HEADER = "ID";
+    private static final String SELECTED_HEADER = "SELECTED";
 
     private final Integer[][] alleleScores; // null element means missing value
 
     /**
      * Create data with name "Biallelic marker data". For details of the
-     * arguments see {@link #SimpleBiAllelicGenotypeData(String, SimpleEntity[], String[], Integer[][])} .
+     * arguments see
+     * {@link #SimpleBiAllelicGenotypeData(String, SimpleEntity[], String[], Integer[][])}
+     * .
      * 
-     * @param itemHeaders item headers (include name and/or unique identifier)
-     * @param markerNames marker names
-     * @param alleleScores 0/1/2 allele score matrix
+     * @param itemHeaders
+     *            item headers (include name and/or unique identifier)
+     * @param markerNames
+     *            marker names
+     * @param alleleScores
+     *            0/1/2 allele score matrix
      */
     public SimpleBiAllelicGenotypeData(SimpleEntity[] itemHeaders, String[] markerNames,
-            Integer[][] alleleScores) {
+        Integer[][] alleleScores) {
         this("Biallelic marker data", itemHeaders, markerNames, alleleScores);
     }
 
@@ -70,14 +84,12 @@ public class SimpleBiAllelicGenotypeData extends SimpleGenotypeData
      * respectively. All entries in this matrix should be 0, 1 or 2 (or
      * <code>null</code> for missing values).
      * <p>
-     * Item headers are required but marker names are optional.
-     * If marker names are given they need not be defined for
-     * all markers nor unique. Each item should at
-     * least have a unique identifier (names are optional).
-     * The length of <code>itemHeaders</code> and
-     * <code>markerNames</code> (if not <code>null</code>)
-     * should be equal to the number of items and
-     * markers, respectively, as inferred from the dimensions of
+     * Item headers are required but marker names are optional. If marker names
+     * are given they need not be defined for all markers nor unique. Each item
+     * should at least have a unique identifier (names are optional). The length
+     * of <code>itemHeaders</code> and <code>markerNames</code> (if not
+     * <code>null</code>) should be equal to the number of items and markers,
+     * respectively, as inferred from the dimensions of
      * <code>alleleScores</code>.
      * <p>
      * Violating any of the requirements will produce an exception.
@@ -89,9 +101,9 @@ public class SimpleBiAllelicGenotypeData extends SimpleGenotypeData
      * @param datasetName
      *            name of the dataset
      * @param itemHeaders
-     *            item headers; its length should equal the number of
-     *            rows in <code>alleleScores</code> and each item should at
-     *            least have a unique identifier
+     *            item headers; its length should equal the number of rows in
+     *            <code>alleleScores</code> and each item should at least have a
+     *            unique identifier
      * @param markerNames
      *            marker names, <code>null</code> if no marker names are
      *            assigned; if not <code>null</code> its length should equal the
@@ -103,11 +115,11 @@ public class SimpleBiAllelicGenotypeData extends SimpleGenotypeData
      *            of items (rows) and markers (columns)
      */
     public SimpleBiAllelicGenotypeData(String datasetName, SimpleEntity[] itemHeaders, String[] markerNames,
-            Integer[][] alleleScores) {
+        Integer[][] alleleScores) {
 
         // pass dataset name, size and item headers to parent
-        super(datasetName, itemHeaders, markerNames,
-              inferAlleleNames(alleleScores), inferAlleleFrequencies(alleleScores));
+        super(datasetName, itemHeaders, markerNames, inferAlleleNames(alleleScores),
+            inferAlleleFrequencies(alleleScores));
 
         // check allele scores and infer number of items/markers
         int n = alleleScores.length;
@@ -119,7 +131,8 @@ public class SimpleBiAllelicGenotypeData extends SimpleGenotypeData
             Integer[] geno = alleleScores[i];
             // check: genotype defined
             if (geno == null) {
-                throw new IllegalArgumentException(String.format("Allele scores not defined for item %d.", i));
+                throw new IllegalArgumentException(
+                    String.format("Allele scores not defined for item %d.", i));
             }
             // set/check number of markers
             if (m == -1) {
@@ -129,14 +142,14 @@ public class SimpleBiAllelicGenotypeData extends SimpleGenotypeData
                 }
             } else if (geno.length != m) {
                 throw new IllegalArgumentException(String.format(
-                        "Incorrect number of markers for item %d. Expected: %d, actual: %d.", i, m, geno.length));
+                    "Incorrect number of markers for item %d. Expected: %d, actual: %d.", i, m, geno.length));
             }
             // check values
             for (int j = 0; j < m; j++) {
                 if (geno[j] != null && (geno[j] < 0 || geno[j] > 2)) {
                     throw new IllegalArgumentException(String.format(
-                            "Unexpected value at data row %d and data column %d. Got: %d (allowed: 0, 1, 2).", i, j,
-                            geno[j]));
+                        "Unexpected value at data row %d and data column %d. Got: %d (allowed: 0, 1, 2).", i,
+                        j, geno[j]));
                 }
             }
         }
@@ -147,27 +160,27 @@ public class SimpleBiAllelicGenotypeData extends SimpleGenotypeData
         }
 
     }
-    
-    private static String[][] inferAlleleNames(Integer[][] alleleScores){
+
+    private static String[][] inferAlleleNames(Integer[][] alleleScores) {
         int numMarkers = alleleScores[0].length;
         String[][] alleleNames = new String[numMarkers][2];
-        for(int m = 0; m < numMarkers; m++){
+        for (int m = 0; m < numMarkers; m++) {
             alleleNames[m][0] = "0";
             alleleNames[m][1] = "1";
         }
         return alleleNames;
     }
- 
-    private static Double[][][] inferAlleleFrequencies(Integer[][] alleleScores){
+
+    private static Double[][][] inferAlleleFrequencies(Integer[][] alleleScores) {
         int numGenotypes = alleleScores.length;
         int numMarkers = alleleScores[0].length;
         Double[][][] freqs = new Double[numGenotypes][numMarkers][2];
-        for(int i = 0; i < numGenotypes; i++){
+        for (int i = 0; i < numGenotypes; i++) {
             for (int m = 0; m < numMarkers; m++) {
-                if(alleleScores[i][m] == null){
+                if (alleleScores[i][m] == null) {
                     freqs[i][m][0] = freqs[i][m][1] = null;
                 } else {
-                    freqs[i][m][1] = ((double) alleleScores[i][m])/2.0;
+                    freqs[i][m][1] = ((double) alleleScores[i][m]) / 2.0;
                     freqs[i][m][0] = 1.0 - freqs[i][m][1];
                 }
             }
@@ -188,26 +201,32 @@ public class SimpleBiAllelicGenotypeData extends SimpleGenotypeData
      * column per marker. Only values 0, 1 and 2 are valid. Empty cells are also
      * allowed in case of missing data.
      * <p>
-     * The file contains one required header row and column ("ID") specifying item
-     * identifiers (row headers) and marker names (colum headers). Item identifiers
-     * should be unique and defined for all items. Marker names may be undefined for some or all
-     * markers and need not be unique. An optional second header column ("NAME") can also be included, specifying
-     * (not necessarily unique) item names. If no explicit item names are provided the unique identifiers are used
-     * as names as well.
+     * The file contains one required header row and column ("ID") specifying
+     * item identifiers (row headers) and marker names (colum headers). Item
+     * identifiers should be unique and defined for all items. Marker names may
+     * be undefined for some or all markers and need not be unique. An optional
+     * second header column ("NAME") can also be included, specifying (not
+     * necessarily unique) item names. If no explicit item names are provided
+     * the unique identifiers are used as names as well.
      * <p>
-     * Leading and trailing whitespace is removed from names and unique identifiers and they are unquoted
-     * if wrapped in single or double quotes after whitespace removal. If it is intended to start or end a
+     * Leading and trailing whitespace is removed from names and unique
+     * identifiers and they are unquoted if wrapped in single or double quotes
+     * after whitespace removal. If it is intended to start or end a
      * name/identifier with whitespace this whitespace should be contained
      * within the quotes, as it will then not be removed.
      * <p>
      * Trailing empty cells can be omitted at any row in the file.
      * <p>
-     * The dataset name is set to the name of the file to which <code>filePath</code> points.
+     * The dataset name is set to the name of the file to which
+     * <code>filePath</code> points.
      * 
-     * @param filePath path to file that contains the data
-     * @param type {@link FileType#TXT} or {@link FileType#CSV}
+     * @param filePath
+     *            path to file that contains the data
+     * @param type
+     *            {@link FileType#TXT} or {@link FileType#CSV}
      * @return biallelic genotype data
-     * @throws IOException if the file can not be read or is not correctly formatted
+     * @throws IOException
+     *             if the file can not be read or is not correctly formatted
      */
     public static SimpleBiAllelicGenotypeData readData(Path filePath, FileType type) throws IOException {
 
@@ -227,12 +246,12 @@ public class SimpleBiAllelicGenotypeData extends SimpleGenotypeData
 
         if (type != FileType.TXT && type != FileType.CSV) {
             throw new IllegalArgumentException(
-                    String.format("Only file types TXT and CSV are supported. Got: %s.", type));
+                String.format("Only file types TXT and CSV are supported. Got: %s.", type));
         }
 
         // read data from file
         try (RowReader reader = IOUtilities.createRowReader(filePath, type,
-                TextFileRowReader.REMOVE_WHITE_SPACE)) {
+            TextFileRowReader.REMOVE_WHITE_SPACE)) {
 
             if (reader == null || !reader.ready()) {
                 throw new IOException("Can not create reader for file " + filePath + ". File may be empty.");
@@ -264,7 +283,7 @@ public class SimpleBiAllelicGenotypeData extends SimpleGenotypeData
 
             // check for presence of ids and names
             String[] firstRow = rows.get(0);
-            if(firstRow.length == 0 || !Objects.equals(firstRow[0], IDENTIFIERS_HEADER)){
+            if (firstRow.length == 0 || !Objects.equals(firstRow[0], IDENTIFIERS_HEADER)) {
                 throw new IOException("Missing header row/column ID.");
             }
             boolean withNames = firstRow.length >= 2 && Objects.equals(firstRow[1], NAMES_HEADER);
@@ -289,8 +308,8 @@ public class SimpleBiAllelicGenotypeData extends SimpleGenotypeData
             // 1: extract marker names (if provided)
 
             String[] markerNames = new String[m];
-            for(int c = numHeaderCols; c < firstRow.length; c++){
-                markerNames[c-numHeaderCols] = firstRow[c];
+            for (int c = numHeaderCols; c < firstRow.length; c++) {
+                markerNames[c - numHeaderCols] = firstRow[c];
             }
 
             // 2: extract item names, identifiers and alelle scores
@@ -314,8 +333,8 @@ public class SimpleBiAllelicGenotypeData extends SimpleGenotypeData
                     } catch (NumberFormatException ex) {
                         // wrap in IO exception
                         throw new IOException(String.format(
-                                "Invalid allele score at row %d, column %d. Expected integer value 0/1/2, got: \"%s\".",
-                                numHeaderRows + i, numHeaderCols + j, s), ex);
+                            "Invalid allele score at row %d, column %d. Expected integer value 0/1/2, got: \"%s\".",
+                            numHeaderRows + i, numHeaderCols + j, s), ex);
                     }
                 }
 
@@ -328,13 +347,13 @@ public class SimpleBiAllelicGenotypeData extends SimpleGenotypeData
                     headers[i] = new SimpleEntityPojo(itemIdentifiers[i], itemNames[i]);
                 } else {
                     headers[i] = new SimpleEntityPojo(itemIdentifiers[i]);
-                }  
+                }
             }
 
             try {
                 // create data
-                return new SimpleBiAllelicGenotypeData(filePath.getFileName().toString(), headers, markerNames,
-                        alleleScores);
+                return new SimpleBiAllelicGenotypeData(filePath.getFileName().toString(), headers,
+                    markerNames, alleleScores);
             } catch (IllegalArgumentException ex) {
                 // convert to IO exception
                 throw new IOException(ex.getMessage());
@@ -345,21 +364,26 @@ public class SimpleBiAllelicGenotypeData extends SimpleGenotypeData
     }
 
     /**
-     * Get list of supported output formats that may be used in {@link #writeData(Path, FileType)}.
+     * Get list of supported output formats that may be used in
+     * {@link #writeData(Path, FileType)}.
      * 
-     * @return list containing {@link GenotypeDataFormat#FREQUENCY} and {@link GenotypeDataFormat#BIPARENTAL}
+     * @return list containing {@link GenotypeDataFormat#FREQUENCY} and
+     *         {@link GenotypeDataFormat#BIPARENTAL}
      */
     @Override
     public List<GenotypeDataFormat> getSupportedOutputFormats() {
         return Arrays.asList(GenotypeDataFormat.FREQUENCY, GenotypeDataFormat.BIPARENTAL);
     }
-    
+
     /**
      * Write data in format {@link GenotypeDataFormat#BIPARENTAL}.
      * 
-     * @param filePath file path
-     * @param fileType {@link FileType#TXT} or {@link FileType#CSV}
-     * @throws IOException if the data can not be written to the file
+     * @param filePath
+     *            file path
+     * @param fileType
+     *            {@link FileType#TXT} or {@link FileType#CSV}
+     * @throws IOException
+     *             if the data can not be written to the file
      */
     @Override
     public void writeData(Path filePath, FileType fileType) throws IOException {
@@ -369,28 +393,71 @@ public class SimpleBiAllelicGenotypeData extends SimpleGenotypeData
     /**
      * Write file to the given format (frequency or biparental).
      * 
-     * @param filePath file path
-     * @param fileType {@link FileType#TXT} or {@link FileType#CSV}
-     * @param format chosen output format
-     * @throws IOException if the data can not be written to the file
+     * @param filePath
+     *            file path
+     * @param fileType
+     *            {@link FileType#TXT} or {@link FileType#CSV}
+     * @param format
+     *            chosen output format
+     * @throws IOException
+     *             if the data can not be written to the file
      */
     @Override
     public void writeData(Path filePath, FileType fileType, GenotypeDataFormat format) throws IOException {
-        
-        if(format == null){
+
+        if (format == null) {
             throw new IllegalArgumentException("Output format not defined.");
         }
-        
-        switch(format){
+
+        switch (format) {
             case BIPARENTAL:
                 writeBiallelicData(filePath, fileType);
                 break;
             default:
                 super.writeData(filePath, fileType, format);
         }
-        
     }
-    
+
+    /**
+     * Write file to the given format (frequency or biparental).
+     * 
+     * @param filePath
+     *            file path
+     * @param fileType
+     *            {@link FileType#TXT} or {@link FileType#CSV}
+     * @param format
+     *            chosen output format
+     * @param solution
+     *            the solution to subset the data
+     * @param includeId
+     *            includes the id used by the solution
+     * @param includeSelected
+     *            includes selected
+     * @param includeUnselected
+     *            includes unselected
+     * @throws IOException
+     *             if the data can not be written to the file
+     */
+    @Override
+    public void writeData(Path filePath, FileType fileType, GenotypeDataFormat format,
+        SubsetSolution solution, boolean includeId, boolean includeSelected, boolean includeUnselected)
+        throws IOException {
+
+        if (format == null) {
+            throw new IllegalArgumentException("Output format not defined.");
+        }
+
+        switch (format) {
+            case BIPARENTAL:
+                writeBiallelicData(filePath, fileType, solution, includeId, includeSelected,
+                    includeUnselected);
+                break;
+            default:
+                super.writeData(filePath, fileType, format, solution, includeId, includeSelected,
+                    includeUnselected);
+        }
+    }
+
     private void writeBiallelicData(Path filePath, FileType fileType) throws IOException {
 
         // validate arguments
@@ -408,14 +475,14 @@ public class SimpleBiAllelicGenotypeData extends SimpleGenotypeData
 
         if (fileType != FileType.TXT && fileType != FileType.CSV) {
             throw new IllegalArgumentException(
-                    String.format("Only file types TXT and CSV are supported. Got: %s.", fileType));
+                String.format("Only file types TXT and CSV are supported. Got: %s.", fileType));
         }
 
         Files.createDirectories(filePath.getParent());
 
         // read data from file
         try (RowWriter writer = IOUtilities.createRowWriter(filePath, fileType,
-                TextFileRowReader.REMOVE_WHITE_SPACE)) {
+            TextFileRowReader.REMOVE_WHITE_SPACE)) {
 
             if (writer == null || !writer.ready()) {
                 throw new IOException("Can not create writer for file " + filePath + ".");
@@ -423,9 +490,9 @@ public class SimpleBiAllelicGenotypeData extends SimpleGenotypeData
 
             // write header row
             writer.writeCell(IDENTIFIERS_HEADER);
-            writer.newColumn() ;
+            writer.newColumn();
             writer.writeCell(NAMES_HEADER);
-            for(int m = 0; m < getNumberOfMarkers(); m++){
+            for (int m = 0; m < getNumberOfMarkers(); m++) {
                 writer.newColumn();
                 writer.writeCell(getMarkerName(m));
             }
@@ -436,10 +503,119 @@ public class SimpleBiAllelicGenotypeData extends SimpleGenotypeData
                 writer.newRow();
                 header = getHeader(r);
                 writer.writeCell(header.getUniqueIdentifier());
-                writer.newColumn() ;
+                writer.newColumn();
                 writer.writeCell(header.getName());
-                writer.newColumn() ;
+                writer.newColumn();
                 writer.writeRowCellsAsArray(alleleScores[r]);
+            }
+
+            writer.close();
+        }
+    }
+
+    private void writeBiallelicData(Path filePath, FileType fileType, SubsetSolution solution,
+        boolean includeId, boolean includeSelected, boolean includeUnselected) throws IOException {
+
+        // validate arguments
+        if (filePath == null) {
+            throw new IllegalArgumentException("File path not defined.");
+        }
+
+        if (filePath.toFile().exists()) {
+            throw new IOException("File already exists : " + filePath + ".");
+        }
+
+        if (fileType == null) {
+            throw new IllegalArgumentException("File type not defined.");
+        }
+
+        if (fileType != FileType.TXT && fileType != FileType.CSV) {
+            throw new IllegalArgumentException(
+                String.format("Only file types TXT and CSV are supported. Got: %s.", fileType));
+        }
+        
+        if (solution == null) {
+            throw new NullPointerException("Solution must be defined");
+        }
+
+        if (solution.getTotalNumIDs() != getSize()) {
+            throw new IllegalArgumentException("Solution size must match data size");
+        }
+
+        if (!includeSelected && !includeUnselected) {
+            throw new IllegalArgumentException("One of includeSelected or includeUnselected must be used");
+        }
+
+        Files.createDirectories(filePath.getParent());
+
+        List<Integer> ids = new ArrayList<Integer>(getIDs()) ;
+        List<Integer> allIDs = new ArrayList<Integer>(solution.getAllIDs());
+        Set<Integer> selectedIDs = new TreeSet<Integer>(solution.getSelectedIDs());
+
+        // read data from file
+        try (RowWriter writer = IOUtilities.createRowWriter(filePath, fileType,
+            TextFileRowReader.REMOVE_WHITE_SPACE)) {
+
+            if (writer == null || !writer.ready()) {
+                throw new IOException("Can not create writer for file " + filePath + ".");
+            }
+
+            // write index row
+            if (includeId) {
+                writer.writeCell(ID_HEADER);
+                writer.newColumn();
+            }
+
+            writer.writeCell(IDENTIFIERS_HEADER);
+            writer.newColumn();
+            writer.writeCell(NAMES_HEADER);
+            for (int m = 0; m < getNumberOfMarkers(); m++) {
+                writer.newColumn();
+                writer.writeCell(getMarkerName(m));
+            }
+
+            if (includeSelected && includeUnselected) {
+                writer.newColumn();
+                writer.writeCell(SELECTED_HEADER);
+            }
+
+            // write data rows
+            SimpleEntity header;
+
+            Iterator<Integer> iterator = allIDs.iterator();
+
+            if (includeSelected && includeUnselected) {
+                iterator = allIDs.iterator();
+            } else {
+                if (includeSelected) {
+                    iterator = solution.getSelectedIDs().iterator();
+                } else {
+                    if (includeUnselected) {
+                        iterator = solution.getUnselectedIDs().iterator();
+                    }
+                }
+            }
+            
+            int i = 0;
+            Integer id;
+
+            // write data rows
+            while (iterator.hasNext()) {
+
+                id = iterator.next();
+                i = ids.indexOf(id);
+                writer.newRow();
+                header = getHeader(i);
+                writer.writeCell(header.getUniqueIdentifier());
+                writer.newColumn();
+                writer.writeCell(header.getName());
+                writer.newColumn();
+                writer.writeRowCellsAsArray(alleleScores[i]);
+                
+                if (includeSelected && includeUnselected) {
+                    writer.newColumn();
+                    writer.writeCell(selectedIDs.contains(id));
+                }
             }
 
             writer.close();
