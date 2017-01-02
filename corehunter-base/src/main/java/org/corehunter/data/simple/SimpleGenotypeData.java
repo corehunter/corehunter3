@@ -64,16 +64,13 @@ public class SimpleGenotypeData extends DataPojo implements GenotypeData {
     private static final String ALLELE_NAMES_HEADER = "ALLELE";
     private static final String IDENTIFIERS_HEADER = "ID";
     private static final String SELECTED_HEADER = "SELECTED";
-    
-    private final Double[][][] alleleFrequencies; // null element means missing
-                                                  // value
+
+    private final Double[][][] alleleFrequencies; // null element means missing value
     private final int numberOfMarkers;
     private final int[] numberOfAllelesForMarker;
     private final int totalNumberAlleles;
-    private final String[] markerNames; // null element means no marker name
-                                        // assigned
-    private final String[][] alleleNames; // null element means no allele name
-                                          // assigned
+    private final String[] markerNames; // null element means no marker name assigned
+    private final String[][] alleleNames; // null element means no allele name assigned
 
     /**
      * Create data with name "Multiallelic marker data". For details of the
@@ -1022,10 +1019,10 @@ public class SimpleGenotypeData extends DataPojo implements GenotypeData {
         if (!includeSelected && !includeUnselected) {
             throw new IllegalArgumentException("One of includeSelected or includeUnselected must be used");
         }
-        
+
         Files.createDirectories(filePath.getParent());
 
-        List<Integer> ids = new ArrayList<Integer>(getIDs()) ;
+        List<Integer> ids = new ArrayList<Integer>(getIDs());
         List<Integer> allIDs = new ArrayList<Integer>(solution.getAllIDs());
         Set<Integer> selectedIDs = new TreeSet<Integer>(solution.getSelectedIDs());
 
@@ -1036,7 +1033,7 @@ public class SimpleGenotypeData extends DataPojo implements GenotypeData {
             if (writer == null || !writer.ready()) {
                 throw new IOException("Can not create writer for file " + filePath + ".");
             }
-            
+
             // write header row
             if (includeId) {
                 writer.writeCell(ID_HEADER);
@@ -1055,14 +1052,14 @@ public class SimpleGenotypeData extends DataPojo implements GenotypeData {
                     writer.writeCell(markerNames[i]);
                 }
             }
-            
+
             if (includeSelected && includeUnselected) {
                 writer.newColumn();
                 writer.writeCell(SELECTED_HEADER);
             }
 
             writer.newRow();
-            
+
             if (includeId) {
                 writer.newColumn();
             }
@@ -1070,16 +1067,16 @@ public class SimpleGenotypeData extends DataPojo implements GenotypeData {
             writer.writeCell(ALLELE_NAMES_HEADER);
 
             writer.newColumn();
-            
+
             for (int i = 0; i < alleleNames.length; ++i) {
                 writer.newColumn();
                 writer.writeRowCellsAsArray(alleleNames[i]);
             }
-        
+
             if (includeSelected && includeUnselected) {
                 writer.newColumn();
             }
-            
+
             SimpleEntity header;
 
             Iterator<Integer> iterator = allIDs.iterator();
@@ -1104,9 +1101,9 @@ public class SimpleGenotypeData extends DataPojo implements GenotypeData {
 
                 id = iterator.next();
                 i = ids.indexOf(id);
-                
+
                 writer.newRow();
-                
+
                 if (includeId) {
                     writer.writeCell(id);
                     writer.newColumn();
@@ -1124,7 +1121,7 @@ public class SimpleGenotypeData extends DataPojo implements GenotypeData {
 
                     writer.writeRowCellsAsArray(alleleFrequencies[i][j]);
                 }
-                
+
                 if (includeSelected && includeUnselected) {
                     writer.newColumn();
                     writer.writeCell(selectedIDs.contains(id));
