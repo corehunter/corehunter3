@@ -53,8 +53,6 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import uno.informatics.common.ConversionException;
-import uno.informatics.common.ConversionUtilities;
 import uno.informatics.data.DataType;
 import uno.informatics.data.Feature;
 import uno.informatics.data.ScaleType;
@@ -127,7 +125,7 @@ public class SimplePhenotypeDataTest {
         OBJECT_FEATURES_MIN_MAX_COL.add(new FeaturePojo("col4", "Col 4", new MethodPojo("col4", "Col 4",
             new ScalePojo("col4", "Col 4", DataType.BOOLEAN, ScaleType.NOMINAL, OBJECT_COL4))));
         OBJECT_FEATURES_MIN_MAX_COL.add(new FeaturePojo("col5", "Col 5", new MethodPojo("col5", "Col 5",
-            new ScalePojo("col5", "Col 5", DataType.DATE, ScaleType.NOMINAL, OBJECT_COL5))));
+            new ScalePojo("col5", "Col 5", DataType.STRING, ScaleType.NOMINAL, OBJECT_COL5))));
     }
 
     protected static final List<List<Object>> OBJECT_TABLE_AS_LIST = new ArrayList<List<Object>>();
@@ -570,9 +568,10 @@ public class SimplePhenotypeDataTest {
             while (reader1.ready() && reader2.ready()) {
                 ++line ;
                 
-                assertEquals("Line " + line + " is not the same", reader1.readLine(), reader2.readLine()) ;
+                assertEquals("Line " + line + " in file " + expected.getName() + " is not the same in file "
+                    + actual.getName(), reader1.readLine(), reader2.readLine());
             }
-            
+       
             assertFalse("expected file has more lines", reader1.ready()) ;
             assertFalse("actual file has more lines", reader2.ready()) ;
             
