@@ -35,7 +35,6 @@ import static org.junit.Assert.fail;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
@@ -83,6 +82,85 @@ public class SimplePhenotypeDataTest {
     private Object[][] expectedBounds;
     private Object[][] expectedValues;
     private String dataName;
+    
+    private static final String TEST_OUTPUT = "target/testoutput";
+
+    protected final static Object[] OBJECT_ROW1 = new Object[] {
+        1, 1.1, "R1C3", true, "12/12/2012"
+    };
+    protected final static Object[] OBJECT_ROW2 = new Object[] {
+        2, 2.2, "R2C3", false, "13/12/2012"
+    };
+    protected final static Object[] OBJECT_ROW3 = new Object[] {
+        3, 3.3, "R3C3", true, "14/12/2012"
+    };
+
+    protected final static Object[] OBJECT_COL1 = new Object[] {
+        OBJECT_ROW1[0], OBJECT_ROW2[0], OBJECT_ROW3[0]
+    };
+
+    protected final static Object[] OBJECT_COL2 = new Object[] {
+        OBJECT_ROW1[1], OBJECT_ROW2[1], OBJECT_ROW3[1]
+    };
+
+    protected final static Object[] OBJECT_COL3 = new Object[] {
+        OBJECT_ROW1[2], OBJECT_ROW2[2], OBJECT_ROW3[2]
+    };
+
+    protected final static Object[] OBJECT_COL4 = new Object[] {
+        OBJECT_ROW1[3], OBJECT_ROW2[3], OBJECT_ROW3[3]
+    };
+
+    protected final static Object[] OBJECT_COL5 = new Object[] {
+        OBJECT_ROW1[4], OBJECT_ROW2[4], OBJECT_ROW3[4]
+    };
+
+    protected static final List<Feature> OBJECT_FEATURES_MIN_MAX_COL = new ArrayList<Feature>();
+
+    static {
+        OBJECT_FEATURES_MIN_MAX_COL.add(new FeaturePojo("col1", "Col 1", new MethodPojo("col1", "Col 1",
+            new ScalePojo("col1", "Col 1", DataType.INTEGER, ScaleType.INTERVAL, 0, 4, OBJECT_COL1))));
+        OBJECT_FEATURES_MIN_MAX_COL.add(new FeaturePojo("col2", "Col 2", new MethodPojo("col2", "Col 2",
+            new ScalePojo("col2", "Col 2", DataType.DOUBLE, ScaleType.RATIO, 0.0, 4.0))));
+        OBJECT_FEATURES_MIN_MAX_COL.add(new FeaturePojo("col3", "Col 3", new MethodPojo("col3", "Col 3",
+            new ScalePojo("col3", "Col 3", DataType.STRING, ScaleType.NOMINAL, OBJECT_COL3))));
+        OBJECT_FEATURES_MIN_MAX_COL.add(new FeaturePojo("col4", "Col 4", new MethodPojo("col4", "Col 4",
+            new ScalePojo("col4", "Col 4", DataType.BOOLEAN, ScaleType.NOMINAL, OBJECT_COL4))));
+        OBJECT_FEATURES_MIN_MAX_COL.add(new FeaturePojo("col5", "Col 5", new MethodPojo("col5", "Col 5",
+            new ScalePojo("col5", "Col 5", DataType.DATE, ScaleType.NOMINAL, OBJECT_COL5))));
+    }
+
+    protected static final List<List<Object>> OBJECT_TABLE_AS_LIST = new ArrayList<List<Object>>();
+
+    static {
+        OBJECT_TABLE_AS_LIST.add(new ArrayList<Object>(OBJECT_ROW1.length));
+
+        OBJECT_TABLE_AS_LIST.get(0).add(OBJECT_ROW1[0]);
+        OBJECT_TABLE_AS_LIST.get(0).add(OBJECT_ROW1[1]);
+        OBJECT_TABLE_AS_LIST.get(0).add(OBJECT_ROW1[2]);
+        OBJECT_TABLE_AS_LIST.get(0).add(OBJECT_ROW1[3]);
+        OBJECT_TABLE_AS_LIST.get(0).add(OBJECT_ROW1[4]);
+
+        OBJECT_TABLE_AS_LIST.add(new ArrayList<Object>(OBJECT_ROW2.length));
+
+        OBJECT_TABLE_AS_LIST.get(1).add(OBJECT_ROW2[0]);
+        OBJECT_TABLE_AS_LIST.get(1).add(OBJECT_ROW2[1]);
+        OBJECT_TABLE_AS_LIST.get(1).add(OBJECT_ROW2[2]);
+        OBJECT_TABLE_AS_LIST.get(1).add(OBJECT_ROW2[3]);
+        OBJECT_TABLE_AS_LIST.get(1).add(OBJECT_ROW2[4]);
+
+        OBJECT_TABLE_AS_LIST.add(new ArrayList<Object>(OBJECT_ROW2.length));
+
+        OBJECT_TABLE_AS_LIST.get(2).add(OBJECT_ROW3[0]);
+        OBJECT_TABLE_AS_LIST.get(2).add(OBJECT_ROW3[1]);
+        OBJECT_TABLE_AS_LIST.get(2).add(OBJECT_ROW3[2]);
+        OBJECT_TABLE_AS_LIST.get(2).add(OBJECT_ROW3[3]);
+        OBJECT_TABLE_AS_LIST.get(2).add(OBJECT_ROW3[4]);
+    }
+
+    private static final int[] SOLUTION = new int[] {
+        0, 2
+    };
 
     @BeforeClass
     public static void beforeClass() {
@@ -214,85 +292,6 @@ public class SimplePhenotypeDataTest {
         }
 
     }
-
-    private static final String TEST_OUTPUT = "target/testoutput";
-
-    protected final static Object[] OBJECT_ROW1 = new Object[] {
-        1, 1.1, "R1C3", true, createDate("12/12/2012")
-    };
-    protected final static Object[] OBJECT_ROW2 = new Object[] {
-        2, 2.2, "R2C3", false, createDate("13/12/2012")
-    };
-    protected final static Object[] OBJECT_ROW3 = new Object[] {
-        3, 3.3, "R3C3", true, createDate("14/12/2012")
-    };
-
-    protected final static Object[] OBJECT_COL1 = new Object[] {
-        OBJECT_ROW1[0], OBJECT_ROW2[0], OBJECT_ROW3[0]
-    };
-
-    protected final static Object[] OBJECT_COL2 = new Object[] {
-        OBJECT_ROW1[1], OBJECT_ROW2[1], OBJECT_ROW3[1]
-    };
-
-    protected final static Object[] OBJECT_COL3 = new Object[] {
-        OBJECT_ROW1[2], OBJECT_ROW2[2], OBJECT_ROW3[2]
-    };
-
-    protected final static Object[] OBJECT_COL4 = new Object[] {
-        OBJECT_ROW1[3], OBJECT_ROW2[3], OBJECT_ROW3[3]
-    };
-
-    protected final static Object[] OBJECT_COL5 = new Object[] {
-        OBJECT_ROW1[4], OBJECT_ROW2[4], OBJECT_ROW3[4]
-    };
-
-    protected static final List<Feature> OBJECT_FEATURES_MIN_MAX_COL = new ArrayList<Feature>();
-
-    static {
-        OBJECT_FEATURES_MIN_MAX_COL.add(new FeaturePojo("col1", "Col 1", new MethodPojo("col1", "Col 1",
-            new ScalePojo("col1", "Col 1", DataType.INTEGER, ScaleType.INTERVAL, 0, 4, OBJECT_COL1))));
-        OBJECT_FEATURES_MIN_MAX_COL.add(new FeaturePojo("col2", "Col 2", new MethodPojo("col2", "Col 2",
-            new ScalePojo("col2", "Col 2", DataType.DOUBLE, ScaleType.RATIO, 0.0, 4.0))));
-        OBJECT_FEATURES_MIN_MAX_COL.add(new FeaturePojo("col3", "Col 3", new MethodPojo("col3", "Col 3",
-            new ScalePojo("col3", "Col 3", DataType.STRING, ScaleType.NOMINAL, OBJECT_COL3))));
-        OBJECT_FEATURES_MIN_MAX_COL.add(new FeaturePojo("col4", "Col 4", new MethodPojo("col4", "Col 4",
-            new ScalePojo("col4", "Col 4", DataType.BOOLEAN, ScaleType.NOMINAL, OBJECT_COL4))));
-        OBJECT_FEATURES_MIN_MAX_COL.add(new FeaturePojo("col5", "Col 5", new MethodPojo("col5", "Col 5",
-            new ScalePojo("col5", "Col 5", DataType.DATE, ScaleType.NOMINAL, OBJECT_COL5))));
-    }
-
-    protected static final List<List<Object>> OBJECT_TABLE_AS_LIST = new ArrayList<List<Object>>();
-
-    static {
-        OBJECT_TABLE_AS_LIST.add(new ArrayList<Object>(OBJECT_ROW1.length));
-
-        OBJECT_TABLE_AS_LIST.get(0).add(OBJECT_ROW1[0]);
-        OBJECT_TABLE_AS_LIST.get(0).add(OBJECT_ROW1[1]);
-        OBJECT_TABLE_AS_LIST.get(0).add(OBJECT_ROW1[2]);
-        OBJECT_TABLE_AS_LIST.get(0).add(OBJECT_ROW1[3]);
-        OBJECT_TABLE_AS_LIST.get(0).add(OBJECT_ROW1[4]);
-
-        OBJECT_TABLE_AS_LIST.add(new ArrayList<Object>(OBJECT_ROW2.length));
-
-        OBJECT_TABLE_AS_LIST.get(1).add(OBJECT_ROW2[0]);
-        OBJECT_TABLE_AS_LIST.get(1).add(OBJECT_ROW2[1]);
-        OBJECT_TABLE_AS_LIST.get(1).add(OBJECT_ROW2[2]);
-        OBJECT_TABLE_AS_LIST.get(1).add(OBJECT_ROW2[3]);
-        OBJECT_TABLE_AS_LIST.get(1).add(OBJECT_ROW2[4]);
-
-        OBJECT_TABLE_AS_LIST.add(new ArrayList<Object>(OBJECT_ROW2.length));
-
-        OBJECT_TABLE_AS_LIST.get(2).add(OBJECT_ROW3[0]);
-        OBJECT_TABLE_AS_LIST.get(2).add(OBJECT_ROW3[1]);
-        OBJECT_TABLE_AS_LIST.get(2).add(OBJECT_ROW3[2]);
-        OBJECT_TABLE_AS_LIST.get(2).add(OBJECT_ROW3[3]);
-        OBJECT_TABLE_AS_LIST.get(2).add(OBJECT_ROW3[4]);
-    }
-
-    private static final int[] SOLUTION = new int[] {
-        0, 2
-    };
 
     @Test
     public void toCsvFileWithAllIds() throws IOException {
@@ -582,18 +581,5 @@ public class SimplePhenotypeDataTest {
         } catch (Exception e) {
             fail(e.getMessage()) ;
         } 
-    }
-
-    /**
-     * @param string
-     *            a data as a string
-     * @return a data from string
-     */
-    private static Object createDate(String value) {
-        try {
-            return ConversionUtilities.convertToDate(value);
-        } catch (ConversionException e) {
-            return null;
-        }
     }
 }
