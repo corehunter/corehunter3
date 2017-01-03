@@ -28,10 +28,15 @@ import static org.corehunter.tests.TestData.PHENOTYPIC_TRAIT_NAMES;
 import static org.corehunter.tests.TestData.PHENOTYPIC_TRAIT_VALUES;
 import static org.corehunter.tests.TestData.SET;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
@@ -42,7 +47,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.TreeSet;
 
-import org.apache.commons.io.FileUtils;
+///import org.apache.commons.io.FileUtils;
 import org.corehunter.data.simple.SimplePhenotypeData;
 import org.jamesframework.core.subset.SubsetSolution;
 import org.junit.AfterClass;
@@ -321,9 +326,9 @@ public class SimplePhenotypeDataTest {
 
         phenotypeData.writeData(path, FileType.CSV, solution, false, true, true);
 
-        assertTrue("Output 1 is not correct!", FileUtils.contentEquals(new File(
+        assertFileEquals("Output 1 is not correct!", new File(
             SimplePhenotypeDataTest.class.getResource("/phenotypes/out/Phenotype-Csv-AllIds1.csv").getPath()),
-            path.toFile()));
+            path.toFile());
 
         dataName = "out2.csv";
 
@@ -335,9 +340,9 @@ public class SimplePhenotypeDataTest {
 
         phenotypeData.writeData(path, FileType.CSV, solution, true, true, true);
 
-        assertTrue("Output 2 is not correct!", FileUtils.contentEquals(new File(
+        assertFileEquals("Output 2 is not correct!", new File(
             SimplePhenotypeDataTest.class.getResource("/phenotypes/out/Phenotype-Csv-AllIds2.csv").getPath()),
-            path.toFile()));
+            path.toFile());
 
         // solution in reverse natural order
         solution = new SubsetSolution(new TreeSet<Integer>(ids), Comparator.reverseOrder());
@@ -356,9 +361,9 @@ public class SimplePhenotypeDataTest {
 
         phenotypeData.writeData(path, FileType.CSV, solution, false, true, true);
 
-        assertTrue("Output 3 is not correct!", FileUtils.contentEquals(new File(
+        assertFileEquals("Output 3 is not correct!", new File(
             SimplePhenotypeDataTest.class.getResource("/phenotypes/out/Phenotype-Csv-AllIds3.csv").getPath()),
-            path.toFile()));
+            path.toFile());
 
         dataName = "out4.csv";
 
@@ -370,9 +375,9 @@ public class SimplePhenotypeDataTest {
 
         phenotypeData.writeData(path, FileType.CSV, solution, true, true, true);
 
-        assertTrue("Output 4 is not correct!", FileUtils.contentEquals(new File(
+        assertFileEquals("Output 4 is not correct!", new File(
             SimplePhenotypeDataTest.class.getResource("/phenotypes/out/Phenotype-Csv-AllIds4.csv").getPath()),
-            path.toFile()));
+            path.toFile());
     }
 
     @Test
@@ -407,11 +412,10 @@ public class SimplePhenotypeDataTest {
 
         phenotypeData.writeData(path, FileType.CSV, solution, false, true, false);
 
-        assertTrue("Output 1 is not correct!",
-            FileUtils.contentEquals(
+        assertFileEquals("Output 1 is not correct!",
                 new File(SimplePhenotypeDataTest.class
                     .getResource("/phenotypes/out/Phenotype-Csv-SelectedlIds1.csv").getPath()),
-                path.toFile()));
+                path.toFile());
 
         dataName = "out2.csv";
 
@@ -423,11 +427,10 @@ public class SimplePhenotypeDataTest {
 
         phenotypeData.writeData(path, FileType.CSV, solution, true, true, false);
 
-        assertTrue("Output 2 is not correct!",
-            FileUtils.contentEquals(
+        assertFileEquals("Output 2 is not correct!",   
                 new File(SimplePhenotypeDataTest.class
                     .getResource("/phenotypes/out/Phenotype-Csv-SelectedlIds2.csv").getPath()),
-                path.toFile()));
+                path.toFile());
 
         // solution in reverse natural order
         solution = new SubsetSolution(new TreeSet<Integer>(ids), Comparator.reverseOrder());
@@ -446,11 +449,10 @@ public class SimplePhenotypeDataTest {
 
         phenotypeData.writeData(path, FileType.CSV, solution, false, true, false);
 
-        assertTrue("Output 3 is not correct!",
-            FileUtils.contentEquals(
+        assertFileEquals("Output 3 is not correct!",    
                 new File(SimplePhenotypeDataTest.class
                     .getResource("/phenotypes/out/Phenotype-Csv-SelectedlIds3.csv").getPath()),
-                path.toFile()));
+                path.toFile());
 
         dataName = "out4.csv";
 
@@ -462,11 +464,10 @@ public class SimplePhenotypeDataTest {
 
         phenotypeData.writeData(path, FileType.CSV, solution, true, true, false);
 
-        assertTrue("Output 4 is not correct!",
-            FileUtils.contentEquals(
+        assertFileEquals("Output 4 is not correct!",
                 new File(SimplePhenotypeDataTest.class
                     .getResource("/phenotypes/out/Phenotype-Csv-SelectedlIds4.csv").getPath()),
-                path.toFile()));
+                path.toFile());
     }
 
     @Test
@@ -501,11 +502,10 @@ public class SimplePhenotypeDataTest {
 
         phenotypeData.writeData(path, FileType.CSV, solution, false, false, true);
 
-        assertTrue("Output 1 is not correct!",
-            FileUtils.contentEquals(
+        assertFileEquals("Output 1 is not correct!",
                 new File(SimplePhenotypeDataTest.class
                     .getResource("/phenotypes/out/Phenotype-Csv-UnselectedlIds1.csv").getPath()),
-                path.toFile()));
+                path.toFile());
 
         dataName = "out2.csv";
 
@@ -517,11 +517,10 @@ public class SimplePhenotypeDataTest {
 
         phenotypeData.writeData(path, FileType.CSV, solution, true, false, true);
 
-        assertTrue("Output 2 is not correct!",
-            FileUtils.contentEquals(
+        assertFileEquals("Output 2 is not correct!",
                 new File(SimplePhenotypeDataTest.class
                     .getResource("/phenotypes/out/Phenotype-Csv-UnselectedlIds2.csv").getPath()),
-                path.toFile()));
+                path.toFile());
 
         // solution in reverse natural order
         solution = new SubsetSolution(new TreeSet<Integer>(ids), Comparator.reverseOrder());
@@ -540,11 +539,10 @@ public class SimplePhenotypeDataTest {
 
         phenotypeData.writeData(path, FileType.CSV, solution, false, false, true);
 
-        assertTrue("Output 3 is not correct!",
-            FileUtils.contentEquals(
+        assertFileEquals("Output 3 is not correct!",
                 new File(SimplePhenotypeDataTest.class
                     .getResource("/phenotypes/out/Phenotype-Csv-UnselectedlIds3.csv").getPath()),
-                path.toFile()));
+                path.toFile());
 
         dataName = "out4.csv";
 
@@ -556,11 +554,34 @@ public class SimplePhenotypeDataTest {
 
         phenotypeData.writeData(path, FileType.CSV, solution, true, false, true);
 
-        assertTrue("Output 4 is not correct!",
-            FileUtils.contentEquals(
+        assertFileEquals("Output 4 is not correct!",
                 new File(SimplePhenotypeDataTest.class
                     .getResource("/phenotypes/out/Phenotype-Csv-UnselectedlIds4.csv").getPath()),
-                path.toFile()));
+                path.toFile());
+    }
+    
+    private void assertFileEquals(String string, File expected, File actual) {
+
+        try {
+            BufferedReader reader1 = new BufferedReader(new FileReader(expected)) ;
+            BufferedReader reader2 = new BufferedReader(new FileReader(actual)) ;
+            
+            int line = 0 ;
+            
+            while (reader1.ready() && reader2.ready()) {
+                ++line ;
+                
+                assertEquals("Line " + line + " is not the same", reader1.readLine(), reader2.readLine()) ;
+            }
+            
+            assertFalse("expected file has more lines", reader1.ready()) ;
+            assertFalse("actual file has more lines", reader2.ready()) ;
+            
+            reader1.close(); 
+            reader2.close(); 
+        } catch (Exception e) {
+            fail(e.getMessage()) ;
+        } 
     }
 
     /**
