@@ -1019,7 +1019,8 @@ public class FileBasedDatasetServicesTest {
 
             assertNotNull("Genotypic Data not found", addedData.getGenotypicData());
 
-            SimplePhenotypeData phenotypicData = SimplePhenotypeData.readPhenotypeData(phenotypicDataPath, FileType.CSV);
+            SimplePhenotypeData phenotypicData = 
+                SimplePhenotypeData.readPhenotypeData(phenotypicDataPath, FileType.CSV);
 
             phenotypicData.setUniqueIdentifier(DATA_UID);
             phenotypicData.setName(DATASET_NAME);
@@ -1087,7 +1088,8 @@ public class FileBasedDatasetServicesTest {
 
             assertNotNull("Restored Genotypic Data not found", restoredData.getGenotypicData());
 
-            SimplePhenotypeData phenotypicData = SimplePhenotypeData.readPhenotypeData(phenotypicDataPath, FileType.CSV);
+            SimplePhenotypeData phenotypicData = 
+                SimplePhenotypeData.readPhenotypeData(phenotypicDataPath, FileType.CSV);
 
             phenotypicData.setUniqueIdentifier(DATA_UID);
             phenotypicData.setName(DATASET_NAME);
@@ -1153,7 +1155,8 @@ public class FileBasedDatasetServicesTest {
 
             assertNotNull("Distances Data not found", addedData.getDistancesData());
 
-            SimplePhenotypeData phenotypicData = SimplePhenotypeData.readPhenotypeData(phenotypicDataPath, FileType.CSV);
+            SimplePhenotypeData phenotypicData = 
+                SimplePhenotypeData.readPhenotypeData(phenotypicDataPath, FileType.CSV);
 
             phenotypicData.setUniqueIdentifier(DATA_UID);
             phenotypicData.setName(DATASET_NAME);
@@ -1234,7 +1237,8 @@ public class FileBasedDatasetServicesTest {
 
             assertNotNull("Restored Distances Data not found", restoredData.getDistancesData());
 
-            SimplePhenotypeData phenotypicData = SimplePhenotypeData.readPhenotypeData(phenotypicDataPath, FileType.CSV);
+            SimplePhenotypeData phenotypicData = 
+                SimplePhenotypeData.readPhenotypeData(phenotypicDataPath, FileType.CSV);
 
             phenotypicData.setUniqueIdentifier(DATA_UID);
             phenotypicData.setName(DATASET_NAME);

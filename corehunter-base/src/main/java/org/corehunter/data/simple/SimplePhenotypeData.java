@@ -45,7 +45,7 @@ import uno.informatics.data.utils.DataOption;
 /**
  * @author Guy Davenport, Herman De Beukelaer
  */
-public class SimplePhenotypeData extends ArrayFeatureData implements PhenotypeData{
+public class SimplePhenotypeData extends ArrayFeatureData implements PhenotypeData {
 
     private static final String ID_HEADER = "X";
     private static final String SELECTED_HEADER = "SELECTED";
@@ -54,7 +54,7 @@ public class SimplePhenotypeData extends ArrayFeatureData implements PhenotypeDa
      * 
      */
     private static final long serialVersionUID = 1L;
- 
+
     public SimplePhenotypeData(String name, Feature[] features, Object[][] values) {
         super(name, features, values);
     }
@@ -93,7 +93,8 @@ public class SimplePhenotypeData extends ArrayFeatureData implements PhenotypeDa
     }
 
     public SimplePhenotypeData(ArrayFeatureData data) {
-        super (data.getUniqueIdentifier(), data.getName(), data.getFeatures(), data.getRowHeaders(), data.getValues()) ;
+        super(data.getUniqueIdentifier(), data.getName(), data.getFeatures(), data.getRowHeaders(),
+            data.getValues());
     }
 
     /**
@@ -117,10 +118,9 @@ public class SimplePhenotypeData extends ArrayFeatureData implements PhenotypeDa
      * @throws IOException
      *             if the file can not be written
      */
-    public void writeData(Path filePath, FileType fileType,
-        SubsetSolution solution, boolean includeId, boolean includeSelected, boolean includeUnselected)
-        throws IOException {
-        
+    public void writeData(Path filePath, FileType fileType, SubsetSolution solution, boolean includeId,
+        boolean includeSelected, boolean includeUnselected) throws IOException {
+
         // validate arguments
 
         if (filePath == null) {
@@ -137,9 +137,9 @@ public class SimplePhenotypeData extends ArrayFeatureData implements PhenotypeDa
 
         if (fileType != FileType.TXT && fileType != FileType.CSV) {
             throw new IllegalArgumentException(
-                    String.format("Only file types TXT and CSV are supported. Got: %s.", fileType));
+                String.format("Only file types TXT and CSV are supported. Got: %s.", fileType));
         }
-        
+
         if (solution == null) {
             throw new NullPointerException("Solution must be defined");
         }
@@ -151,16 +151,16 @@ public class SimplePhenotypeData extends ArrayFeatureData implements PhenotypeDa
         if (!includeSelected && !includeUnselected) {
             throw new IllegalArgumentException("One of includeSelected or includeUnselected must be used");
         }
-        
+
         Files.createDirectories(filePath.getParent());
-        
+
         List<Integer> ids = new ArrayList<Integer>(getIDs());
         List<Integer> allIDs = new ArrayList<Integer>(solution.getAllIDs());
         Set<Integer> selectedIDs = new TreeSet<Integer>(solution.getSelectedIDs());
 
         RowWriter writer = IOUtilities.createRowWriter(filePath, fileType, TextFileRowReader.ROWS_SAME_SIZE,
-                    TextFileRowReader.REMOVE_WHITE_SPACE);
-        
+            TextFileRowReader.REMOVE_WHITE_SPACE);
+
         // write header row
         if (includeId) {
             writer.writeCell(ID_HEADER);
@@ -168,115 +168,113 @@ public class SimplePhenotypeData extends ArrayFeatureData implements PhenotypeDa
         }
 
         writer.writeCell(ID);
-        writer.newColumn() ;
+        writer.newColumn();
         writer.writeCell(NAME);
 
-        Iterator<Feature> iterator = getFeatures().iterator() ;
-        
-        Feature feature ;
-        
-        while (iterator.hasNext()){
-            writer.newColumn() ;
-            feature = iterator.next() ;
-            writer.writeCell(feature.getUniqueIdentifier()); 
+        Iterator<Feature> iterator = getFeatures().iterator();
+
+        Feature feature;
+
+        while (iterator.hasNext()) {
+            writer.newColumn();
+            feature = iterator.next();
+            writer.writeCell(feature.getUniqueIdentifier());
         }
-        
+
         if (includeSelected && includeUnselected) {
             writer.newColumn();
             writer.writeCell(SELECTED_HEADER);
         }
-        
-        writer.newRow() ;
-        
+
+        writer.newRow();
+
         if (includeId) {
-            writer.newColumn() ;
+            writer.newColumn();
         }
-        
+
         writer.writeCell(NAME);
-        writer.newColumn() ;
+        writer.newColumn();
 
-        iterator = getFeatures().iterator() ;
-         
-        while (iterator.hasNext()){
-            writer.newColumn() ;
-            feature = iterator.next() ;
-            writer.writeCell(feature.getName()); 
+        iterator = getFeatures().iterator();
+
+        while (iterator.hasNext()) {
+            writer.newColumn();
+            feature = iterator.next();
+            writer.writeCell(feature.getName());
         }
-        
+
         if (includeSelected && includeUnselected) {
             writer.newColumn();
         }
- 
-        writer.newRow() ;
-        
+
+        writer.newRow();
+
         if (includeId) {
-            writer.newColumn() ;
+            writer.newColumn();
         }
-        
+
         writer.writeCell(TYPE);
-        writer.newColumn() ;
-        
-        iterator = getFeatures().iterator() ;
-        
-        while (iterator.hasNext()){
-            writer.newColumn() ;
-            feature = iterator.next() ;
-            writer.writeCell(
-                    feature.getMethod().getScale().getScaleType().getAbbreviation()
-                  + feature.getMethod().getScale().getDataType().getAbbreviation()
-            ); 
+        writer.newColumn();
+
+        iterator = getFeatures().iterator();
+
+        while (iterator.hasNext()) {
+            writer.newColumn();
+            feature = iterator.next();
+            writer.writeCell(feature.getMethod().getScale().getScaleType().getAbbreviation()
+                + feature.getMethod().getScale().getDataType().getAbbreviation());
         }
 
         if (includeSelected && includeUnselected) {
             writer.newColumn();
         }
-        
-        writer.newRow() ;
-        
+
+        writer.newRow();
+
         if (includeId) {
-            writer.newColumn() ;
+            writer.newColumn();
         }
-        
+
         writer.writeCell(MIN);
-        writer.newColumn() ;
-        
-        iterator = getFeatures().iterator() ;
-        
-        while (iterator.hasNext()){
-            writer.newColumn() ;
-            feature = iterator.next() ;
-            writer.writeCell(feature.getMethod().getScale().getMinimumValue()); 
-        }
- 
-        if (includeSelected && includeUnselected) {
+        writer.newColumn();
+
+        iterator = getFeatures().iterator();
+
+        while (iterator.hasNext()) {
             writer.newColumn();
-        }
-        
-        writer.newRow() ;
-        
-        if (includeId) {
-            writer.newColumn() ;
-        }
-        
-        writer.writeCell(MAX);
-        writer.newColumn() ;
-        
-        iterator = getFeatures().iterator() ;
-        
-        while (iterator.hasNext()){
-            writer.newColumn() ;
-            feature = iterator.next() ;
-            writer.writeCell(feature.getMethod().getScale().getMaximumValue()); 
+            feature = iterator.next();
+            writer.writeCell(feature.getMethod().getScale().getMinimumValue());
         }
 
-        FeatureDataRow row ;
-        
         if (includeSelected && includeUnselected) {
             writer.newColumn();
         }
-        
+
+        writer.newRow();
+
+        if (includeId) {
+            writer.newColumn();
+        }
+
+        writer.writeCell(MAX);
+        writer.newColumn();
+
+        iterator = getFeatures().iterator();
+
+        while (iterator.hasNext()) {
+            writer.newColumn();
+            feature = iterator.next();
+            writer.writeCell(feature.getMethod().getScale().getMaximumValue());
+        }
+
+        FeatureDataRow row;
+
+        if (includeSelected && includeUnselected) {
+            writer.newColumn();
+        }
+
         SimpleEntity header;
-        
+
         Iterator<Integer> iterator2 = allIDs.iterator();
 
         if (includeSelected && includeUnselected) {
@@ -290,41 +288,42 @@ public class SimplePhenotypeData extends ArrayFeatureData implements PhenotypeDa
                 }
             }
         }
-        
+
         int i = 0;
         Integer id;
-        
-        while (iterator2.hasNext()){
-            
+
+        while (iterator2.hasNext()) {
+
             id = iterator2.next();
             i = ids.indexOf(id);
-            
-            writer.newRow() ;
-            
+
+            writer.newRow();
+
             if (includeId) {
                 writer.writeCell(id);
                 writer.newColumn();
             }
-            
+
             header = getHeader(i);
-            
-            row = getRow(i) ;
+
+            row = getRow(i);
             writer.writeCell(header.getUniqueIdentifier());
-            writer.newColumn() ;
+            writer.newColumn();
             writer.writeCell(header.getName());
-            writer.newColumn() ;
+            writer.newColumn();
             writer.writeRowCells(row.getValues());
-            
+
             if (includeSelected && includeUnselected) {
                 writer.newColumn();
                 writer.writeCell(selectedIDs.contains(id));
             }
         }
-           
-        writer.close(); 
+
+        writer.close();
     }
-    
-    public static final SimplePhenotypeData readPhenotypeData(Path filePath, FileType type, DataOption... options) throws IOException {
+
+    public static final SimplePhenotypeData readPhenotypeData(Path filePath, FileType type,
+        DataOption... options) throws IOException {
         return new SimplePhenotypeData(ArrayFeatureData.readData(filePath, type, options));
     }
 }
