@@ -21,11 +21,11 @@ package org.corehunter.listener;
 
 import java.io.PrintStream;
 
+import org.corehunter.CoreHunterListener;
 import org.jamesframework.core.problems.constraints.validations.Validation;
 import org.jamesframework.core.problems.objectives.evaluations.Evaluation;
 import org.jamesframework.core.search.Search;
 import org.jamesframework.core.subset.SubsetSolution;
-import org.corehunter.CoreHunterListener;
 
 public class SimpleCoreHunterListener implements CoreHunterListener {
 

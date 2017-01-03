@@ -19,33 +19,30 @@
 
 package org.corehunter.tests.objectives.distance.measures;
 
+import static org.corehunter.tests.TestData.GOWER_DISTANCES_MISSING_VALUES_CEIL;
+import static org.corehunter.tests.TestData.GOWER_DISTANCES_MISSING_VALUES_FLOOR;
 import static org.corehunter.tests.TestData.PRECISION;
+import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.Arrays;
 
-import org.corehunter.data.DistanceMatrixData;
 import org.corehunter.data.CoreHunterData;
+import org.corehunter.data.DistanceMatrixData;
+import org.corehunter.data.PhenotypeData;
 import org.corehunter.data.simple.SimpleDistanceMatrixData;
+import org.corehunter.data.simple.SimplePhenotypeData;
 import org.corehunter.objectives.distance.measures.GowerDistance;
 import org.corehunter.objectives.distance.measures.MissingValuesPolicy;
+import org.junit.Test;
 
-import static org.corehunter.tests.TestData.GOWER_DISTANCES_MISSING_VALUES_CEIL;
-import static org.corehunter.tests.TestData.GOWER_DISTANCES_MISSING_VALUES_FLOOR;
-
-import uno.informatics.data.io.FileType;
 import uno.informatics.data.DataType;
 import uno.informatics.data.Feature;
 import uno.informatics.data.ScaleType;
 import uno.informatics.data.dataset.DatasetException;
-import uno.informatics.data.dataset.FeatureData;
-import uno.informatics.data.feature.array.ArrayFeatureData;
+import uno.informatics.data.io.FileType;
 import uno.informatics.data.pojo.SimpleFeaturePojo;
-
-import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * @author Guy Davenport, Herman De Beukelaer
@@ -86,7 +83,7 @@ public class GowerDistanceTest {
     @Test
     public void testInMemory() {
 
-        FeatureData pheno = new ArrayFeatureData("in-memory", FEATURES, DATA);
+        PhenotypeData pheno = new SimplePhenotypeData("in-memory", FEATURES, DATA);
         CoreHunterData data = new CoreHunterData(pheno);
         
         GowerDistance distanceMetric = new GowerDistance();
@@ -107,7 +104,7 @@ public class GowerDistanceTest {
     @Test
     public void testFromFile() throws IOException, DatasetException {
         
-        FeatureData pheno = ArrayFeatureData.readData(
+        PhenotypeData pheno = SimplePhenotypeData.readPhenotypeData(
                 Paths.get(GowerDistanceTest.class.getResource(DATA_FILE).getPath()),
                 FileType.CSV
         );
@@ -132,7 +129,7 @@ public class GowerDistanceTest {
     @Test
     public void testFromFileWithMissingValues() throws IOException, DatasetException {
         
-        FeatureData pheno = ArrayFeatureData.readData(
+        PhenotypeData pheno = SimplePhenotypeData.readPhenotypeData(
                 Paths.get(GowerDistanceTest.class.getResource(DATA_FILE_MISSING_VALUES).getPath()),
                 FileType.CSV
         );
@@ -174,7 +171,7 @@ public class GowerDistanceTest {
     @Test
     public void testFromLargeFile() throws IOException, DatasetException {
         
-        FeatureData pheno = ArrayFeatureData.readData(
+        PhenotypeData pheno = SimplePhenotypeData.readPhenotypeData(
                 Paths.get(GowerDistanceTest.class.getResource(DATA_FILE_LARGE).getPath()),
                 FileType.CSV
         );

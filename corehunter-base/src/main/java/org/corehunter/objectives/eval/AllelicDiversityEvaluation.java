@@ -22,8 +22,9 @@ package org.corehunter.objectives.eval;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Set;
-import org.jamesframework.core.problems.objectives.evaluations.Evaluation;
+
 import org.corehunter.data.GenotypeData;
+import org.jamesframework.core.problems.objectives.evaluations.Evaluation;
 
 /**
  * @author Herman De Beukelaer

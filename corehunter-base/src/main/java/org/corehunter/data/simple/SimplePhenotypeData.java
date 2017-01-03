@@ -40,6 +40,7 @@ import uno.informatics.data.SimpleEntity;
 import uno.informatics.data.dataset.FeatureDataRow;
 import uno.informatics.data.feature.array.ArrayFeatureData;
 import uno.informatics.data.io.FileType;
+import uno.informatics.data.utils.DataOption;
 
 /**
  * @author Guy Davenport, Herman De Beukelaer
@@ -89,6 +90,10 @@ public class SimplePhenotypeData extends ArrayFeatureData implements PhenotypeDa
     public SimplePhenotypeData(String uniqueIdentifier, String name, List<? extends Feature> features,
         SimpleEntity[] rowHeaders, Object[][] values) {
         super(uniqueIdentifier, name, features, rowHeaders, values);
+    }
+
+    public SimplePhenotypeData(ArrayFeatureData data) {
+        super (data.getUniqueIdentifier(), data.getName(), data.getFeatures(), data.getRowHeaders(), data.getValues()) ;
     }
 
     /**
@@ -317,5 +322,9 @@ public class SimplePhenotypeData extends ArrayFeatureData implements PhenotypeDa
         }
            
         writer.close(); 
+    }
+    
+    public static final SimplePhenotypeData readPhenotypeData(Path filePath, FileType type, DataOption... options) throws IOException {
+        return new SimplePhenotypeData(ArrayFeatureData.readData(filePath, type, options));
     }
 }

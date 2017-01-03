@@ -30,18 +30,18 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.corehunter.data.BiAllelicGenotypeData;
 import org.corehunter.data.GenotypeDataFormat;
 import org.corehunter.util.StringUtils;
 import org.jamesframework.core.subset.SubsetSolution;
 
-import uno.informatics.data.io.FileType;
 import uno.informatics.common.io.IOUtilities;
 import uno.informatics.common.io.RowReader;
 import uno.informatics.common.io.RowWriter;
 import uno.informatics.common.io.text.TextFileRowReader;
 import uno.informatics.data.SimpleEntity;
+import uno.informatics.data.io.FileType;
 import uno.informatics.data.pojo.SimpleEntityPojo;
-import org.corehunter.data.BiAllelicGenotypeData;
 
 /**
  * @author Guy Davenport, Herman De Beukelaer

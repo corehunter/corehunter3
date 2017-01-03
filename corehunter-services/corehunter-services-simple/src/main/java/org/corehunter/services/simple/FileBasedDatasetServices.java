@@ -40,6 +40,7 @@ import org.corehunter.data.GenotypeDataFormat;
 import org.corehunter.data.simple.SimpleBiAllelicGenotypeData;
 import org.corehunter.data.simple.SimpleDistanceMatrixData;
 import org.corehunter.data.simple.SimpleGenotypeData;
+import org.corehunter.data.simple.SimplePhenotypeData;
 import org.corehunter.services.DatasetServices;
 
 import com.thoughtworks.xstream.XStream;
@@ -50,7 +51,6 @@ import uno.informatics.data.Data;
 import uno.informatics.data.Dataset;
 import uno.informatics.data.SimpleEntity;
 import uno.informatics.data.dataset.DatasetException;
-import uno.informatics.data.feature.array.ArrayFeatureData;
 import uno.informatics.data.io.FileType;
 import uno.informatics.data.pojo.DatasetPojo;
 import uno.informatics.data.pojo.SimpleEntityPojo;
@@ -449,10 +449,10 @@ public class FileBasedDatasetServices implements DatasetServices {
                     throw e;
                 }
 
-                ArrayFeatureData arrayFeatureData;
+                SimplePhenotypeData phenotypeData;
 
                 try {
-                    arrayFeatureData = ArrayFeatureData.readData(copyPath, fileType);
+                    phenotypeData = SimplePhenotypeData.readPhenotypeData(copyPath, fileType);
                 } catch (IOException e) {
                     Files.deleteIfExists(copyPath);
                     throw e;
@@ -460,17 +460,17 @@ public class FileBasedDatasetServices implements DatasetServices {
 
                 // TODO write data method should be on interface?
                 try {
-                    arrayFeatureData.writeData(internalPath, FileType.TXT);
+                    phenotypeData.writeData(internalPath, FileType.TXT);
                 } catch (IOException e) {
                     Files.deleteIfExists(copyPath);
                     throw e;
                 }
 
                 if (coreHunterData != null) {
-                    coreHunterData = new CoreHunterData(coreHunterData.getGenotypicData(), arrayFeatureData,
+                    coreHunterData = new CoreHunterData(coreHunterData.getGenotypicData(), phenotypeData,
                             coreHunterData.getDistancesData());
                 } else {
-                    coreHunterData = new CoreHunterData(null, arrayFeatureData, null);
+                    coreHunterData = new CoreHunterData(null, phenotypeData, null);
                 }
 
                 dataCache.put(datasetId, coreHunterData);
@@ -595,9 +595,9 @@ public class FileBasedDatasetServices implements DatasetServices {
 
                     originalPath = Paths.get(getPath().toString(), PHENOTYPIC_PATH, datasetId + getSuffix(fileType));
 
-                    ArrayFeatureData arrayFeatureData = ArrayFeatureData.readData(originalPath, fileType);
+                    SimplePhenotypeData phenotypeData = SimplePhenotypeData.readPhenotypeData(originalPath, fileType);
 
-                    return arrayFeatureData;
+                    return phenotypeData;
                 case DISTANCES:
 
                     fileType = getFileType(path, DISTANCES_PATH, datasetId);
@@ -787,7 +787,7 @@ public class FileBasedDatasetServices implements DatasetServices {
     private CoreHunterData readCoreHunterDataInternal(String datasetId) throws IOException {
 
         GenotypeData genotypicData = null;
-        ArrayFeatureData phenotypicData = null;
+        SimplePhenotypeData phenotypicData = null;
         SimpleDistanceMatrixData distance = null;
 
         Path path = Paths.get(getPath().toString(), GENOTYPIC_PATH, datasetId + SUFFIX);
@@ -818,7 +818,7 @@ public class FileBasedDatasetServices implements DatasetServices {
         path = Paths.get(getPath().toString(), PHENOTYPIC_PATH, datasetId + SUFFIX);
 
         if (Files.exists(path)) {
-            phenotypicData = ArrayFeatureData.readData(path, FileType.TXT);
+            phenotypicData = SimplePhenotypeData.readPhenotypeData(path, FileType.TXT);
             
             dataPath = Paths.get(getPath().toString(), PHENOTYPIC_PATH,
                     datasetId + DATA_SUFFIX);

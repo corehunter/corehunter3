@@ -19,25 +19,23 @@
 
 package org.corehunter.tests.objectives.distance.measures;
 
+import static org.corehunter.tests.TestData.ALLELE_FREQUENCIES;
 import static org.corehunter.tests.TestData.ALLELE_NAMES;
+import static org.corehunter.tests.TestData.HEADERS_NON_UNIQUE_NAMES;
 import static org.corehunter.tests.TestData.MARKER_NAMES;
 import static org.corehunter.tests.TestData.MODIFIED_ROGERS_DISTANCES;
 import static org.corehunter.tests.TestData.MODIFIED_ROGERS_DISTANCES_CEIL_MISSING;
 import static org.corehunter.tests.TestData.NAME;
 import static org.corehunter.tests.TestData.PRECISION;
-import static org.corehunter.tests.TestData.ALLELE_FREQUENCIES;
-import static org.corehunter.tests.TestData.HEADERS_NON_UNIQUE_NAMES;
-
-import org.corehunter.data.simple.SimpleGenotypeData;
-import org.corehunter.objectives.distance.measures.ModifiedRogersDistance;
-import org.corehunter.data.CoreHunterData;
+import static org.junit.Assert.assertEquals;
 
 import java.util.Iterator;
+
+import org.corehunter.data.CoreHunterData;
+import org.corehunter.data.simple.SimpleGenotypeData;
 import org.corehunter.objectives.distance.measures.MissingValuesPolicy;
-
+import org.corehunter.objectives.distance.measures.ModifiedRogersDistance;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * @author Guy Davenport, Herman De Beukelaer

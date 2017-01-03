@@ -41,6 +41,7 @@ import org.corehunter.data.GenotypeDataFormat;
 import org.corehunter.data.simple.SimpleBiAllelicGenotypeData;
 import org.corehunter.data.simple.SimpleDistanceMatrixData;
 import org.corehunter.data.simple.SimpleGenotypeData;
+import org.corehunter.data.simple.SimplePhenotypeData;
 import org.corehunter.services.simple.FileBasedDatasetServices;
 import org.junit.Test;
 
@@ -50,7 +51,6 @@ import uno.informatics.data.Feature;
 import uno.informatics.data.SimpleEntity;
 import uno.informatics.data.dataset.FeatureData;
 import uno.informatics.data.dataset.FeatureDataRow;
-import uno.informatics.data.feature.array.ArrayFeatureData;
 import uno.informatics.data.io.FileType;
 import uno.informatics.data.pojo.DatasetPojo;
 import uno.informatics.data.pojo.OntologyTermPojo;
@@ -314,7 +314,7 @@ public class FileBasedDatasetServicesTest {
 
             assertNotNull("Phenotypic Data not found", addedData.getPhenotypicData());
 
-            ArrayFeatureData data = ArrayFeatureData.readData(dataPath, FileType.CSV);
+            SimplePhenotypeData data = SimplePhenotypeData.readPhenotypeData(dataPath, FileType.CSV);
 
             data.setUniqueIdentifier(DATA_UID);
             data.setName(DATASET_NAME);
@@ -366,7 +366,7 @@ public class FileBasedDatasetServicesTest {
 
             assertNotNull("Restored Phenotypic Data not found", restoredData.getPhenotypicData());
 
-            ArrayFeatureData data = ArrayFeatureData.readData(dataPath, FileType.CSV);
+            SimplePhenotypeData data = SimplePhenotypeData.readPhenotypeData(dataPath, FileType.CSV);
 
             data.setUniqueIdentifier(DATA_UID);
             data.setName(DATASET_NAME);
@@ -1019,7 +1019,7 @@ public class FileBasedDatasetServicesTest {
 
             assertNotNull("Genotypic Data not found", addedData.getGenotypicData());
 
-            ArrayFeatureData phenotypicData = ArrayFeatureData.readData(phenotypicDataPath, FileType.CSV);
+            SimplePhenotypeData phenotypicData = SimplePhenotypeData.readPhenotypeData(phenotypicDataPath, FileType.CSV);
 
             phenotypicData.setUniqueIdentifier(DATA_UID);
             phenotypicData.setName(DATASET_NAME);
@@ -1087,7 +1087,7 @@ public class FileBasedDatasetServicesTest {
 
             assertNotNull("Restored Genotypic Data not found", restoredData.getGenotypicData());
 
-            ArrayFeatureData phenotypicData = ArrayFeatureData.readData(phenotypicDataPath, FileType.CSV);
+            SimplePhenotypeData phenotypicData = SimplePhenotypeData.readPhenotypeData(phenotypicDataPath, FileType.CSV);
 
             phenotypicData.setUniqueIdentifier(DATA_UID);
             phenotypicData.setName(DATASET_NAME);
@@ -1153,7 +1153,7 @@ public class FileBasedDatasetServicesTest {
 
             assertNotNull("Distances Data not found", addedData.getDistancesData());
 
-            ArrayFeatureData phenotypicData = ArrayFeatureData.readData(phenotypicDataPath, FileType.CSV);
+            SimplePhenotypeData phenotypicData = SimplePhenotypeData.readPhenotypeData(phenotypicDataPath, FileType.CSV);
 
             phenotypicData.setUniqueIdentifier(DATA_UID);
             phenotypicData.setName(DATASET_NAME);
@@ -1234,7 +1234,7 @@ public class FileBasedDatasetServicesTest {
 
             assertNotNull("Restored Distances Data not found", restoredData.getDistancesData());
 
-            ArrayFeatureData phenotypicData = ArrayFeatureData.readData(phenotypicDataPath, FileType.CSV);
+            SimplePhenotypeData phenotypicData = SimplePhenotypeData.readPhenotypeData(phenotypicDataPath, FileType.CSV);
 
             phenotypicData.setUniqueIdentifier(DATA_UID);
             phenotypicData.setName(DATASET_NAME);

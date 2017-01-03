@@ -19,21 +19,20 @@
 
 package org.corehunter.tests.objectives.distance.measures;
 
-import static org.corehunter.tests.TestData.MODIFIED_ROGERS_DISTANCES;
 import static org.corehunter.tests.TestData.CAVALLI_SFORZA_EDWARDS_DISTANCES;
-import static org.corehunter.tests.TestData.PRECISION;
 import static org.corehunter.tests.TestData.HEADERS_UNIQUE_NAMES;
+import static org.corehunter.tests.TestData.MODIFIED_ROGERS_DISTANCES;
+import static org.corehunter.tests.TestData.PRECISION;
+import static org.junit.Assert.assertEquals;
 
 import java.util.Iterator;
-import org.corehunter.data.DistanceMatrixData;
-import org.corehunter.data.CoreHunterData;
-import org.corehunter.data.simple.SimpleDistanceMatrixData;
 
+import org.corehunter.data.CoreHunterData;
+import org.corehunter.data.DistanceMatrixData;
+import org.corehunter.data.simple.SimpleDistanceMatrixData;
 import org.corehunter.objectives.distance.DistanceMeasure;
 import org.corehunter.objectives.distance.measures.PrecomputedDistance;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * @author Guy Davenport, Herman De Beukelaer

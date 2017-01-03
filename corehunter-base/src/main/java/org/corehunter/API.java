@@ -34,14 +34,14 @@ import org.corehunter.data.GenotypeDataFormat;
 import org.corehunter.data.simple.SimpleBiAllelicGenotypeData;
 import org.corehunter.data.simple.SimpleDistanceMatrixData;
 import org.corehunter.data.simple.SimpleGenotypeData;
+import org.corehunter.data.simple.SimplePhenotypeData;
 import org.corehunter.listener.SimpleCoreHunterListener;
 import org.jamesframework.core.subset.SubsetSolution;
+
 import uno.informatics.data.Data;
 import uno.informatics.data.Feature;
 import uno.informatics.data.Scale;
 import uno.informatics.data.SimpleEntity;
-import uno.informatics.data.dataset.FeatureData;
-import uno.informatics.data.feature.array.ArrayFeatureData;
 import uno.informatics.data.io.FileType;
 import uno.informatics.data.pojo.DataPojo;
 import uno.informatics.data.pojo.SimpleEntityPojo;
@@ -342,11 +342,11 @@ public class API {
     /* Phenotype data */
     /* -------------- */
 
-    public static FeatureData readPhenotypeData(String file) throws IOException {
-        return ArrayFeatureData.readData(Paths.get(file), inferFileType(file));
+    public static SimplePhenotypeData readPhenotypeData(String file) throws IOException {
+        return new SimplePhenotypeData(SimplePhenotypeData.readPhenotypeData(Paths.get(file), inferFileType(file)));
     }
     
-    public static Double[] getRanges(FeatureData data){
+    public static Double[] getRanges(SimplePhenotypeData data){
         List<Feature> features = data.getFeatures();
         int numTraits = features.size();
         Double[] ranges = new Double[numTraits];

@@ -25,14 +25,18 @@ import static org.corehunter.tests.TestData.ALLELE_FREQUENCIES_HOMOZYGOUS;
 import static org.corehunter.tests.TestData.ALLELE_NAMES;
 import static org.corehunter.tests.TestData.ALLELE_NAMES_DIPLOID;
 import static org.corehunter.tests.TestData.ALLELE_NAMES_HOMOZYGOUS;
-import static org.corehunter.tests.TestData.DISTANCES;
 import static org.corehunter.tests.TestData.HEADERS_NON_UNIQUE_NAMES;
 import static org.corehunter.tests.TestData.HEADERS_UNIQUE_NAMES;
 import static org.corehunter.tests.TestData.MARKER_NAMES;
+import static org.corehunter.tests.TestData.MARKER_NAMES_DEFAULT;
 import static org.corehunter.tests.TestData.NAME;
 import static org.corehunter.tests.TestData.PRECISION;
 import static org.corehunter.tests.TestData.SET;
 import static org.corehunter.tests.TestData.UNDEFINED_ALLELE_NAMES;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
@@ -46,25 +50,17 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.TreeSet;
 
+import org.apache.commons.io.FileUtils;
+import org.corehunter.data.GenotypeData;
 import org.corehunter.data.GenotypeDataFormat;
-import org.corehunter.data.simple.SimpleDistanceMatrixData;
 import org.corehunter.data.simple.SimpleGenotypeData;
 import org.jamesframework.core.subset.SubsetSolution;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import uno.informatics.data.io.FileType;
 import uno.informatics.data.SimpleEntity;
-
-import org.apache.commons.io.FileUtils;
-import org.corehunter.data.GenotypeData;
-
-import static org.corehunter.tests.TestData.MARKER_NAMES_DEFAULT;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import uno.informatics.data.io.FileType;
 
 /**
  * @author Guy Davenport, Herman De Beukelaer
