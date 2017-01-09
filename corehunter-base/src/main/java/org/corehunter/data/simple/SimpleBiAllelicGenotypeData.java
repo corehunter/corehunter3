@@ -480,7 +480,7 @@ public class SimpleBiAllelicGenotypeData extends SimpleGenotypeData implements B
 
         Files.createDirectories(filePath.getParent());
 
-        // read data from file
+        // write data to file
         try (RowWriter writer = IOUtilities.createRowWriter(filePath, fileType,
             TextFileRowReader.REMOVE_WHITE_SPACE)) {
 
@@ -548,9 +548,9 @@ public class SimpleBiAllelicGenotypeData extends SimpleGenotypeData implements B
 
         Files.createDirectories(filePath.getParent());
 
-        List<Integer> ids = new ArrayList<Integer>(getIDs()) ;
-        List<Integer> allIDs = new ArrayList<Integer>(solution.getAllIDs());
-        Set<Integer> selectedIDs = new TreeSet<Integer>(solution.getSelectedIDs());
+        List<Integer> ids = new ArrayList<>(getIDs()) ;
+        List<Integer> allIDs = new ArrayList<>(solution.getAllIDs());
+        Set<Integer> selectedIDs = new TreeSet<>(solution.getSelectedIDs());
 
         // read data from file
         try (RowWriter writer = IOUtilities.createRowWriter(filePath, fileType,
@@ -582,7 +582,7 @@ public class SimpleBiAllelicGenotypeData extends SimpleGenotypeData implements B
             // write data rows
             SimpleEntity header;
 
-            Iterator<Integer> iterator = null ;
+            Iterator<Integer> iterator = null;
 
             if (includeSelected && includeUnselected) {
                 iterator = allIDs.iterator();
@@ -592,18 +592,19 @@ public class SimpleBiAllelicGenotypeData extends SimpleGenotypeData implements B
                 } else {
                     if (includeUnselected) {
                         iterator = solution.getUnselectedIDs().iterator();
+                    } else {
+                        throw new IllegalArgumentException(
+                                "Output should include selected and/or unselected accessions."
+                        );
                     }
                 }
             }
             
-            int i = 0;
-            Integer id;
-
             // write data rows
             while (iterator.hasNext()) {
 
-                id = iterator.next();
-                i = ids.indexOf(id);
+                int id = iterator.next();
+                int i = ids.indexOf(id);
                 writer.newRow();
                 header = getHeader(i);
                 writer.writeCell(header.getUniqueIdentifier());
