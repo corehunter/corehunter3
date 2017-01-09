@@ -343,7 +343,7 @@ public class API {
     /* -------------- */
 
     public static SimplePhenotypeData readPhenotypeData(String file) throws IOException {
-        return new SimplePhenotypeData(SimplePhenotypeData.readPhenotypeData(Paths.get(file), inferFileType(file)));
+        return SimplePhenotypeData.readPhenotypeData(Paths.get(file), inferFileType(file));
     }
     
     public static Double[] getRanges(SimplePhenotypeData data){
