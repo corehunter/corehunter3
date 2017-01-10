@@ -48,9 +48,6 @@ import uno.informatics.data.pojo.SimpleEntityPojo;
  */
 public class SimpleBiAllelicGenotypeData extends SimpleGenotypeData implements BiAllelicGenotypeData {
 
-    /**
-     * 
-     */
     private static final long serialVersionUID = 1L;
     private static final String ID_HEADER = "X";
     private static final String NAMES_HEADER = "NAME";
@@ -430,11 +427,11 @@ public class SimpleBiAllelicGenotypeData extends SimpleGenotypeData implements B
      * @param solution
      *            the solution to subset the data
      * @param includeId
-     *            includes the id used by the solution
+     *            includes the integer id used by the solution
      * @param includeSelected
-     *            includes selected
+     *            includes selected accessions
      * @param includeUnselected
-     *            includes unselected
+     *            includes unselected accessions
      * @throws IOException
      *             if the data can not be written to the file
      */
@@ -460,57 +457,12 @@ public class SimpleBiAllelicGenotypeData extends SimpleGenotypeData implements B
 
     private void writeBiallelicData(Path filePath, FileType fileType) throws IOException {
 
-        // validate arguments
-        if (filePath == null) {
-            throw new IllegalArgumentException("File path not defined.");
-        }
-
-        if (filePath.toFile().exists()) {
-            throw new IOException("File already exists : " + filePath + ".");
-        }
-
-        if (fileType == null) {
-            throw new IllegalArgumentException("File type not defined.");
-        }
-
-        if (fileType != FileType.TXT && fileType != FileType.CSV) {
-            throw new IllegalArgumentException(
-                String.format("Only file types TXT and CSV are supported. Got: %s.", fileType));
-        }
-
-        Files.createDirectories(filePath.getParent());
-
-        // write data to file
-        try (RowWriter writer = IOUtilities.createRowWriter(filePath, fileType,
-            TextFileRowReader.REMOVE_WHITE_SPACE)) {
-
-            if (writer == null || !writer.ready()) {
-                throw new IOException("Can not create writer for file " + filePath + ".");
-            }
-
-            // write header row
-            writer.writeCell(IDENTIFIERS_HEADER);
-            writer.newColumn();
-            writer.writeCell(NAMES_HEADER);
-            for (int m = 0; m < getNumberOfMarkers(); m++) {
-                writer.newColumn();
-                writer.writeCell(getMarkerName(m));
-            }
-
-            // write data rows
-            SimpleEntity header;
-            for (int r = 0; r < alleleScores.length; r++) {
-                writer.newRow();
-                header = getHeader(r);
-                writer.writeCell(header.getUniqueIdentifier());
-                writer.newColumn();
-                writer.writeCell(header.getName());
-                writer.newColumn();
-                writer.writeRowCellsAsArray(alleleScores[r]);
-            }
-
-            writer.close();
-        }
+        // create auxiliary solution in which all IDs are selected
+        SubsetSolution all = new SubsetSolution(getIDs());
+        all.selectAll();
+        // write unselected (all)
+        writeBiallelicData(filePath, fileType, all, false, true, false);
+        
     }
 
     private void writeBiallelicData(Path filePath, FileType fileType, SubsetSolution solution,
@@ -522,7 +474,7 @@ public class SimpleBiAllelicGenotypeData extends SimpleGenotypeData implements B
         }
 
         if (filePath.toFile().exists()) {
-            throw new IOException("File already exists : " + filePath + ".");
+            throw new IOException("File already exists: " + filePath + ".");
         }
 
         if (fileType == null) {
@@ -531,92 +483,97 @@ public class SimpleBiAllelicGenotypeData extends SimpleGenotypeData implements B
 
         if (fileType != FileType.TXT && fileType != FileType.CSV) {
             throw new IllegalArgumentException(
-                String.format("Only file types TXT and CSV are supported. Got: %s.", fileType));
+                String.format("Only file types TXT and CSV are supported. Got: %s.", fileType)
+            );
         }
         
         if (solution == null) {
-            throw new NullPointerException("Solution must be defined");
+            throw new NullPointerException("Solution must be defined.");
         }
 
-        if (solution.getTotalNumIDs() != getSize()) {
-            throw new IllegalArgumentException("Solution size must match data size");
-        }
-
-        if (!includeSelected && !includeUnselected) {
-            throw new IllegalArgumentException("One of includeSelected or includeUnselected must be used");
+        if (!(solution.getAllIDs().equals(getIDs()))) {
+            throw new IllegalArgumentException("Solution ids must match data.");
         }
 
         Files.createDirectories(filePath.getParent());
 
-        List<Integer> ids = new ArrayList<>(getIDs()) ;
-        List<Integer> allIDs = new ArrayList<>(solution.getAllIDs());
-        Set<Integer> selectedIDs = new TreeSet<>(solution.getSelectedIDs());
-
-        // read data from file
-        try (RowWriter writer = IOUtilities.createRowWriter(filePath, fileType,
-            TextFileRowReader.REMOVE_WHITE_SPACE)) {
+        // write data to file
+        boolean includeAll = includeSelected && includeUnselected;
+        try (RowWriter writer = IOUtilities.createRowWriter(
+                filePath, fileType, TextFileRowReader.REMOVE_WHITE_SPACE
+        )) {
 
             if (writer == null || !writer.ready()) {
                 throw new IOException("Can not create writer for file " + filePath + ".");
             }
 
-            // write index row
+            // write internal integer id column header
             if (includeId) {
                 writer.writeCell(ID_HEADER);
                 writer.newColumn();
             }
 
+            // write string id and name column headers
             writer.writeCell(IDENTIFIERS_HEADER);
             writer.newColumn();
             writer.writeCell(NAMES_HEADER);
+            
+            // write selection column header if both selected and unselected are included
+            if (includeAll) {
+                writer.newColumn();
+                writer.writeCell(SELECTED_HEADER);
+            }
+            
+            // write marker column headers
             for (int m = 0; m < getNumberOfMarkers(); m++) {
                 writer.newColumn();
                 writer.writeCell(getMarkerName(m));
             }
 
-            if (includeSelected && includeUnselected) {
-                writer.newColumn();
-                writer.writeCell(SELECTED_HEADER);
-            }
-
-            // write data rows
-            SimpleEntity header;
-
-            Iterator<Integer> iterator = null;
-
-            if (includeSelected && includeUnselected) {
-                iterator = allIDs.iterator();
+            // obtain sorted list of IDs included in output
+            Set<Integer> includedIDs;
+            if (includeAll) {
+                includedIDs = getIDs();
+            } else if (includeSelected) {
+                includedIDs = solution.getSelectedIDs();
+            } else if (includeUnselected) {
+                includedIDs = solution.getUnselectedIDs();
             } else {
-                if (includeSelected) {
-                    iterator = solution.getSelectedIDs().iterator();
-                } else {
-                    if (includeUnselected) {
-                        iterator = solution.getUnselectedIDs().iterator();
-                    } else {
-                        throw new IllegalArgumentException(
-                                "Output should include selected and/or unselected accessions."
-                        );
-                    }
-                }
+                throw new IllegalArgumentException(
+                        "One of 'includeSelected' or 'includeUnselected' must be used."
+                );
             }
+            List<Integer> sortedIDs = new ArrayList<>(includedIDs);
+            sortedIDs.sort(null);
             
             // write data rows
-            while (iterator.hasNext()) {
-
-                int id = iterator.next();
-                int i = ids.indexOf(id);
+            Set<Integer> selected = solution.getSelectedIDs();
+            for (int id : sortedIDs) {
+                
                 writer.newRow();
-                header = getHeader(i);
+                
+                // write integer id if requested
+                if(includeId){
+                    writer.writeCell(id);
+                    writer.newColumn();
+                }
+                
+                // write string id and name
+                SimpleEntity header = getHeader(id);
                 writer.writeCell(header.getUniqueIdentifier());
                 writer.newColumn();
                 writer.writeCell(header.getName());
                 writer.newColumn();
-                writer.writeRowCellsAsArray(alleleScores[i]);
                 
-                if (includeSelected && includeUnselected) {
+                // mark selection if needed
+                if (includeAll) {
+                    writer.writeCell(selected.contains(id));
                     writer.newColumn();
-                    writer.writeCell(selectedIDs.contains(id));
                 }
+                
+                // write allele scores
+                writer.writeRowCellsAsArray(alleleScores[id]);
+                
             }
 
             writer.close();
