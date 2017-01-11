@@ -24,11 +24,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import java.util.TreeSet;
 
 import org.corehunter.data.BiAllelicGenotypeData;
 import org.corehunter.data.GenotypeDataFormat;
