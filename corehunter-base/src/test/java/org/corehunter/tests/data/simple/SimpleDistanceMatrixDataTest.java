@@ -27,7 +27,6 @@ import static org.corehunter.tests.TestData.PRECISION;
 import static org.corehunter.tests.TestData.SET;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
@@ -35,17 +34,17 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.TreeSet;
+import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
 import org.corehunter.data.simple.SimpleDistanceMatrixData;
 import org.jamesframework.core.subset.SubsetSolution;
+
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import static org.junit.Assert.assertTrue;
 
 import uno.informatics.data.SimpleEntity;
 import uno.informatics.data.io.FileType;
@@ -61,7 +60,7 @@ public class SimpleDistanceMatrixDataTest {
     private static final String TEST_OUTPUT = "target/testoutput";
 
     private static final String ERRONEOUS_FILES_DIR = "/distances/err/";
-    private static final int[] SOLUTION = new int[] {
+    private static final int[] SELECTION = new int[] {
         1, 3, 4
     };
 
@@ -141,284 +140,166 @@ public class SimpleDistanceMatrixDataTest {
     @Test
     public void toCsvFileWithAllIds() throws IOException {
         expectedHeaders = HEADERS_UNIQUE_NAMES;
-
         SimpleDistanceMatrixData distanceData = new SimpleDistanceMatrixData(expectedHeaders, DISTANCES);
 
-        List<Integer> ids = new ArrayList<Integer>(distanceData.getIDs());
+        Set<Integer> ids = distanceData.getIDs();
 
         Path dirPath = Paths.get(TEST_OUTPUT);
 
         Files.createDirectories(dirPath);
 
-        dirPath = Files.createTempDirectory(dirPath, "DistanceMatrix-Csv-AllIds");
+        dirPath = Files.createTempDirectory(dirPath, "DistanceMatrix-AllIds");
 
-        // solution in natural order
-        SubsetSolution solution = new SubsetSolution(new TreeSet<Integer>(ids));
-
-        for (int i = 0; i < SOLUTION.length; ++i) {
-            solution.select(SOLUTION[i]);
+        // create solution
+        SubsetSolution solution = new SubsetSolution(ids);
+        for(int sel : SELECTION){
+            solution.select(sel);
         }
-
-        dataName = "out1.csv";
-
-        Path path = Paths.get(dirPath.toString(), dataName);
-
-        Files.deleteIfExists(path);
-
-        System.out.println(" |- Write distance File (with solution) " + dataName);
-
-        distanceData.writeData(path, FileType.CSV, solution, false, true, true);
-
-        assertTrue("Output 1 is not correct!",
-            FileUtils
-                .contentEquals(
-                    new File(SimpleDistanceMatrixDataTest.class
-                        .getResource("/distances/out/DistanceMatrix-Csv-AllIds1.csv").getPath()),
-                    path.toFile()));
-
-        dataName = "out2.csv";
+        
+        Path path;
+        
+        // write with integer ids
+        dataName = "with-ids.csv";
 
         path = Paths.get(dirPath.toString(), dataName);
 
-        Files.deleteIfExists(path);
-
-        System.out.println(" |- Write distance File (with solution) " + dataName);
+        System.out.println(" |- Write distance matrix file (with solution) " + dataName);
 
         distanceData.writeData(path, FileType.CSV, solution, true, true, true);
 
-        assertTrue("Output 2 is not correct!",
+        assertTrue("Output is not correct!",
             FileUtils
                 .contentEquals(
                     new File(SimpleDistanceMatrixDataTest.class
-                        .getResource("/distances/out/DistanceMatrix-Csv-AllIds2.csv").getPath()),
+                        .getResource("/distances/out/all-with-ids.csv").getPath()),
                     path.toFile()));
         
-        // solution in reverse natural order
-        solution = new SubsetSolution(new TreeSet<Integer>(ids), Comparator.reverseOrder());
-        
-        for (int i = 0; i < SOLUTION.length; ++i) {
-            solution.select(SOLUTION[i]);
-        }
-        
-        dataName = "out3.csv";
+        // write without integer ids
+        dataName = "no-ids.csv";
 
         path = Paths.get(dirPath.toString(), dataName);
 
-        Files.deleteIfExists(path);
-
-        System.out.println(" |- Write distance File (with solution reverse order) " + dataName);
+        System.out.println(" |- Write distance matrix file (with solution) " + dataName);
 
         distanceData.writeData(path, FileType.CSV, solution, false, true, true);
 
-        assertTrue("Output 3 is not correct!",
+        assertTrue("Output is not correct!",
             FileUtils
                 .contentEquals(
                     new File(SimpleDistanceMatrixDataTest.class
-                        .getResource("/distances/out/DistanceMatrix-Csv-AllIds3.csv").getPath()),
+                        .getResource("/distances/out/all-no-ids.csv").getPath()),
                     path.toFile()));
-
-        dataName = "out4.csv";
-
-        path = Paths.get(dirPath.toString(), dataName);
-
-        Files.deleteIfExists(path);
-
-        System.out.println(" |- Write distance File (with solution reverse order) " + dataName);
-
-        distanceData.writeData(path, FileType.CSV, solution, true, true, true);
-
-        assertTrue("Output 4 is not correct!",
-            FileUtils
-                .contentEquals(
-                    new File(SimpleDistanceMatrixDataTest.class
-                        .getResource("/distances/out/DistanceMatrix-Csv-AllIds4.csv").getPath()),
-                    path.toFile()));
+        
     }
-
+    
     @Test
-    public void toCsvFileWithSelectedlIds() throws IOException {
+    public void toCsvFileWithSelectedIds() throws IOException {
         expectedHeaders = HEADERS_UNIQUE_NAMES;
-
         SimpleDistanceMatrixData distanceData = new SimpleDistanceMatrixData(expectedHeaders, DISTANCES);
 
-        List<Integer> ids = new ArrayList<Integer>(distanceData.getIDs());
+        Set<Integer> ids = distanceData.getIDs();
 
         Path dirPath = Paths.get(TEST_OUTPUT);
 
         Files.createDirectories(dirPath);
 
-        dirPath = Files.createTempDirectory(dirPath, "DistanceMatrix-Csv-SelectedlIds");
+        dirPath = Files.createTempDirectory(dirPath, "DistanceMatrix-SelectedIds");
 
-        // solution in natural order
-        SubsetSolution solution = new SubsetSolution(new TreeSet<Integer>(ids));
-
-        for (int i = 0; i < SOLUTION.length; ++i) {
-            solution.select(SOLUTION[i]);
+        // create solution
+        SubsetSolution solution = new SubsetSolution(ids);
+        for(int sel : SELECTION){
+            solution.select(sel);
         }
-
-        dataName = "out1.csv";
-
-        Path path = Paths.get(dirPath.toString(), dataName);
-
-        Files.deleteIfExists(path);
-
-        System.out.println(" |- Write distance File (with selected) " + dataName);
-
-        distanceData.writeData(path, FileType.CSV, solution, false, true, false);
-
-        assertTrue("Output 1 is not correct!",
-            FileUtils.contentEquals(
-                new File(SimpleDistanceMatrixDataTest.class
-                    .getResource("/distances/out/DistanceMatrix-Csv-SelectedlIds1.csv").getPath()),
-                path.toFile()));
-
-        dataName = "out2.csv";
+        
+        Path path;
+        
+        // write with integer ids
+        dataName = "with-ids.csv";
 
         path = Paths.get(dirPath.toString(), dataName);
 
-        Files.deleteIfExists(path);
-
-        System.out.println(" |- Write distance File (with selected and index) " + dataName);
+        System.out.println(" |- Write distance matrix file (with solution) " + dataName);
 
         distanceData.writeData(path, FileType.CSV, solution, true, true, false);
 
-        assertTrue("Output 2 is not correct!",
-            FileUtils.contentEquals(
-                new File(SimpleDistanceMatrixDataTest.class
-                    .getResource("/distances/out/DistanceMatrix-Csv-SelectedlIds2.csv").getPath()),
-                path.toFile()));
+        assertTrue("Output is not correct!",
+            FileUtils
+                .contentEquals(
+                    new File(SimpleDistanceMatrixDataTest.class
+                        .getResource("/distances/out/sel-with-ids.csv").getPath()),
+                    path.toFile()));
         
-        // solution in reverse natural order
-        solution = new SubsetSolution(new TreeSet<Integer>(ids), Comparator.reverseOrder());
-        
-        for (int i = 0; i < SOLUTION.length; ++i) {
-            solution.select(SOLUTION[i]);
-        }
-       
-        dataName = "out3.csv";
+        // write without integer ids
+        dataName = "no-ids.csv";
 
         path = Paths.get(dirPath.toString(), dataName);
 
-        Files.deleteIfExists(path);
-
-        System.out.println(" |- Write distance File (with selected reverse order) " + dataName);
+        System.out.println(" |- Write distance matrix file (with solution) " + dataName);
 
         distanceData.writeData(path, FileType.CSV, solution, false, true, false);
 
-        assertTrue("Output 3 is not correct!",
-            FileUtils.contentEquals(
-                new File(SimpleDistanceMatrixDataTest.class
-                    .getResource("/distances/out/DistanceMatrix-Csv-SelectedlIds3.csv").getPath()),
-                path.toFile()));
-
-        dataName = "out4.csv";
-
-        path = Paths.get(dirPath.toString(), dataName);
-
-        Files.deleteIfExists(path);
-
-        System.out.println(" |- Write distance File (with selected reverse order and index) " + dataName);
-
-        distanceData.writeData(path, FileType.CSV, solution, true, true, false);
-
-        assertTrue("Output 4 is not correct!",
-            FileUtils.contentEquals(
-                new File(SimpleDistanceMatrixDataTest.class
-                    .getResource("/distances/out/DistanceMatrix-Csv-SelectedlIds4.csv").getPath()),
-                path.toFile()));
+        assertTrue("Output is not correct!",
+            FileUtils
+                .contentEquals(
+                    new File(SimpleDistanceMatrixDataTest.class
+                        .getResource("/distances/out/sel-no-ids.csv").getPath()),
+                    path.toFile()));
+        
     }
-
+    
     @Test
-    public void toCsvFileWithUnselectedlIds() throws IOException {
+    public void toCsvFileWithUnselectedIds() throws IOException {
         expectedHeaders = HEADERS_UNIQUE_NAMES;
-
         SimpleDistanceMatrixData distanceData = new SimpleDistanceMatrixData(expectedHeaders, DISTANCES);
 
-        List<Integer> ids = new ArrayList<Integer>(distanceData.getIDs());
+        Set<Integer> ids = distanceData.getIDs();
 
         Path dirPath = Paths.get(TEST_OUTPUT);
 
         Files.createDirectories(dirPath);
 
-        dirPath = Files.createTempDirectory(dirPath, "DistanceMatrix-Csv-UnselectedlIds");
+        dirPath = Files.createTempDirectory(dirPath, "DistanceMatrix-UnselectedIds");
 
-        // solution in natural order
-        SubsetSolution solution = new SubsetSolution(new TreeSet<Integer>(ids));
-
-        for (int i = 0; i < SOLUTION.length; ++i) {
-            solution.select(SOLUTION[i]);
+        // create solution
+        SubsetSolution solution = new SubsetSolution(ids);
+        for(int sel : SELECTION){
+            solution.select(sel);
         }
-
-        dataName = "out1.csv";
-
-        Path path = Paths.get(dirPath.toString(), dataName);
-
-        Files.deleteIfExists(path);
-
-        System.out.println(" |- Write distance File (with unselected) " + dataName);
-
-        distanceData.writeData(path, FileType.CSV, solution, false, false, true);
-
-        assertTrue("Output 1 is not correct!",
-            FileUtils.contentEquals(
-                new File(SimpleDistanceMatrixDataTest.class
-                    .getResource("/distances/out/DistanceMatrix-Csv-UnselectedlIds1.csv").getPath()),
-                path.toFile()));
-
-        dataName = "out2.csv";
+        
+        Path path;
+        
+        // write with integer ids
+        dataName = "with-ids.csv";
 
         path = Paths.get(dirPath.toString(), dataName);
 
-        Files.deleteIfExists(path);
-
-        System.out.println(" |- Write distance File (with unselected and index) " + dataName);
+        System.out.println(" |- Write distance matrix file (with solution) " + dataName);
 
         distanceData.writeData(path, FileType.CSV, solution, true, false, true);
 
-        assertTrue("Output 2 is not correct!",
-            FileUtils.contentEquals(
-                new File(SimpleDistanceMatrixDataTest.class
-                    .getResource("/distances/out/DistanceMatrix-Csv-UnselectedlIds2.csv").getPath()),
-                path.toFile()));
+        assertTrue("Output is not correct!",
+            FileUtils
+                .contentEquals(
+                    new File(SimpleDistanceMatrixDataTest.class
+                        .getResource("/distances/out/unsel-with-ids.csv").getPath()),
+                    path.toFile()));
         
-        // solution in reverse natural order
-        solution = new SubsetSolution(new TreeSet<Integer>(ids), Comparator.reverseOrder());
-        
-        for (int i = 0; i < SOLUTION.length; ++i) {
-            solution.select(SOLUTION[i]);
-        }
-        
-        dataName = "out3.csv";
+        // write without integer ids
+        dataName = "no-ids.csv";
 
         path = Paths.get(dirPath.toString(), dataName);
 
-        Files.deleteIfExists(path);
-
-        System.out.println(" |- Write distance File (with unselected reverse order) " + dataName);
+        System.out.println(" |- Write distance matrix file (with solution) " + dataName);
 
         distanceData.writeData(path, FileType.CSV, solution, false, false, true);
 
-        assertTrue("Output 3 is not correct!",
-            FileUtils.contentEquals(
-                new File(SimpleDistanceMatrixDataTest.class
-                    .getResource("/distances/out/DistanceMatrix-Csv-UnselectedlIds3.csv").getPath()),
-                path.toFile()));
-
-        dataName = "out4.csv";
-
-        path = Paths.get(dirPath.toString(), dataName);
-
-        Files.deleteIfExists(path);
-
-        System.out.println(" |- Write distance File (with unselected reverse order and index) " + dataName);
-
-        distanceData.writeData(path, FileType.CSV, solution, true, false, true);
-
-        assertTrue("Output 4 is not correct!",
-            FileUtils.contentEquals(
-                new File(SimpleDistanceMatrixDataTest.class
-                    .getResource("/distances/out/DistanceMatrix-Csv-UnselectedlIds4.csv").getPath()),
-                path.toFile()));
+        assertTrue("Output is not correct!",
+            FileUtils
+                .contentEquals(
+                    new File(SimpleDistanceMatrixDataTest.class
+                        .getResource("/distances/out/unsel-no-ids.csv").getPath()),
+                    path.toFile()));
+        
     }
 
     @Test
