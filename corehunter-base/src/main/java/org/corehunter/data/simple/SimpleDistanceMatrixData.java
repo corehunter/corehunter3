@@ -355,59 +355,12 @@ public class SimpleDistanceMatrixData extends DataPojo implements DistanceMatrix
      */
     public void writeData(Path filePath, FileType fileType) throws IOException {
 
-        // validate arguments
-        if (filePath == null) {
-            throw new IllegalArgumentException("File path not defined.");
-        }
-
-        if (filePath.toFile().exists()) {
-            throw new IOException("File already exists : " + filePath + ".");
-        }
-
-        if (fileType == null) {
-            throw new IllegalArgumentException("File type not defined.");
-        }
-
-        if (fileType != FileType.TXT && fileType != FileType.CSV) {
-            throw new IllegalArgumentException(
-                String.format("Only file types TXT and CSV are supported. Got: %s.", fileType));
-        }
-
-        Files.createDirectories(filePath.getParent());
-
-        // write data to file
-        try (RowWriter writer = IOUtilities.createRowWriter(filePath, fileType,
-            TextFileRowReader.REMOVE_WHITE_SPACE)) {
-
-            if (writer == null || !writer.ready()) {
-                throw new IOException("Can not create writer for file " + filePath + ".");
-            }
-
-            // write header row
-            writer.writeCell(IDENTIFIERS_HEADER);
-            writer.newColumn();
-            writer.writeCell(NAMES_HEADER);
-            for (int i = 0; i < getSize(); i++) {
-                writer.newColumn();
-                writer.writeCell(getHeader(i).getUniqueIdentifier());
-            }
-
-            // write data rows
-            for (int i = 0; i < getSize(); i++) {
-                writer.newRow();
-                // write id and name
-                writer.writeCell(getHeader(i).getUniqueIdentifier());
-                writer.newColumn();
-                writer.writeCell(getHeader(i).getName());
-                // write matrix entries
-                for (int j = 0; j < getSize(); j++) {
-                    writer.newColumn();
-                    writer.writeCell(distances[i][j]);
-                }
-            }
-
-            writer.close();
-        }
+        // create auxiliary solution in which all IDs are selected
+        SubsetSolution all = new SubsetSolution(getIDs());
+        all.selectAll();
+        // write selected (all)
+        writeData(filePath, fileType, all, false, true, false);
+        
     }
 
     /**
@@ -422,11 +375,11 @@ public class SimpleDistanceMatrixData extends DataPojo implements DistanceMatrix
      * @param solution
      *            the solution to subset the data
      * @param includeId
-     *            includes the id used by the solution
+     *            includes the integer id used by the solution
      * @param includeSelected
-     *            includes selected
+     *            includes selected accessions
      * @param includeUnselected
-     *            includes unselected
+     *            includes unselected accessions
      * @throws IOException
      *             if the file can not be written
      */
@@ -434,7 +387,7 @@ public class SimpleDistanceMatrixData extends DataPojo implements DistanceMatrix
         boolean includeSelected, boolean includeUnselected) throws IOException {
 
         if (filePath.toFile().exists()) {
-            throw new IOException("File already exists : " + filePath + ".");
+            throw new IOException("File already exists: " + filePath + ".");
         }
 
         if (fileType == null) {
@@ -443,98 +396,99 @@ public class SimpleDistanceMatrixData extends DataPojo implements DistanceMatrix
 
         if (fileType != FileType.TXT && fileType != FileType.CSV) {
             throw new IllegalArgumentException(
-                String.format("Only file types TXT and CSV are supported. Got: %s.", fileType));
+                String.format("Only file types TXT and CSV are supported. Got: %s.", fileType)
+            );
         }
 
         if (solution == null) {
             throw new NullPointerException("Solution must be defined");
         }
 
-        if (solution.getTotalNumIDs() != getSize()) {
-            throw new IllegalArgumentException("Solution size must match data size");
+        if (!(solution.getAllIDs().equals(getIDs()))) {
+            throw new IllegalArgumentException("Solution ids must match data.");
         }
-
-        if (!includeSelected && !includeUnselected) {
-            throw new IllegalArgumentException("One of includeSelected or includeUnselected must be used");
-        }
-
-        List<Integer> ids = new ArrayList<Integer>(getIDs()) ;
-        List<Integer> allIDs = new ArrayList<Integer>(solution.getAllIDs());
-        Set<Integer> selectedIDs = new TreeSet<Integer>(solution.getSelectedIDs());
-
+        
         Files.createDirectories(filePath.getParent());
 
         // write data to file
-        try (RowWriter writer = IOUtilities.createRowWriter(filePath, fileType,
-            TextFileRowReader.REMOVE_WHITE_SPACE)) {
+        boolean markSelection = includeSelected && includeUnselected;
+        try (RowWriter writer = IOUtilities.createRowWriter(
+                filePath, fileType, TextFileRowReader.REMOVE_WHITE_SPACE
+        )) {
 
             if (writer == null || !writer.ready()) {
                 throw new IOException("Can not create writer for file " + filePath + ".");
             }
 
-            // write header row
+            // write internal integer id column header
             if (includeId) {
                 writer.writeCell(ID_HEADER);
                 writer.newColumn();
             }
-
+            
+            // write string id and name column headers
             writer.writeCell(IDENTIFIERS_HEADER);
             writer.newColumn();
             writer.writeCell(NAMES_HEADER);
+            
+            // write selection column header if both selected and unselected are included
+            if (markSelection) {
+                writer.newColumn();
+                writer.writeCell(SELECTED_HEADER);
+            }
+            
+            // write string ids as column headers
             for (int i = 0; i < getSize(); i++) {
                 writer.newColumn();
                 writer.writeCell(getHeader(i).getUniqueIdentifier());
             }
-
-            if (includeSelected && includeUnselected) {
-                writer.newColumn();
-                writer.writeCell(SELECTED_HEADER);
-            }
-
-            Iterator<Integer> iterator = null ;
-
-            if (includeSelected && includeUnselected) {
-                iterator = allIDs.iterator();
+            
+            // obtain sorted list of IDs included in output
+            Set<Integer> includedIDs;
+            if (markSelection) {
+                includedIDs = getIDs();
+            } else if (includeSelected) {
+                includedIDs = solution.getSelectedIDs();
+            } else if (includeUnselected) {
+                includedIDs = solution.getUnselectedIDs();
             } else {
-                if (includeSelected) {
-                    iterator = solution.getSelectedIDs().iterator();
-                } else {
-                    if (includeUnselected) {
-                        iterator = solution.getUnselectedIDs().iterator();
-                    }
-                }
+                throw new IllegalArgumentException(
+                        "One of 'includeSelected' or 'includeUnselected' must be used."
+                );
             }
-
-            int i = 0;
-            Integer id;
+            List<Integer> sortedIDs = new ArrayList<>(includedIDs);
+            sortedIDs.sort(null);
 
             // write data rows
-            while (iterator.hasNext()) {
-
-                id = iterator.next();
-                i = ids.indexOf(id);
+            Set<Integer> selected = solution.getSelectedIDs();
+            for (int id : sortedIDs) {
 
                 writer.newRow();
 
+                // write integer ID if included
                 if (includeId) {
                     writer.writeCell(id);
                     writer.newColumn();
                 }
 
-                // write id and name
-                writer.writeCell(getHeader(i).getUniqueIdentifier());
+                // write string id and name
+                SimpleEntity header = getHeader(id);
+                writer.writeCell(header.getUniqueIdentifier());
                 writer.newColumn();
-                writer.writeCell(getHeader(i).getName());
+                writer.writeCell(header.getName());
+
+                // mark selection if needed
+                if(markSelection){
+                    writer.newColumn();
+                    writer.writeCell(selected.contains(id));
+                }
+                
                 // write matrix entries
                 for (int j = 0; j < getSize(); j++) {
                     writer.newColumn();
-                    writer.writeCell(distances[i][j]);
+                    writer.writeCell(distances[id][j]);
                 }
 
-                if (includeSelected && includeUnselected) {
-                    writer.newColumn();
-                    writer.writeCell(selectedIDs.contains(id));
-                }
             }
 
             writer.close();
