@@ -458,7 +458,7 @@ public class SimpleBiAllelicGenotypeData extends SimpleGenotypeData implements B
         // create auxiliary solution in which all IDs are selected
         SubsetSolution all = new SubsetSolution(getIDs());
         all.selectAll();
-        // write unselected (all)
+        // write selected (all)
         writeBiallelicData(filePath, fileType, all, false, true, false);
         
     }
@@ -496,7 +496,7 @@ public class SimpleBiAllelicGenotypeData extends SimpleGenotypeData implements B
         Files.createDirectories(filePath.getParent());
 
         // write data to file
-        boolean includeAll = includeSelected && includeUnselected;
+        boolean markSelection = includeSelected && includeUnselected;
         try (RowWriter writer = IOUtilities.createRowWriter(
                 filePath, fileType, TextFileRowReader.REMOVE_WHITE_SPACE
         )) {
@@ -517,7 +517,7 @@ public class SimpleBiAllelicGenotypeData extends SimpleGenotypeData implements B
             writer.writeCell(NAMES_HEADER);
             
             // write selection column header if both selected and unselected are included
-            if (includeAll) {
+            if (markSelection) {
                 writer.newColumn();
                 writer.writeCell(SELECTED_HEADER);
             }
@@ -530,7 +530,7 @@ public class SimpleBiAllelicGenotypeData extends SimpleGenotypeData implements B
 
             // obtain sorted list of IDs included in output
             Set<Integer> includedIDs;
-            if (includeAll) {
+            if (markSelection) {
                 includedIDs = getIDs();
             } else if (includeSelected) {
                 includedIDs = solution.getSelectedIDs();
@@ -564,7 +564,7 @@ public class SimpleBiAllelicGenotypeData extends SimpleGenotypeData implements B
                 writer.newColumn();
                 
                 // mark selection if needed
-                if (includeAll) {
+                if (markSelection) {
                     writer.writeCell(selected.contains(id));
                     writer.newColumn();
                 }
