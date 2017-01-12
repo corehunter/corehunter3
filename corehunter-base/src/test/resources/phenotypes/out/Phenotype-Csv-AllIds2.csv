@@ -1,8 +1,0 @@
-X,ID,NAME,col1,col2,col3,col4,col5,SELECTED
-,NAME,,Col 1,Col 2,Col 3,Col 4,Col 5,
-,TYPE,,II,RD,NS,NB,NS,
-,MIN,,0,0.0,,,,
-,MAX,,4,4.0,,,,
-0,1,1,1.1,R1C3,true,12/12/2012,true
-1,2,2,2.2,R2C3,false,13/12/2012,false
-2,3,3,3.3,R3C3,true,14/12/2012,true

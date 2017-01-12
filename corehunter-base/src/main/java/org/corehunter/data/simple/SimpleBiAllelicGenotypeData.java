@@ -492,6 +492,12 @@ public class SimpleBiAllelicGenotypeData extends SimpleGenotypeData implements B
         if (!(solution.getAllIDs().equals(getIDs()))) {
             throw new IllegalArgumentException("Solution ids must match data.");
         }
+        
+        if(!includeSelected && !includeUnselected){
+            throw new IllegalArgumentException(
+                    "One of 'includeSelected' or 'includeUnselected' must be used."
+            );
+        }
 
         Files.createDirectories(filePath.getParent());
 

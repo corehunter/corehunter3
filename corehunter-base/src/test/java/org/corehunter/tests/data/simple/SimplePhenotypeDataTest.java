@@ -27,28 +27,26 @@ import static org.corehunter.tests.TestData.PHENOTYPIC_TRAIT_MISSING_VALUES;
 import static org.corehunter.tests.TestData.PHENOTYPIC_TRAIT_NAMES;
 import static org.corehunter.tests.TestData.PHENOTYPIC_TRAIT_VALUES;
 import static org.corehunter.tests.TestData.SET;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
-import java.io.BufferedReader;
+import org.corehunter.data.simple.SimplePhenotypeData;
+import org.jamesframework.core.subset.SubsetSolution;
+import org.apache.commons.io.FileUtils;
+
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Comparator;
+import java.util.Arrays;
 import java.util.List;
-import java.util.TreeSet;
+import java.util.Set;
 
-///import org.apache.commons.io.FileUtils;
-import org.corehunter.data.simple.SimplePhenotypeData;
-import org.jamesframework.core.subset.SubsetSolution;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -84,13 +82,13 @@ public class SimplePhenotypeDataTest {
     private static final String TEST_OUTPUT = "target/testoutput";
 
     protected final static Object[] OBJECT_ROW1 = new Object[] {
-        1, 1.1, "R1C3", true, "12/12/2012"
+        "Alice", 1, 1.1, "R1C3", true, "12/12/2012"
     };
     protected final static Object[] OBJECT_ROW2 = new Object[] {
-        2, 2.2, "R2C3", false, "13/12/2012"
+        "Bob", 2, 2.2, "R2C3", false, "13/12/2012"
     };
     protected final static Object[] OBJECT_ROW3 = new Object[] {
-        3, 3.3, "R3C3", true, "14/12/2012"
+        "Carol", 3, 3.3, "R3C3", true, "14/12/2012"
     };
 
     protected final static Object[] OBJECT_COL1 = new Object[] {
@@ -113,7 +111,7 @@ public class SimplePhenotypeDataTest {
         OBJECT_ROW1[4], OBJECT_ROW2[4], OBJECT_ROW3[4]
     };
 
-    protected static final List<Feature> OBJECT_FEATURES_MIN_MAX_COL = new ArrayList<Feature>();
+    protected static final List<Feature> OBJECT_FEATURES_MIN_MAX_COL = new ArrayList<>();
 
     static {
         OBJECT_FEATURES_MIN_MAX_COL.add(new FeaturePojo("col1", "Col 1", new MethodPojo("col1", "Col 1",
@@ -128,35 +126,15 @@ public class SimplePhenotypeDataTest {
             new ScalePojo("col5", "Col 5", DataType.STRING, ScaleType.NOMINAL, OBJECT_COL5))));
     }
 
-    protected static final List<List<Object>> OBJECT_TABLE_AS_LIST = new ArrayList<List<Object>>();
+    protected static final List<List<Object>> OBJECT_TABLE_AS_LIST = new ArrayList<>();
 
-    static {
-        OBJECT_TABLE_AS_LIST.add(new ArrayList<Object>(OBJECT_ROW1.length));
-
-        OBJECT_TABLE_AS_LIST.get(0).add(OBJECT_ROW1[0]);
-        OBJECT_TABLE_AS_LIST.get(0).add(OBJECT_ROW1[1]);
-        OBJECT_TABLE_AS_LIST.get(0).add(OBJECT_ROW1[2]);
-        OBJECT_TABLE_AS_LIST.get(0).add(OBJECT_ROW1[3]);
-        OBJECT_TABLE_AS_LIST.get(0).add(OBJECT_ROW1[4]);
-
-        OBJECT_TABLE_AS_LIST.add(new ArrayList<Object>(OBJECT_ROW2.length));
-
-        OBJECT_TABLE_AS_LIST.get(1).add(OBJECT_ROW2[0]);
-        OBJECT_TABLE_AS_LIST.get(1).add(OBJECT_ROW2[1]);
-        OBJECT_TABLE_AS_LIST.get(1).add(OBJECT_ROW2[2]);
-        OBJECT_TABLE_AS_LIST.get(1).add(OBJECT_ROW2[3]);
-        OBJECT_TABLE_AS_LIST.get(1).add(OBJECT_ROW2[4]);
-
-        OBJECT_TABLE_AS_LIST.add(new ArrayList<Object>(OBJECT_ROW2.length));
-
-        OBJECT_TABLE_AS_LIST.get(2).add(OBJECT_ROW3[0]);
-        OBJECT_TABLE_AS_LIST.get(2).add(OBJECT_ROW3[1]);
-        OBJECT_TABLE_AS_LIST.get(2).add(OBJECT_ROW3[2]);
-        OBJECT_TABLE_AS_LIST.get(2).add(OBJECT_ROW3[3]);
-        OBJECT_TABLE_AS_LIST.get(2).add(OBJECT_ROW3[4]);
+    static {        
+        OBJECT_TABLE_AS_LIST.add(Arrays.asList(OBJECT_ROW1));
+        OBJECT_TABLE_AS_LIST.add(Arrays.asList(OBJECT_ROW2));
+        OBJECT_TABLE_AS_LIST.add(Arrays.asList(OBJECT_ROW3));
     }
 
-    private static final int[] SOLUTION = new int[] {
+    private static final int[] SELECTION = new int[] {
         0, 2
     };
 
@@ -294,291 +272,169 @@ public class SimplePhenotypeDataTest {
     @Test
     public void toCsvFileWithAllIds() throws IOException {
         expectedHeaders = HEADERS_UNIQUE_NAMES;
-
         SimplePhenotypeData phenotypeData = new SimplePhenotypeData("Phenotype Data",
             OBJECT_FEATURES_MIN_MAX_COL, OBJECT_TABLE_AS_LIST);
 
-        List<Integer> ids = new ArrayList<Integer>(phenotypeData.getIDs());
+        Set<Integer> ids = phenotypeData.getIDs();
 
         Path dirPath = Paths.get(TEST_OUTPUT);
 
         Files.createDirectories(dirPath);
 
-        dirPath = Files.createTempDirectory(dirPath, "Phenotype-Csv-AllIds");
+        dirPath = Files.createTempDirectory(dirPath, "Phenotype-AllIds");
 
-        // solution in natural order
-        SubsetSolution solution = new SubsetSolution(new TreeSet<Integer>(ids));
-
-        for (int i = 0; i < SOLUTION.length; ++i) {
-            solution.select(SOLUTION[i]);
+        // create solution
+        SubsetSolution solution = new SubsetSolution(ids);
+        for(int sel : SELECTION){
+            solution.select(sel);
         }
-
-        dataName = "out1.csv";
-
-        Path path = Paths.get(dirPath.toString(), dataName);
-
-        Files.deleteIfExists(path);
-
-        System.out.println(" |- Write phenotype File (with solution) " + dataName);
-
-        phenotypeData.writeData(path, FileType.CSV, solution, false, true, true);
-
-        assertFileEquals("Output 1 is not correct!", new File(
-            SimplePhenotypeDataTest.class.getResource("/phenotypes/out/Phenotype-Csv-AllIds1.csv").getPath()),
-            path.toFile());
-
-        dataName = "out2.csv";
+        
+        Path path;
+        
+        // write with integer ids
+        dataName = "with-ids.csv";
 
         path = Paths.get(dirPath.toString(), dataName);
 
-        Files.deleteIfExists(path);
-
-        System.out.println(" |- Write phenotype File (with solution) " + dataName);
+        System.out.println(" |- Write phenotype file (with solution) " + dataName);
 
         phenotypeData.writeData(path, FileType.CSV, solution, true, true, true);
 
-        assertFileEquals("Output 2 is not correct!", new File(
-            SimplePhenotypeDataTest.class.getResource("/phenotypes/out/Phenotype-Csv-AllIds2.csv").getPath()),
-            path.toFile());
-
-        // solution in reverse natural order
-        solution = new SubsetSolution(new TreeSet<Integer>(ids), Comparator.reverseOrder());
-
-        for (int i = 0; i < SOLUTION.length; ++i) {
-            solution.select(SOLUTION[i]);
-        }
-
-        dataName = "out3.csv";
+        assertTrue("Output is not correct!",
+            FileUtils
+                .contentEquals(
+                    new File(SimpleDistanceMatrixDataTest.class
+                        .getResource("/phenotypes/out/all-with-ids.csv").getPath()),
+                    path.toFile()));
+        
+        // write with integer ids
+        dataName = "no-ids.csv";
 
         path = Paths.get(dirPath.toString(), dataName);
 
-        Files.deleteIfExists(path);
-
-        System.out.println(" |- Write phenotype File (with solution reverse order) " + dataName);
+        System.out.println(" |- Write phenotype file (with solution) " + dataName);
 
         phenotypeData.writeData(path, FileType.CSV, solution, false, true, true);
 
-        assertFileEquals("Output 3 is not correct!", new File(
-            SimplePhenotypeDataTest.class.getResource("/phenotypes/out/Phenotype-Csv-AllIds3.csv").getPath()),
-            path.toFile());
+        assertTrue("Output is not correct!",
+            FileUtils
+                .contentEquals(
+                    new File(SimpleDistanceMatrixDataTest.class
+                        .getResource("/phenotypes/out/all-no-ids.csv").getPath()),
+                    path.toFile()));
 
-        dataName = "out4.csv";
-
-        path = Paths.get(dirPath.toString(), dataName);
-
-        Files.deleteIfExists(path);
-
-        System.out.println(" |- Write phenotype File (with solution reverse order) " + dataName);
-
-        phenotypeData.writeData(path, FileType.CSV, solution, true, true, true);
-
-        assertFileEquals("Output 4 is not correct!", new File(
-            SimplePhenotypeDataTest.class.getResource("/phenotypes/out/Phenotype-Csv-AllIds4.csv").getPath()),
-            path.toFile());
-    }
-
-    @Test
-    public void toCsvFileWithSelectedlIds() throws IOException {
-        expectedHeaders = HEADERS_UNIQUE_NAMES;
-
-        SimplePhenotypeData phenotypeData = new SimplePhenotypeData("Phenotype Data",
-            OBJECT_FEATURES_MIN_MAX_COL, OBJECT_TABLE_AS_LIST);
-
-        List<Integer> ids = new ArrayList<Integer>(phenotypeData.getIDs());
-
-        Path dirPath = Paths.get(TEST_OUTPUT);
-
-        Files.createDirectories(dirPath);
-
-        dirPath = Files.createTempDirectory(dirPath, "Phenotype-Csv-SelectedlIds");
-
-        // solution in natural order
-        SubsetSolution solution = new SubsetSolution(new TreeSet<Integer>(ids));
-
-        for (int i = 0; i < SOLUTION.length; ++i) {
-            solution.select(SOLUTION[i]);
-        }
-
-        dataName = "out1.csv";
-
-        Path path = Paths.get(dirPath.toString(), dataName);
-
-        Files.deleteIfExists(path);
-
-        System.out.println(" |- Write phenotype File (with selected) " + dataName);
-
-        phenotypeData.writeData(path, FileType.CSV, solution, false, true, false);
-
-        assertFileEquals("Output 1 is not correct!",
-                new File(SimplePhenotypeDataTest.class
-                    .getResource("/phenotypes/out/Phenotype-Csv-SelectedlIds1.csv").getPath()),
-                path.toFile());
-
-        dataName = "out2.csv";
-
-        path = Paths.get(dirPath.toString(), dataName);
-
-        Files.deleteIfExists(path);
-
-        System.out.println(" |- Write phenotype File (with selected and index) " + dataName);
-
-        phenotypeData.writeData(path, FileType.CSV, solution, true, true, false);
-
-        assertFileEquals("Output 2 is not correct!",   
-                new File(SimplePhenotypeDataTest.class
-                    .getResource("/phenotypes/out/Phenotype-Csv-SelectedlIds2.csv").getPath()),
-                path.toFile());
-
-        // solution in reverse natural order
-        solution = new SubsetSolution(new TreeSet<Integer>(ids), Comparator.reverseOrder());
-
-        for (int i = 0; i < SOLUTION.length; ++i) {
-            solution.select(SOLUTION[i]);
-        }
-
-        dataName = "out3.csv";
-
-        path = Paths.get(dirPath.toString(), dataName);
-
-        Files.deleteIfExists(path);
-
-        System.out.println(" |- Write phenotype File (with selected reverse order) " + dataName);
-
-        phenotypeData.writeData(path, FileType.CSV, solution, false, true, false);
-
-        assertFileEquals("Output 3 is not correct!",    
-                new File(SimplePhenotypeDataTest.class
-                    .getResource("/phenotypes/out/Phenotype-Csv-SelectedlIds3.csv").getPath()),
-                path.toFile());
-
-        dataName = "out4.csv";
-
-        path = Paths.get(dirPath.toString(), dataName);
-
-        Files.deleteIfExists(path);
-
-        System.out.println(" |- Write phenotype File (with selected reverse order and index) " + dataName);
-
-        phenotypeData.writeData(path, FileType.CSV, solution, true, true, false);
-
-        assertFileEquals("Output 4 is not correct!",
-                new File(SimplePhenotypeDataTest.class
-                    .getResource("/phenotypes/out/Phenotype-Csv-SelectedlIds4.csv").getPath()),
-                path.toFile());
-    }
-
-    @Test
-    public void toCsvFileWithUnselectedlIds() throws IOException {
-        expectedHeaders = HEADERS_UNIQUE_NAMES;
-
-        SimplePhenotypeData phenotypeData = new SimplePhenotypeData("Phenotype Data",
-            OBJECT_FEATURES_MIN_MAX_COL, OBJECT_TABLE_AS_LIST);
-
-        List<Integer> ids = new ArrayList<Integer>(phenotypeData.getIDs());
-
-        Path dirPath = Paths.get(TEST_OUTPUT);
-
-        Files.createDirectories(dirPath);
-
-        dirPath = Files.createTempDirectory(dirPath, "Phenotype-Csv-UnselectedlIds");
-
-        // solution in natural order
-        SubsetSolution solution = new SubsetSolution(new TreeSet<Integer>(ids));
-
-        for (int i = 0; i < SOLUTION.length; ++i) {
-            solution.select(SOLUTION[i]);
-        }
-
-        dataName = "out1.csv";
-
-        Path path = Paths.get(dirPath.toString(), dataName);
-
-        Files.deleteIfExists(path);
-
-        System.out.println(" |- Write phenotype File (with unselected) " + dataName);
-
-        phenotypeData.writeData(path, FileType.CSV, solution, false, false, true);
-
-        assertFileEquals("Output 1 is not correct!",
-                new File(SimplePhenotypeDataTest.class
-                    .getResource("/phenotypes/out/Phenotype-Csv-UnselectedlIds1.csv").getPath()),
-                path.toFile());
-
-        dataName = "out2.csv";
-
-        path = Paths.get(dirPath.toString(), dataName);
-
-        Files.deleteIfExists(path);
-
-        System.out.println(" |- Write phenotype File (with unselected and index) " + dataName);
-
-        phenotypeData.writeData(path, FileType.CSV, solution, true, false, true);
-
-        assertFileEquals("Output 2 is not correct!",
-                new File(SimplePhenotypeDataTest.class
-                    .getResource("/phenotypes/out/Phenotype-Csv-UnselectedlIds2.csv").getPath()),
-                path.toFile());
-
-        // solution in reverse natural order
-        solution = new SubsetSolution(new TreeSet<Integer>(ids), Comparator.reverseOrder());
-
-        for (int i = 0; i < SOLUTION.length; ++i) {
-            solution.select(SOLUTION[i]);
-        }
-
-        dataName = "out3.csv";
-
-        path = Paths.get(dirPath.toString(), dataName);
-
-        Files.deleteIfExists(path);
-
-        System.out.println(" |- Write phenotype File (with unselected reverse order) " + dataName);
-
-        phenotypeData.writeData(path, FileType.CSV, solution, false, false, true);
-
-        assertFileEquals("Output 3 is not correct!",
-                new File(SimplePhenotypeDataTest.class
-                    .getResource("/phenotypes/out/Phenotype-Csv-UnselectedlIds3.csv").getPath()),
-                path.toFile());
-
-        dataName = "out4.csv";
-
-        path = Paths.get(dirPath.toString(), dataName);
-
-        Files.deleteIfExists(path);
-
-        System.out.println(" |- Write phenotype File (with unselected reverse order and index) " + dataName);
-
-        phenotypeData.writeData(path, FileType.CSV, solution, true, false, true);
-
-        assertFileEquals("Output 4 is not correct!",
-                new File(SimplePhenotypeDataTest.class
-                    .getResource("/phenotypes/out/Phenotype-Csv-UnselectedlIds4.csv").getPath()),
-                path.toFile());
     }
     
-    private void assertFileEquals(String string, File expected, File actual) {
+    @Test
+    public void toCsvFileWithSelectedIds() throws IOException {
+        expectedHeaders = HEADERS_UNIQUE_NAMES;
+        SimplePhenotypeData phenotypeData = new SimplePhenotypeData("Phenotype Data",
+            OBJECT_FEATURES_MIN_MAX_COL, OBJECT_TABLE_AS_LIST);
 
-        try {
-            BufferedReader reader1 = new BufferedReader(new FileReader(expected)) ;
-            BufferedReader reader2 = new BufferedReader(new FileReader(actual)) ;
-            
-            int line = 0 ;
-            
-            while (reader1.ready() && reader2.ready()) {
-                ++line ;
-                
-                assertEquals("Line " + line + " in file " + expected.getName() + " is not the same in file "
-                    + actual.getName(), reader1.readLine(), reader2.readLine());
-            }
-       
-            assertFalse("expected file has more lines", reader1.ready()) ;
-            assertFalse("actual file has more lines", reader2.ready()) ;
-            
-            reader1.close(); 
-            reader2.close(); 
-        } catch (Exception e) {
-            fail(e.getMessage()) ;
-        } 
+        Set<Integer> ids = phenotypeData.getIDs();
+
+        Path dirPath = Paths.get(TEST_OUTPUT);
+
+        Files.createDirectories(dirPath);
+
+        dirPath = Files.createTempDirectory(dirPath, "Phenotype-SelectedIds");
+
+        // create solution
+        SubsetSolution solution = new SubsetSolution(ids);
+        for(int sel : SELECTION){
+            solution.select(sel);
+        }
+        
+        Path path;
+        
+        // write with integer ids
+        dataName = "with-ids.csv";
+
+        path = Paths.get(dirPath.toString(), dataName);
+
+        System.out.println(" |- Write phenotype file (with solution) " + dataName);
+
+        phenotypeData.writeData(path, FileType.CSV, solution, true, true, false);
+
+        assertTrue("Output is not correct!",
+            FileUtils
+                .contentEquals(
+                    new File(SimpleDistanceMatrixDataTest.class
+                        .getResource("/phenotypes/out/sel-with-ids.csv").getPath()),
+                    path.toFile()));
+        
+        // write with integer ids
+        dataName = "no-ids.csv";
+
+        path = Paths.get(dirPath.toString(), dataName);
+
+        System.out.println(" |- Write phenotype file (with solution) " + dataName);
+
+        phenotypeData.writeData(path, FileType.CSV, solution, false, true, false);
+
+        assertTrue("Output is not correct!",
+            FileUtils
+                .contentEquals(
+                    new File(SimpleDistanceMatrixDataTest.class
+                        .getResource("/phenotypes/out/sel-no-ids.csv").getPath()),
+                    path.toFile()));
+
     }
+    
+    @Test
+    public void toCsvFileWithUnselectedIds() throws IOException {
+        expectedHeaders = HEADERS_UNIQUE_NAMES;
+        SimplePhenotypeData phenotypeData = new SimplePhenotypeData("Phenotype Data",
+            OBJECT_FEATURES_MIN_MAX_COL, OBJECT_TABLE_AS_LIST);
+
+        Set<Integer> ids = phenotypeData.getIDs();
+
+        Path dirPath = Paths.get(TEST_OUTPUT);
+
+        Files.createDirectories(dirPath);
+
+        dirPath = Files.createTempDirectory(dirPath, "Phenotype-UnselectedIds");
+
+        // create solution
+        SubsetSolution solution = new SubsetSolution(ids);
+        for(int sel : SELECTION){
+            solution.select(sel);
+        }
+        
+        Path path;
+        
+        // write with integer ids
+        dataName = "with-ids.csv";
+
+        path = Paths.get(dirPath.toString(), dataName);
+
+        System.out.println(" |- Write phenotype file (with solution) " + dataName);
+
+        phenotypeData.writeData(path, FileType.CSV, solution, true, false, true);
+
+        assertTrue("Output is not correct!",
+            FileUtils
+                .contentEquals(
+                    new File(SimpleDistanceMatrixDataTest.class
+                        .getResource("/phenotypes/out/unsel-with-ids.csv").getPath()),
+                    path.toFile()));
+        
+        // write with integer ids
+        dataName = "no-ids.csv";
+
+        path = Paths.get(dirPath.toString(), dataName);
+
+        System.out.println(" |- Write phenotype file (with solution) " + dataName);
+
+        phenotypeData.writeData(path, FileType.CSV, solution, false, false, true);
+
+        assertTrue("Output is not correct!",
+            FileUtils
+                .contentEquals(
+                    new File(SimpleDistanceMatrixDataTest.class
+                        .getResource("/phenotypes/out/unsel-no-ids.csv").getPath()),
+                    path.toFile()));
+
+    }
+    
 }

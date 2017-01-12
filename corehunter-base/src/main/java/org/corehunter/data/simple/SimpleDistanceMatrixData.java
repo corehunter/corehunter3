@@ -406,6 +406,12 @@ public class SimpleDistanceMatrixData extends DataPojo implements DistanceMatrix
             throw new IllegalArgumentException("Solution ids must match data.");
         }
         
+        if(!includeSelected && !includeUnselected){
+            throw new IllegalArgumentException(
+                    "One of 'includeSelected' or 'includeUnselected' must be used."
+            );
+        }
+        
         Files.createDirectories(filePath.getParent());
 
         // write data to file

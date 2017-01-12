@@ -943,6 +943,12 @@ public class SimpleGenotypeData extends DataPojo implements GenotypeData {
         if (!(solution.getAllIDs().equals(getIDs()))) {
             throw new IllegalArgumentException("Solution ids must match data.");
         }
+        
+        if(!includeSelected && !includeUnselected){
+            throw new IllegalArgumentException(
+                    "One of 'includeSelected' or 'includeUnselected' must be used."
+            );
+        }
 
         Files.createDirectories(filePath.getParent());
 
