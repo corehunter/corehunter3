@@ -34,7 +34,6 @@ import java.util.TreeSet;
 import java.util.stream.Stream;
 
 import org.corehunter.data.GenotypeDataFormat;
-import org.corehunter.util.StringUtils;
 
 import uno.informatics.data.io.FileType;
 import uno.informatics.common.io.IOUtilities;
@@ -417,7 +416,7 @@ public class SimpleGenotypeData extends DataPojo implements GenotypeData {
             if(numDataCols == 0){
                 throw new IOException("No data columns.");
             }
-            // extract and unquote marker column names
+            // extract marker column names
             markerNamesRow = Arrays.stream(markerNamesRow)
                                    .skip(numHeaderCols)
                                    .toArray(n -> new String[n]);
@@ -592,7 +591,6 @@ public class SimpleGenotypeData extends DataPojo implements GenotypeData {
             // extend rows with null values where needed
             for(int r = 0; r < rows.size(); r++){
                 String[] row = rows.get(r);
-
                 if(row.length < numCols){
                     row = Arrays.copyOf(row, numCols);
                 }
@@ -774,12 +772,12 @@ public class SimpleGenotypeData extends DataPojo implements GenotypeData {
         for(int c = 0; c < columnNames.length; c++){
             String columnName = columnNames[c];
             if(columnName == null){
-                throw new IllegalArgumentException("Missing column name for column " + c + ".");
+                throw new IllegalArgumentException("Missing column name for data column " + c + ".");
             }
             String markerName = inferMarkerName(columnName);
             if(markerName.equals("")){
                 throw new IllegalArgumentException(String.format(
-                        "Invalid marker name at column %d (%s).", c, columnName
+                        "Invalid marker name at data column %d (%s).", c, columnName
                 ));
             }
             if(curName == null || !markerName.equals(curName)){

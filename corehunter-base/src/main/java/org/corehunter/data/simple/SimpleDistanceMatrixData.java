@@ -190,7 +190,7 @@ public class SimpleDistanceMatrixData extends DataPojo implements DistanceMatrix
         try (RowReader reader = IOUtilities.createRowReader(
                 filePath, type, 
                 TextFileRowReader.REMOVE_WHITE_SPACE,
-                TextFileRowReader.ROWS_SAME_SIZE, 
+                TextFileRowReader.ROWS_SAME_SIZE,
                 TextFileRowReader.REMOVE_QUOTES
         )) {
             
