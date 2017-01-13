@@ -152,10 +152,9 @@ public class SimpleDistanceMatrixData extends DataPojo implements DistanceMatrix
      * unique identifiers are used as names as well. Optionally, the same item identifiers from the first header
      * column may also be included on the first row (in the same order).
      * <p>
-     * Leading and trailing whitespace is removed from names and unique identifiers and they are unquoted if
-     * wrapped in single or double quotes after whitespace removal. If it is intended to start or end a
-     * name/identifier with whitespace this whitespace should be contained within the quotes, as it
-     * will then not be removed.
+     * Leading and trailing whitespace is removed and values are unquoted if wrapped in single or double quotes
+     * after whitespace removal. If it is intended to start or end a string with whitespace this whitespace
+     * should be contained within the quotes.
      * <p>
      * The dataset name is set to the name of the file from which the data is read.
      * 

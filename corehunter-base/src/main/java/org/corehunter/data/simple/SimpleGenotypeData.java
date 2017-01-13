@@ -323,13 +323,13 @@ public class SimpleGenotypeData extends DataPojo implements GenotypeData {
      * {@link SimpleBiAllelicGenotypeData#readData(Path, FileType)}.
      * 
      * <p>
-     * In all formats leading and trailing whitespace is removed from names and unique identifiers and they are 
-     * unquoted if wrapped in single or double quotes after whitespace removal. If it is intended to start or end a 
-     * name/identifier with whitespace this whitespace should be contained within the quotes, as it will then not be 
-     * removed. Also, column names may optionally include an arbitrary suffix added to the marker name, starting
-     * with a dash, underscore or dot character. The latter allows to use column names such as "M1-1" and "M1-2",
-     * "M1.a" and "M1.b" or "M1_1" and "M1_2" for a marker named "M1" with two columns. The column name prefix
-     * up to before the last occurrence of any dash, underscore or dot character is taken to be the marker name.
+     * In all formats leading and trailing whitespace is removed and values are unquoted if wrapped in single or
+     * double quotes after whitespace removal. If it is intended to start or end a string with whitespace this
+     * whitespace should be contained within the quotes. Specifically, column names may optionally include an
+     * arbitrary suffix added to the marker name, starting with a dash, underscore or dot character. The latter
+     * allows to use column names such as "M1-1" and "M1-2", "M1.a" and "M1.b" or "M1_1" and "M1_2" for a marker
+     * named "M1" with two columns. The column name prefix up to before the last occurrence of any dash,
+     * underscore or dot character is taken to be the marker name.
      * <p>
      * Trailing empty cells can be omitted from any row in the file.
      * <p>

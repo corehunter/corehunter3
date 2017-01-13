@@ -194,10 +194,9 @@ public class SimpleBiAllelicGenotypeData extends SimpleGenotypeData
      * (not necessarily unique) item names. If no explicit item names are provided the unique identifiers are used
      * as names as well.
      * <p>
-     * Leading and trailing whitespace is removed from names and unique identifiers and they are unquoted
-     * if wrapped in single or double quotes after whitespace removal. If it is intended to start or end a
-     * name/identifier with whitespace this whitespace should be contained
-     * within the quotes, as it will then not be removed.
+     * Leading and trailing whitespace is removed and values are unquoted if wrapped in single or double quotes
+     * after whitespace removal. If it is intended to start or end a string with whitespace this whitespace
+     * should be contained within the quotes.
      * <p>
      * Trailing empty cells can be omitted at any row in the file.
      * <p>
