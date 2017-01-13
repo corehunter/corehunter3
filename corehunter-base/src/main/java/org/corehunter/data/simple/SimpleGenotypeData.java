@@ -386,7 +386,8 @@ public class SimpleGenotypeData extends DataPojo implements GenotypeData {
         try (RowReader reader = IOUtilities.createRowReader(
                 filePath, type,
                 TextFileRowReader.REMOVE_WHITE_SPACE,
-                TextFileRowReader.ROWS_SAME_SIZE
+                TextFileRowReader.ROWS_SAME_SIZE, 
+                TextFileRowReader.REMOVE_QUOTES
         )) {
             
             if (reader == null || !reader.ready()) {
@@ -419,7 +420,6 @@ public class SimpleGenotypeData extends DataPojo implements GenotypeData {
             // extract and unquote marker column names
             markerNamesRow = Arrays.stream(markerNamesRow)
                                    .skip(numHeaderCols)
-                                   .map(StringUtils::unquote)
                                    .toArray(n -> new String[n]);
             // extract/check names and infer number of alleles per marker
             HashMap<String, Integer> markers;
@@ -464,7 +464,7 @@ public class SimpleGenotypeData extends DataPojo implements GenotypeData {
                     for(int m = 0; m < numMarkers; m++){
                         alleleNames[m] = new String[alleleCounts[m]];
                         for(int a = 0; a < alleleNames[m].length; a++){
-                            alleleNames[m][a] = StringUtils.unquote(row[aglob]);
+                            alleleNames[m][a] = row[aglob];
                             aglob++;
                         }
                     }
@@ -473,10 +473,10 @@ public class SimpleGenotypeData extends DataPojo implements GenotypeData {
                     // process data row
                     
                     // extract unique item identifier
-                    itemIdentifiers.add(StringUtils.unquote(row[0]));
+                    itemIdentifiers.add(row[0]);
                     // extract item name, if included
                     if(withNames){
-                        itemNames.add(StringUtils.unquote(row[1]));
+                        itemNames.add(row[1]);
                     }
 
                     // group frequencies per marker
@@ -564,7 +564,10 @@ public class SimpleGenotypeData extends DataPojo implements GenotypeData {
         
         // read data from file
         try(RowReader reader = IOUtilities.createRowReader(
-                filePath, type, TextFileRowReader.REMOVE_WHITE_SPACE
+                filePath, type, 
+                TextFileRowReader.REMOVE_WHITE_SPACE,
+                TextFileRowReader.REMOVE_QUOTES,
+                TextFileRowReader.ROWS_SAME_SIZE
         )){
             
             if (reader == null || !reader.ready()) {
@@ -586,10 +589,10 @@ public class SimpleGenotypeData extends DataPojo implements GenotypeData {
             
             // infer number of columns
             int numCols = rows.stream().mapToInt(row -> row.length).max().getAsInt();
-            // extend rows with null values where needed + unquote
+            // extend rows with null values where needed
             for(int r = 0; r < rows.size(); r++){
                 String[] row = rows.get(r);
-                row = StringUtils.unquote(row);
+
                 if(row.length < numCols){
                     row = Arrays.copyOf(row, numCols);
                 }

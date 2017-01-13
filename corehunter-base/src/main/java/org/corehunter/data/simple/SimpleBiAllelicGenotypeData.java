@@ -28,7 +28,6 @@ import java.util.List;
 import java.util.Objects;
 
 import org.corehunter.data.GenotypeDataFormat;
-import org.corehunter.util.StringUtils;
 
 import uno.informatics.data.io.FileType;
 import uno.informatics.common.io.IOUtilities;
@@ -232,7 +231,8 @@ public class SimpleBiAllelicGenotypeData extends SimpleGenotypeData
 
         // read data from file
         try (RowReader reader = IOUtilities.createRowReader(filePath, type,
-                TextFileRowReader.REMOVE_WHITE_SPACE)) {
+            TextFileRowReader.REMOVE_WHITE_SPACE,
+            TextFileRowReader.REMOVE_QUOTES)) {
 
             if (reader == null || !reader.ready()) {
                 throw new IOException("Can not create reader for file " + filePath + ". File may be empty.");
@@ -245,7 +245,7 @@ public class SimpleBiAllelicGenotypeData extends SimpleGenotypeData
             // read and unquote all data
             List<String[]> rows = new ArrayList<>();
             while (reader.nextRow()) {
-                rows.add(StringUtils.unquote(reader.getRowCellsAsStringArray()));
+                rows.add(reader.getRowCellsAsStringArray());
             }
             if (rows.isEmpty()) {
                 throw new IOException("File is empty.");

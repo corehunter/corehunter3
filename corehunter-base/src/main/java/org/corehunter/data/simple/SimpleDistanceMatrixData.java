@@ -27,7 +27,6 @@ import java.util.List;
 import java.util.Objects;
 
 import org.corehunter.data.DistanceMatrixData;
-import org.corehunter.util.StringUtils;
 
 import uno.informatics.data.io.FileType;
 import uno.informatics.common.io.IOUtilities;
@@ -189,7 +188,10 @@ public class SimpleDistanceMatrixData extends DataPojo implements DistanceMatrix
 
         // read data from file
         try (RowReader reader = IOUtilities.createRowReader(
-                filePath, type, TextFileRowReader.REMOVE_WHITE_SPACE
+                filePath, type, 
+                TextFileRowReader.REMOVE_WHITE_SPACE,
+                TextFileRowReader.ROWS_SAME_SIZE, 
+                TextFileRowReader.REMOVE_QUOTES
         )) {
             
             if (reader == null || !reader.ready()) {
@@ -230,15 +232,15 @@ public class SimpleDistanceMatrixData extends DataPojo implements DistanceMatrix
             String[] ids = new String[n];
             String[] names = new String[n];
             for(int i = 0; i < n; i++){
-                ids[i] = StringUtils.unquote(rows.get(i+1)[0]);
-                names[i] = withNames ? StringUtils.unquote(rows.get(i+1)[1]) : ids[i];
+                ids[i] = rows.get(i+1)[0];
+                names[i] = withNames ? rows.get(i+1)[1] : ids[i];
             }
             
             // verify ids on header row, if provided
             if(firstRow.length > numHeaderCols){
                 for(int i = 0; i < n; i++){
                     if(numHeaderCols + i >= firstRow.length
-                            || !Objects.equals(ids[i], StringUtils.unquote(firstRow[numHeaderCols+i]))){
+                            || !Objects.equals(ids[i], firstRow[numHeaderCols+i])){
                         throw new IOException("Row and column identifiers differ.");
                     }
                 }
