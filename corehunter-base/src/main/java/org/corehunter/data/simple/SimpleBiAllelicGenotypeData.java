@@ -231,7 +231,7 @@ public class SimpleBiAllelicGenotypeData extends SimpleGenotypeData
         // read data from file
         try (RowReader reader = IOUtilities.createRowReader(filePath, type,
             TextFileRowReader.REMOVE_WHITE_SPACE,
-            TextFileRowReader.ROWS_SAME_SIZE,
+            /*TextFileRowReader.ROWS_SAME_SIZE,*/
             TextFileRowReader.REMOVE_QUOTES)) {
 
             if (reader == null || !reader.ready()) {
