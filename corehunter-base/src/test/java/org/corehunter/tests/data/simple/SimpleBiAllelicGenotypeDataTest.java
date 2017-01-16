@@ -123,17 +123,6 @@ public class SimpleBiAllelicGenotypeDataTest {
             Paths.get(SimpleBiAllelicGenotypeDataTest.class.getResource(CSV_IDS).getPath()), FileType.CSV
         ));
     }
-
-    @Test
-    public void tmp() throws IOException {
-        datasetName = "ids.csv";
-        expectedHeaders = HEADERS_UNIQUE_NAMES;
-        expectedMarkerNames = MARKER_NAMES;
-        System.out.println(" |- Read File " + datasetName);
-        testData(SimpleBiAllelicGenotypeData.readData(
-            Paths.get(SimpleBiAllelicGenotypeDataTest.class.getResource("/biallelic_genotypes/err/missing-id.csv").getPath()), FileType.CSV
-        ));
-    }
     
     @Test
     public void fromCsvFileWithIdsAndNames() throws IOException {
