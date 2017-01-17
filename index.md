@@ -16,17 +16,17 @@ The measures included in Core Hunter 3 are listed below.
 
 ### Distance based measures
 
-- Average entry-to-nearest-entry distance, i.e. the mean distance between each selected accession and the closest other selected accession. Maximizing this measure yields high diversity in the core (maximum dissimilarity of core accessions). Tends to include cluster edges.
-- Average accession-to-nearest-entry distance, i.e. the mean distance between each accession in the entire collection and the closest selected accession. Minimizing this measure yields cores that maximally represent all individual accessions from the full collection. Tends to focus on cluster centers.
-- Average entry-to-entry distance (provided for historical reasons, not preferred).
+1. Average entry-to-nearest-entry distance, i.e. the mean distance between each selected accession and the closest other selected accession. Maximizing this measure yields high diversity in the core (maximum dissimilarity of core accessions). Tends to include cluster edges.
+2. Average accession-to-nearest-entry distance, i.e. the mean distance between each accession in the entire collection and the closest selected accession. Minimizing this measure yields cores that maximally represent all individual accessions from the full collection. Tends to focus on cluster centers.
+3. Average entry-to-entry distance (provided for historical reasons, not preferred).
 
 Gower's distance is used to compute distances from phenotypic traits, and both the Modified Roger's as well as Cavalli-Sforza & Edwards distances are supported for genetic marker data. Alternatively, a precomputed distance matrix can be used.
 
 ### Allelic richness
 
-- Shannon's index.
-- Expected heterozygosity.
-- Allele coverage.
+1. Shannon's index.
+2. Expected heterozygosity.
+3. Allele coverage.
 
 Available for genetic marker data only.
 
