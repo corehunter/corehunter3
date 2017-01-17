@@ -20,8 +20,8 @@
 package org.corehunter.objectives.distance.measures;
 
 import org.corehunter.data.CoreHunterData;
-import org.corehunter.exceptions.CoreHunterException;
 import org.corehunter.data.GenotypeData;
+import org.corehunter.exceptions.CoreHunterException;
 
 /**
  * @author Guy Davenport, Herman De Beukelaer

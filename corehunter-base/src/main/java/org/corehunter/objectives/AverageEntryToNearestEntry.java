@@ -30,7 +30,6 @@ import org.corehunter.objectives.distance.DistanceMeasure;
 import org.corehunter.objectives.distance.eval.NearestEntry;
 import org.corehunter.objectives.distance.eval.NearestEntryEvaluation;
 import org.corehunter.objectives.distance.measures.MissingValuesPolicy;
-
 import org.jamesframework.core.exceptions.IncompatibleDeltaEvaluationException;
 import org.jamesframework.core.problems.objectives.Objective;
 import org.jamesframework.core.problems.objectives.evaluations.Evaluation;

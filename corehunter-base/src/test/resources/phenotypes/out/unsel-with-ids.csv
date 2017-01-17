@@ -1,0 +1,6 @@
+X,ID,NAME,col1,col2,col3,col4,col5
+,NAME,,Col 1,Col 2,Col 3,Col 4,Col 5
+,TYPE,,II,RD,NS,NB,NS
+,MIN,,0,0.0,,,
+,MAX,,4,4.0,,,
+1,Bob,Bob,2,2.2,R2C3,false,13/12/2012

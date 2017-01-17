@@ -1,0 +1,6 @@
+X,ID,NAME,SELECTED,Alice,Dave,Bob,Carol,Eve
+0,Alice,Alice,false,0.0,0.2,0.4,0.6,0.8
+1,Dave,Dave,true,0.2,0.0,0.2,0.4,0.6
+2,Bob,Bob,false,0.4,0.2,0.0,0.1,0.4
+3,Carol,Carol,true,0.6,0.4,0.1,0.0,0.2
+4,Eve,Eve,true,0.8,0.6,0.4,0.2,0.0

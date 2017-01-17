@@ -24,13 +24,12 @@ import org.corehunter.CoreHunterObjectiveType;
 import org.corehunter.data.CoreHunterData;
 import org.corehunter.data.DistanceMatrixData;
 import org.corehunter.data.GenotypeData;
+import org.corehunter.data.PhenotypeData;
 import org.corehunter.data.simple.SimpleDistanceMatrixData;
 import org.corehunter.data.simple.SimpleGenotypeData;
+import org.corehunter.data.simple.SimplePhenotypeData;
 import org.corehunter.tests.data.simple.CoreHunterDataTest;
 import org.junit.Test;
-
-import uno.informatics.data.dataset.FeatureData;
-import uno.informatics.data.feature.array.ArrayFeatureData;
 
 public class APITest {
 
@@ -73,7 +72,7 @@ public class APITest {
         GenotypeData genotypes = new SimpleGenotypeData(HEADERS_UNIQUE_NAMES, MARKER_NAMES, ALLELE_NAMES,
             ALLELE_FREQUENCIES);
         GENO_DATA = new CoreHunterData(genotypes);
-        FeatureData phenotypes = new ArrayFeatureData(NAME, PHENOTYPIC_TRAIT_FEATURES,
+        PhenotypeData phenotypes = new SimplePhenotypeData(NAME, PHENOTYPIC_TRAIT_FEATURES,
             PHENOTYPIC_TRAIT_VALUES_WITH_HEADERS);
         PHENOTYPES_DATA = new CoreHunterData(phenotypes);
         DistanceMatrixData distances = new SimpleDistanceMatrixData(HEADERS_UNIQUE_NAMES, DISTANCES);

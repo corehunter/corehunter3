@@ -26,7 +26,6 @@ import java.util.Set;
 import org.corehunter.data.CoreHunterData;
 import org.corehunter.objectives.distance.DistanceMeasure;
 import org.corehunter.objectives.distance.measures.MissingValuesPolicy;
-
 import org.jamesframework.core.exceptions.IncompatibleDeltaEvaluationException;
 import org.jamesframework.core.problems.objectives.Objective;
 import org.jamesframework.core.problems.objectives.evaluations.Evaluation;

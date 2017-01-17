@@ -19,34 +19,32 @@
 
 package org.corehunter.tests.objectives;
 
-import java.util.Random;
-
 import static org.corehunter.tests.TestData.ALLELE_FREQUENCIES;
 import static org.corehunter.tests.TestData.ALLELE_NAMES;
 import static org.corehunter.tests.TestData.COVERAGE_SUBSET1;
+import static org.corehunter.tests.TestData.COVERAGE_SUBSET2;
+import static org.corehunter.tests.TestData.COVERAGE_SUBSET3;
 import static org.corehunter.tests.TestData.HEADERS_NON_UNIQUE_NAMES;
 import static org.corehunter.tests.TestData.MARKER_NAMES;
 import static org.corehunter.tests.TestData.NAME;
 import static org.corehunter.tests.TestData.PRECISION;
 import static org.corehunter.tests.TestData.SUBSET1;
-import static org.corehunter.tests.TestData.COVERAGE_SUBSET2;
-import static org.corehunter.tests.TestData.COVERAGE_SUBSET3;
 import static org.corehunter.tests.TestData.SUBSET2;
 import static org.corehunter.tests.TestData.SUBSET3;
 import static org.corehunter.tests.TestData.SUBSET_EMPTY;
 
-import org.corehunter.data.simple.SimpleGenotypeData;
+import java.util.Random;
+
 import org.corehunter.data.CoreHunterData;
+import org.corehunter.data.simple.SimpleGenotypeData;
 import org.corehunter.objectives.Coverage;
 import org.jamesframework.core.problems.objectives.evaluations.Evaluation;
 import org.jamesframework.core.problems.objectives.evaluations.SimpleEvaluation;
 import org.jamesframework.core.search.neigh.Move;
 import org.jamesframework.core.search.neigh.Neighbourhood;
 import org.jamesframework.core.subset.SubsetProblem;
-
 import org.jamesframework.core.subset.SubsetSolution;
 import org.jamesframework.core.subset.neigh.SinglePerturbationNeighbourhood;
-
 import org.junit.Test;
 
 /**

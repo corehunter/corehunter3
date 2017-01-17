@@ -28,34 +28,36 @@ import static org.corehunter.tests.TestData.ALLELE_NAMES_HOMOZYGOUS;
 import static org.corehunter.tests.TestData.HEADERS_NON_UNIQUE_NAMES;
 import static org.corehunter.tests.TestData.HEADERS_UNIQUE_NAMES;
 import static org.corehunter.tests.TestData.MARKER_NAMES;
+import static org.corehunter.tests.TestData.MARKER_NAMES_DEFAULT;
 import static org.corehunter.tests.TestData.NAME;
 import static org.corehunter.tests.TestData.PRECISION;
 import static org.corehunter.tests.TestData.SET;
 import static org.corehunter.tests.TestData.UNDEFINED_ALLELE_NAMES;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.Set;
 
+import org.apache.commons.io.FileUtils;
+import org.corehunter.data.GenotypeData;
 import org.corehunter.data.GenotypeDataFormat;
 import org.corehunter.data.simple.SimpleGenotypeData;
+import org.jamesframework.core.subset.SubsetSolution;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import uno.informatics.data.io.FileType;
 import uno.informatics.data.SimpleEntity;
-
-import org.corehunter.data.GenotypeData;
-
-import static org.corehunter.tests.TestData.MARKER_NAMES_DEFAULT;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import uno.informatics.data.io.FileType;
 
 /**
  * @author Guy Davenport, Herman De Beukelaer
@@ -78,6 +80,10 @@ public class SimpleGenotypeDataTest {
     private static final String ERRONEOUS_FILES_DIR = "/frequency_genotypes/err/";
     private static final String DIPLOID_ERRONEOUS_FILES_DIR = "/diploid_genotypes/err/";
     private static final String TEST_OUTPUT = "target/testoutput";
+    
+    private static final int[] SELECTION = new int[] {
+        1, 3, 4
+    };
     
     private SimpleEntity[] expectedHeaders;
     private String[] expectedMarkerNames;
@@ -214,9 +220,7 @@ public class SimpleGenotypeDataTest {
         path = Files.createTempDirectory(path, "GenoFreqs-CsvAlleleNames") ;
         
         path = Paths.get(path.toString(), dataName) ;
-        
-        Files.deleteIfExists(path) ;
-        
+                
         System.out.println(" |- Write File " + dataName);
         genotypicData.writeData(path, FileType.CSV);
         
@@ -224,6 +228,183 @@ public class SimpleGenotypeDataTest {
         testDataFrequencies(SimpleGenotypeData.readData(path, FileType.CSV));
     }
     
+    @Test
+    public void toCsvFileWithAllIds() throws IOException {
+        expectedHeaders = HEADERS_UNIQUE_NAMES;
+        expectedMarkerNames = MARKER_NAMES;
+        expectedAlleleNames = ALLELE_NAMES;
+        
+        SimpleGenotypeData genotypicData = new SimpleGenotypeData(expectedHeaders, 
+                expectedMarkerNames, expectedAlleleNames, ALLELE_FREQUENCIES) ;
+        
+        Set<Integer> ids = genotypicData.getIDs();
+
+        Path dirPath = Paths.get(TEST_OUTPUT);
+
+        Files.createDirectories(dirPath);
+
+        dirPath = Files.createTempDirectory(dirPath, "GenoFreqs-AllIds");
+        
+        // create solution
+        SubsetSolution solution = new SubsetSolution(ids);
+        for(int sel : SELECTION){
+            solution.select(sel);
+        }
+        
+        Path path;
+        
+        // write with integer ids
+        dataName = "with-ids.csv";
+
+        path = Paths.get(dirPath.toString(), dataName);
+
+        System.out.println(" |- Write frequency genotypes file (with solution) " + dataName);
+
+        genotypicData.writeData(path, FileType.CSV, GenotypeDataFormat.FREQUENCY, solution, true, true, true);
+
+        assertTrue("Output is not correct!",
+            FileUtils
+                .contentEquals(
+                    new File(SimpleDistanceMatrixDataTest.class
+                        .getResource("/frequency_genotypes/out/all-with-ids.csv").getPath()),
+                    path.toFile()));
+        
+        // write without integer ids
+        dataName = "no-ids.csv";
+
+        path = Paths.get(dirPath.toString(), dataName);
+
+        System.out.println(" |- Write frequency genotypes file (with solution) " + dataName);
+
+        genotypicData.writeData(path, FileType.CSV, GenotypeDataFormat.FREQUENCY, solution, false, true, true);
+
+        assertTrue("Output is not correct!",
+            FileUtils
+                .contentEquals(
+                    new File(SimpleDistanceMatrixDataTest.class
+                        .getResource("/frequency_genotypes/out/all-no-ids.csv").getPath()),
+                    path.toFile()));
+
+    }
+    
+    @Test
+    public void toCsvFileWithSelectedIds() throws IOException {
+        expectedHeaders = HEADERS_UNIQUE_NAMES;
+        expectedMarkerNames = MARKER_NAMES;
+        expectedAlleleNames = ALLELE_NAMES;
+        
+        SimpleGenotypeData genotypicData = new SimpleGenotypeData(expectedHeaders, 
+                expectedMarkerNames, expectedAlleleNames, ALLELE_FREQUENCIES) ;
+        
+        Set<Integer> ids = genotypicData.getIDs();
+
+        Path dirPath = Paths.get(TEST_OUTPUT);
+
+        Files.createDirectories(dirPath);
+
+        dirPath = Files.createTempDirectory(dirPath, "GenoFreqs-SelectedIds");
+        
+        // create solution
+        SubsetSolution solution = new SubsetSolution(ids);
+        for(int sel : SELECTION){
+            solution.select(sel);
+        }
+        
+        Path path;
+        
+        // write with integer ids
+        dataName = "with-ids.csv";
+
+        path = Paths.get(dirPath.toString(), dataName);
+
+        System.out.println(" |- Write frequency genotypes file (with solution) " + dataName);
+
+        genotypicData.writeData(path, FileType.CSV, GenotypeDataFormat.FREQUENCY, solution, true, true, false);
+
+        assertTrue("Output is not correct!",
+            FileUtils
+                .contentEquals(
+                    new File(SimpleDistanceMatrixDataTest.class
+                        .getResource("/frequency_genotypes/out/sel-with-ids.csv").getPath()),
+                    path.toFile()));
+        
+        // write without integer ids
+        dataName = "no-ids.csv";
+
+        path = Paths.get(dirPath.toString(), dataName);
+
+        System.out.println(" |- Write frequency genotypes file (with solution) " + dataName);
+
+        genotypicData.writeData(path, FileType.CSV, GenotypeDataFormat.FREQUENCY, solution, false, true, false);
+
+        assertTrue("Output is not correct!",
+            FileUtils
+                .contentEquals(
+                    new File(SimpleDistanceMatrixDataTest.class
+                        .getResource("/frequency_genotypes/out/sel-no-ids.csv").getPath()),
+                    path.toFile()));
+
+    }
+    
+    @Test
+    public void toCsvFileWithUnselectedIds() throws IOException {
+        expectedHeaders = HEADERS_UNIQUE_NAMES;
+        expectedMarkerNames = MARKER_NAMES;
+        expectedAlleleNames = ALLELE_NAMES;
+        
+        SimpleGenotypeData genotypicData = new SimpleGenotypeData(expectedHeaders, 
+                expectedMarkerNames, expectedAlleleNames, ALLELE_FREQUENCIES) ;
+        
+        Set<Integer> ids = genotypicData.getIDs();
+
+        Path dirPath = Paths.get(TEST_OUTPUT);
+
+        Files.createDirectories(dirPath);
+
+        dirPath = Files.createTempDirectory(dirPath, "GenoFreqs-UnselectedIds");
+        
+        // create solution
+        SubsetSolution solution = new SubsetSolution(ids);
+        for(int sel : SELECTION){
+            solution.select(sel);
+        }
+        
+        Path path;
+        
+        // write with integer ids
+        dataName = "with-ids.csv";
+
+        path = Paths.get(dirPath.toString(), dataName);
+
+        System.out.println(" |- Write frequency genotypes file (with solution) " + dataName);
+
+        genotypicData.writeData(path, FileType.CSV, GenotypeDataFormat.FREQUENCY, solution, true, false, true);
+
+        assertTrue("Output is not correct!",
+            FileUtils
+                .contentEquals(
+                    new File(SimpleDistanceMatrixDataTest.class
+                        .getResource("/frequency_genotypes/out/unsel-with-ids.csv").getPath()),
+                    path.toFile()));
+        
+        // write without integer ids
+        dataName = "no-ids.csv";
+
+        path = Paths.get(dirPath.toString(), dataName);
+
+        System.out.println(" |- Write frequency genotypes file (with solution) " + dataName);
+
+        genotypicData.writeData(path, FileType.CSV, GenotypeDataFormat.FREQUENCY, solution, false, false, true);
+
+        assertTrue("Output is not correct!",
+            FileUtils
+                .contentEquals(
+                    new File(SimpleDistanceMatrixDataTest.class
+                        .getResource("/frequency_genotypes/out/unsel-no-ids.csv").getPath()),
+                    path.toFile()));
+
+    }
+
     @Test
     public void erroneousFiles() throws IOException {
         System.out.println(" |- Test erroneous files:");
@@ -318,9 +499,7 @@ public class SimpleGenotypeDataTest {
         path = Files.createTempDirectory(path, "GenoHomozygous-Csv");
         
         path = Paths.get(path.toString(), dataName);
-        
-        Files.deleteIfExists(path);
-        
+                
         System.out.println(" |- Write homozygous File " + dataName);
         genotypicData.writeData(path, FileType.CSV);
         
@@ -400,9 +579,7 @@ public class SimpleGenotypeDataTest {
         path = Files.createTempDirectory(path, "GenoDiploid-Csv");
         
         path = Paths.get(path.toString(), dataName);
-        
-        Files.deleteIfExists(path);
-        
+                
         System.out.println(" |- Write diploid File " + dataName);
         genotypicData.writeData(path, FileType.CSV);
         
