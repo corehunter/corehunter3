@@ -35,8 +35,10 @@ import java.util.stream.Stream;
 
 import org.corehunter.data.GenotypeData;
 import org.corehunter.data.GenotypeDataFormat;
+
 import org.corehunter.util.StringUtils;
 import org.jamesframework.core.subset.SubsetSolution;
+
 
 import uno.informatics.common.io.IOUtilities;
 import uno.informatics.common.io.RowReader;
@@ -429,9 +431,13 @@ public class SimpleGenotypeData extends DataPojo implements GenotypeData {
         }
 
         // read data from file
-        try (RowReader reader = IOUtilities.createRowReader(filePath, type,
-            TextFileRowReader.REMOVE_WHITE_SPACE, TextFileRowReader.ROWS_SAME_SIZE)) {
 
+        try (RowReader reader = IOUtilities.createRowReader(
+                filePath, type,
+                TextFileRowReader.REMOVE_WHITE_SPACE,
+                TextFileRowReader.ROWS_SAME_SIZE_AS_FIRST,
+                TextFileRowReader.REMOVE_QUOTES
+        )) {
             if (reader == null || !reader.ready()) {
                 throw new IOException("Can not create reader for file " + filePath + ". File may be empty.");
             }
@@ -460,9 +466,12 @@ public class SimpleGenotypeData extends DataPojo implements GenotypeData {
             if (numDataCols == 0) {
                 throw new IOException("No data columns.");
             }
-            // extract and unquote marker column names
-            markerNamesRow = Arrays.stream(markerNamesRow).skip(numHeaderCols).map(StringUtils::unquote)
-                .toArray(n -> new String[n]);
+
+            // extract marker column names
+            markerNamesRow = Arrays.stream(markerNamesRow)
+                                   .skip(numHeaderCols)
+                                   .toArray(n -> new String[n]);
+
             // extract/check names and infer number of alleles per marker
             HashMap<String, Integer> markers;
             try {
@@ -504,8 +513,10 @@ public class SimpleGenotypeData extends DataPojo implements GenotypeData {
                     alleleNames = new String[numMarkers][];
                     for (int m = 0; m < numMarkers; m++) {
                         alleleNames[m] = new String[alleleCounts[m]];
-                        for (int a = 0; a < alleleNames[m].length; a++) {
-                            alleleNames[m][a] = StringUtils.unquote(row[aglob]);
+
+                        for(int a = 0; a < alleleNames[m].length; a++){
+                            alleleNames[m][a] = row[aglob];
+
                             aglob++;
                         }
                     }
@@ -514,10 +525,12 @@ public class SimpleGenotypeData extends DataPojo implements GenotypeData {
                     // process data row
 
                     // extract unique item identifier
-                    itemIdentifiers.add(StringUtils.unquote(row[0]));
+                    itemIdentifiers.add(row[0]);
                     // extract item name, if included
-                    if (withNames) {
-                        itemNames.add(StringUtils.unquote(row[1]));
+
+                    if(withNames){
+                        itemNames.add(row[1]);
+
                     }
 
                     // group frequencies per marker
@@ -602,9 +615,12 @@ public class SimpleGenotypeData extends DataPojo implements GenotypeData {
         }
 
         // read data from file
-        try (RowReader reader = IOUtilities.createRowReader(filePath, type,
-            TextFileRowReader.REMOVE_WHITE_SPACE)) {
-
+        try(RowReader reader = IOUtilities.createRowReader(
+                filePath, type, 
+                TextFileRowReader.REMOVE_WHITE_SPACE,
+                TextFileRowReader.REMOVE_QUOTES
+        )){
+            
             if (reader == null || !reader.ready()) {
                 throw new IOException("Can not create reader for file " + filePath + ". File may be empty.");
             }
@@ -624,11 +640,11 @@ public class SimpleGenotypeData extends DataPojo implements GenotypeData {
 
             // infer number of columns
             int numCols = rows.stream().mapToInt(row -> row.length).max().getAsInt();
-            // extend rows with null values where needed + unquote
-            for (int r = 0; r < rows.size(); r++) {
+
+            // extend rows with null values where needed
+            for(int r = 0; r < rows.size(); r++){
                 String[] row = rows.get(r);
-                row = StringUtils.unquote(row);
-                if (row.length < numCols) {
+                if(row.length < numCols){
                     row = Arrays.copyOf(row, numCols);
                 }
                 rows.set(r, row);
@@ -807,13 +823,16 @@ public class SimpleGenotypeData extends DataPojo implements GenotypeData {
         String curName = null;
         for (int c = 0; c < columnNames.length; c++) {
             String columnName = columnNames[c];
-            if (columnName == null) {
-                throw new IllegalArgumentException("Missing column name for column " + c + ".");
+
+            if(columnName == null){
+                throw new IllegalArgumentException("Missing column name for data column " + c + ".");
             }
             String markerName = inferMarkerName(columnName);
-            if (markerName.equals("")) {
-                throw new IllegalArgumentException(
-                    String.format("Invalid marker name at column %d (%s).", c, columnName));
+            if(markerName.equals("")){
+                throw new IllegalArgumentException(String.format(
+                        "Invalid marker name at data column %d (%s).", c, columnName
+                ));
+
             }
             if (curName == null || !markerName.equals(curName)) {
                 // first column for new marker

@@ -246,7 +246,8 @@ public class SimpleBiAllelicGenotypeData extends SimpleGenotypeData implements B
 
         // read data from file
         try (RowReader reader = IOUtilities.createRowReader(filePath, type,
-            TextFileRowReader.REMOVE_WHITE_SPACE)) {
+            TextFileRowReader.REMOVE_WHITE_SPACE,
+            TextFileRowReader.REMOVE_QUOTES)) {
 
             if (reader == null || !reader.ready()) {
                 throw new IOException("Can not create reader for file " + filePath + ". File may be empty.");
@@ -256,10 +257,10 @@ public class SimpleBiAllelicGenotypeData extends SimpleGenotypeData implements B
                 throw new IOException("File is empty.");
             }
 
-            // read and unquote all data
+            // read all data
             List<String[]> rows = new ArrayList<>();
             while (reader.nextRow()) {
-                rows.add(StringUtils.unquote(reader.getRowCellsAsStringArray()));
+                rows.add(reader.getRowCellsAsStringArray());
             }
             if (rows.isEmpty()) {
                 throw new IOException("File is empty.");

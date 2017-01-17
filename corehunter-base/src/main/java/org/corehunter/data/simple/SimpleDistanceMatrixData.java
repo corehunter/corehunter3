@@ -28,7 +28,6 @@ import java.util.Objects;
 import java.util.Set;
 
 import org.corehunter.data.DistanceMatrixData;
-import org.corehunter.util.StringUtils;
 import org.jamesframework.core.subset.SubsetSolution;
 
 import uno.informatics.common.io.IOUtilities;
@@ -211,8 +210,11 @@ public class SimpleDistanceMatrixData extends DataPojo implements DistanceMatrix
         }
 
         // read data from file
-        try (RowReader reader = IOUtilities.createRowReader(filePath, type,
-            TextFileRowReader.REMOVE_WHITE_SPACE)) {
+        try (RowReader reader = IOUtilities.createRowReader(
+                filePath, type, 
+                TextFileRowReader.REMOVE_WHITE_SPACE,
+                TextFileRowReader.REMOVE_QUOTES
+        )) {
 
             if (reader == null || !reader.ready()) {
                 throw new IOException("Can not create reader for file " + filePath + ". File may be empty.");
@@ -251,16 +253,18 @@ public class SimpleDistanceMatrixData extends DataPojo implements DistanceMatrix
             // extract ids and names
             String[] ids = new String[n];
             String[] names = new String[n];
-            for (int i = 0; i < n; i++) {
-                ids[i] = StringUtils.unquote(rows.get(i + 1)[0]);
-                names[i] = withNames ? StringUtils.unquote(rows.get(i + 1)[1]) : ids[i];
+
+            for(int i = 0; i < n; i++){
+                ids[i] = rows.get(i+1)[0];
+                names[i] = withNames ? rows.get(i+1)[1] : ids[i];
+
             }
 
             // verify ids on header row, if provided
-            if (firstRow.length > numHeaderCols) {
-                for (int i = 0; i < n; i++) {
-                    if (numHeaderCols + i >= firstRow.length
-                        || !Objects.equals(ids[i], StringUtils.unquote(firstRow[numHeaderCols + i]))) {
+            if(firstRow.length > numHeaderCols){
+                for(int i = 0; i < n; i++){
+                    if(numHeaderCols + i >= firstRow.length
+                            || !Objects.equals(ids[i], firstRow[numHeaderCols+i])){
                         throw new IOException("Row and column identifiers differ.");
                     }
                 }
