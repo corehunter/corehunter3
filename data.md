@@ -1,4 +1,4 @@
-[Home](index)&mdash;Data
+[< Home](index)
 
 ## Supported data types
 Core Hunter 3 supports multiple types of genetic marker data, phenotypic traits and precomputed distance matrices. Data can be loaded from files and, when using the R package, from data frames and matrices. Both comma separated `csv` and tab separated `txt` files can be used.
