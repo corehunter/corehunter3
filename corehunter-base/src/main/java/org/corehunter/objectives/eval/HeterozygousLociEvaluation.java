@@ -21,6 +21,7 @@ package org.corehunter.objectives.eval;
 
 import java.util.Collection;
 import java.util.Set;
+
 import org.corehunter.data.GenotypeData;
 
 /**

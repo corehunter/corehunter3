@@ -41,6 +41,10 @@ import uno.informatics.data.pojo.DataPojo;
  */
 public class CoreHunterData extends DataPojo implements IntegerIdentifiedData {
     
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
     private static final List<CoreHunterMeasure> NO_MEASURES = new LinkedList<>() ;
     private final GenotypeData genotypicData; 
     private final FeatureData phenotypicData;

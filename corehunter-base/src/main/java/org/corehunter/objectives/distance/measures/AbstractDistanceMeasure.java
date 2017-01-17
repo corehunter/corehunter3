@@ -21,6 +21,7 @@ package org.corehunter.objectives.distance.measures;
 
 import java.util.HashMap;
 import java.util.Map;
+
 import org.corehunter.data.CoreHunterData;
 import org.corehunter.objectives.distance.DistanceMeasure;
 
