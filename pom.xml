@@ -37,7 +37,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <informatics-common.version>1.3.0-SNAPSHOT</informatics-common.version>
+        <informatics-common.version>1.3.0</informatics-common.version>
     </properties>
 
     <distributionManagement>

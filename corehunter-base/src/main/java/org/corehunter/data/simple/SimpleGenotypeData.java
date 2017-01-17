@@ -385,7 +385,7 @@ public class SimpleGenotypeData extends DataPojo implements GenotypeData {
         try (RowReader reader = IOUtilities.createRowReader(
                 filePath, type,
                 TextFileRowReader.REMOVE_WHITE_SPACE,
-                TextFileRowReader.ROWS_SAME_SIZE,
+                TextFileRowReader.ROWS_SAME_SIZE_AS_FIRST,
                 TextFileRowReader.REMOVE_QUOTES
         )) {
             
