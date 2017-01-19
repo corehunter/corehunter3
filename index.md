@@ -16,19 +16,21 @@ The measures included in Core Hunter 3 are listed below.
 
 ### Distance based measures
 
-1. Average entry-to-nearest-entry distance, i.e. the mean distance between each selected accession and the closest other selected accession. Maximizing this measure yields high diversity in the core (maximum dissimilarity of core accessions). Tends to include cluster edges.
+1. Average entry-to-nearest-entry distance, i.e. the mean distance between each selected accession and the closest other selected accession. Maximizing this measure yields high diversity in the core (maximum dissimilarity of core accessions). Aims to represents the whole range of values in the core, including the extremes.
 2. Average accession-to-nearest-entry distance, i.e. the mean distance between each accession in the entire collection and the closest selected accession. Minimizing this measure yields cores that maximally represent all individual accessions from the full collection. Tends to focus on cluster centers.
 3. Average entry-to-entry distance (provided for historical reasons, not preferred).
 
-Gower's distance is used to compute distances from phenotypic traits, and both the Modified Roger's as well as Cavalli-Sforza & Edwards distances are supported for genetic marker data. Alternatively, a precomputed distance matrix can be used.
+Gower's distance is used to compute distances from phenotypic traits, and both Modified Roger's as well as Cavalli-Sforza & Edwards distance is supported for genetic marker data. Alternatively, a precomputed distance matrix can be provided by the user.
 
 ### Allelic richness
 
-1. Shannon's index.
-2. Expected heterozygosity.
-3. Allele coverage.
+Available for genetic marker data only:
 
-Available for genetic marker data only.
+1. Shannon's diversity index.
+2. Expected heterozygosity.
+3. Allele coverage, i.e. the percentage of marker alleles observed in the full collection that are retained in the core.
+
+Formulas for these three allelic richness measures can be found in the original Core Hunter publication [(Thachuk et al., 2009)](http://www.biomedcentral.com/1471-2105/10/243).
 
 ## Getting started with Core Hunter
 Core Hunter is implemented in Java and can be executed in R or using the graphical interface. In both cases you will need to have installed a [Java Runtime Environment (JRE)](http://www.oracle.com/technetwork/java/javase/downloads/jre8-downloads-2133155.html) version 8 or later.
