@@ -75,12 +75,13 @@ More information about the supported data file formats is provided [here](data).
 There are numerous options when sampling a core. For example, you can change the size of the core (defaults to 20%), optimize a specific measure (defaults to average entry-to-nearest-entry distance), maximize a weighted index including multiple measures, change stop conditions (by default, the algorithm stops when it was unable to further improve the core during the last 10 seconds), etc. All functions have detailed documentation, for example try
 
 ```R
+> ?corehunter
+> ?sampleCore
+> ?objective
+> ?coreHunterData
 > ?genotypes
 > ?phenotypes
 > ?distances
-> ?coreHunterData
-> ?sampleCore
-> ?objective
 ```
 
 Many examples are included in the R package as well.
