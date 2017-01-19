@@ -16,7 +16,7 @@ The measures included in Core Hunter 3 are listed below.
 
 ### Distance based measures
 
-1. Average entry-to-nearest-entry distance, i.e. the mean distance between each selected accession and the closest other selected accession. Maximizing this measure yields high diversity in the core (maximum dissimilarity of core accessions). Aims to represents the whole range of values in the core, including the extremes.
+1. Average entry-to-nearest-entry distance, i.e. the mean distance between each selected accession and the closest other selected accession. Maximizing this measure yields high diversity in the core expressed through maximum dissimilarity of selected core accessions. Aims to represents the whole range of values including the extremes.
 2. Average accession-to-nearest-entry distance, i.e. the mean distance between each accession in the entire collection and the closest selected accession. Minimizing this measure yields cores that maximally represent all individual accessions from the full collection. Tends to focus on cluster centers.
 3. Average entry-to-entry distance (provided for historical reasons, not preferred).
 
