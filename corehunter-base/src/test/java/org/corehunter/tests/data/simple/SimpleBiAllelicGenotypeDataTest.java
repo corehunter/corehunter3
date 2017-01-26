@@ -29,29 +29,31 @@ import static org.corehunter.tests.TestData.NAME;
 import static org.corehunter.tests.TestData.PRECISION;
 import static org.corehunter.tests.TestData.SET;
 import static org.corehunter.tests.TestData.UNDEFINED_MARKER_NAMES;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import org.corehunter.data.GenotypeDataFormat;
+import java.util.Set;
 
+import org.apache.commons.io.FileUtils;
+import org.corehunter.data.GenotypeData;
+import org.corehunter.data.GenotypeDataFormat;
 import org.corehunter.data.simple.SimpleBiAllelicGenotypeData;
 import org.corehunter.data.simple.SimpleGenotypeData;
+import org.jamesframework.core.subset.SubsetSolution;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import uno.informatics.data.io.FileType;
 import uno.informatics.data.SimpleEntity;
-
-import org.corehunter.data.GenotypeData;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import uno.informatics.data.io.FileType;
 
 /**
  * @author Guy Davenport, Herman De Beukelaer
@@ -66,9 +68,13 @@ public class SimpleBiAllelicGenotypeDataTest {
     private static final String ERRONEOUS_FILES_DIR = "/biallelic_genotypes/err/";
     private static final String TEST_OUTPUT = "target/testoutput";
     
+    private static final int[] SELECTION = new int[] {
+        1, 3, 4
+    };
+    
     private SimpleEntity[] expectedHeaders;
     private String[] expectedMarkerNames;
-    private String datasetName;
+    private String dataName;
     
     @BeforeClass
     public static void beforeClass(){
@@ -83,7 +89,7 @@ public class SimpleBiAllelicGenotypeDataTest {
     @Test
     public void inMemoryTest() {
         System.out.println(" |- In memory test");
-        datasetName = null;
+        dataName = null;
         expectedHeaders = HEADERS_NON_UNIQUE_NAMES;
         expectedMarkerNames = MARKER_NAMES;
         testData(new SimpleBiAllelicGenotypeData(
@@ -94,7 +100,7 @@ public class SimpleBiAllelicGenotypeDataTest {
     @Test
     public void inMemoryTestWithName() {
         System.out.println(" |- In memory test with dataset name");
-        datasetName = NAME;
+        dataName = NAME;
         expectedHeaders = HEADERS_NON_UNIQUE_NAMES;
         expectedMarkerNames = MARKER_NAMES;
         testData(new SimpleBiAllelicGenotypeData(
@@ -104,10 +110,10 @@ public class SimpleBiAllelicGenotypeDataTest {
     
     @Test
     public void fromTxtFileWithIds() throws IOException {
-        datasetName = "ids.txt";
+        dataName = "ids.txt";
         expectedHeaders = HEADERS_UNIQUE_NAMES;
         expectedMarkerNames = MARKER_NAMES;
-        System.out.println(" |- Read File " + datasetName);
+        System.out.println(" |- Read File " + dataName);
         testData(SimpleBiAllelicGenotypeData.readData(
             Paths.get(SimpleBiAllelicGenotypeDataTest.class.getResource(TXT_IDS).getPath()), FileType.TXT
         ));
@@ -115,10 +121,10 @@ public class SimpleBiAllelicGenotypeDataTest {
     
     @Test
     public void fromCsvFileWithIds() throws IOException {
-        datasetName = "ids.csv";
+        dataName = "ids.csv";
         expectedHeaders = HEADERS_UNIQUE_NAMES;
         expectedMarkerNames = MARKER_NAMES;
-        System.out.println(" |- Read File " + datasetName);
+        System.out.println(" |- Read File " + dataName);
         testData(SimpleBiAllelicGenotypeData.readData(
             Paths.get(SimpleBiAllelicGenotypeDataTest.class.getResource(CSV_IDS).getPath()), FileType.CSV
         ));
@@ -126,10 +132,10 @@ public class SimpleBiAllelicGenotypeDataTest {
     
     @Test
     public void fromCsvFileWithIdsAndNames() throws IOException {
-        datasetName = "ids-and-names.csv";
+        dataName = "ids-and-names.csv";
         expectedHeaders = HEADERS_NON_UNIQUE_NAMES;
         expectedMarkerNames = MARKER_NAMES;
-        System.out.println(" |- Read File " + datasetName);
+        System.out.println(" |- Read File " + dataName);
         testData(SimpleBiAllelicGenotypeData.readData(
             Paths.get(SimpleBiAllelicGenotypeDataTest.class.getResource(CSV_IDS_NAMES).getPath()), FileType.CSV
         ));
@@ -137,10 +143,10 @@ public class SimpleBiAllelicGenotypeDataTest {
     
     @Test
     public void fromCsvFileWithoutMarkerNames() throws IOException {
-        datasetName = "no-marker-names.csv";
+        dataName = "no-marker-names.csv";
         expectedHeaders = HEADERS_UNIQUE_NAMES;
         expectedMarkerNames = UNDEFINED_MARKER_NAMES;
-        System.out.println(" |- Read File " + datasetName);
+        System.out.println(" |- Read File " + dataName);
         testData(SimpleBiAllelicGenotypeData.readData(
             Paths.get(SimpleBiAllelicGenotypeDataTest.class.getResource(CSV_NO_MARKER_NAMES).getPath()), FileType.CSV
         ));
@@ -148,7 +154,7 @@ public class SimpleBiAllelicGenotypeDataTest {
     
     @Test
     public void toTxtFile() throws IOException {
-        datasetName = "out.txt";
+        dataName = "out.txt";
         expectedHeaders = HEADERS_UNIQUE_NAMES;
         expectedMarkerNames = MARKER_NAMES;
         
@@ -161,20 +167,18 @@ public class SimpleBiAllelicGenotypeDataTest {
         
         path = Files.createTempDirectory(path, "GenoBiallelic-Txt") ;
         
-        path = Paths.get(path.toString(), datasetName) ;
-        
-        Files.deleteIfExists(path) ;
-        
-        System.out.println(" |- Write File " + datasetName);
+        path = Paths.get(path.toString(), dataName) ;
+                
+        System.out.println(" |- Write File " + dataName);
         genotypicData.writeData(path, FileType.TXT);
         
-        System.out.println(" |- Read written File " + datasetName);
+        System.out.println(" |- Read written File " + dataName);
         testData(SimpleBiAllelicGenotypeData.readData(path, FileType.TXT));
     }
     
     @Test
     public void toCsvFile() throws IOException {
-        datasetName = "out.csv";
+        dataName = "out.csv";
         expectedHeaders = HEADERS_NON_UNIQUE_NAMES;
         expectedMarkerNames = MARKER_NAMES;
         
@@ -187,20 +191,18 @@ public class SimpleBiAllelicGenotypeDataTest {
         
         path = Files.createTempDirectory(path, "GenoBiallelic-Csv") ;
         
-        path = Paths.get(path.toString(), datasetName) ;
-        
-        Files.deleteIfExists(path) ;
-        
-        System.out.println(" |- Write File " + datasetName);
+        path = Paths.get(path.toString(), dataName) ;
+                
+        System.out.println(" |- Write File " + dataName);
         genotypicData.writeData(path, FileType.CSV);
         
-        System.out.println(" |- Read written File " + datasetName);
+        System.out.println(" |- Read written File " + dataName);
         testData(SimpleBiAllelicGenotypeData.readData(path, FileType.CSV));
     }
     
     @Test
     public void toCsvFileFrequencies() throws IOException {
-        datasetName = "freqs.csv";
+        dataName = "freqs.csv";
         expectedHeaders = HEADERS_NON_UNIQUE_NAMES;
         expectedMarkerNames = MARKER_NAMES;
         
@@ -213,14 +215,12 @@ public class SimpleBiAllelicGenotypeDataTest {
         
         path = Files.createTempDirectory(path, "GenoBiallelic-CsvFrequencies") ;
         
-        path = Paths.get(path.toString(), datasetName) ;
-        
-        Files.deleteIfExists(path) ;
-        
-        System.out.println(" |- Write File " + datasetName);
+        path = Paths.get(path.toString(), dataName) ;
+                
+        System.out.println(" |- Write File " + dataName);
         genotypicData.writeData(path, FileType.CSV, GenotypeDataFormat.FREQUENCY);
         
-        System.out.println(" |- Read written File " + datasetName);
+        System.out.println(" |- Read written File " + dataName);
         GenotypeData data = SimpleGenotypeData.readData(path, FileType.CSV);
         
         for (int i = 0; i < data.getSize(); i++) {
@@ -244,6 +244,300 @@ public class SimpleBiAllelicGenotypeDataTest {
 
             }
         }
+        
+    }
+    
+    @Test
+    public void toCsvFileWithAllIds() throws IOException {
+        expectedHeaders = HEADERS_UNIQUE_NAMES;
+        expectedMarkerNames = MARKER_NAMES;
+        
+        SimpleBiAllelicGenotypeData genotypicData = 
+            new SimpleBiAllelicGenotypeData(expectedHeaders, expectedMarkerNames, ALLELE_SCORES_BIALLELIC) ;
+        
+        Set<Integer> ids = genotypicData.getIDs();
+
+        Path dirPath = Paths.get(TEST_OUTPUT);
+
+        Files.createDirectories(dirPath);
+
+        dirPath = Files.createTempDirectory(dirPath, "GenoBiallelic-AllIds");
+
+        // create solution
+        SubsetSolution solution = new SubsetSolution(ids);
+        for(int sel : SELECTION){
+            solution.select(sel);
+        }
+        
+        Path path;
+        
+        // write allele score format with integer ids
+        dataName = "bi-with-ids.csv";
+
+        path = Paths.get(dirPath.toString(), dataName);
+
+        System.out.println(" |- Write biallelic genotypes file (with solution) " + dataName);
+
+        genotypicData.writeData(path, FileType.CSV, GenotypeDataFormat.BIPARENTAL, solution, true, true, true);
+
+        assertTrue("Output file is not correct!",
+            FileUtils.contentEquals(
+                new File(SimpleDistanceMatrixDataTest.class.getResource(
+                        "/biallelic_genotypes/out/all-bi-with-ids.csv"
+                ).getPath()),
+                path.toFile()
+            )
+        );
+        
+        // write allele score format without integer ids
+        dataName = "bi-no-ids.csv";
+
+        path = Paths.get(dirPath.toString(), dataName);
+
+        System.out.println(" |- Write biallelic genotypes file (with solution) " + dataName);
+
+        genotypicData.writeData(path, FileType.CSV, GenotypeDataFormat.BIPARENTAL, solution, false, true, true);
+
+        assertTrue("Output file is not correct!",
+            FileUtils.contentEquals(
+                new File(SimpleDistanceMatrixDataTest.class.getResource(
+                        "/biallelic_genotypes/out/all-bi-no-ids.csv"
+                ).getPath()),
+                path.toFile()
+            )
+        );
+        
+        // write frequency format with integer ids
+        dataName = "freq-with-ids.csv";
+
+        path = Paths.get(dirPath.toString(), dataName);
+
+        System.out.println(" |- Write biallelic genotypes file (with solution) " + dataName);
+
+        genotypicData.writeData(path, FileType.CSV, GenotypeDataFormat.FREQUENCY, solution, true, true, true);
+
+        assertTrue("Output file is not correct!",
+            FileUtils.contentEquals(
+                new File(SimpleDistanceMatrixDataTest.class.getResource(
+                        "/biallelic_genotypes/out/all-freq-with-ids.csv"
+                ).getPath()),
+                path.toFile()
+            )
+        );
+
+        // write frequency format without integer ids
+        dataName = "freq-no-ids.csv";
+
+        path = Paths.get(dirPath.toString(), dataName);
+
+        System.out.println(" |- Write biallelic genotypes file (with solution) " + dataName);
+
+        genotypicData.writeData(path, FileType.CSV, GenotypeDataFormat.FREQUENCY, solution, false, true, true);
+
+        assertTrue("Output file is not correct!",
+            FileUtils.contentEquals(
+                new File(SimpleDistanceMatrixDataTest.class.getResource(
+                        "/biallelic_genotypes/out/all-freq-no-ids.csv"
+                ).getPath()),
+                path.toFile()
+            )
+        );
+        
+    }
+    
+    @Test
+    public void toCsvFileWithSelectedIds() throws IOException {
+        expectedHeaders = HEADERS_UNIQUE_NAMES;
+        expectedMarkerNames = MARKER_NAMES;
+        
+        SimpleBiAllelicGenotypeData genotypicData = 
+            new SimpleBiAllelicGenotypeData(expectedHeaders, expectedMarkerNames, ALLELE_SCORES_BIALLELIC) ;
+        
+        Set<Integer> ids = genotypicData.getIDs();
+
+        Path dirPath = Paths.get(TEST_OUTPUT);
+
+        Files.createDirectories(dirPath);
+
+        dirPath = Files.createTempDirectory(dirPath, "GenoBiallelic-SelectedIds");
+
+        // create solution
+        SubsetSolution solution = new SubsetSolution(ids);
+        for(int sel : SELECTION){
+            solution.select(sel);
+        }
+        
+        Path path;
+        
+        // write allele score format with integer ids
+        dataName = "bi-with-ids.csv";
+
+        path = Paths.get(dirPath.toString(), dataName);
+
+        System.out.println(" |- Write biallelic genotypes file (with solution) " + dataName);
+
+        genotypicData.writeData(path, FileType.CSV, GenotypeDataFormat.BIPARENTAL, solution, true, true, false);
+
+        assertTrue("Output file is not correct!",
+            FileUtils.contentEquals(
+                new File(SimpleDistanceMatrixDataTest.class.getResource(
+                        "/biallelic_genotypes/out/sel-bi-with-ids.csv"
+                ).getPath()),
+                path.toFile()
+            )
+        );
+        
+        // write allele score format without integer ids
+        dataName = "bi-no-ids.csv";
+
+        path = Paths.get(dirPath.toString(), dataName);
+
+        System.out.println(" |- Write biallelic genotypes file (with solution) " + dataName);
+
+        genotypicData.writeData(path, FileType.CSV, GenotypeDataFormat.BIPARENTAL, solution, false, true, false);
+
+        assertTrue("Output file is not correct!",
+            FileUtils.contentEquals(
+                new File(SimpleDistanceMatrixDataTest.class.getResource(
+                        "/biallelic_genotypes/out/sel-bi-no-ids.csv"
+                ).getPath()),
+                path.toFile()
+            )
+        );
+        
+        // write frequency format with integer ids
+        dataName = "freq-with-ids.csv";
+
+        path = Paths.get(dirPath.toString(), dataName);
+
+        System.out.println(" |- Write biallelic genotypes file (with solution) " + dataName);
+
+        genotypicData.writeData(path, FileType.CSV, GenotypeDataFormat.FREQUENCY, solution, true, true, false);
+
+        assertTrue("Output file is not correct!",
+            FileUtils.contentEquals(
+                new File(SimpleDistanceMatrixDataTest.class.getResource(
+                        "/biallelic_genotypes/out/sel-freq-with-ids.csv"
+                ).getPath()),
+                path.toFile()
+            )
+        );
+
+        // write frequency format without integer ids
+        dataName = "freq-no-ids.csv";
+
+        path = Paths.get(dirPath.toString(), dataName);
+
+        System.out.println(" |- Write biallelic genotypes file (with solution) " + dataName);
+
+        genotypicData.writeData(path, FileType.CSV, GenotypeDataFormat.FREQUENCY, solution, false, true, false);
+
+        assertTrue("Output file is not correct!",
+            FileUtils.contentEquals(
+                new File(SimpleDistanceMatrixDataTest.class.getResource(
+                        "/biallelic_genotypes/out/sel-freq-no-ids.csv"
+                ).getPath()),
+                path.toFile()
+            )
+        );
+        
+    }
+    
+    @Test
+    public void toCsvFileWithUnselectedIds() throws IOException {
+        expectedHeaders = HEADERS_UNIQUE_NAMES;
+        expectedMarkerNames = MARKER_NAMES;
+        
+        SimpleBiAllelicGenotypeData genotypicData = 
+            new SimpleBiAllelicGenotypeData(expectedHeaders, expectedMarkerNames, ALLELE_SCORES_BIALLELIC) ;
+        
+        Set<Integer> ids = genotypicData.getIDs();
+
+        Path dirPath = Paths.get(TEST_OUTPUT);
+
+        Files.createDirectories(dirPath);
+
+        dirPath = Files.createTempDirectory(dirPath, "GenoBiallelic-UnselectedIds");
+
+        // create solution
+        SubsetSolution solution = new SubsetSolution(ids);
+        for(int sel : SELECTION){
+            solution.select(sel);
+        }
+        
+        Path path;
+        
+        // write allele score format with integer ids
+        dataName = "bi-with-ids.csv";
+
+        path = Paths.get(dirPath.toString(), dataName);
+
+        System.out.println(" |- Write biallelic genotypes file (with solution) " + dataName);
+
+        genotypicData.writeData(path, FileType.CSV, GenotypeDataFormat.BIPARENTAL, solution, true, false, true);
+
+        assertTrue("Output file is not correct!",
+            FileUtils.contentEquals(
+                new File(SimpleDistanceMatrixDataTest.class.getResource(
+                        "/biallelic_genotypes/out/unsel-bi-with-ids.csv"
+                ).getPath()),
+                path.toFile()
+            )
+        );
+        
+        // write allele score format without integer ids
+        dataName = "bi-no-ids.csv";
+
+        path = Paths.get(dirPath.toString(), dataName);
+
+        System.out.println(" |- Write biallelic genotypes file (with solution) " + dataName);
+
+        genotypicData.writeData(path, FileType.CSV, GenotypeDataFormat.BIPARENTAL, solution, false, false, true);
+
+        assertTrue("Output file is not correct!",
+            FileUtils.contentEquals(
+                new File(SimpleDistanceMatrixDataTest.class.getResource(
+                        "/biallelic_genotypes/out/unsel-bi-no-ids.csv"
+                ).getPath()),
+                path.toFile()
+            )
+        );
+        
+        // write frequency format with integer ids
+        dataName = "freq-with-ids.csv";
+
+        path = Paths.get(dirPath.toString(), dataName);
+
+        System.out.println(" |- Write biallelic genotypes file (with solution) " + dataName);
+
+        genotypicData.writeData(path, FileType.CSV, GenotypeDataFormat.FREQUENCY, solution, true, false, true);
+
+        assertTrue("Output file is not correct!",
+            FileUtils.contentEquals(
+                new File(SimpleDistanceMatrixDataTest.class.getResource(
+                        "/biallelic_genotypes/out/unsel-freq-with-ids.csv"
+                ).getPath()),
+                path.toFile()
+            )
+        );
+
+        // write frequency format without integer ids
+        dataName = "freq-no-ids.csv";
+
+        path = Paths.get(dirPath.toString(), dataName);
+
+        System.out.println(" |- Write biallelic genotypes file (with solution) " + dataName);
+
+        genotypicData.writeData(path, FileType.CSV, GenotypeDataFormat.FREQUENCY, solution, false, false, true);
+
+        assertTrue("Output file is not correct!",
+            FileUtils.contentEquals(
+                new File(SimpleDistanceMatrixDataTest.class.getResource(
+                        "/biallelic_genotypes/out/unsel-freq-no-ids.csv"
+                ).getPath()),
+                path.toFile()
+            )
+        );
         
     }
     
@@ -272,7 +566,7 @@ public class SimpleBiAllelicGenotypeDataTest {
     private void testData(SimpleBiAllelicGenotypeData data) {
         
         // check dataset name, if set
-        String expectedDatasetName = datasetName != null ? datasetName : "Biallelic marker data";
+        String expectedDatasetName = dataName != null ? dataName : "Biallelic marker data";
         assertEquals("Incorrect data name.", expectedDatasetName, data.getName());
         
         // check IDs

@@ -23,15 +23,22 @@ import java.util.List;
 
 import org.jamesframework.core.subset.SubsetSolution;
 
+/**
+ * Services for running CoreHunter
+ * 
+ * @author daveneti
+ *
+ */
 public interface CoreHunterRunServices {
 
     /**
-     * Executes a Core Hunter run with the given arguments
+     * Starts the execution of a Core Hunter run with the given arguments
      * 
      * @param arguments
      *            the Core Hunter Run Arguments
      * @return The initial CoreHunterRun object containing the current status,
      *         arguments and unique identifier of the run
+     * @throws IllegalStateException if the service is not running or shutting down
      */
     public CoreHunterRun executeCoreHunter(CoreHunterRunArguments arguments);
 
@@ -41,34 +48,46 @@ public interface CoreHunterRunServices {
      * @param uniqueIdentifier
      *            the unique identifier of the run that was provided on
      *            execution
-     * @return the current information about the Core Hunter run
+     * @return the current information about the Core Hunter run, or
+     *  <code>null</code> if not such run exists.
      */
 
     public CoreHunterRun getCoreHunterRun(String uniqueIdentifier);
 
     /**
-     * Removes the current CoreHunterRun and tries to stop the run if it is
+     * Removes the CoreHunterRun and tries to stop the run if it is
      * still running, If the run can not be removed, the client will need to
-     * check at date or use the {@link #removeCoreHunterRun(String)} method
+     * check at later time or use the {@link #deleteCoreHunterRun(String)} method
      * 
      * @param uniqueIdentifier
      *            the unique identifier of the run that was provided on
      *            execution
      * @return <code>true</code> if the CoreHunterRun was successfully removed,
      *         <code>false</code> if the run can not be removed.
+     * @throws java.util.NoSuchElementException if no such run exists
      */
     public boolean removeCoreHunterRun(String uniqueIdentifier);
 
     /**
-     * Deletes the current CoreHunterRun and tries to stop the run if it is
+     * Deletes the CoreHunterRun and tries to stop the run if it is
      * still running, This method guarantees to be able to delete the run
      * regardless of if it can be stopped.
      * 
      * @param uniqueIdentifier
      *            the unique identifier of the run that was provided on
      *            execution
+     * @throws java.util.NoSuchElementException if no such run exists  
      */
     public void deleteCoreHunterRun(String uniqueIdentifier);
+    
+    /**
+     * Updates the CoreHunterRun. Only editable fields such as the name can be changed.
+     * 
+     * @param coreHunterRun a CoreHunterRun run of  run that was provided on
+     *            execution
+     * @throws java.util.NoSuchElementException if no such run exists
+     */
+    public void updateCoreHunterRun(CoreHunterRun coreHunterRun);
 
     /**
      * Gets the current information about all Core Hunter runs
@@ -88,7 +107,7 @@ public interface CoreHunterRunServices {
     public String getOutputStream(String uniqueIdentifier);
 
     /**
-     * Gets the current error stream provides by the run 
+     * Gets the current error stream provided by the run 
      * 
      * @param uniqueIdentifier
      *            the unique identifier of the run that was provided on
@@ -98,7 +117,7 @@ public interface CoreHunterRunServices {
     public String getErrorStream(String uniqueIdentifier);
 
     /**
-     * Gets the current error message provides by the run 
+     * Gets the current error message provided by the run 
      * 
      * @param uniqueIdentifier
      *            the unique identifier of the run that was provided on
@@ -119,4 +138,14 @@ public interface CoreHunterRunServices {
      * @return the current error message provided by the run 
      */
     public SubsetSolution getSubsetSolution(String uniqueIdentifier);
+
+    /**
+     * Gets the arguments provided when the run was executed
+     * 
+     * @param uniqueIdentifier
+     *            the unique identifier of the run that was provided on
+     *            execution
+     * @return the arguments provided when the run was executed
+     */
+    CoreHunterRunArguments getArguments(String uniqueIdentifier);
 }

@@ -21,11 +21,11 @@ package org.corehunter.listener;
 
 import java.io.PrintStream;
 
+import org.corehunter.CoreHunterListener;
 import org.jamesframework.core.problems.constraints.validations.Validation;
 import org.jamesframework.core.problems.objectives.evaluations.Evaluation;
 import org.jamesframework.core.search.Search;
 import org.jamesframework.core.subset.SubsetSolution;
-import org.corehunter.CoreHunterListener;
 
 public class SimpleCoreHunterListener implements CoreHunterListener {
 
@@ -55,7 +55,7 @@ public class SimpleCoreHunterListener implements CoreHunterListener {
 
     @Override
     public void searchStarted(Search<? extends SubsetSolution> search) {
-        printStream.println(prefix + "Search started: " + search.getName());
+        printStream.println(String.format("%sSearch : %s started.", prefix, search.getName()));
     }
 
     @Override
@@ -63,25 +63,25 @@ public class SimpleCoreHunterListener implements CoreHunterListener {
         double t = search.getRuntime() / 1000;
         long s = search.getSteps();
         printStream.println(
-                prefix + "Search " + search.getName() + " stopped (" + t + " sec, " + s + " steps)"
-        );
+                String.format("%sSearch : %s stopped after %f seconds and %d steps", prefix, search.getName(), t, s));
+        printStream.println(String.format("%sBest solution with evaluation : %f", prefix,
+                search.getBestSolutionEvaluation().getValue()));
+        printStream.println(String.format("%sBest solution with evaluation : %s", prefix, search.getBestSolution()));
     }
 
     @Override
-    public void newBestSolution(Search<? extends SubsetSolution> search,
-                                SubsetSolution newBestSolution,
-                                Evaluation newBestSolutionEvaluation,
-                                Validation newBestSolutionValidation) {
+    public void newBestSolution(Search<? extends SubsetSolution> search, SubsetSolution newBestSolution,
+            Evaluation newBestSolutionEvaluation, Validation newBestSolutionValidation) {
         printStream.format("%sCurrent value: %f%n", prefix, newBestSolutionEvaluation.getValue());
     }
 
     @Override
     public void preprocessingStarted(String message) {
-        printStream.println(prefix + message);
+        printStream.println(String.format("%s%s", prefix, message));
     }
 
     @Override
     public void preprocessingStopped(String message) {
-        printStream.println(prefix + message);
+        printStream.println(String.format("%s%s", prefix, message));
     }
 }

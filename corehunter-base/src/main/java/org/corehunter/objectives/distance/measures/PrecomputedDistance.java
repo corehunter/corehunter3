@@ -19,10 +19,10 @@
 
 package org.corehunter.objectives.distance.measures;
 
-import org.corehunter.objectives.distance.DistanceMeasure;
-import org.corehunter.data.DistanceMatrixData;
 import org.corehunter.data.CoreHunterData;
+import org.corehunter.data.DistanceMatrixData;
 import org.corehunter.exceptions.CoreHunterException;
+import org.corehunter.objectives.distance.DistanceMeasure;
 
 /**
  * @author Herman De Beukelaer

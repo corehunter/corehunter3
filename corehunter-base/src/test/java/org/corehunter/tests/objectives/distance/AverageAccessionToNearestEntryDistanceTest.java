@@ -19,17 +19,6 @@
 
 package org.corehunter.tests.objectives.distance;
 
-import java.util.Random;
-import org.corehunter.data.DistanceMatrixData;
-import org.corehunter.data.CoreHunterData;
-import org.corehunter.data.simple.SimpleDistanceMatrixData;
-import org.corehunter.data.simple.SimpleGenotypeData;
-import org.corehunter.objectives.AverageAccessionToNearestEntry;
-import org.corehunter.objectives.distance.measures.CavalliSforzaEdwardsDistance;
-import org.corehunter.objectives.distance.measures.GowerDistance;
-import org.corehunter.objectives.distance.measures.ModifiedRogersDistance;
-import org.corehunter.objectives.distance.measures.PrecomputedDistance;
-
 import static org.corehunter.tests.TestData.ACCESSION_TO_NEAREST_ENTRY_CAVALLI_SFORZA_SUBSET1;
 import static org.corehunter.tests.TestData.ACCESSION_TO_NEAREST_ENTRY_CAVALLI_SFORZA_SUBSET2;
 import static org.corehunter.tests.TestData.ACCESSION_TO_NEAREST_ENTRY_CAVALLI_SFORZA_SUBSET3;
@@ -55,18 +44,28 @@ import static org.corehunter.tests.TestData.SUBSET3;
 import static org.corehunter.tests.TestData.SUBSET_EMPTY;
 import static org.corehunter.tests.TestData.SUBSET_FULL;
 
+import java.util.Random;
+
+import org.corehunter.data.CoreHunterData;
+import org.corehunter.data.DistanceMatrixData;
+import org.corehunter.data.PhenotypeData;
+import org.corehunter.data.simple.SimpleDistanceMatrixData;
+import org.corehunter.data.simple.SimpleGenotypeData;
+import org.corehunter.data.simple.SimplePhenotypeData;
+import org.corehunter.objectives.AverageAccessionToNearestEntry;
+import org.corehunter.objectives.distance.measures.CavalliSforzaEdwardsDistance;
+import org.corehunter.objectives.distance.measures.GowerDistance;
+import org.corehunter.objectives.distance.measures.ModifiedRogersDistance;
+import org.corehunter.objectives.distance.measures.PrecomputedDistance;
 import org.corehunter.tests.objectives.EvaluationTest;
 import org.jamesframework.core.problems.objectives.evaluations.Evaluation;
 import org.jamesframework.core.problems.objectives.evaluations.SimpleEvaluation;
 import org.jamesframework.core.search.neigh.Move;
 import org.jamesframework.core.search.neigh.Neighbourhood;
 import org.jamesframework.core.subset.SubsetProblem;
-
 import org.jamesframework.core.subset.SubsetSolution;
 import org.jamesframework.core.subset.neigh.SinglePerturbationNeighbourhood;
 import org.junit.Test;
-import uno.informatics.data.dataset.FeatureData;
-import uno.informatics.data.feature.array.ArrayFeatureData;
 
 /**
  * @author Herman De Beukelaer
@@ -174,7 +173,7 @@ public class AverageAccessionToNearestEntryDistanceTest extends EvaluationTest {
     @Test
     public void testGower() {
         
-        FeatureData pheno = new ArrayFeatureData(
+        PhenotypeData pheno = new SimplePhenotypeData(
                 NAME, PHENOTYPIC_TRAIT_FEATURES, PHENOTYPIC_TRAIT_VALUES_WITH_HEADERS
         );
         CoreHunterData data = new CoreHunterData(pheno);

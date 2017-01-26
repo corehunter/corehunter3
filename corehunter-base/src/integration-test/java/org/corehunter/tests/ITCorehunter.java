@@ -19,9 +19,6 @@
 
 package org.corehunter.tests;
 
-import java.util.Arrays;
-import java.util.List;
-
 import static org.corehunter.tests.TestData.ALLELE_FREQUENCIES;
 import static org.corehunter.tests.TestData.ALLELE_NAMES;
 import static org.corehunter.tests.TestData.DISTANCES;
@@ -30,6 +27,11 @@ import static org.corehunter.tests.TestData.MARKER_NAMES;
 import static org.corehunter.tests.TestData.NAME;
 import static org.corehunter.tests.TestData.PHENOTYPIC_TRAIT_FEATURES;
 import static org.corehunter.tests.TestData.PHENOTYPIC_TRAIT_VALUES_WITH_HEADERS;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+import java.util.Arrays;
+import java.util.List;
 
 import org.corehunter.CoreHunter;
 import org.corehunter.CoreHunterArguments;
@@ -39,15 +41,15 @@ import org.corehunter.CoreHunterObjectiveType;
 import org.corehunter.data.CoreHunterData;
 import org.corehunter.data.DistanceMatrixData;
 import org.corehunter.data.GenotypeData;
+import org.corehunter.data.PhenotypeData;
 import org.corehunter.data.simple.SimpleDistanceMatrixData;
 import org.corehunter.data.simple.SimpleGenotypeData;
-import org.corehunter.listener.SimpleCoreHunterListener;
+import org.corehunter.data.simple.SimplePhenotypeData;
 import org.corehunter.objectives.AverageAccessionToNearestEntry;
 import org.corehunter.objectives.AverageEntryToEntry;
 import org.corehunter.objectives.HeterozygousLoci;
 import org.corehunter.objectives.distance.measures.GowerDistance;
 import org.corehunter.objectives.distance.measures.PrecomputedDistance;
-
 import org.jamesframework.core.problems.objectives.Objective;
 import org.jamesframework.core.search.Search;
 import org.jamesframework.core.search.algo.exh.ExhaustiveSearch;
@@ -55,12 +57,6 @@ import org.jamesframework.core.subset.SubsetProblem;
 import org.jamesframework.core.subset.SubsetSolution;
 import org.jamesframework.core.subset.algo.exh.SubsetSolutionIterator;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
-import uno.informatics.data.dataset.FeatureData;
-import uno.informatics.data.feature.array.ArrayFeatureData;
 
 /**
  * @author Guy Davenport, Herman De Beukelaer
@@ -79,7 +75,7 @@ public class ITCorehunter {
                 HEADERS_UNIQUE_NAMES, MARKER_NAMES, ALLELE_NAMES, ALLELE_FREQUENCIES
         );
         GENOTYPES_DATA = new CoreHunterData(genotypes);
-        FeatureData phenotypes = new ArrayFeatureData(
+        PhenotypeData phenotypes = new SimplePhenotypeData(
                 NAME, PHENOTYPIC_TRAIT_FEATURES, PHENOTYPIC_TRAIT_VALUES_WITH_HEADERS
         );
         PHENOTYPES_DATA = new CoreHunterData(phenotypes);

@@ -25,10 +25,10 @@ import java.util.TreeSet;
 
 import org.jamesframework.core.problems.objectives.evaluations.Evaluation;
 import org.jamesframework.core.problems.objectives.evaluations.SimpleEvaluation;
+
 import uno.informatics.data.DataType;
 import uno.informatics.data.Feature;
 import uno.informatics.data.ScaleType;
-
 import uno.informatics.data.SimpleEntity;
 import uno.informatics.data.pojo.SimpleEntityPojo;
 import uno.informatics.data.pojo.SimpleFeaturePojo;

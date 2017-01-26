@@ -19,21 +19,21 @@
 
 package org.corehunter.tests.objectives;
 
-import java.util.Random;
-
 import static org.corehunter.tests.TestData.ALLELE_FREQUENCIES;
 import static org.corehunter.tests.TestData.ALLELE_NAMES;
 import static org.corehunter.tests.TestData.HEADERS_NON_UNIQUE_NAMES;
 import static org.corehunter.tests.TestData.MARKER_NAMES;
 import static org.corehunter.tests.TestData.NAME;
 import static org.corehunter.tests.TestData.PRECISION;
-import static org.corehunter.tests.TestData.SUBSET1;
-import static org.corehunter.tests.TestData.SUBSET2;
 import static org.corehunter.tests.TestData.SHANNONS_SUBSET1;
 import static org.corehunter.tests.TestData.SHANNONS_SUBSET2;
 import static org.corehunter.tests.TestData.SHANNONS_SUBSET3;
+import static org.corehunter.tests.TestData.SUBSET1;
+import static org.corehunter.tests.TestData.SUBSET2;
 import static org.corehunter.tests.TestData.SUBSET3;
 import static org.corehunter.tests.TestData.SUBSET_EMPTY;
+
+import java.util.Random;
 
 import org.corehunter.data.CoreHunterData;
 import org.corehunter.data.simple.SimpleGenotypeData;
