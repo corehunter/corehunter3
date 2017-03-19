@@ -513,33 +513,22 @@ public class API {
      * Creates a list of default objectives, one for each type of data available, with equal weights.
      * 
      * @param coreHunterData the data for which the objectives are required
-     * @return list of default objectives
+     * @return list of default objectives (each with weight 1.0) 
      */
     public static final List<CoreHunterObjective> createDefaultObjectives(CoreHunterData coreHunterData) {
         List<CoreHunterObjective> objectives = new ArrayList<>();
 
         if (coreHunterData != null) {
-            int count = 0;
-            if (coreHunterData.hasGenotypes()) {
-                ++count;
-            }
-            if (coreHunterData.hasPhenotypes()) {
-                ++count;
-            }
-            if (coreHunterData.hasDistances()) {
-                ++count;
-            }
 
             if (coreHunterData.hasGenotypes()) {
-                objectives.add(new CoreHunterObjective(DEFAULT_OBJECTIVE, DEFAULT_GENOTYPE_MEASURE, 1.0 / count));
+                objectives.add(new CoreHunterObjective(DEFAULT_OBJECTIVE, DEFAULT_GENOTYPE_MEASURE, 1.0));
             }
             if (coreHunterData.hasPhenotypes()) {
-                objectives.add(new CoreHunterObjective(DEFAULT_OBJECTIVE, CoreHunterMeasure.GOWERS, 1.0 / count));
+                objectives.add(new CoreHunterObjective(DEFAULT_OBJECTIVE, CoreHunterMeasure.GOWERS, 1.0));
             }
             if (coreHunterData.hasDistances()) {
                 objectives.add(new CoreHunterObjective(
-                        DEFAULT_OBJECTIVE, CoreHunterMeasure.PRECOMPUTED_DISTANCE, 1.0 / count
-                ));
+                        DEFAULT_OBJECTIVE, CoreHunterMeasure.PRECOMPUTED_DISTANCE, 1.0));
             }
         }
 
