@@ -9,6 +9,10 @@ Version 3 has been recoded from scratch using the [JAMES framework](http://www.j
 
 For the latest information on Core Hunter please subscribe to the [user group](https://groups.google.com/d/forum/corehunter-users).
 
+## Data formats
+
+Information about the supported data file formats is available [here](data).
+
 ## Evaluation measures
 One of the main strengths of Core Hunter is that it can directly optimize a number of different evaluation measures.
 If desired, multiple measures can be simultaneously optimized as part of a weighted index.
