@@ -190,7 +190,7 @@ public class SimpleGenotypeData extends DataPojo implements GenotypeData {
                 double sum = Arrays.stream(alleleFreqs).filter(Objects::nonNull)
                     .mapToDouble(Double::doubleValue).sum();
                 // sum should not exceed 1.0
-                if (sum > 1.0) {
+                if (sum > 1.0 + SUM_TO_ONE_PRECISION) {
                     throw new IllegalArgumentException(
                         "Allele frequency sum per marker should not exceed one.");
                 }

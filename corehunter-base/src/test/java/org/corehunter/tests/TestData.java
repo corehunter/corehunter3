@@ -38,7 +38,7 @@ import uno.informatics.data.pojo.SimpleFeaturePojo;
  */
 public class TestData {
 
-    public static final double PRECISION = 1e-10;
+    public static final double PRECISION = 1e-8;
 
     public static final double[][] DISTANCES = new double[][]{
         new double[]{0.0, 0.2, 0.4, 0.6, 0.8},
