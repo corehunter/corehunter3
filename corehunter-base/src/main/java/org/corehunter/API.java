@@ -21,11 +21,7 @@ package org.corehunter;
 
 import java.io.IOException;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 import org.corehunter.data.CoreHunterData;
 import org.corehunter.data.DistanceMatrixData;
@@ -385,8 +381,11 @@ public class API {
         
     public static CoreHunterArguments createArguments(CoreHunterData data, int size,
                                                       CoreHunterObjective[] objectives,
-                                                      boolean normalizeMultiObjective){
-        return new CoreHunterArguments(data, size, Arrays.asList(objectives), normalizeMultiObjective);
+                                                      boolean normalizeMultiObjective,
+                                                      long seed){
+        return new CoreHunterArguments(
+                data, size, Arrays.asList(objectives), normalizeMultiObjective, new Random(seed)
+        );
     }
 
     /* --------- */

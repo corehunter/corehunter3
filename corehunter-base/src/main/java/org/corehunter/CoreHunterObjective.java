@@ -194,7 +194,7 @@ public class CoreHunterObjective {
      * normalizationRange, which can any be value
      * 
      * @param objective
-     *            the objective to tested against this objective
+     *            the objective to be tested against this objective
      * @return <code>true</code> if the objective type and measure are the
      *         equal, <code>true</code> otherwise
      */
