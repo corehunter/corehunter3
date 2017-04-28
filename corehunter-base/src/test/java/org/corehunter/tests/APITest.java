@@ -226,27 +226,27 @@ public class APITest {
         assertArrayEquals("Default objectives for genotypes and phenotypes data not correct",
             new CoreHunterObjective[] {
                 new CoreHunterObjective(CoreHunterObjectiveType.AV_ENTRY_TO_NEAREST_ENTRY,
-                    CoreHunterMeasure.MODIFIED_ROGERS, 0.5),
+                    CoreHunterMeasure.MODIFIED_ROGERS, 1.0),
                 new CoreHunterObjective(CoreHunterObjectiveType.AV_ENTRY_TO_NEAREST_ENTRY,
-                    CoreHunterMeasure.GOWERS, 0.5)
+                    CoreHunterMeasure.GOWERS, 1.0)
             }, API.createDefaultObjectives(GENO_AND_PHENOTYPES_DATA).toArray());
 
         assertArrayEquals("Default objectives for phenotypes and distance data not correct",
             new CoreHunterObjective[] {
                 new CoreHunterObjective(CoreHunterObjectiveType.AV_ENTRY_TO_NEAREST_ENTRY,
-                    CoreHunterMeasure.GOWERS, 0.5),
+                    CoreHunterMeasure.GOWERS, 1.0),
                 new CoreHunterObjective(CoreHunterObjectiveType.AV_ENTRY_TO_NEAREST_ENTRY,
-                    CoreHunterMeasure.PRECOMPUTED_DISTANCE, 0.5)
+                    CoreHunterMeasure.PRECOMPUTED_DISTANCE, 1.0)
             }, API.createDefaultObjectives(PHENOTYPES_AND_DISTANCES_DATA).toArray());
 
         assertArrayEquals("Default objectives for genotypes, phenotypes and distance data not correct",
             new CoreHunterObjective[] {
                 new CoreHunterObjective(CoreHunterObjectiveType.AV_ENTRY_TO_NEAREST_ENTRY,
-                    CoreHunterMeasure.MODIFIED_ROGERS, 1.0 / 3.0),
+                    CoreHunterMeasure.MODIFIED_ROGERS, 1.0),
                 new CoreHunterObjective(CoreHunterObjectiveType.AV_ENTRY_TO_NEAREST_ENTRY,
-                    CoreHunterMeasure.GOWERS, 1.0 / 3.0),
+                    CoreHunterMeasure.GOWERS, 1.0),
                 new CoreHunterObjective(CoreHunterObjectiveType.AV_ENTRY_TO_NEAREST_ENTRY,
-                    CoreHunterMeasure.PRECOMPUTED_DISTANCE, 1.0 / 3.0)
+                    CoreHunterMeasure.PRECOMPUTED_DISTANCE, 1.0)
             }, API.createDefaultObjectives(GENO_PHENOTYPES_AND_DISTANCES_DATA).toArray());
     }
 
