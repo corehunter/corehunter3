@@ -44,6 +44,7 @@ import uno.informatics.common.io.IOUtilities;
 import uno.informatics.common.io.RowReader;
 import uno.informatics.common.io.RowWriter;
 import uno.informatics.common.io.text.TextFileRowReader;
+import uno.informatics.common.io.text.TextFileRowWriter;
 import uno.informatics.data.SimpleEntity;
 import uno.informatics.data.io.FileType;
 import uno.informatics.data.pojo.DataPojo;
@@ -974,7 +975,7 @@ public class SimpleGenotypeData extends DataPojo implements GenotypeData {
         // write data to file
         boolean markSelection = includeSelected && includeUnselected;
         try (RowWriter writer = IOUtilities.createRowWriter(
-                filePath, fileType, TextFileRowReader.REMOVE_WHITE_SPACE
+                filePath, fileType, TextFileRowWriter.ADD_QUOTES
         )) {
 
             if (writer == null || !writer.ready()) {

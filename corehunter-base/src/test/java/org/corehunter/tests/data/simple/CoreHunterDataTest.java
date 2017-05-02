@@ -207,7 +207,7 @@ public class CoreHunterDataTest {
         
         DistanceMatrixData dist = readDistanceMatrixData(DISTANCES_NON_UNIQUE_NAMES);
         PhenotypeData pheno = readPhenotypicTraitData(PHENOTYPES_NON_UNIQUE_NAMES);
-        GenotypeData geno = readMarkerData(MARKERS_IDS_SOME_NAMES);
+        GenotypeData geno = readMarkerData(MARKERS_NON_UNIQUE_NAMES);
         
         expectedHeaders = TestData.HEADERS_NON_UNIQUE_NAMES;
         
