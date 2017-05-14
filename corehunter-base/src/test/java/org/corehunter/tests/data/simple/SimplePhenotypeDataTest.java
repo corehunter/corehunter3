@@ -71,7 +71,8 @@ public class SimplePhenotypeDataTest {
     private static final String CSV_IDS_NAMES = "/phenotypes/ids-and-names.csv";
     private static final String CSV_IDS_MIN_MAX = "/phenotypes/ids-min-max.csv";
     private static final String CSV_IDS_MISSING_VALUES = "/phenotypes/missing-values.csv";
-
+    private static final String LONG_FILE = "/phenotypes/phenotype_data.csv";
+    
     private static final String ERRONEOUS_FILES_DIR = "/phenotypes/err/";
 
     private SimpleEntity[] expectedHeaders;
@@ -191,6 +192,13 @@ public class SimplePhenotypeDataTest {
         testData(SimplePhenotypeData.readPhenotypeData(
             Paths.get(SimplePhenotypeDataTest.class.getResource(CSV_IDS_MISSING_VALUES).getPath()),
             FileType.CSV));
+    }
+    
+    @Test
+    public void fromCsvFileLargeFiles() throws IOException {
+        SimplePhenotypeData.readPhenotypeData(
+            Paths.get(SimplePhenotypeDataTest.class.getResource(LONG_FILE).getPath()),
+            FileType.CSV);
     }
 
     @Test

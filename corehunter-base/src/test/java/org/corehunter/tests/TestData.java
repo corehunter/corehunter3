@@ -54,11 +54,11 @@ public class TestData {
     };
     
     public static final String[] NON_UNIQUE_NAMES = new String[]{
-        "Alice", "Unknown", "Bob", "Bob", "Carol"
+        "Alice", "Unkn\"own", "Bob", "Bob", "Car,ol"
     };
     
     public static final String[] UNIQUE_IDENTIFIERS = new String[]{
-        "Alice", "Unknown", "Bob-1", "Bob-2", "Carol"
+        "Ali,ce", "Unkn\"own", "Bob-1", "Bob'-2", "Car'ol"
     };
     
     public static final SimpleEntity[] HEADERS_UNIQUE_NAMES;
