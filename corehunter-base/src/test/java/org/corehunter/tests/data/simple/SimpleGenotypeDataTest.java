@@ -68,15 +68,18 @@ public class SimpleGenotypeDataTest {
     private static final String CSV_IDS = "/frequency_genotypes/ids.csv";
     private static final String CSV_IDS_NAMES = "/frequency_genotypes/ids-and-names.csv";
     private static final String CSV_NO_ALLELE_NAMES = "/frequency_genotypes/no-allele-names.csv";
+    private static final String FREQUENCY_LONG_FILE = "/frequency_genotypes/frequency_genotypic_data.csv";
     
     private static final String DIPLOID_TXT_IDS = "/diploid_genotypes/ids.txt";
     private static final String DIPLOID_CSV_IDS = "/diploid_genotypes/ids.csv";
     private static final String DIPLOID_CSV_IDS_NAMES = "/diploid_genotypes/ids-and-names.csv";
-
+    private static final String DIPLOID_LONG_FILE = "/diploid_genotypes/diploid_genotypic_data.csv";
+    
     private static final String HOMOZYGOUS_TXT_IDS = "/homozygous_genotypes/ids.txt";
     private static final String HOMOZYGOUS_CSV_IDS = "/homozygous_genotypes/ids.csv";
     private static final String HOMOZYGOUS_CSV_IDS_NAMES = "/homozygous_genotypes/ids-and-names.csv";
-
+    private static final String HOMOZYGOUS_LONG_FILE = "/homozygous_genotypes/homozygous_genotypic_data.csv";
+    
     private static final String ERRONEOUS_FILES_DIR = "/frequency_genotypes/err/";
     private static final String DIPLOID_ERRONEOUS_FILES_DIR = "/diploid_genotypes/err/";
     private static final String TEST_OUTPUT = "target/testoutput";
@@ -174,6 +177,13 @@ public class SimpleGenotypeDataTest {
         testDataFrequencies(SimpleGenotypeData.readData(
             Paths.get(SimpleGenotypeDataTest.class.getResource(CSV_NO_ALLELE_NAMES).getPath()), FileType.CSV
         ));
+    }
+    
+    @Test
+    public void fromCsvLargeFiles() throws IOException {
+        SimpleGenotypeData.readData(
+            Paths.get(SimpleGenotypeDataTest.class.getResource(FREQUENCY_LONG_FILE).getPath()), FileType.CSV
+        );
     }
     
     @Test
@@ -482,6 +492,13 @@ public class SimpleGenotypeDataTest {
     }
     
     @Test
+    public void homozygousfromCsvLargeFiles() throws IOException {
+        SimpleGenotypeData.readData(
+            Paths.get(SimpleGenotypeDataTest.class.getResource(HOMOZYGOUS_LONG_FILE).getPath()),
+            FileType.CSV, GenotypeDataFormat.DEFAULT)  ;
+    }
+    
+    @Test
     public void homozygousToCsvFile() throws IOException {
         dataName = "out.csv";
         expectedHeaders = HEADERS_NON_UNIQUE_NAMES;
@@ -559,6 +576,14 @@ public class SimpleGenotypeDataTest {
             Paths.get(SimpleGenotypeDataTest.class.getResource(DIPLOID_CSV_IDS_NAMES).getPath()),
             FileType.CSV, GenotypeDataFormat.DEFAULT
         ));
+    }
+    
+    @Test
+    public void diploidFromCsvLargeFiles() throws IOException {
+        SimpleGenotypeData.readData(
+            Paths.get(SimpleGenotypeDataTest.class.getResource(DIPLOID_LONG_FILE).getPath()), FileType.CSV, 
+            GenotypeDataFormat.DEFAULT
+        );
     }
     
     @Test
