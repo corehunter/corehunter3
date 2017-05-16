@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.Random;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -127,7 +128,7 @@ public class CoreHunter {
             throw new IllegalArgumentException("Dataset not defined!");
         }
         if(!arguments.isNormalized()){
-            throw new IllegalArgumentException("Normalization is disabled.");
+            throw new IllegalArgumentException("Normalization supposed to be disabled.");
         }
         List<CoreHunterObjective> objectives = arguments.getObjectives();
         if(objectives == null || objectives.isEmpty()){
@@ -136,31 +137,18 @@ public class CoreHunter {
         if(objectives.size() < 2){
             throw new IllegalArgumentException("At least two objectives required for Pareto normalization.");
         }
-        
-        // set size and neighbourhood
-        int size = arguments.getSubsetSize();
-        Neighbourhood<SubsetSolution> neigh = new SingleSwapNeighbourhood();
-        
+
         // optimize each objective separately (in parallel)
         List<SubsetSolution> bestSolutions = objectives.parallelStream().map(obj -> {
             Objective<SubsetSolution, CoreHunterData> jamesObj = createObjective(data, obj);
-            // create normalization problem and search
-            SubsetProblem<CoreHunterData> problem = new SubsetProblem<>(data, jamesObj, size);
-            RandomDescent<SubsetSolution> normSearch = new RandomDescent<>(problem, neigh);
-            // set stop conditions
-            if(timeLimit > 0){
-                normSearch.addStopCriterion(new MaxRuntime(timeLimit, TimeUnit.MILLISECONDS));
-            }
-            if(maxTimeWithoutImprovement > 0){
-                normSearch.addStopCriterion(
-                        new MaxTimeWithoutImprovement(maxTimeWithoutImprovement, TimeUnit.MILLISECONDS)
-                );
-            }
+            // create normalization search
+            Search<SubsetSolution> normSearch = createRandomDescent(arguments, jamesObj);
             // execute normalization search
             normSearch.run();
             // return best solution
             return normSearch.getBestSolution();
-        })  .collect(Collectors.toList());
+        })
+            .collect(Collectors.toList());
         
         // determine normalization ranges (based on Pareto maxima/minima)
         List<Range<Double>> ranges = new ArrayList<>();
@@ -203,20 +191,7 @@ public class CoreHunter {
         }
 
         // create search from arguments
-        Search<SubsetSolution> search = createSearch(arguments);
-
-        // set stop criteria
-        if(timeLimit <= 0 && maxTimeWithoutImprovement <= 0){
-            throw new IllegalStateException(
-                    "Please specify time limit and/or maximum time without improvement before execution."
-            );
-        }
-        if (timeLimit > 0) {
-            search.addStopCriterion(new MaxRuntime(timeLimit, TimeUnit.MILLISECONDS));
-        }
-        if (maxTimeWithoutImprovement > 0){
-            search.addStopCriterion(new MaxTimeWithoutImprovement(maxTimeWithoutImprovement, TimeUnit.MILLISECONDS));
-        }
+        Search<SubsetSolution> search = createMainSearch(arguments);
         
         // add search listener (if any)
         if (listener != null) {
@@ -291,31 +266,74 @@ public class CoreHunter {
         this.listener = listener;
     }
 
-    protected Search<SubsetSolution> createSearch(CoreHunterArguments arguments) {
+    private Search<SubsetSolution> createMainSearch(CoreHunterArguments arguments) {
 
-        int size = arguments.getSubsetSize();
 
-        Objective<SubsetSolution, CoreHunterData> objective = createObjective(arguments);
+        Objective<SubsetSolution, CoreHunterData> obj = createObjective(arguments);
 
-        SubsetProblem<CoreHunterData> problem = new SubsetProblem<>(arguments.getData(), objective, size);
-        Neighbourhood<SubsetSolution> neigh = new SingleSwapNeighbourhood();
-        
-        Search<SubsetSolution> search = createSearch(problem, neigh);
-
-        return search;
-
-    }
-    
-    private Search<SubsetSolution> createSearch(SubsetProblem<CoreHunterData> problem,
-                                                Neighbourhood<SubsetSolution> neigh){
         switch(mode){
             case DEFAULT:
-                return new ParallelTempering<>(problem, neigh, PT_NUM_REPLICAS, PT_MIN_TEMP, PT_MAX_TEMP);
+                return createParallelTempering(arguments, obj);
             case FAST:
-                return new RandomDescent<>(problem, neigh);
+                return createRandomDescent(arguments, obj);
             default:
                 throw new CoreHunterException("Unknown execution mode " + mode + ".");
         }
+
+    }
+
+    private Search<SubsetSolution> createRandomDescent(CoreHunterArguments args,
+                                                       Objective<SubsetSolution, CoreHunterData> obj){
+        return setupSearch(
+                new RandomDescent<>(createProblem(args, obj), createNeighbourhood()),
+                args
+        );
+    }
+
+    private Search<SubsetSolution> createParallelTempering(CoreHunterArguments args,
+                                                           Objective<SubsetSolution, CoreHunterData> obj){
+        return setupSearch(new ParallelTempering<>(
+                createProblem(args, obj), createNeighbourhood(),
+                PT_NUM_REPLICAS, PT_MIN_TEMP, PT_MAX_TEMP),
+                args
+        );
+    }
+
+    private SubsetProblem<CoreHunterData> createProblem(CoreHunterArguments args,
+                                                        Objective<SubsetSolution, CoreHunterData> obj){
+        return new SubsetProblem<>(
+                args.getData(), obj, args.getSubsetSize()
+        );
+    }
+
+    private Neighbourhood<SubsetSolution> createNeighbourhood(){
+        return new SingleSwapNeighbourhood();
+    }
+
+    private Search<SubsetSolution> setupSearch(Search<SubsetSolution> search, CoreHunterArguments args){
+        search = setStopCriteria(search);
+        search = setRandom(search, args);
+        return search;
+    }
+
+    private Search<SubsetSolution> setStopCriteria(Search<SubsetSolution> search){
+        if(timeLimit <= 0 && maxTimeWithoutImprovement <= 0){
+            throw new IllegalStateException(
+                    "Please specify time limit and/or maximum time without improvement before execution."
+            );
+        }
+        if (timeLimit > 0) {
+            search.addStopCriterion(new MaxRuntime(timeLimit, TimeUnit.MILLISECONDS));
+        }
+        if (maxTimeWithoutImprovement > 0){
+            search.addStopCriterion(new MaxTimeWithoutImprovement(maxTimeWithoutImprovement, TimeUnit.MILLISECONDS));
+        }
+        return search;
+    }
+
+    private Search<SubsetSolution> setRandom(Search<SubsetSolution> search, CoreHunterArguments args){
+        search.setRandom(new Random(args.generateSeed()));
+        return search;
     }
 
     private Objective<SubsetSolution, CoreHunterData> createObjective(CoreHunterArguments arguments) {

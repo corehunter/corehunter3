@@ -22,37 +22,17 @@ package org.corehunter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 
 import org.corehunter.data.CoreHunterData;
 
 public class CoreHunterArguments {
 
-    private int subsetSize;
-    private CoreHunterData data;
-    private List<CoreHunterObjective> objectives;
-    private boolean normalize;
-    
-    /**
-     * Creates arguments with no objectives (private constructor).
-     * 
-     * @param data the data for the run
-     * @param subsetSize the desired subset size
-     */
-    private CoreHunterArguments(CoreHunterData data, int subsetSize) {
-        if (data == null) {
-            throw new IllegalArgumentException("Data undefined.");
-        }
-        if (subsetSize < 2) {
-            throw new IllegalArgumentException("Requested subset size must at least be 2 or more.");
-        }
-        if (subsetSize >= data.getSize()) {
-            throw new IllegalArgumentException(
-                    String.format("Requested subset size must be less than total data size %d.", data.getSize())
-            );
-        }
-        this.data = data ;
-        this.subsetSize = subsetSize ;
-    }
+    private final int subsetSize;
+    private final CoreHunterData data;
+    private final List<CoreHunterObjective> objectives;
+    private final boolean normalize;
+    private final Random seedGenerator;
     
     /**
      * Creates a single objective configuration with no defined measure.
@@ -62,13 +42,7 @@ public class CoreHunterArguments {
      * @param objective the objective type 
      */
     public CoreHunterArguments(CoreHunterData data, int subsetSize, CoreHunterObjectiveType objective) {
-        this(data, subsetSize);
-        if (objective == null) {
-            throw new IllegalArgumentException("Objective not defined.");
-        }
-        objectives = Collections.singletonList(new CoreHunterObjective(objective));
-        // no normalization for single objective configuration
-        normalize = false;
+        this(data, subsetSize, objective, null);
     }
 
     /**
@@ -81,16 +55,13 @@ public class CoreHunterArguments {
      */
     public CoreHunterArguments(CoreHunterData data, int subsetSize,
                                CoreHunterObjectiveType objective, CoreHunterMeasure measure) {
-        this(data, subsetSize);
+        this(data, subsetSize, Collections.singletonList(new CoreHunterObjective(objective, measure)));
         if (objective == null) {
             throw new IllegalArgumentException("Objective not defined.");
         }
         if (measure == null) {
             throw new IllegalArgumentException("Measure not defined.");
         }
-        objectives = Collections.singletonList(new CoreHunterObjective(objective, measure));
-        // no normalization for single objective configuration
-        normalize = false;
     }
     
     /**
@@ -107,7 +78,7 @@ public class CoreHunterArguments {
     
     /**
      * Creates a multiple objective configuration.
-     * If <code>normalize</code> is <code>true</code> automatic normalization is enabled but
+     * If <code>normalize</code> is <code>true</code> automatic normalization is enabled, but
      * only if more than one objective is included. In case of a single objective this argument
      * is ignored.
      * 
@@ -119,12 +90,47 @@ public class CoreHunterArguments {
     public CoreHunterArguments(CoreHunterData data, int subsetSize,
                                List<CoreHunterObjective> objectives,
                                boolean normalize) {
-        this(data, subsetSize) ;
+        this(data, subsetSize, objectives, normalize, new Random());
+    }
+
+    /**
+     * Creates a multiple objective configuration.
+     * If <code>normalize</code> is <code>true</code> automatic normalization is enabled, but
+     * only if more than one objective is included. In case of a single objective this argument
+     * is ignored.
+     *
+     * @param data the data for the run
+     * @param subsetSize the desired subset size
+     * @param objectives the objectives for the run
+     * @param normalize indicates whether objectives should be normalized prior to execution
+     * @param seedGenerator used to generate seeds for searches
+     */
+    public CoreHunterArguments(CoreHunterData data, int subsetSize,
+                               List<CoreHunterObjective> objectives,
+                               boolean normalize, Random seedGenerator) {
+        // set data and size
+        if (data == null) {
+            throw new IllegalArgumentException("Data undefined.");
+        }
+        if (subsetSize < 2) {
+            throw new IllegalArgumentException("Requested subset size must at least be 2 or more.");
+        }
+        if (subsetSize >= data.getSize()) {
+            throw new IllegalArgumentException(
+                    String.format("Requested subset size must be less than total data size %d.", data.getSize())
+            );
+        }
+        this.data = data ;
+        this.subsetSize = subsetSize ;
+        // set objectives
         if (objectives == null || objectives.isEmpty()) {
             throw new IllegalArgumentException("Objectives not defined.");
         }
         this.objectives = Collections.unmodifiableList(new ArrayList<>(objectives));
+        // set normalization flag
         this.normalize = objectives.size() > 1 && normalize;
+        // set seed generator
+        this.seedGenerator = seedGenerator;
     }
 
     public final CoreHunterData getData() {
@@ -141,6 +147,10 @@ public class CoreHunterArguments {
     
     public final boolean isNormalized(){
         return normalize;
+    }
+
+    public final long generateSeed(){
+        return seedGenerator.nextLong();
     }
     
 }
