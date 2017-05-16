@@ -19,7 +19,12 @@
 
 package org.corehunter;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Locale;
+import java.util.Objects;
+import java.util.Random;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -36,9 +41,7 @@ import org.corehunter.objectives.distance.measures.CavalliSforzaEdwardsDistance;
 import org.corehunter.objectives.distance.measures.GowerDistance;
 import org.corehunter.objectives.distance.measures.ModifiedRogersDistance;
 import org.corehunter.objectives.distance.measures.PrecomputedDistance;
-import org.jamesframework.core.problems.Problem;
 import org.jamesframework.core.problems.objectives.Objective;
-import org.jamesframework.core.problems.sol.RandomSolutionGenerator;
 import org.jamesframework.core.search.Search;
 import org.jamesframework.core.search.algo.ParallelTempering;
 import org.jamesframework.core.search.algo.RandomDescent;

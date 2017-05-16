@@ -21,7 +21,12 @@ package org.corehunter;
 
 import java.io.IOException;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Random;
 
 import org.corehunter.data.CoreHunterData;
 import org.corehunter.data.DistanceMatrixData;
