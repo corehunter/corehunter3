@@ -64,7 +64,8 @@ public class SimpleBiAllelicGenotypeDataTest {
     private static final String CSV_IDS = "/biallelic_genotypes/ids.csv";
     private static final String CSV_IDS_NAMES = "/biallelic_genotypes/ids-and-names.csv";
     private static final String CSV_NO_MARKER_NAMES = "/biallelic_genotypes/no-marker-names.csv";
-
+    private static final String LONG_FILE = "/biallelic_genotypes/biallelic_genotypes_data.csv";
+    
     private static final String ERRONEOUS_FILES_DIR = "/biallelic_genotypes/err/";
     private static final String TEST_OUTPUT = "target/testoutput";
     
@@ -150,6 +151,13 @@ public class SimpleBiAllelicGenotypeDataTest {
         testData(SimpleBiAllelicGenotypeData.readData(
             Paths.get(SimpleBiAllelicGenotypeDataTest.class.getResource(CSV_NO_MARKER_NAMES).getPath()), FileType.CSV
         ));
+    }
+    
+    @Test
+    public void fromCsvFileLargeFiles() throws IOException {
+        SimpleBiAllelicGenotypeData.readData(
+            Paths.get(SimpleBiAllelicGenotypeDataTest.class.getResource(LONG_FILE).getPath()), FileType.CSV
+        );
     }
     
     @Test

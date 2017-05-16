@@ -3,5 +3,5 @@ TYPE    ,         , N      , O      , I      , R      , NB
 Alice   , Alice   , A      , 3      , 4      , 1.4    , false
 Unknown ,         , B      , 1      , 5      , 0.5    , true
 Bob-1   , Bob     , A      , 0      , 6      , 0.5    , true
-Bob-2   , Fake Bob, C      , 2      , 9      , 0.5    , false
-Carol   , Carol   , B      , 2      , 1      , 1.3    , true
+"Bob'-2"   , Fake Bob, C      , 2      , 9      , 0.5    , false
+Carol   , 'Car"ol'   , B      , 2      , 1      , 1.3    , true
