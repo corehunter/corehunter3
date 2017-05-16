@@ -147,7 +147,8 @@ public class CoreHunter {
             normSearch.run();
             // return best solution
             return normSearch.getBestSolution();
-        }).collect(Collectors.toList());
+        })
+            .collect(Collectors.toList());
         
         // determine normalization ranges (based on Pareto maxima/minima)
         List<Range<Double>> ranges = new ArrayList<>();
