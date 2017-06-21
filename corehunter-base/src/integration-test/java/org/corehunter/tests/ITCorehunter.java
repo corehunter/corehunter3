@@ -31,7 +31,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.corehunter.CoreHunter;
 import org.corehunter.CoreHunterArguments;
@@ -46,7 +48,7 @@ import org.corehunter.data.simple.SimpleDistanceMatrixData;
 import org.corehunter.data.simple.SimpleGenotypeData;
 import org.corehunter.data.simple.SimplePhenotypeData;
 import org.corehunter.objectives.AverageAccessionToNearestEntry;
-import org.corehunter.objectives.AverageEntryToEntry;
+import org.corehunter.objectives.AverageEntryToNearestEntry;
 import org.corehunter.objectives.HeterozygousLoci;
 import org.corehunter.objectives.distance.measures.GowerDistance;
 import org.corehunter.objectives.distance.measures.PrecomputedDistance;
@@ -69,16 +71,20 @@ public class ITCorehunter {
     private static final CoreHunterData DATA;
     
     static {
+        
         DistanceMatrixData distances = new SimpleDistanceMatrixData(HEADERS_UNIQUE_NAMES, DISTANCES);
         DISTANCES_DATA = new CoreHunterData(distances);
+        
         GenotypeData genotypes = new SimpleGenotypeData(
                 HEADERS_UNIQUE_NAMES, MARKER_NAMES, ALLELE_NAMES, ALLELE_FREQUENCIES
         );
         GENOTYPES_DATA = new CoreHunterData(genotypes);
+        
         PhenotypeData phenotypes = new SimplePhenotypeData(
                 NAME, PHENOTYPIC_TRAIT_FEATURES, PHENOTYPIC_TRAIT_VALUES_WITH_HEADERS
         );
         PHENOTYPES_DATA = new CoreHunterData(phenotypes);
+        
         DATA = new CoreHunterData(genotypes, phenotypes, distances);
     }   
     
@@ -92,18 +98,18 @@ public class ITCorehunter {
         
         int size = 2;
         int time = 2;
-        Objective<SubsetSolution, CoreHunterData> obj = new AverageEntryToEntry(new PrecomputedDistance());
 
         // run Core Hunter
         CoreHunterArguments arguments = 
                 new CoreHunterArguments(data, size, 
-                        CoreHunterObjectiveType.AV_ENTRY_TO_ENTRY, 
+                        CoreHunterObjectiveType.AV_ENTRY_TO_NEAREST_ENTRY, 
                         CoreHunterMeasure.PRECOMPUTED_DISTANCE);
         CoreHunter corehunter = new CoreHunter();
         corehunter.setTimeLimit(time);
         SubsetSolution result = corehunter.execute(arguments);
 
         // compare with optimal solution
+        Objective<SubsetSolution, CoreHunterData> obj = new AverageEntryToNearestEntry(new PrecomputedDistance());
         assertEquals(getOptimalSolution(data, obj, size), result);
 
     }
@@ -146,6 +152,36 @@ public class ITCorehunter {
         assertTrue(aneValue <= aneMax);
         assertTrue(aneValue >= aneMin);
         
+    }
+    
+    /**
+     * Test execution with genotype data and fixed seed.
+     */
+    @Test
+    public void testGenotypeDataWithSeed() {
+
+        CoreHunterData data = GENOTYPES_DATA;
+        
+        int size = 3;
+        int time = 1;
+        long seed = 42;
+        
+        Set<SubsetSolution> results = new HashSet<>();
+        for(int i = 0; i < 5; i++){
+            // run Core Hunter
+            CoreHunterArguments arguments = 
+                    new CoreHunterArguments(data, size, 
+                            CoreHunterObjectiveType.AV_ENTRY_TO_NEAREST_ENTRY, 
+                            CoreHunterMeasure.MODIFIED_ROGERS);
+            CoreHunter corehunter = new CoreHunter();
+            corehunter.setTimeLimit(time);
+            corehunter.setSeed(seed);
+            SubsetSolution result = corehunter.execute(arguments);
+            results.add(result);
+        }
+        
+        assertEquals(1, results.size());
+
     }
     
     // get best solution through exhaustive search
