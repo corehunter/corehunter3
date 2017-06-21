@@ -32,7 +32,6 @@ public class CoreHunterArguments {
     private final CoreHunterData data;
     private final List<CoreHunterObjective> objectives;
     private final boolean normalize;
-    private final Random seedGenerator;
     
     /**
      * Creates a single objective configuration with no defined measure.
@@ -75,13 +74,13 @@ public class CoreHunterArguments {
     public CoreHunterArguments(CoreHunterData data, int subsetSize, List<CoreHunterObjective> objectives) {
         this(data, subsetSize, objectives, true);
     }
-    
+
     /**
      * Creates a multiple objective configuration.
      * If <code>normalize</code> is <code>true</code> automatic normalization is enabled, but
-     * only if more than one objective is included. In case of a single objective this argument
+     * only if more than one objective is included. In case of a single objective, this argument
      * is ignored.
-     * 
+     *
      * @param data the data for the run
      * @param subsetSize the desired subset size
      * @param objectives the objectives for the run
@@ -90,24 +89,6 @@ public class CoreHunterArguments {
     public CoreHunterArguments(CoreHunterData data, int subsetSize,
                                List<CoreHunterObjective> objectives,
                                boolean normalize) {
-        this(data, subsetSize, objectives, normalize, new Random());
-    }
-
-    /**
-     * Creates a multiple objective configuration.
-     * If <code>normalize</code> is <code>true</code> automatic normalization is enabled, but
-     * only if more than one objective is included. In case of a single objective this argument
-     * is ignored.
-     *
-     * @param data the data for the run
-     * @param subsetSize the desired subset size
-     * @param objectives the objectives for the run
-     * @param normalize indicates whether objectives should be normalized prior to execution
-     * @param seedGenerator used to generate seeds for searches
-     */
-    public CoreHunterArguments(CoreHunterData data, int subsetSize,
-                               List<CoreHunterObjective> objectives,
-                               boolean normalize, Random seedGenerator) {
         // set data and size
         if (data == null) {
             throw new IllegalArgumentException("Data undefined.");
@@ -129,8 +110,6 @@ public class CoreHunterArguments {
         this.objectives = Collections.unmodifiableList(new ArrayList<>(objectives));
         // set normalization flag
         this.normalize = objectives.size() > 1 && normalize;
-        // set seed generator
-        this.seedGenerator = seedGenerator;
     }
 
     public final CoreHunterData getData() {
@@ -147,10 +126,6 @@ public class CoreHunterArguments {
     
     public final boolean isNormalized(){
         return normalize;
-    }
-
-    public final long generateSeed(){
-        return seedGenerator.nextLong();
     }
     
 }

@@ -72,6 +72,8 @@ public class CoreHunter {
     private long timeLimit = -1;
     private long maxTimeWithoutImprovement = -1;
     private CoreHunterExecutionMode mode;
+    
+    private final Random seedGenerator;
 
     public CoreHunter() {
         this(CoreHunterExecutionMode.DEFAULT);
@@ -99,11 +101,15 @@ public class CoreHunter {
      * @param mode execution mode
      */
     public CoreHunter(CoreHunterExecutionMode mode) {
+        // set execution mode
         this.mode = mode;
+        // set default stop conditions
         maxTimeWithoutImprovement = DEFAULT_MAX_TIME_WITHOUT_IMPROVEMENT;
         if(mode == CoreHunterExecutionMode.FAST){
             maxTimeWithoutImprovement = FAST_MAX_TIME_WITHOUT_IMPROVEMENT;
         }
+        // set seed generator
+        seedGenerator = new Random();
     }
 
     /**
@@ -265,9 +271,12 @@ public class CoreHunter {
     public void setListener(CoreHunterListener listener){
         this.listener = listener;
     }
+    
+    public void setSeed(long seed){
+        seedGenerator.setSeed(seed);
+    }
 
     private Search<SubsetSolution> createMainSearch(CoreHunterArguments arguments) {
-
 
         Objective<SubsetSolution, CoreHunterData> obj = createObjective(arguments);
 
@@ -284,18 +293,16 @@ public class CoreHunter {
 
     private Search<SubsetSolution> createRandomDescent(CoreHunterArguments args,
                                                        Objective<SubsetSolution, CoreHunterData> obj){
-        return setupSearch(
-                new RandomDescent<>(createProblem(args, obj), createNeighbourhood()),
-                args
-        );
+        return setupSearch(new RandomDescent<>(createProblem(args, obj), createNeighbourhood()));
     }
 
     private Search<SubsetSolution> createParallelTempering(CoreHunterArguments args,
                                                            Objective<SubsetSolution, CoreHunterData> obj){
-        return setupSearch(new ParallelTempering<>(
+        return setupSearch(
+            new ParallelTempering<>(
                 createProblem(args, obj), createNeighbourhood(),
-                PT_NUM_REPLICAS, PT_MIN_TEMP, PT_MAX_TEMP),
-                args
+                PT_NUM_REPLICAS, PT_MIN_TEMP, PT_MAX_TEMP
+            )
         );
     }
 
@@ -310,9 +317,9 @@ public class CoreHunter {
         return new SingleSwapNeighbourhood();
     }
 
-    private Search<SubsetSolution> setupSearch(Search<SubsetSolution> search, CoreHunterArguments args){
+    private Search<SubsetSolution> setupSearch(Search<SubsetSolution> search){
         search = setStopCriteria(search);
-        search = setRandom(search, args);
+        search = setRandom(search);
         return search;
     }
 
@@ -331,8 +338,8 @@ public class CoreHunter {
         return search;
     }
 
-    private Search<SubsetSolution> setRandom(Search<SubsetSolution> search, CoreHunterArguments args){
-        search.setRandom(new Random(args.generateSeed()));
+    private Search<SubsetSolution> setRandom(Search<SubsetSolution> search){
+        search.setRandom(new Random(seedGenerator.nextLong()));
         return search;
     }
 
