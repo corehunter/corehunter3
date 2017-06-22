@@ -40,6 +40,7 @@ import java.nio.file.Paths;
 
 import org.corehunter.CoreHunter;
 import org.corehunter.CoreHunterArguments;
+import org.corehunter.CoreHunterExecutionMode;
 import org.corehunter.CoreHunterMeasure;
 import org.corehunter.CoreHunterObjective;
 import org.corehunter.CoreHunterObjectiveType;
@@ -75,6 +76,8 @@ public class ITCorehunter {
     private static final CoreHunterData PHENOTYPES_DATA;
     private static final CoreHunterData DATA;
     
+    private static final int SECOND = 1000;
+    
     static {
         
         DistanceMatrixData distances = new SimpleDistanceMatrixData(HEADERS_UNIQUE_NAMES, DISTANCES);
@@ -98,11 +101,13 @@ public class ITCorehunter {
      */
     @Test
     public void testExecuteDistanceMatrix() {
+        
+        System.out.println(" - sample from distance matrix (2 sec time limit)");
 
         CoreHunterData data = DISTANCES_DATA;
         
         int size = 2;
-        int time = 2;
+        int time = 2 * SECOND;
 
         // run Core Hunter
         CoreHunterArguments arguments = 
@@ -121,6 +126,8 @@ public class ITCorehunter {
     
     @Test
     public void testMultiObjectiveConfiguration(){
+        
+        System.out.println(" - multi-objective (default <= 10 sec without improvement)");
 
         CoreHunterData data = DATA;
         
@@ -164,15 +171,17 @@ public class ITCorehunter {
      */
     @Test
     public void testGenotypeDataWithSeed() {
+        
+        System.out.println(" - 10 x sample from genotype data with fixed seed (1 sec time limit)");
 
         CoreHunterData data = GENOTYPES_DATA;
         
         int size = 3;
-        int time = 1;
+        int time = 1 * SECOND;
         long seed = 42;
         
         Set<SubsetSolution> results = new HashSet<>();
-        for(int i = 0; i < 5; i++){
+        for(int i = 0; i < 10; i++){
             // run Core Hunter
             CoreHunterArguments arguments = 
                     new CoreHunterArguments(data, size, 
@@ -195,23 +204,151 @@ public class ITCorehunter {
     @Test
     public void testLargeGenoWithSeed() throws IOException{
         
+        System.out.println(" - 10 x sample n=2 from large genotype data with fixed seed (1 sec time limit) ");
+        
         GenotypeData geno = SimpleBiAllelicGenotypeData.readData(
-                Paths.get(ITCorehunter.class.getResource("/biallelic_genotypes/ids-and-names.csv").getPath()),
-                FileType.CSV
+            Paths.get(ITCorehunter.class.getResource("/biallelic_genotypes/biallelic_genotypes_data.csv").getPath()),
+            FileType.CSV
         );
         CoreHunterData data = new CoreHunterData(geno);
         
         int size = 2;
-        int time = 1;
+        int time = 1 * SECOND;
         long seed = 42;
         
         Set<SubsetSolution> results = new HashSet<>();
-        for(int i = 0; i < 5; i++){
+        for(int i = 0; i < 10; i++){
             // run Core Hunter
             CoreHunterArguments arguments = 
                     new CoreHunterArguments(data, size, 
                             CoreHunterObjectiveType.AV_ENTRY_TO_NEAREST_ENTRY, 
                             CoreHunterMeasure.MODIFIED_ROGERS);
+            CoreHunter corehunter = new CoreHunter();
+            corehunter.setTimeLimit(time);
+            corehunter.setSeed(seed);
+            SubsetSolution result = corehunter.execute(arguments);
+            results.add(result);
+        }
+        
+        assertEquals(1, results.size());
+        
+    }
+    
+    /**
+     * Test execution with large genotype data and fixed seed, in fast mode.
+     */
+    @Test
+    public void testLargeGenoWithSeedFastMode() throws IOException{
+        
+        System.out.println(" - 10 x sample n=2 from large genotype data with fixed seed (fast, 1 sec time limit) ");
+        
+        GenotypeData geno = SimpleBiAllelicGenotypeData.readData(
+            Paths.get(ITCorehunter.class.getResource("/biallelic_genotypes/biallelic_genotypes_data.csv").getPath()),
+            FileType.CSV
+        );
+        CoreHunterData data = new CoreHunterData(geno);
+        
+        int size = 2;
+        int time = 1 * SECOND;
+        long seed = 42;
+        
+        Set<SubsetSolution> results = new HashSet<>();
+        for(int i = 0; i < 10; i++){
+            // run Core Hunter
+            CoreHunterArguments arguments = 
+                    new CoreHunterArguments(data, size, 
+                            CoreHunterObjectiveType.AV_ENTRY_TO_NEAREST_ENTRY, 
+                            CoreHunterMeasure.MODIFIED_ROGERS);
+            CoreHunter corehunter = new CoreHunter(CoreHunterExecutionMode.FAST);
+            corehunter.setTimeLimit(time);
+            corehunter.setSeed(seed);
+            SubsetSolution result = corehunter.execute(arguments);
+            results.add(result);
+        }
+        
+        assertEquals(1, results.size());
+        
+    }
+    
+    /**
+     * Test execution with large genotype data, multiple objectives (not normalized), and fixed seed.
+     */
+    @Test
+    public void testLargeGenoMultiObjWithSeed() throws IOException{
+        
+        System.out.println(
+            " - 10 x sample n=2 from large genotype data with fixed seed (multi-obj not normalized, 1 sec time limit)"
+        );
+        
+        GenotypeData geno = SimpleBiAllelicGenotypeData.readData(
+            Paths.get(ITCorehunter.class.getResource("/biallelic_genotypes/biallelic_genotypes_data.csv").getPath()),
+            FileType.CSV
+        );
+        CoreHunterData data = new CoreHunterData(geno);
+        
+        int size = 2;
+        int time = 1 * SECOND;
+        long seed = 42;
+        
+        Set<SubsetSolution> results = new HashSet<>();
+        for(int i = 0; i < 10; i++){
+            // run Core Hunter
+            CoreHunterArguments arguments = 
+                    new CoreHunterArguments(data, size, Arrays.asList(
+                        new CoreHunterObjective(
+                                CoreHunterObjectiveType.AV_ENTRY_TO_NEAREST_ENTRY,
+                                CoreHunterMeasure.MODIFIED_ROGERS
+                        ),
+                        new CoreHunterObjective(
+                                CoreHunterObjectiveType.AV_ACCESSION_TO_NEAREST_ENTRY,
+                                CoreHunterMeasure.CAVALLI_SFORZA_EDWARDS
+                        )
+                    ), false); // disable normalization
+            CoreHunter corehunter = new CoreHunter();
+            corehunter.setTimeLimit(time);
+            corehunter.setSeed(seed);
+            SubsetSolution result = corehunter.execute(arguments);
+            results.add(result);
+        }
+        
+        assertEquals(1, results.size());
+        
+    }
+    
+    /**
+     * Test execution with large genotype data, multiple objectives (normalized), and fixed seed.
+     */
+    @Test
+    public void testLargeGenoMultiObjNormalizedWithSeed() throws IOException{
+        
+        System.out.println(
+            " - 10 x sample n=2 from large genotype data with fixed seed (multi-obj normalized, 1 sec time limit)"
+        );
+        
+        GenotypeData geno = SimpleBiAllelicGenotypeData.readData(
+            Paths.get(ITCorehunter.class.getResource("/biallelic_genotypes/biallelic_genotypes_data.csv").getPath()),
+            FileType.CSV
+        );
+        CoreHunterData data = new CoreHunterData(geno);
+        
+        int size = 2;
+        int time = 1 * SECOND;
+        long seed = 42;
+        
+        Set<SubsetSolution> results = new HashSet<>();
+        for(int i = 0; i < 10; i++){
+            // run Core Hunter
+            CoreHunterArguments arguments = 
+                    new CoreHunterArguments(data, size, Arrays.asList(
+                        new CoreHunterObjective(
+                                CoreHunterObjectiveType.AV_ENTRY_TO_NEAREST_ENTRY,
+                                CoreHunterMeasure.MODIFIED_ROGERS
+                        ),
+                        new CoreHunterObjective(
+                                CoreHunterObjectiveType.AV_ACCESSION_TO_NEAREST_ENTRY,
+                                CoreHunterMeasure.CAVALLI_SFORZA_EDWARDS
+                        )
+                    ), true); // enable normalization
             CoreHunter corehunter = new CoreHunter();
             corehunter.setTimeLimit(time);
             corehunter.setSeed(seed);
