@@ -42,7 +42,9 @@ import org.corehunter.objectives.distance.measures.GowerDistance;
 import org.corehunter.objectives.distance.measures.ModifiedRogersDistance;
 import org.corehunter.objectives.distance.measures.PrecomputedDistance;
 import org.jamesframework.core.problems.objectives.Objective;
+import org.jamesframework.core.search.LocalSearch;
 import org.jamesframework.core.search.Search;
+import org.jamesframework.core.search.algo.MetropolisSearch;
 import org.jamesframework.core.search.algo.ParallelTempering;
 import org.jamesframework.core.search.algo.RandomDescent;
 import org.jamesframework.core.search.neigh.Neighbourhood;
@@ -146,15 +148,15 @@ public class CoreHunter {
 
         // optimize each objective separately (in parallel)
         List<SubsetSolution> bestSolutions = objectives.parallelStream().map(obj -> {
-            Objective<SubsetSolution, CoreHunterData> jamesObj = createObjective(data, obj);
-            // create normalization search
-            Search<SubsetSolution> normSearch = createRandomDescent(arguments, jamesObj);
-            // execute normalization search
-            normSearch.run();
-            // return best solution
-            return normSearch.getBestSolution();
-        })
-            .collect(Collectors.toList());
+                Objective<SubsetSolution, CoreHunterData> jamesObj = createObjective(data, obj);
+                // create normalization search
+                Search<SubsetSolution> normSearch = createRandomDescent(arguments, jamesObj);
+                // execute normalization search
+                normSearch.run();
+                // return best solution
+                return normSearch.getBestSolution();
+            }
+            ).collect(Collectors.toList());
         
         // determine normalization ranges (based on Pareto maxima/minima)
         List<Range<Double>> ranges = new ArrayList<>();
@@ -293,17 +295,25 @@ public class CoreHunter {
 
     private Search<SubsetSolution> createRandomDescent(CoreHunterArguments args,
                                                        Objective<SubsetSolution, CoreHunterData> obj){
-        return setupSearch(new RandomDescent<>(createProblem(args, obj), createNeighbourhood()));
+        LocalSearch<SubsetSolution> rd = new RandomDescent<>(createProblem(args, obj), createNeighbourhood());
+        rd.setRandom(new Random(seedGenerator.nextLong()));
+        return setStopCriteria(rd);
     }
 
     private Search<SubsetSolution> createParallelTempering(CoreHunterArguments args,
                                                            Objective<SubsetSolution, CoreHunterData> obj){
-        return setupSearch(
-            new ParallelTempering<>(
-                createProblem(args, obj), createNeighbourhood(),
-                PT_NUM_REPLICAS, PT_MIN_TEMP, PT_MAX_TEMP
-            )
+        ParallelTempering<SubsetSolution> pt = new ParallelTempering<>(
+            createProblem(args, obj), createNeighbourhood(),
+            PT_NUM_REPLICAS, PT_MIN_TEMP, PT_MAX_TEMP,
+            // custom Metropolis factory to set seeds
+            (p, n, t) ->  {
+                MetropolisSearch<SubsetSolution> rep = new MetropolisSearch<>(p, n, t);
+                rep.setRandom(new Random(seedGenerator.nextLong()));
+                return rep;
+            }
         );
+        pt.setRandom(new Random(seedGenerator.nextLong()));
+        return setStopCriteria(pt);
     }
 
     private SubsetProblem<CoreHunterData> createProblem(CoreHunterArguments args,
@@ -315,12 +325,6 @@ public class CoreHunter {
 
     private Neighbourhood<SubsetSolution> createNeighbourhood(){
         return new SingleSwapNeighbourhood();
-    }
-
-    private Search<SubsetSolution> setupSearch(Search<SubsetSolution> search){
-        search = setStopCriteria(search);
-        search = setRandom(search);
-        return search;
     }
 
     private Search<SubsetSolution> setStopCriteria(Search<SubsetSolution> search){
@@ -335,11 +339,6 @@ public class CoreHunter {
         if (maxTimeWithoutImprovement > 0){
             search.addStopCriterion(new MaxTimeWithoutImprovement(maxTimeWithoutImprovement, TimeUnit.MILLISECONDS));
         }
-        return search;
-    }
-
-    private Search<SubsetSolution> setRandom(Search<SubsetSolution> search){
-        search.setRandom(new Random(seedGenerator.nextLong()));
         return search;
     }
 

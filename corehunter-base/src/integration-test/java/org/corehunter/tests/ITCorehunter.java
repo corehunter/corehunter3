@@ -35,6 +35,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import java.io.IOException;
+import java.nio.file.Paths;
+
 import org.corehunter.CoreHunter;
 import org.corehunter.CoreHunterArguments;
 import org.corehunter.CoreHunterMeasure;
@@ -44,6 +47,7 @@ import org.corehunter.data.CoreHunterData;
 import org.corehunter.data.DistanceMatrixData;
 import org.corehunter.data.GenotypeData;
 import org.corehunter.data.PhenotypeData;
+import org.corehunter.data.simple.SimpleBiAllelicGenotypeData;
 import org.corehunter.data.simple.SimpleDistanceMatrixData;
 import org.corehunter.data.simple.SimpleGenotypeData;
 import org.corehunter.data.simple.SimplePhenotypeData;
@@ -59,6 +63,7 @@ import org.jamesframework.core.subset.SubsetProblem;
 import org.jamesframework.core.subset.SubsetSolution;
 import org.jamesframework.core.subset.algo.exh.SubsetSolutionIterator;
 import org.junit.Test;
+import uno.informatics.data.io.FileType;
 
 /**
  * @author Guy Davenport, Herman De Beukelaer
@@ -182,6 +187,40 @@ public class ITCorehunter {
         
         assertEquals(1, results.size());
 
+    }
+    
+    /**
+     * Test execution with large genotype data and fixed seed.
+     */
+    @Test
+    public void testLargeGenoWithSeed() throws IOException{
+        
+        GenotypeData geno = SimpleBiAllelicGenotypeData.readData(
+                Paths.get(ITCorehunter.class.getResource("/biallelic_genotypes/ids-and-names.csv").getPath()),
+                FileType.CSV
+        );
+        CoreHunterData data = new CoreHunterData(geno);
+        
+        int size = 2;
+        int time = 1;
+        long seed = 42;
+        
+        Set<SubsetSolution> results = new HashSet<>();
+        for(int i = 0; i < 5; i++){
+            // run Core Hunter
+            CoreHunterArguments arguments = 
+                    new CoreHunterArguments(data, size, 
+                            CoreHunterObjectiveType.AV_ENTRY_TO_NEAREST_ENTRY, 
+                            CoreHunterMeasure.MODIFIED_ROGERS);
+            CoreHunter corehunter = new CoreHunter();
+            corehunter.setTimeLimit(time);
+            corehunter.setSeed(seed);
+            SubsetSolution result = corehunter.execute(arguments);
+            results.add(result);
+        }
+        
+        assertEquals(1, results.size());
+        
     }
     
     // get best solution through exhaustive search
