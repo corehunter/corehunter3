@@ -21,8 +21,10 @@ package org.corehunter;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
@@ -146,11 +148,17 @@ public class CoreHunter {
             throw new IllegalArgumentException("At least two objectives required for Pareto normalization.");
         }
 
+        // precompute seed for each normalization search to get a reproducible parallel execution
+        Map<CoreHunterObjective, Long> seeds = new HashMap<>();
+        objectives.stream().forEachOrdered(obj -> seeds.put(obj, seedGenerator.nextLong()));
+        
         // optimize each objective separately (in parallel)
         List<SubsetSolution> bestSolutions = objectives.parallelStream().map(obj -> {
                 Objective<SubsetSolution, CoreHunterData> jamesObj = createObjective(data, obj);
                 // create normalization search
                 Search<SubsetSolution> normSearch = createRandomDescent(arguments, jamesObj);
+                // use random generator with pregenerated seed!
+                normSearch.setRandom(new Random(seeds.get(obj)));
                 // execute normalization search
                 normSearch.run();
                 // return best solution
