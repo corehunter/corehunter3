@@ -21,8 +21,10 @@ package org.corehunter;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
@@ -42,7 +44,9 @@ import org.corehunter.objectives.distance.measures.GowerDistance;
 import org.corehunter.objectives.distance.measures.ModifiedRogersDistance;
 import org.corehunter.objectives.distance.measures.PrecomputedDistance;
 import org.jamesframework.core.problems.objectives.Objective;
+import org.jamesframework.core.search.LocalSearch;
 import org.jamesframework.core.search.Search;
+import org.jamesframework.core.search.algo.MetropolisSearch;
 import org.jamesframework.core.search.algo.ParallelTempering;
 import org.jamesframework.core.search.algo.RandomDescent;
 import org.jamesframework.core.search.neigh.Neighbourhood;
@@ -72,6 +76,8 @@ public class CoreHunter {
     private long timeLimit = -1;
     private long maxTimeWithoutImprovement = -1;
     private CoreHunterExecutionMode mode;
+    
+    private final Random seedGenerator;
 
     public CoreHunter() {
         this(CoreHunterExecutionMode.DEFAULT);
@@ -99,11 +105,15 @@ public class CoreHunter {
      * @param mode execution mode
      */
     public CoreHunter(CoreHunterExecutionMode mode) {
+        // set execution mode
         this.mode = mode;
+        // set default stop conditions
         maxTimeWithoutImprovement = DEFAULT_MAX_TIME_WITHOUT_IMPROVEMENT;
         if(mode == CoreHunterExecutionMode.FAST){
             maxTimeWithoutImprovement = FAST_MAX_TIME_WITHOUT_IMPROVEMENT;
         }
+        // set seed generator
+        seedGenerator = new Random();
     }
 
     /**
@@ -138,17 +148,23 @@ public class CoreHunter {
             throw new IllegalArgumentException("At least two objectives required for Pareto normalization.");
         }
 
+        // precompute seed for each normalization search to get a reproducible parallel execution
+        Map<CoreHunterObjective, Long> seeds = new HashMap<>();
+        objectives.stream().forEachOrdered(obj -> seeds.put(obj, seedGenerator.nextLong()));
+        
         // optimize each objective separately (in parallel)
         List<SubsetSolution> bestSolutions = objectives.parallelStream().map(obj -> {
-            Objective<SubsetSolution, CoreHunterData> jamesObj = createObjective(data, obj);
-            // create normalization search
-            Search<SubsetSolution> normSearch = createRandomDescent(arguments, jamesObj);
-            // execute normalization search
-            normSearch.run();
-            // return best solution
-            return normSearch.getBestSolution();
-        })
-            .collect(Collectors.toList());
+                Objective<SubsetSolution, CoreHunterData> jamesObj = createObjective(data, obj);
+                // create normalization search
+                Search<SubsetSolution> normSearch = createRandomDescent(arguments, jamesObj);
+                // use random generator with pregenerated seed!
+                normSearch.setRandom(new Random(seeds.get(obj)));
+                // execute normalization search
+                normSearch.run();
+                // return best solution
+                return normSearch.getBestSolution();
+            }
+            ).collect(Collectors.toList());
         
         // determine normalization ranges (based on Pareto maxima/minima)
         List<Range<Double>> ranges = new ArrayList<>();
@@ -265,9 +281,12 @@ public class CoreHunter {
     public void setListener(CoreHunterListener listener){
         this.listener = listener;
     }
+    
+    public void setSeed(long seed){
+        seedGenerator.setSeed(seed);
+    }
 
     private Search<SubsetSolution> createMainSearch(CoreHunterArguments arguments) {
-
 
         Objective<SubsetSolution, CoreHunterData> obj = createObjective(arguments);
 
@@ -284,19 +303,25 @@ public class CoreHunter {
 
     private Search<SubsetSolution> createRandomDescent(CoreHunterArguments args,
                                                        Objective<SubsetSolution, CoreHunterData> obj){
-        return setupSearch(
-                new RandomDescent<>(createProblem(args, obj), createNeighbourhood()),
-                args
-        );
+        LocalSearch<SubsetSolution> rd = new RandomDescent<>(createProblem(args, obj), createNeighbourhood());
+        rd.setRandom(new Random(seedGenerator.nextLong()));
+        return setStopCriteria(rd);
     }
 
     private Search<SubsetSolution> createParallelTempering(CoreHunterArguments args,
                                                            Objective<SubsetSolution, CoreHunterData> obj){
-        return setupSearch(new ParallelTempering<>(
-                createProblem(args, obj), createNeighbourhood(),
-                PT_NUM_REPLICAS, PT_MIN_TEMP, PT_MAX_TEMP),
-                args
+        ParallelTempering<SubsetSolution> pt = new ParallelTempering<>(
+            createProblem(args, obj), createNeighbourhood(),
+            PT_NUM_REPLICAS, PT_MIN_TEMP, PT_MAX_TEMP,
+            // custom Metropolis factory to set seeds
+            (p, n, t) ->  {
+                MetropolisSearch<SubsetSolution> rep = new MetropolisSearch<>(p, n, t);
+                rep.setRandom(new Random(seedGenerator.nextLong()));
+                return rep;
+            }
         );
+        pt.setRandom(new Random(seedGenerator.nextLong()));
+        return setStopCriteria(pt);
     }
 
     private SubsetProblem<CoreHunterData> createProblem(CoreHunterArguments args,
@@ -308,12 +333,6 @@ public class CoreHunter {
 
     private Neighbourhood<SubsetSolution> createNeighbourhood(){
         return new SingleSwapNeighbourhood();
-    }
-
-    private Search<SubsetSolution> setupSearch(Search<SubsetSolution> search, CoreHunterArguments args){
-        search = setStopCriteria(search);
-        search = setRandom(search, args);
-        return search;
     }
 
     private Search<SubsetSolution> setStopCriteria(Search<SubsetSolution> search){
@@ -328,11 +347,6 @@ public class CoreHunter {
         if (maxTimeWithoutImprovement > 0){
             search.addStopCriterion(new MaxTimeWithoutImprovement(maxTimeWithoutImprovement, TimeUnit.MILLISECONDS));
         }
-        return search;
-    }
-
-    private Search<SubsetSolution> setRandom(Search<SubsetSolution> search, CoreHunterArguments args){
-        search.setRandom(new Random(args.generateSeed()));
         return search;
     }
 

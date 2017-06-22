@@ -386,11 +386,8 @@ public class API {
         
     public static CoreHunterArguments createArguments(CoreHunterData data, int size,
                                                       CoreHunterObjective[] objectives,
-                                                      boolean normalizeMultiObjective,
-                                                      long seed){
-        return new CoreHunterArguments(
-                data, size, Arrays.asList(objectives), normalizeMultiObjective, new Random(seed)
-        );
+                                                      boolean normalizeMultiObjective){
+        return new CoreHunterArguments(data, size, Arrays.asList(objectives), normalizeMultiObjective);
     }
 
     /* --------- */
@@ -415,11 +412,14 @@ public class API {
      *                                  If set to a negative value, the default improvement time of
      *                                  the chosen execution mode is used: 10 seconds in default mode,
      *                                  2 seconds in fast mode.
+     * @param seed Positive seed used for random generation to allow reproducible results.
+     *             If zero or negative, no seed is applied.
      * @return Matrix containing normalization ranges.
      *         One row per objective, and two columns with lower and upper bound, respectively.
      */
     public static double[][] getNormalizationRanges(CoreHunterArguments args, String mode,
-                                                    int timeLimit, int maxTimeWithoutImprovement){
+                                                    int timeLimit, int maxTimeWithoutImprovement,
+                                                    long seed){
         // interpret arguments
         CoreHunterExecutionMode exMode = CoreHunterExecutionMode.DEFAULT;
         if (mode.equals("fast")) {
@@ -432,6 +432,9 @@ public class API {
         }
         if (maxTimeWithoutImprovement > 0) {
             ch.setMaxTimeWithoutImprovement(1000 * maxTimeWithoutImprovement); // convert to milliseconds
+        }
+        if(seed > 0){
+            ch.setSeed(seed);
         }
         // determine ranges
         List<Range<Double>> rangeList = ch.normalize(args);
@@ -456,12 +459,14 @@ public class API {
      *                                  If set to a negative value, the default improvement time of
      *                                  the chosen execution mode is used: 10 seconds in default mode,
      *                                  2 seconds in fast mode.
+     * @param seed Positive seed used for random generation to allow reproducible results.
+     *             If zero or negative, no seed is applied.
      * @param silent If <code>true</code> no output is written to the console.
      * @return Indices of selected items (zero-based).
      */
     public static int[] sampleCore(CoreHunterArguments args, String mode,
                                    int timeLimit, int maxTimeWithoutImprovement,
-                                   boolean silent) {
+                                   long seed, boolean silent) {
         // interpret arguments
         CoreHunterExecutionMode exMode = CoreHunterExecutionMode.DEFAULT;
         if (mode.equals("fast")) {
@@ -474,6 +479,9 @@ public class API {
         }
         if (maxTimeWithoutImprovement > 0) {
             ch.setMaxTimeWithoutImprovement(1000 * maxTimeWithoutImprovement); // convert to milliseconds
+        }
+        if(seed > 0){
+            ch.setSeed(seed);
         }
         if (!silent) {
             ch.setListener(new SimpleCoreHunterListener());

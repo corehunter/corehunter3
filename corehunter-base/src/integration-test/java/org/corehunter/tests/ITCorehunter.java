@@ -31,10 +31,16 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+
+import java.io.IOException;
+import java.nio.file.Paths;
 
 import org.corehunter.CoreHunter;
 import org.corehunter.CoreHunterArguments;
+import org.corehunter.CoreHunterExecutionMode;
 import org.corehunter.CoreHunterMeasure;
 import org.corehunter.CoreHunterObjective;
 import org.corehunter.CoreHunterObjectiveType;
@@ -42,11 +48,12 @@ import org.corehunter.data.CoreHunterData;
 import org.corehunter.data.DistanceMatrixData;
 import org.corehunter.data.GenotypeData;
 import org.corehunter.data.PhenotypeData;
+import org.corehunter.data.simple.SimpleBiAllelicGenotypeData;
 import org.corehunter.data.simple.SimpleDistanceMatrixData;
 import org.corehunter.data.simple.SimpleGenotypeData;
 import org.corehunter.data.simple.SimplePhenotypeData;
 import org.corehunter.objectives.AverageAccessionToNearestEntry;
-import org.corehunter.objectives.AverageEntryToEntry;
+import org.corehunter.objectives.AverageEntryToNearestEntry;
 import org.corehunter.objectives.HeterozygousLoci;
 import org.corehunter.objectives.distance.measures.GowerDistance;
 import org.corehunter.objectives.distance.measures.PrecomputedDistance;
@@ -57,6 +64,7 @@ import org.jamesframework.core.subset.SubsetProblem;
 import org.jamesframework.core.subset.SubsetSolution;
 import org.jamesframework.core.subset.algo.exh.SubsetSolutionIterator;
 import org.junit.Test;
+import uno.informatics.data.io.FileType;
 
 /**
  * @author Guy Davenport, Herman De Beukelaer
@@ -68,17 +76,23 @@ public class ITCorehunter {
     private static final CoreHunterData PHENOTYPES_DATA;
     private static final CoreHunterData DATA;
     
+    private static final int SECOND = 1000;
+    
     static {
+        
         DistanceMatrixData distances = new SimpleDistanceMatrixData(HEADERS_UNIQUE_NAMES, DISTANCES);
         DISTANCES_DATA = new CoreHunterData(distances);
+        
         GenotypeData genotypes = new SimpleGenotypeData(
                 HEADERS_UNIQUE_NAMES, MARKER_NAMES, ALLELE_NAMES, ALLELE_FREQUENCIES
         );
         GENOTYPES_DATA = new CoreHunterData(genotypes);
+        
         PhenotypeData phenotypes = new SimplePhenotypeData(
                 NAME, PHENOTYPIC_TRAIT_FEATURES, PHENOTYPIC_TRAIT_VALUES_WITH_HEADERS
         );
         PHENOTYPES_DATA = new CoreHunterData(phenotypes);
+        
         DATA = new CoreHunterData(genotypes, phenotypes, distances);
     }   
     
@@ -87,29 +101,33 @@ public class ITCorehunter {
      */
     @Test
     public void testExecuteDistanceMatrix() {
+        
+        System.out.println(" - sample from distance matrix (2 sec time limit)");
 
         CoreHunterData data = DISTANCES_DATA;
         
         int size = 2;
-        int time = 2;
-        Objective<SubsetSolution, CoreHunterData> obj = new AverageEntryToEntry(new PrecomputedDistance());
+        int time = 2 * SECOND;
 
         // run Core Hunter
         CoreHunterArguments arguments = 
                 new CoreHunterArguments(data, size, 
-                        CoreHunterObjectiveType.AV_ENTRY_TO_ENTRY, 
+                        CoreHunterObjectiveType.AV_ENTRY_TO_NEAREST_ENTRY, 
                         CoreHunterMeasure.PRECOMPUTED_DISTANCE);
         CoreHunter corehunter = new CoreHunter();
         corehunter.setTimeLimit(time);
         SubsetSolution result = corehunter.execute(arguments);
 
         // compare with optimal solution
+        Objective<SubsetSolution, CoreHunterData> obj = new AverageEntryToNearestEntry(new PrecomputedDistance());
         assertEquals(getOptimalSolution(data, obj, size), result);
 
     }
     
     @Test
     public void testMultiObjectiveConfiguration(){
+        
+        System.out.println(" - multi-objective (default <= 10 sec without improvement)");
 
         CoreHunterData data = DATA;
         
@@ -145,6 +163,200 @@ public class ITCorehunter {
         assertTrue(heValue >= heMin);
         assertTrue(aneValue <= aneMax);
         assertTrue(aneValue >= aneMin);
+        
+    }
+    
+    /**
+     * Test execution with genotype data and fixed seed.
+     */
+    @Test
+    public void testGenotypeDataWithSeed() {
+        
+        System.out.println(" - 10 x sample from genotype data with fixed seed (1 sec time limit)");
+
+        CoreHunterData data = GENOTYPES_DATA;
+        
+        int size = 3;
+        int time = 1 * SECOND;
+        long seed = 42;
+        
+        Set<SubsetSolution> results = new HashSet<>();
+        for(int i = 0; i < 10; i++){
+            // run Core Hunter
+            CoreHunterArguments arguments = 
+                    new CoreHunterArguments(data, size, 
+                            CoreHunterObjectiveType.AV_ENTRY_TO_NEAREST_ENTRY, 
+                            CoreHunterMeasure.MODIFIED_ROGERS);
+            CoreHunter corehunter = new CoreHunter();
+            corehunter.setTimeLimit(time);
+            corehunter.setSeed(seed);
+            SubsetSolution result = corehunter.execute(arguments);
+            results.add(result);
+        }
+        
+        assertEquals(1, results.size());
+
+    }
+    
+    /**
+     * Test execution with large genotype data and fixed seed.
+     */
+    @Test
+    public void testLargeGenoWithSeed() throws IOException{
+        
+        System.out.println(" - 10 x sample n=2 from large genotype data with fixed seed (1 sec time limit) ");
+        
+        GenotypeData geno = SimpleBiAllelicGenotypeData.readData(
+            Paths.get(ITCorehunter.class.getResource("/biallelic_genotypes/biallelic_genotypes_data.csv").getPath()),
+            FileType.CSV
+        );
+        CoreHunterData data = new CoreHunterData(geno);
+        
+        int size = 2;
+        int time = 1 * SECOND;
+        long seed = 42;
+        
+        Set<SubsetSolution> results = new HashSet<>();
+        for(int i = 0; i < 10; i++){
+            // run Core Hunter
+            CoreHunterArguments arguments = 
+                    new CoreHunterArguments(data, size, 
+                            CoreHunterObjectiveType.AV_ENTRY_TO_NEAREST_ENTRY, 
+                            CoreHunterMeasure.MODIFIED_ROGERS);
+            CoreHunter corehunter = new CoreHunter();
+            corehunter.setTimeLimit(time);
+            corehunter.setSeed(seed);
+            SubsetSolution result = corehunter.execute(arguments);
+            results.add(result);
+        }
+        
+        assertEquals(1, results.size());
+        
+    }
+    
+    /**
+     * Test execution with large genotype data and fixed seed, in fast mode.
+     */
+    @Test
+    public void testLargeGenoWithSeedFastMode() throws IOException{
+        
+        System.out.println(" - 10 x sample n=2 from large genotype data with fixed seed (fast, 1 sec time limit) ");
+        
+        GenotypeData geno = SimpleBiAllelicGenotypeData.readData(
+            Paths.get(ITCorehunter.class.getResource("/biallelic_genotypes/biallelic_genotypes_data.csv").getPath()),
+            FileType.CSV
+        );
+        CoreHunterData data = new CoreHunterData(geno);
+        
+        int size = 2;
+        int time = 1 * SECOND;
+        long seed = 42;
+        
+        Set<SubsetSolution> results = new HashSet<>();
+        for(int i = 0; i < 10; i++){
+            // run Core Hunter
+            CoreHunterArguments arguments = 
+                    new CoreHunterArguments(data, size, 
+                            CoreHunterObjectiveType.AV_ENTRY_TO_NEAREST_ENTRY, 
+                            CoreHunterMeasure.MODIFIED_ROGERS);
+            CoreHunter corehunter = new CoreHunter(CoreHunterExecutionMode.FAST);
+            corehunter.setTimeLimit(time);
+            corehunter.setSeed(seed);
+            SubsetSolution result = corehunter.execute(arguments);
+            results.add(result);
+        }
+        
+        assertEquals(1, results.size());
+        
+    }
+    
+    /**
+     * Test execution with large genotype data, multiple objectives (not normalized), and fixed seed.
+     */
+    @Test
+    public void testLargeGenoMultiObjWithSeed() throws IOException{
+        
+        System.out.println(
+            " - 10 x sample n=2 from large genotype data with fixed seed (multi-obj not normalized, 1 sec time limit)"
+        );
+        
+        GenotypeData geno = SimpleBiAllelicGenotypeData.readData(
+            Paths.get(ITCorehunter.class.getResource("/biallelic_genotypes/biallelic_genotypes_data.csv").getPath()),
+            FileType.CSV
+        );
+        CoreHunterData data = new CoreHunterData(geno);
+        
+        int size = 2;
+        int time = 1 * SECOND;
+        long seed = 42;
+        
+        Set<SubsetSolution> results = new HashSet<>();
+        for(int i = 0; i < 10; i++){
+            // run Core Hunter
+            CoreHunterArguments arguments = 
+                    new CoreHunterArguments(data, size, Arrays.asList(
+                        new CoreHunterObjective(
+                                CoreHunterObjectiveType.AV_ENTRY_TO_NEAREST_ENTRY,
+                                CoreHunterMeasure.MODIFIED_ROGERS
+                        ),
+                        new CoreHunterObjective(
+                                CoreHunterObjectiveType.AV_ACCESSION_TO_NEAREST_ENTRY,
+                                CoreHunterMeasure.CAVALLI_SFORZA_EDWARDS
+                        )
+                    ), false); // disable normalization
+            CoreHunter corehunter = new CoreHunter();
+            corehunter.setTimeLimit(time);
+            corehunter.setSeed(seed);
+            SubsetSolution result = corehunter.execute(arguments);
+            results.add(result);
+        }
+        
+        assertEquals(1, results.size());
+        
+    }
+    
+    /**
+     * Test execution with large genotype data, multiple objectives (normalized), and fixed seed.
+     */
+    @Test
+    public void testLargeGenoMultiObjNormalizedWithSeed() throws IOException{
+        
+        System.out.println(
+            " - 10 x sample n=2 from large genotype data with fixed seed (multi-obj normalized, 1 sec time limit)"
+        );
+        
+        GenotypeData geno = SimpleBiAllelicGenotypeData.readData(
+            Paths.get(ITCorehunter.class.getResource("/biallelic_genotypes/biallelic_genotypes_data.csv").getPath()),
+            FileType.CSV
+        );
+        CoreHunterData data = new CoreHunterData(geno);
+        
+        int size = 2;
+        int time = 1 * SECOND;
+        long seed = 42;
+        
+        Set<SubsetSolution> results = new HashSet<>();
+        for(int i = 0; i < 10; i++){
+            // run Core Hunter
+            CoreHunterArguments arguments = 
+                    new CoreHunterArguments(data, size, Arrays.asList(
+                        new CoreHunterObjective(
+                                CoreHunterObjectiveType.AV_ENTRY_TO_NEAREST_ENTRY,
+                                CoreHunterMeasure.MODIFIED_ROGERS
+                        ),
+                        new CoreHunterObjective(
+                                CoreHunterObjectiveType.AV_ACCESSION_TO_NEAREST_ENTRY,
+                                CoreHunterMeasure.CAVALLI_SFORZA_EDWARDS
+                        )
+                    ), true); // enable normalization
+            CoreHunter corehunter = new CoreHunter();
+            corehunter.setTimeLimit(time);
+            corehunter.setSeed(seed);
+            SubsetSolution result = corehunter.execute(arguments);
+            results.add(result);
+        }
+        
+        assertEquals(1, results.size());
         
     }
     
