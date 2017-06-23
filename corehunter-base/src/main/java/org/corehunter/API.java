@@ -26,7 +26,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Random;
+import java.util.Set;
 
 import org.corehunter.data.CoreHunterData;
 import org.corehunter.data.DistanceMatrixData;
@@ -386,8 +386,14 @@ public class API {
         
     public static CoreHunterArguments createArguments(CoreHunterData data, int size,
                                                       CoreHunterObjective[] objectives,
+                                                      Set<Integer> alwaysSelected,
+                                                      Set<Integer> neverSelected,
                                                       boolean normalizeMultiObjective){
-        return new CoreHunterArguments(data, size, Arrays.asList(objectives), normalizeMultiObjective);
+        return new CoreHunterArguments(
+                data, size, Arrays.asList(objectives),
+                alwaysSelected, neverSelected,
+                normalizeMultiObjective
+        );
     }
 
     /* --------- */
