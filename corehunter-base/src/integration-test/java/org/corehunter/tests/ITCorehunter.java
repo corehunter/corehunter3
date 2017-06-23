@@ -213,7 +213,7 @@ public class ITCorehunter {
         CoreHunterData data = new CoreHunterData(geno);
         
         int size = 2;
-        int time = 1 * SECOND;
+        int time = 2 * SECOND;
         long seed = 42;
         
         Set<SubsetSolution> results = new HashSet<>();
@@ -249,7 +249,7 @@ public class ITCorehunter {
         CoreHunterData data = new CoreHunterData(geno);
         
         int size = 2;
-        int time = 1 * SECOND;
+        int time = 2 * SECOND;
         long seed = 42;
         
         Set<SubsetSolution> results = new HashSet<>();
@@ -287,7 +287,7 @@ public class ITCorehunter {
         CoreHunterData data = new CoreHunterData(geno);
         
         int size = 2;
-        int time = 1 * SECOND;
+        int time = 4 * SECOND;
         long seed = 42;
         
         Set<SubsetSolution> results = new HashSet<>();
@@ -332,7 +332,7 @@ public class ITCorehunter {
         CoreHunterData data = new CoreHunterData(geno);
         
         int size = 2;
-        int time = 1 * SECOND;
+        int time = 4 * SECOND;
         long seed = 42;
         
         Set<SubsetSolution> results = new HashSet<>();
