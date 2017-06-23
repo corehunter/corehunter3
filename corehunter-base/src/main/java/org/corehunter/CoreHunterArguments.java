@@ -153,6 +153,16 @@ public class CoreHunterArguments {
         if (neverSelected == null) {
             throw new IllegalArgumentException("Set of never selected IDs can not be null.");
         }
+        if(alwaysSelected.stream().anyMatch(neverSelected::contains)
+            || neverSelected.stream().anyMatch(alwaysSelected::contains)){
+            throw new IllegalArgumentException("Sets of always and never selected IDs should be disjoint.");
+        }
+        if(alwaysSelected.size() > subsetSize){
+            throw new IllegalArgumentException("Set of always selected IDs can not be larger than subset size.");
+        }
+        if(data.getSize() - neverSelected.size() < subsetSize){
+            throw new IllegalArgumentException("Too many never selected IDs: can not obtain requested subset size.");
+        }
         this.alwaysSelected = Collections.unmodifiableSet(new HashSet<>(alwaysSelected));
         this.neverSelected = Collections.unmodifiableSet(new HashSet<>(neverSelected));
         // set normalization flag
