@@ -75,41 +75,37 @@ public class CoreHunterArguments {
      * @param objectives the objectives for the run
      */
     public CoreHunterArguments(CoreHunterData data, int subsetSize, List<CoreHunterObjective> objectives) {
-        this(data, subsetSize, objectives, true);
+        this(data, subsetSize, objectives, Collections.emptySet());
     }
 
     /**
-     * Creates a single- or multi-objective configuration.
-     * If <code>normalize</code> is <code>true</code> automatic normalization is enabled, but
-     * only if more than one objective is included. In case of a single objective, this argument
-     * is ignored.
-     *
-     * @param data the data for the run
-     * @param subsetSize the desired subset size
-     * @param objectives the objectives for the run
-     * @param normalize indicates whether objectives should be normalized prior to execution
-     */
-    public CoreHunterArguments(CoreHunterData data, int subsetSize,
-                               List<CoreHunterObjective> objectives,
-                               boolean normalize) {
-        this(data, subsetSize, objectives, Collections.emptySet(), normalize);
-    }
-    
-    /**
      * Creates a single- or multi-objective configuration with a set of always selected IDs.
-     * If <code>normalize</code> is <code>true</code> automatic normalization is enabled, but
-     * only if more than one objective is included. In case of a single objective, this argument
-     * is ignored.
+     * Automatic normalization is enabled whenever more than one objective is included.
      *
      * @param data the data for the run
      * @param subsetSize the desired subset size
      * @param objectives the objectives for the run
      * @param alwaysSelected set of IDs that will always be selected in the core
-     * @param normalize indicates whether objectives should be normalized prior to execution
+     */
+    public CoreHunterArguments(CoreHunterData data, int subsetSize,
+                               List<CoreHunterObjective> objectives,
+                               Set<Integer> alwaysSelected) {
+        this(data, subsetSize, objectives, alwaysSelected, Collections.emptySet());
+    }
+    
+    /**
+     * Creates a single- or multi-objective configuration with a set of always and/or never selected IDs.
+     * Automatic normalization is enabled whenever more than one objective is included.
+     *
+     * @param data the data for the run
+     * @param subsetSize the desired subset size
+     * @param objectives the objectives for the run
+     * @param alwaysSelected set of IDs that will always be selected in the core
+     * @param neverSelected set of IDs that will never be selected in the core
      */
     public CoreHunterArguments(CoreHunterData data, int subsetSize, List<CoreHunterObjective> objectives,
-                               Set<Integer> alwaysSelected, boolean normalize) {
-        this(data, subsetSize, objectives, alwaysSelected, Collections.emptySet(), normalize);
+                               Set<Integer> alwaysSelected, Set<Integer> neverSelected) {
+        this(data, subsetSize, objectives, alwaysSelected, neverSelected, true);
     }
     
     /**
