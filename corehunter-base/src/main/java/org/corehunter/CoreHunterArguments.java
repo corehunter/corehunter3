@@ -21,7 +21,9 @@ package org.corehunter;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.corehunter.data.CoreHunterData;
 
@@ -31,6 +33,8 @@ public class CoreHunterArguments {
     private final CoreHunterData data;
     private final List<CoreHunterObjective> objectives;
     private final boolean normalize;
+    private final Set<Integer> alwaysSelected;
+    private final Set<Integer> neverSelected;
     
     /**
      * Creates a single objective configuration with no defined measure.
@@ -63,7 +67,7 @@ public class CoreHunterArguments {
     }
     
     /**
-     * Creates a multiple objective configuration.
+     * Creates a single- or multi-objective configuration.
      * Automatic normalization is enabled whenever more than one objective is included.
      * 
      * @param data the data for the run
@@ -75,7 +79,7 @@ public class CoreHunterArguments {
     }
 
     /**
-     * Creates a multiple objective configuration.
+     * Creates a single- or multi-objective configuration.
      * If <code>normalize</code> is <code>true</code> automatic normalization is enabled, but
      * only if more than one objective is included. In case of a single objective, this argument
      * is ignored.
@@ -88,6 +92,41 @@ public class CoreHunterArguments {
     public CoreHunterArguments(CoreHunterData data, int subsetSize,
                                List<CoreHunterObjective> objectives,
                                boolean normalize) {
+        this(data, subsetSize, objectives, Collections.emptySet(), normalize);
+    }
+    
+    /**
+     * Creates a single- or multi-objective configuration with a set of always selected IDs.
+     * If <code>normalize</code> is <code>true</code> automatic normalization is enabled, but
+     * only if more than one objective is included. In case of a single objective, this argument
+     * is ignored.
+     *
+     * @param data the data for the run
+     * @param subsetSize the desired subset size
+     * @param objectives the objectives for the run
+     * @param alwaysSelected set of IDs that will always be selected in the core
+     * @param normalize indicates whether objectives should be normalized prior to execution
+     */
+    public CoreHunterArguments(CoreHunterData data, int subsetSize, List<CoreHunterObjective> objectives,
+                               Set<Integer> alwaysSelected, boolean normalize) {
+        this(data, subsetSize, objectives, alwaysSelected, Collections.emptySet(), normalize);
+    }
+    
+    /**
+     * Creates a single- or multi-objective configuration with set of always and/or never selected IDs.
+     * If <code>normalize</code> is <code>true</code> automatic normalization is enabled, but
+     * only if more than one objective is included. In case of a single objective, this argument
+     * is ignored.
+     *
+     * @param data the data for the run
+     * @param subsetSize the desired subset size
+     * @param objectives the objectives for the run
+     * @param alwaysSelected set of IDs that will always be selected in the core
+     * @param neverSelected set of IDs that will never be selected in the core
+     * @param normalize indicates whether objectives should be normalized prior to execution
+     */
+    public CoreHunterArguments(CoreHunterData data, int subsetSize, List<CoreHunterObjective> objectives,
+                               Set<Integer> alwaysSelected, Set<Integer> neverSelected, boolean normalize) {
         // set data and size
         if (data == null) {
             throw new IllegalArgumentException("Data undefined.");
@@ -107,6 +146,15 @@ public class CoreHunterArguments {
             throw new IllegalArgumentException("Objectives not defined.");
         }
         this.objectives = Collections.unmodifiableList(new ArrayList<>(objectives));
+        // store set of always/never selected ids
+        if (alwaysSelected == null) {
+            throw new IllegalArgumentException("Set of always selected IDs can not be null.");
+        }
+        if (neverSelected == null) {
+            throw new IllegalArgumentException("Set of never selected IDs can not be null.");
+        }
+        this.alwaysSelected = Collections.unmodifiableSet(new HashSet<>(alwaysSelected));
+        this.neverSelected = Collections.unmodifiableSet(new HashSet<>(neverSelected));
         // set normalization flag
         this.normalize = objectives.size() > 1 && normalize;
     }
@@ -121,6 +169,14 @@ public class CoreHunterArguments {
 
     public final int getSubsetSize() {
         return subsetSize;
+    }
+    
+    public final Set getAlwaysSelected(){
+        return alwaysSelected;
+    }
+    
+    public final Set getNeverSelected(){
+        return neverSelected;
     }
     
     public final boolean isNormalized(){
