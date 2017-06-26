@@ -3,6 +3,10 @@
 ## Supported data types
 Core Hunter 3 supports multiple types of genetic marker data, phenotypic traits and precomputed distance matrices. Data can be loaded from files and, when using the R package, from data frames and matrices. Both comma separated `csv` and tab separated `txt` files can be used.
 
+#### Usage of quotes
+
+In all data file formats described below, ids, names, and any other text values can be optionally wrapped in single (`'`) or double (`"`) quotes. Any unquoted surrounding whitespace is removed. Text values containing single quotes need to be wrapped in double quotes, and vice versa. Therefore, values containing both single and double quotes are not allowed.
+
 ### Genetic marker data
 
 Genotypes can be provided in various formats.
