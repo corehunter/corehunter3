@@ -20,6 +20,7 @@
 package org.corehunter.listener;
 
 import java.io.PrintStream;
+import java.util.Locale;
 
 import org.corehunter.CoreHunterListener;
 import org.jamesframework.core.problems.constraints.validations.Validation;
@@ -55,33 +56,39 @@ public class SimpleCoreHunterListener implements CoreHunterListener {
 
     @Override
     public void searchStarted(Search<? extends SubsetSolution> search) {
-        printStream.println(String.format("%sSearch : %s started.", prefix, search.getName()));
+        printStream.format(Locale.US, "%sSearch : %s started%n", prefix, search.getName());
     }
 
     @Override
     public void searchStopped(Search<? extends SubsetSolution> search) {
         double t = search.getRuntime() / 1000;
         long s = search.getSteps();
-        printStream.println(
-                String.format("%sSearch : %s stopped after %f seconds and %d steps", prefix, search.getName(), t, s));
-        printStream.println(String.format("%sBest solution with evaluation : %f", prefix,
-                search.getBestSolutionEvaluation().getValue()));
-        printStream.println(String.format("%sBest solution with evaluation : %s", prefix, search.getBestSolution()));
+        printStream.format(
+                Locale.US,
+                "%sSearch : %s stopped after %f seconds and %d steps%n",
+                prefix, search.getName(), t, s
+        );
+        printStream.format(
+                Locale.US,
+                "%sBest solution with evaluation : %f%n",
+                prefix, search.getBestSolutionEvaluation().getValue()
+        );
+        printStream.format(Locale.US, "%sBest solution with evaluation : %s%n", prefix, search.getBestSolution());
     }
 
     @Override
     public void newBestSolution(Search<? extends SubsetSolution> search, SubsetSolution newBestSolution,
             Evaluation newBestSolutionEvaluation, Validation newBestSolutionValidation) {
-        printStream.format("%sCurrent value: %f%n", prefix, newBestSolutionEvaluation.getValue());
+        printStream.format(Locale.US, "%sCurrent value: %f%n", prefix, newBestSolutionEvaluation.getValue());
     }
 
     @Override
     public void preprocessingStarted(String message) {
-        printStream.println(String.format("%s%s", prefix, message));
+        printStream.format(Locale.US, "%s%s%n", prefix, message);
     }
 
     @Override
     public void preprocessingStopped(String message) {
-        printStream.println(String.format("%s%s", prefix, message));
+        printStream.format("%s%s%n", prefix, message);
     }
 }
