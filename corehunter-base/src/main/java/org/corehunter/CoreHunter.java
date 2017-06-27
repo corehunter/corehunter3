@@ -22,11 +22,13 @@ package org.corehunter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Random;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -55,6 +57,7 @@ import org.jamesframework.core.search.stopcriteria.MaxTimeWithoutImprovement;
 import org.jamesframework.core.subset.SubsetProblem;
 import org.jamesframework.core.subset.SubsetSolution;
 import org.jamesframework.core.subset.neigh.SingleSwapNeighbourhood;
+import org.jamesframework.core.util.SetUtilities;
 import org.jamesframework.ext.problems.objectives.NormalizedObjective;
 import org.jamesframework.ext.problems.objectives.WeightedIndex;
 
@@ -303,7 +306,7 @@ public class CoreHunter {
 
     private Search<SubsetSolution> createRandomDescent(CoreHunterArguments args,
                                                        Objective<SubsetSolution, CoreHunterData> obj){
-        LocalSearch<SubsetSolution> rd = new RandomDescent<>(createProblem(args, obj), createNeighbourhood());
+        LocalSearch<SubsetSolution> rd = new RandomDescent<>(createProblem(args, obj), createNeighbourhood(args));
         rd.setRandom(new Random(seedGenerator.nextLong()));
         return setStopCriteria(rd);
     }
@@ -311,7 +314,7 @@ public class CoreHunter {
     private Search<SubsetSolution> createParallelTempering(CoreHunterArguments args,
                                                            Objective<SubsetSolution, CoreHunterData> obj){
         ParallelTempering<SubsetSolution> pt = new ParallelTempering<>(
-            createProblem(args, obj), createNeighbourhood(),
+            createProblem(args, obj), createNeighbourhood(args),
             PT_NUM_REPLICAS, PT_MIN_TEMP, PT_MAX_TEMP,
             // custom Metropolis factory to set seeds
             (p, n, t) ->  {
@@ -326,13 +329,28 @@ public class CoreHunter {
 
     private SubsetProblem<CoreHunterData> createProblem(CoreHunterArguments args,
                                                         Objective<SubsetSolution, CoreHunterData> obj){
-        return new SubsetProblem<>(
-                args.getData(), obj, args.getSubsetSize()
-        );
+        int size = args.getSubsetSize();
+        SubsetProblem<CoreHunterData> problem = new SubsetProblem<>(args.getData(), obj, size);
+        problem.setRandomSolutionGenerator((rnd, data) -> {
+            // create subset solution containing always selected ids
+            SubsetSolution sol = new SubsetSolution(data.getIDs(), args.getAlwaysSelected());
+            // find remaining candidates for selection
+            // (exclude both already selected and never selected ids)
+            Set<Integer> candidates = new HashSet<>(sol.getUnselectedIDs());
+            candidates.removeAll(args.getNeverSelected());
+            // randomly select more items to obtain requested size
+            sol.selectAll(SetUtilities.getRandomSubset(candidates, size - sol.getNumSelectedIDs(), rnd));
+            // return random initial solution
+            return sol;
+        });
+        return problem;
     }
 
-    private Neighbourhood<SubsetSolution> createNeighbourhood(){
-        return new SingleSwapNeighbourhood();
+    private Neighbourhood<SubsetSolution> createNeighbourhood(CoreHunterArguments args){
+        Set<Integer> fixed = new HashSet<>();
+        fixed.addAll(args.getAlwaysSelected());
+        fixed.addAll(args.getNeverSelected());
+        return new SingleSwapNeighbourhood(fixed);
     }
 
     private Search<SubsetSolution> setStopCriteria(Search<SubsetSolution> search){
