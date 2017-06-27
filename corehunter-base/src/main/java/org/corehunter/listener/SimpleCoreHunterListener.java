@@ -65,7 +65,7 @@ public class SimpleCoreHunterListener implements CoreHunterListener {
         long s = search.getSteps();
         printStream.format(
                 Locale.US,
-                "%sSearch : %s stopped after %f seconds and %d steps%n",
+                "%sSearch : %s stopped after %.1f seconds and %d steps%n",
                 prefix, search.getName(), t, s
         );
         printStream.format(
