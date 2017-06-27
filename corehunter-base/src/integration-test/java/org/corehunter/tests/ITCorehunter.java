@@ -98,7 +98,7 @@ public class ITCorehunter {
         DATA = new CoreHunterData(genotypes, phenotypes, distances);
     }   
     
-    /**
+    /*
      * Test execution with distance matrix.
      */
     @Test
@@ -168,7 +168,7 @@ public class ITCorehunter {
         
     }
     
-    /**
+    /*
      * Test execution with genotype data and fixed seed.
      */
     @Test
@@ -200,7 +200,7 @@ public class ITCorehunter {
 
     }
     
-    /**
+    /*
      * Test execution with large genotype data and fixed seed.
      */
     @Test
@@ -236,7 +236,7 @@ public class ITCorehunter {
         
     }
     
-    /**
+    /*
      * Test execution with large genotype data and fixed seed, in fast mode.
      */
     @Test
@@ -272,7 +272,7 @@ public class ITCorehunter {
         
     }
     
-    /**
+    /*
      * Test execution with large genotype data, multiple objectives (not normalized), and fixed seed.
      */
     @Test
@@ -317,7 +317,7 @@ public class ITCorehunter {
         
     }
     
-    /**
+    /*
      * Test execution with large genotype data, multiple objectives (normalized), and fixed seed.
      */
     @Test
@@ -362,7 +362,7 @@ public class ITCorehunter {
         
     }
     
-    /**
+    /*
      * Test execution with phenotype data and always selected IDs.
      */
     @Test
@@ -391,8 +391,71 @@ public class ITCorehunter {
         Assert.assertTrue(result.getSelectedIDs().contains(3));
 
     }
+    
+    /*
+     * Test execution with phenotype data and always selected IDs (fast mode).
+     */
+    @Test
+    public void testPhenotypeDataWithAlwaysSelectedIDsFastMode() {
+        
+        System.out.println(" - phenotype data with always selected ids (fast mode)");
 
-    /**
+        CoreHunterData data = PHENOTYPES_DATA;
+        
+        int size = 3;
+        int time = 1 * SECOND;
+        
+        Set<Integer> always = new HashSet<>(Arrays.asList(0, 3));
+        
+        List<CoreHunterObjective> obj = Arrays.asList(
+            new CoreHunterObjective(
+                CoreHunterObjectiveType.AV_ENTRY_TO_NEAREST_ENTRY, CoreHunterMeasure.GOWERS
+            )
+        );
+        CoreHunterArguments arguments = new CoreHunterArguments(data, size, obj, always);
+        CoreHunter corehunter = new CoreHunter(CoreHunterExecutionMode.FAST);
+        corehunter.setTimeLimit(time);
+        SubsetSolution result = corehunter.execute(arguments);
+        
+        Assert.assertTrue(result.getSelectedIDs().contains(0));
+        Assert.assertTrue(result.getSelectedIDs().contains(3));
+
+    }
+    
+    /*
+     * Test execution with phenotype data and always selected IDs (multi-objective).
+     */
+    @Test
+    public void testPhenotypeDataWithAlwaysSelectedIDsMultiObj() {
+        
+        System.out.println(" - phenotype data with always selected ids (multi-objective)");
+
+        CoreHunterData data = PHENOTYPES_DATA;
+        
+        int size = 3;
+        int time = 1 * SECOND;
+        
+        Set<Integer> always = new HashSet<>(Arrays.asList(0, 3));
+        
+        List<CoreHunterObjective> obj = Arrays.asList(
+            new CoreHunterObjective(
+                CoreHunterObjectiveType.AV_ENTRY_TO_NEAREST_ENTRY, CoreHunterMeasure.GOWERS
+            ),
+            new CoreHunterObjective(
+                CoreHunterObjectiveType.AV_ACCESSION_TO_NEAREST_ENTRY, CoreHunterMeasure.GOWERS
+            )
+        );
+        CoreHunterArguments arguments = new CoreHunterArguments(data, size, obj, always);
+        CoreHunter corehunter = new CoreHunter();
+        corehunter.setTimeLimit(time);
+        SubsetSolution result = corehunter.execute(arguments);
+        
+        Assert.assertTrue(result.getSelectedIDs().contains(0));
+        Assert.assertTrue(result.getSelectedIDs().contains(3));
+
+    }
+
+    /*
      * Test execution with phenotype data and always and never selected IDs.
      */
     @Test
@@ -424,7 +487,7 @@ public class ITCorehunter {
 
     }
     
-    /**
+    /*
      * Test execution with phenotype data and always and never selected IDs (2).
      */
     @Test

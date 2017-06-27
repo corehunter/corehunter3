@@ -334,8 +334,9 @@ public class CoreHunter {
         problem.setRandomSolutionGenerator((rnd, data) -> {
             // create subset solution containing always selected ids
             SubsetSolution sol = new SubsetSolution(data.getIDs(), args.getAlwaysSelected());
-            // find remaining candidates for selection (exclude never selected ids)
-            Set<Integer> candidates = new HashSet<>(data.getIDs());
+            // find remaining candidates for selection
+            // (exclude both already selected and never selected ids)
+            Set<Integer> candidates = new HashSet<>(sol.getUnselectedIDs());
             candidates.removeAll(args.getNeverSelected());
             // randomly select more items to obtain requested size
             sol.selectAll(SetUtilities.getRandomSubset(candidates, size - sol.getNumSelectedIDs(), rnd));
