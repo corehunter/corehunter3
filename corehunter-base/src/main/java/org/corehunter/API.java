@@ -415,11 +415,12 @@ public class API {
      * @param mode Execution mode, one of "default" or "fast". Only affects the default
      *             stop conditions, not the used algorithm (always random descent).
      * @param timeLimit Absolute runtime limit in seconds.
-     *                  If set to a negative value no time limit is used.
+     *                  Not used if set to a negative value.
      * @param maxTimeWithoutImprovement Maximum time without finding an improvement, in seconds.
-     *                                  If set to a negative value, the default improvement time of
-     *                                  the chosen execution mode is used: 10 seconds in default mode,
-     *                                  2 seconds in fast mode.
+     *                                  Not used if set to a negative value. In case no explicit
+     *                                  stop conditions have been specified, the maximum time without
+     *                                  improvement defaults to 10 seconds in default mode, or 2 seconds
+     *                                  in fast mode.
      * @param seed Positive seed used for random generation to allow reproducible results.
      *             If zero or negative, no seed is applied.
      * @return Matrix containing normalization ranges.
@@ -435,12 +436,13 @@ public class API {
         }
         // create Core Hunter executor
         CoreHunter ch = new CoreHunter(exMode);
-        if (timeLimit > 0) {
-            ch.setTimeLimit(1000 * timeLimit); // convert to milliseconds
+        // set stop conditions
+        if(timeLimit > 0 || maxTimeWithoutImprovement > 0){
+            // convert to milliseconds
+            ch.setTimeLimit(1000 * timeLimit); 
+            ch.setMaxTimeWithoutImprovement(1000 * maxTimeWithoutImprovement);
         }
-        if (maxTimeWithoutImprovement > 0) {
-            ch.setMaxTimeWithoutImprovement(1000 * maxTimeWithoutImprovement); // convert to milliseconds
-        }
+        // set seed
         if(seed > 0){
             ch.setSeed(seed);
         }
@@ -462,11 +464,12 @@ public class API {
      * @param args Core Hunter arguments including data, objective and subset size.
      * @param mode Execution mode, one of "default" or "fast".
      * @param timeLimit Absolute runtime limit in seconds.
-     *                  If set to a negative value no time limit is used.
+     *                  Not used if set to a negative value.
      * @param maxTimeWithoutImprovement Maximum time without finding an improvement, in seconds.
-     *                                  If set to a negative value, the default improvement time of
-     *                                  the chosen execution mode is used: 10 seconds in default mode,
-     *                                  2 seconds in fast mode.
+     *                                  Not used if set to a negative value. In case no explicit
+     *                                  stop conditions have been specified, the maximum time without
+     *                                  improvement defaults to 10 seconds in default mode, or 2 seconds
+     *                                  in fast mode.
      * @param seed Positive seed used for random generation to allow reproducible results.
      *             If zero or negative, no seed is applied.
      * @param silent If <code>true</code> no output is written to the console.
@@ -482,15 +485,17 @@ public class API {
         }
         // create Core Hunter executor
         CoreHunter ch = new CoreHunter(exMode);
-        if (timeLimit > 0) {
-            ch.setTimeLimit(1000 * timeLimit); // convert to milliseconds
+        // set stop conditions
+        if(timeLimit > 0 || maxTimeWithoutImprovement > 0){
+            // convert to milliseconds
+            ch.setTimeLimit(1000 * timeLimit); 
+            ch.setMaxTimeWithoutImprovement(1000 * maxTimeWithoutImprovement);
         }
-        if (maxTimeWithoutImprovement > 0) {
-            ch.setMaxTimeWithoutImprovement(1000 * maxTimeWithoutImprovement); // convert to milliseconds
-        }
+        // set seed
         if(seed > 0){
             ch.setSeed(seed);
         }
+        // attach listener
         if (!silent) {
             ch.setListener(new SimpleCoreHunterListener());
         }
