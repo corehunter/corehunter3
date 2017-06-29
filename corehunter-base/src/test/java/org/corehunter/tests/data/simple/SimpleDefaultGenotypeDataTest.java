@@ -19,18 +19,20 @@
 
 package org.corehunter.tests.data.simple;
 
+import java.io.File;
 import static org.corehunter.tests.TestData.ALLELE_OBS_DIPLOID;
 import static org.corehunter.tests.TestData.ALLELE_FREQUENCIES_DIPLOID;
 import static org.corehunter.tests.TestData.ALLELE_OBS_HOMOZYGOUS;
 import static org.corehunter.tests.TestData.ALLELE_FREQUENCIES_HOMOZYGOUS;
 import static org.corehunter.tests.TestData.ALLELE_NAMES_DIPLOID;
 import static org.corehunter.tests.TestData.ALLELE_NAMES_HOMOZYGOUS;
-import static org.corehunter.tests.TestData.HEADERS_NON_UNIQUE_NAMES;
 import static org.corehunter.tests.TestData.HEADERS_UNIQUE_NAMES;
+import static org.corehunter.tests.TestData.HEADERS_NON_UNIQUE_NAMES;
 import static org.corehunter.tests.TestData.MARKER_NAMES_DEFAULT;
 import static org.corehunter.tests.TestData.NAME;
 import static org.corehunter.tests.TestData.PRECISION;
 import static org.corehunter.tests.TestData.SET;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -42,6 +44,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.Set;
+import org.apache.commons.io.FileUtils;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -50,6 +54,7 @@ import uno.informatics.data.SimpleEntity;
 import uno.informatics.data.io.FileType;
 import org.corehunter.data.FrequencyGenotypeData;
 import org.corehunter.data.simple.SimpleDefaultGenotypeData;
+import org.jamesframework.core.subset.SubsetSolution;
 
 /**
  * @author Guy Davenport, Herman De Beukelaer
@@ -160,12 +165,12 @@ public class SimpleDefaultGenotypeDataTest {
     @Test
     public void homozygousToCsvFile() throws IOException {
         dataName = "out.csv";
-        expectedHeaders = HEADERS_NON_UNIQUE_NAMES;
+        expectedHeaders = HEADERS_UNIQUE_NAMES;
         expectedMarkerNames = MARKER_NAMES_DEFAULT;
         expectedAlleleNames = ALLELE_NAMES_HOMOZYGOUS;
         
         SimpleDefaultGenotypeData genotypicData = new SimpleDefaultGenotypeData(
-                NAME, HEADERS_NON_UNIQUE_NAMES, MARKER_NAMES_DEFAULT, ALLELE_OBS_HOMOZYGOUS
+                NAME, HEADERS_UNIQUE_NAMES, MARKER_NAMES_DEFAULT, ALLELE_OBS_HOMOZYGOUS
         );
         
         Path path = Paths.get(TEST_OUTPUT);
@@ -181,6 +186,186 @@ public class SimpleDefaultGenotypeDataTest {
         
         System.out.println(" |- Read written File " + dataName);
         testDataHomozygous(SimpleDefaultGenotypeData.readData(path, FileType.CSV));
+    }
+    
+    @Test
+    public void homozygousToCsvFileWithAllIds() throws IOException {
+        expectedHeaders = HEADERS_UNIQUE_NAMES;
+        expectedMarkerNames = MARKER_NAMES_DEFAULT;
+        expectedAlleleNames = ALLELE_NAMES_HOMOZYGOUS;
+        
+        SimpleDefaultGenotypeData genotypicData = new SimpleDefaultGenotypeData(
+                NAME, HEADERS_UNIQUE_NAMES, MARKER_NAMES_DEFAULT, ALLELE_OBS_HOMOZYGOUS
+        );
+        
+        Set<Integer> ids = genotypicData.getIDs();
+
+        Path dirPath = Paths.get(TEST_OUTPUT);
+
+        Files.createDirectories(dirPath);
+
+        dirPath = Files.createTempDirectory(dirPath, "GenoHomozygous-AllIds");
+        
+        // create solution
+        SubsetSolution solution = new SubsetSolution(ids);
+        for(int sel : SELECTION){
+            solution.select(sel);
+        }
+        
+        Path path;
+        
+        // write with integer ids
+        dataName = "with-ids.csv";
+
+        path = Paths.get(dirPath.toString(), dataName);
+
+        System.out.println(" |- Write default genotypes file (homozygous, with solution) " + dataName);
+
+        genotypicData.writeData(path, FileType.CSV, solution, true, true, true);
+
+        assertTrue("Output is not correct!",
+            FileUtils
+                .contentEquals(
+                    new File(SimpleDistanceMatrixDataTest.class
+                        .getResource("/homozygous_genotypes/out/all-with-ids.csv").getPath()),
+                    path.toFile()));
+        
+        // write without integer ids
+        dataName = "no-ids.csv";
+
+        path = Paths.get(dirPath.toString(), dataName);
+
+        System.out.println(" |- Write default genotypes file (homozygous, with solution) " + dataName);
+
+        genotypicData.writeData(path, FileType.CSV, solution, true, true, false);
+
+        assertTrue("Output is not correct!",
+            FileUtils
+                .contentEquals(
+                    new File(SimpleDistanceMatrixDataTest.class
+                        .getResource("/homozygous_genotypes/out/all-no-ids.csv").getPath()),
+                    path.toFile()));
+
+    }
+    
+    @Test
+    public void homozygousToCsvFileWithSelectedIds() throws IOException {
+        expectedHeaders = HEADERS_UNIQUE_NAMES;
+        expectedMarkerNames = MARKER_NAMES_DEFAULT;
+        expectedAlleleNames = ALLELE_NAMES_HOMOZYGOUS;
+        
+        SimpleDefaultGenotypeData genotypicData = new SimpleDefaultGenotypeData(
+                NAME, HEADERS_UNIQUE_NAMES, MARKER_NAMES_DEFAULT, ALLELE_OBS_HOMOZYGOUS
+        );
+        
+        Set<Integer> ids = genotypicData.getIDs();
+
+        Path dirPath = Paths.get(TEST_OUTPUT);
+
+        Files.createDirectories(dirPath);
+
+        dirPath = Files.createTempDirectory(dirPath, "GenoHomozygous-SelectedIds");
+        
+        // create solution
+        SubsetSolution solution = new SubsetSolution(ids);
+        for(int sel : SELECTION){
+            solution.select(sel);
+        }
+        
+        Path path;
+        
+        // write with integer ids
+        dataName = "with-ids.csv";
+
+        path = Paths.get(dirPath.toString(), dataName);
+
+        System.out.println(" |- Write default genotypes file (homozygous, with solution) " + dataName);
+
+        genotypicData.writeData(path, FileType.CSV, solution, true, false, true);
+
+        assertTrue("Output is not correct!",
+            FileUtils
+                .contentEquals(
+                    new File(SimpleDistanceMatrixDataTest.class
+                        .getResource("/homozygous_genotypes/out/sel-with-ids.csv").getPath()),
+                    path.toFile()));
+        
+        // write without integer ids
+        dataName = "no-ids.csv";
+
+        path = Paths.get(dirPath.toString(), dataName);
+
+        System.out.println(" |- Write default genotypes file (homozygous, with solution) " + dataName);
+
+        genotypicData.writeData(path, FileType.CSV, solution, true, false, false);
+
+        assertTrue("Output is not correct!",
+            FileUtils
+                .contentEquals(
+                    new File(SimpleDistanceMatrixDataTest.class
+                        .getResource("/homozygous_genotypes/out/sel-no-ids.csv").getPath()),
+                    path.toFile()));
+
+    }
+    
+    @Test
+    public void homozygousToCsvFileWithUnselectedIds() throws IOException {
+        expectedHeaders = HEADERS_UNIQUE_NAMES;
+        expectedMarkerNames = MARKER_NAMES_DEFAULT;
+        expectedAlleleNames = ALLELE_NAMES_HOMOZYGOUS;
+        
+        SimpleDefaultGenotypeData genotypicData = new SimpleDefaultGenotypeData(
+                NAME, HEADERS_UNIQUE_NAMES, MARKER_NAMES_DEFAULT, ALLELE_OBS_HOMOZYGOUS
+        );
+        
+        Set<Integer> ids = genotypicData.getIDs();
+
+        Path dirPath = Paths.get(TEST_OUTPUT);
+
+        Files.createDirectories(dirPath);
+
+        dirPath = Files.createTempDirectory(dirPath, "GenoHomozygous-UnselectedIds");
+        
+        // create solution
+        SubsetSolution solution = new SubsetSolution(ids);
+        for(int sel : SELECTION){
+            solution.select(sel);
+        }
+        
+        Path path;
+        
+        // write with integer ids
+        dataName = "with-ids.csv";
+
+        path = Paths.get(dirPath.toString(), dataName);
+
+        System.out.println(" |- Write default genotypes file (homozygous, with solution) " + dataName);
+
+        genotypicData.writeData(path, FileType.CSV, solution, false, true, true);
+
+        assertTrue("Output is not correct!",
+            FileUtils
+                .contentEquals(
+                    new File(SimpleDistanceMatrixDataTest.class
+                        .getResource("/homozygous_genotypes/out/unsel-with-ids.csv").getPath()),
+                    path.toFile()));
+        
+        // write without integer ids
+        dataName = "no-ids.csv";
+
+        path = Paths.get(dirPath.toString(), dataName);
+
+        System.out.println(" |- Write default genotypes file (homozygous, with solution) " + dataName);
+
+        genotypicData.writeData(path, FileType.CSV, solution, false, true, false);
+
+        assertTrue("Output is not correct!",
+            FileUtils
+                .contentEquals(
+                    new File(SimpleDistanceMatrixDataTest.class
+                        .getResource("/homozygous_genotypes/out/unsel-no-ids.csv").getPath()),
+                    path.toFile()));
+
     }
     
     /***********/
@@ -276,6 +461,186 @@ public class SimpleDefaultGenotypeDataTest {
         
         System.out.println(" |- Read written File " + dataName);
         testDataDiploid(SimpleDefaultGenotypeData.readData(path, FileType.CSV));
+    }
+    
+    @Test
+    public void diploidToCsvFileWithAllIds() throws IOException {
+        expectedHeaders = HEADERS_UNIQUE_NAMES;
+        expectedMarkerNames = MARKER_NAMES_DEFAULT;
+        expectedAlleleNames = ALLELE_NAMES_DIPLOID;
+        
+        SimpleDefaultGenotypeData genotypicData = new SimpleDefaultGenotypeData(
+                NAME, HEADERS_UNIQUE_NAMES, MARKER_NAMES_DEFAULT, ALLELE_OBS_DIPLOID
+        );
+        
+        Set<Integer> ids = genotypicData.getIDs();
+
+        Path dirPath = Paths.get(TEST_OUTPUT);
+
+        Files.createDirectories(dirPath);
+
+        dirPath = Files.createTempDirectory(dirPath, "GenoDiploid-AllIds");
+        
+        // create solution
+        SubsetSolution solution = new SubsetSolution(ids);
+        for(int sel : SELECTION){
+            solution.select(sel);
+        }
+        
+        Path path;
+        
+        // write with integer ids
+        dataName = "with-ids.csv";
+
+        path = Paths.get(dirPath.toString(), dataName);
+
+        System.out.println(" |- Write default genotypes file (diploid, with solution) " + dataName);
+
+        genotypicData.writeData(path, FileType.CSV, solution, true, true, true);
+
+        assertTrue("Output is not correct!",
+            FileUtils
+                .contentEquals(
+                    new File(SimpleDistanceMatrixDataTest.class
+                        .getResource("/diploid_genotypes/out/all-with-ids.csv").getPath()),
+                    path.toFile()));
+        
+        // write without integer ids
+        dataName = "no-ids.csv";
+
+        path = Paths.get(dirPath.toString(), dataName);
+
+        System.out.println(" |- Write default genotypes file (diploid, with solution) " + dataName);
+
+        genotypicData.writeData(path, FileType.CSV, solution, true, true, false);
+
+        assertTrue("Output is not correct!",
+            FileUtils
+                .contentEquals(
+                    new File(SimpleDistanceMatrixDataTest.class
+                        .getResource("/diploid_genotypes/out/all-no-ids.csv").getPath()),
+                    path.toFile()));
+
+    }
+    
+    @Test
+    public void diploidToCsvFileWithSelectedIds() throws IOException {
+        expectedHeaders = HEADERS_UNIQUE_NAMES;
+        expectedMarkerNames = MARKER_NAMES_DEFAULT;
+        expectedAlleleNames = ALLELE_NAMES_DIPLOID;
+        
+        SimpleDefaultGenotypeData genotypicData = new SimpleDefaultGenotypeData(
+                NAME, HEADERS_UNIQUE_NAMES, MARKER_NAMES_DEFAULT, ALLELE_OBS_DIPLOID
+        );
+        
+        Set<Integer> ids = genotypicData.getIDs();
+
+        Path dirPath = Paths.get(TEST_OUTPUT);
+
+        Files.createDirectories(dirPath);
+
+        dirPath = Files.createTempDirectory(dirPath, "GenoDiploid-SelectedIds");
+        
+        // create solution
+        SubsetSolution solution = new SubsetSolution(ids);
+        for(int sel : SELECTION){
+            solution.select(sel);
+        }
+        
+        Path path;
+        
+        // write with integer ids
+        dataName = "with-ids.csv";
+
+        path = Paths.get(dirPath.toString(), dataName);
+
+        System.out.println(" |- Write default genotypes file (diploid, with solution) " + dataName);
+
+        genotypicData.writeData(path, FileType.CSV, solution, true, false, true);
+
+        assertTrue("Output is not correct!",
+            FileUtils
+                .contentEquals(
+                    new File(SimpleDistanceMatrixDataTest.class
+                        .getResource("/diploid_genotypes/out/sel-with-ids.csv").getPath()),
+                    path.toFile()));
+        
+        // write without integer ids
+        dataName = "no-ids.csv";
+
+        path = Paths.get(dirPath.toString(), dataName);
+
+        System.out.println(" |- Write default genotypes file (diploid, with solution) " + dataName);
+
+        genotypicData.writeData(path, FileType.CSV, solution, true, false, false);
+
+        assertTrue("Output is not correct!",
+            FileUtils
+                .contentEquals(
+                    new File(SimpleDistanceMatrixDataTest.class
+                        .getResource("/diploid_genotypes/out/sel-no-ids.csv").getPath()),
+                    path.toFile()));
+
+    }
+    
+    @Test
+    public void diploidToCsvFileWithUnselectedIds() throws IOException {
+        expectedHeaders = HEADERS_UNIQUE_NAMES;
+        expectedMarkerNames = MARKER_NAMES_DEFAULT;
+        expectedAlleleNames = ALLELE_NAMES_DIPLOID;
+        
+        SimpleDefaultGenotypeData genotypicData = new SimpleDefaultGenotypeData(
+                NAME, HEADERS_UNIQUE_NAMES, MARKER_NAMES_DEFAULT, ALLELE_OBS_DIPLOID
+        );
+        
+        Set<Integer> ids = genotypicData.getIDs();
+
+        Path dirPath = Paths.get(TEST_OUTPUT);
+
+        Files.createDirectories(dirPath);
+
+        dirPath = Files.createTempDirectory(dirPath, "GenoDiploid-UnselectedIds");
+        
+        // create solution
+        SubsetSolution solution = new SubsetSolution(ids);
+        for(int sel : SELECTION){
+            solution.select(sel);
+        }
+        
+        Path path;
+        
+        // write with integer ids
+        dataName = "with-ids.csv";
+
+        path = Paths.get(dirPath.toString(), dataName);
+
+        System.out.println(" |- Write default genotypes file (diploid, with solution) " + dataName);
+
+        genotypicData.writeData(path, FileType.CSV, solution, false, true, true);
+
+        assertTrue("Output is not correct!",
+            FileUtils
+                .contentEquals(
+                    new File(SimpleDistanceMatrixDataTest.class
+                        .getResource("/diploid_genotypes/out/unsel-with-ids.csv").getPath()),
+                    path.toFile()));
+        
+        // write without integer ids
+        dataName = "no-ids.csv";
+
+        path = Paths.get(dirPath.toString(), dataName);
+
+        System.out.println(" |- Write default genotypes file (diploid, with solution) " + dataName);
+
+        genotypicData.writeData(path, FileType.CSV, solution, false, true, false);
+
+        assertTrue("Output is not correct!",
+            FileUtils
+                .contentEquals(
+                    new File(SimpleDistanceMatrixDataTest.class
+                        .getResource("/diploid_genotypes/out/unsel-no-ids.csv").getPath()),
+                    path.toFile()));
+
     }
     
     @Test
