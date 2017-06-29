@@ -23,13 +23,13 @@ import org.corehunter.CoreHunterObjective;
 import org.corehunter.CoreHunterObjectiveType;
 import org.corehunter.data.CoreHunterData;
 import org.corehunter.data.DistanceMatrixData;
-import org.corehunter.data.GenotypeData;
 import org.corehunter.data.PhenotypeData;
 import org.corehunter.data.simple.SimpleDistanceMatrixData;
-import org.corehunter.data.simple.SimpleGenotypeData;
+import org.corehunter.data.simple.SimpleFrequencyGenotypeData;
 import org.corehunter.data.simple.SimplePhenotypeData;
 import org.corehunter.tests.data.simple.CoreHunterDataTest;
 import org.junit.Test;
+import org.corehunter.data.FrequencyGenotypeData;
 
 public class APITest {
 
@@ -69,12 +69,17 @@ public class APITest {
         CoreHunterObjectiveType.AV_ENTRY_TO_NEAREST_ENTRY, CoreHunterMeasure.PRECOMPUTED_DISTANCE, 1.0);
 
     static {
-        GenotypeData genotypes = new SimpleGenotypeData(HEADERS_UNIQUE_NAMES, MARKER_NAMES, ALLELE_NAMES,
-            ALLELE_FREQUENCIES);
+        
+        FrequencyGenotypeData genotypes = new SimpleFrequencyGenotypeData(
+                HEADERS_UNIQUE_NAMES, MARKER_NAMES, ALLELE_NAMES,ALLELE_FREQUENCIES
+        );
         GENO_DATA = new CoreHunterData(genotypes);
-        PhenotypeData phenotypes = new SimplePhenotypeData(NAME, PHENOTYPIC_TRAIT_FEATURES,
-            PHENOTYPIC_TRAIT_VALUES_WITH_HEADERS);
+        
+        PhenotypeData phenotypes = new SimplePhenotypeData(
+                NAME, PHENOTYPIC_TRAIT_FEATURES, PHENOTYPIC_TRAIT_VALUES_WITH_HEADERS
+        );
         PHENOTYPES_DATA = new CoreHunterData(phenotypes);
+        
         DistanceMatrixData distances = new SimpleDistanceMatrixData(HEADERS_UNIQUE_NAMES, DISTANCES);
         DISTANCES_DATA = new CoreHunterData(distances);
 
@@ -130,8 +135,9 @@ public class APITest {
     @Test
     public void testReadGenotypeData() {
         try {
-            API.readGenotypeData(CoreHunterDataTest.class.getResource(MARKERS_UNIQUE_NAMES).getPath(),
-                "DEFAULT");
+            API.readGenotypeData(
+                CoreHunterDataTest.class.getResource(MARKERS_UNIQUE_NAMES).getPath(), "default"
+            );
         } catch (IOException e) {
             fail(e.getMessage());
         }

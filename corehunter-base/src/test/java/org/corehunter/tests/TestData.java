@@ -159,6 +159,39 @@ public class TestData {
         }
     };
     
+    public static final String[][][] ALLELE_OBS_DIPLOID = {
+        {
+            {"1", "3"},
+            {"B", "B"},
+            {"a1", "a1"},
+            {null, null}
+        },
+        {
+            {"2", "2"},
+            {"C", "A"},
+            {"a1", "a2"},
+            {"+", "-"}
+        },
+        {
+            {"1", "2"},
+            {"D", "D"},
+            {"a2", "a2"},
+            {"+", "+"}
+        },
+        {
+            {"2", "3"},
+            {"B", "B"},
+            {"a2", "a1"},
+            {"+", "-"}
+        },
+        {
+            {"1", "1"},
+            {null, null},
+            {"a1", "a1"},
+            {"-", "-"}
+        }
+    };
+    
     public static final Double[][][] ALLELE_FREQUENCIES_DIPLOID = {
         {
             {0.5, 0.0, 0.5},
@@ -189,6 +222,39 @@ public class TestData {
             {null, null, null, null},
             {1.0, 0.0},
             {0.0, 1.0}
+        }
+    };
+    
+    public static final String[][][] ALLELE_OBS_HOMOZYGOUS = {
+        {
+            {"1"},
+            {"B"},
+            {"a1"},
+            {null}
+        },
+        {
+            {"2"},
+            {"C"},
+            {"a1"},
+            {"+"}
+        },
+        {
+            {"1"},
+            {"D"},
+            {"a2"},
+            {"+"}
+        },
+        {
+            {"2"},
+            {"B"},
+            {"a2"},
+            {"+"}
+        },
+        {
+            {"1"},
+            {null},
+            {"a1"},
+            {"-"}
         }
     };
     

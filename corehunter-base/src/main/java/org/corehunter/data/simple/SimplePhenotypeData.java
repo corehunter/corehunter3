@@ -30,7 +30,6 @@ import org.jamesframework.core.subset.SubsetSolution;
 
 import uno.informatics.common.io.IOUtilities;
 import uno.informatics.common.io.RowWriter;
-import uno.informatics.common.io.text.TextFileRowReader;
 import uno.informatics.common.io.text.TextFileRowWriter;
 import uno.informatics.data.DataOption;
 import uno.informatics.data.Feature;

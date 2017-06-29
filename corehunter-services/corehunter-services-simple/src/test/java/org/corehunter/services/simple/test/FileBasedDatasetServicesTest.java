@@ -36,11 +36,12 @@ import java.util.List;
 import org.corehunter.data.CoreHunterData;
 import org.corehunter.data.CoreHunterDataType;
 import org.corehunter.data.DistanceMatrixData;
-import org.corehunter.data.GenotypeData;
+import org.corehunter.data.FrequencyGenotypeData;
 import org.corehunter.data.GenotypeDataFormat;
 import org.corehunter.data.simple.SimpleBiAllelicGenotypeData;
+import org.corehunter.data.simple.SimpleDefaultGenotypeData;
 import org.corehunter.data.simple.SimpleDistanceMatrixData;
-import org.corehunter.data.simple.SimpleGenotypeData;
+import org.corehunter.data.simple.SimpleFrequencyGenotypeData;
 import org.corehunter.data.simple.SimplePhenotypeData;
 import org.corehunter.services.simple.FileBasedDatasetServices;
 import org.junit.Test;
@@ -432,8 +433,9 @@ public class FileBasedDatasetServicesTest {
 
             assertNotNull("Genotypic Data not found", addedData.getGenotypicData());
 
-            SimpleGenotypeData data = (SimpleGenotypeData) SimpleGenotypeData.readData(dataPath,
-                FileType.CSV);
+            SimpleFrequencyGenotypeData data = (SimpleFrequencyGenotypeData) SimpleFrequencyGenotypeData.readData(
+                    dataPath, FileType.CSV
+            );
 
             data.setUniqueIdentifier(DATA_UID);
             data.setName(DATASET_NAME);
@@ -480,8 +482,9 @@ public class FileBasedDatasetServicesTest {
 
             assertNotNull("Genotypic Data not found", addedData.getGenotypicData());
 
-            SimpleGenotypeData data = (SimpleGenotypeData) SimpleGenotypeData.readData(dataPath, FileType.CSV,
-                GenotypeDataFormat.DEFAULT);
+            SimpleDefaultGenotypeData data = (SimpleDefaultGenotypeData) SimpleDefaultGenotypeData.readData(
+                    dataPath, FileType.CSV
+            );
 
             data.setUniqueIdentifier(DATA_UID);
             data.setName(DATASET_NAME);
@@ -576,8 +579,9 @@ public class FileBasedDatasetServicesTest {
 
             assertNotNull("Genotypic Data not found", addedData.getGenotypicData());
 
-            SimpleGenotypeData data = (SimpleGenotypeData) SimpleGenotypeData.readData(dataPath, FileType.CSV,
-                GenotypeDataFormat.DEFAULT);
+            SimpleDefaultGenotypeData data = (SimpleDefaultGenotypeData) SimpleDefaultGenotypeData.readData(
+                    dataPath, FileType.CSV
+            );
 
             data.setUniqueIdentifier(DATA_UID);
             data.setName(DATASET_NAME);
@@ -624,8 +628,9 @@ public class FileBasedDatasetServicesTest {
 
             assertNotNull("Genotypic Data not found", addedData.getGenotypicData());
 
-            SimpleGenotypeData data = (SimpleGenotypeData) SimpleGenotypeData.readData(dataPath,
-                FileType.CSV);
+            SimpleFrequencyGenotypeData data = (SimpleFrequencyGenotypeData) SimpleFrequencyGenotypeData.readData(
+                    dataPath, FileType.CSV
+            );
 
             data.setUniqueIdentifier(DATA_UID);
             data.setName(DATASET_NAME);
@@ -680,8 +685,9 @@ public class FileBasedDatasetServicesTest {
 
             assertNotNull("Restored Genotypic Data not found", restoredData.getGenotypicData());
 
-            SimpleGenotypeData data = (SimpleGenotypeData) SimpleGenotypeData.readData(dataPath,
-                FileType.CSV);
+            SimpleFrequencyGenotypeData data = (SimpleFrequencyGenotypeData) SimpleFrequencyGenotypeData.readData(
+                    dataPath, FileType.CSV
+            );
 
             data.setUniqueIdentifier(DATA_UID);
             data.setName(DATASET_NAME);
@@ -738,8 +744,9 @@ public class FileBasedDatasetServicesTest {
 
             dataPath = Paths.get(ClassLoader.getSystemResource(FREQUENCY_GENOTYPIC_FILE).toURI());
 
-            SimpleGenotypeData data = (SimpleGenotypeData) SimpleGenotypeData.readData(dataPath,
-                FileType.CSV);
+            SimpleFrequencyGenotypeData data = (SimpleFrequencyGenotypeData) SimpleFrequencyGenotypeData.readData(
+                    dataPath, FileType.CSV
+            );
 
             data.setUniqueIdentifier(DATA_UID);
             data.setName(DATASET_NAME);
@@ -850,8 +857,9 @@ public class FileBasedDatasetServicesTest {
 
             assertNotNull("Restored Genotypic Data not found", restoredData.getGenotypicData());
 
-            SimpleGenotypeData data = (SimpleGenotypeData) SimpleGenotypeData.readData(dataPath, FileType.CSV,
-                GenotypeDataFormat.DEFAULT);
+            SimpleDefaultGenotypeData data = (SimpleDefaultGenotypeData) SimpleDefaultGenotypeData.readData(
+                    dataPath, FileType.CSV
+            );
 
             data.setUniqueIdentifier(DATA_UID);
             data.setName(DATASET_NAME);
@@ -909,8 +917,9 @@ public class FileBasedDatasetServicesTest {
 
             dataPath = Paths.get(ClassLoader.getSystemResource(FREQUENCY_GENOTYPIC_FILE).toURI());
 
-            SimpleGenotypeData data = (SimpleGenotypeData) SimpleGenotypeData.readData(dataPath, FileType.CSV,
-                GenotypeDataFormat.FREQUENCY);
+            SimpleFrequencyGenotypeData data = (SimpleFrequencyGenotypeData) SimpleFrequencyGenotypeData.readData(
+                    dataPath, FileType.CSV
+            );
 
             data.setUniqueIdentifier(DATA_UID);
             data.setName(DATASET_NAME);
@@ -1075,7 +1084,7 @@ public class FileBasedDatasetServicesTest {
 
             compareFeatureData(phenotypicData, addedData.getPhenotypicData());
 
-            SimpleGenotypeData genotypicData = (SimpleGenotypeData) SimpleGenotypeData
+            SimpleFrequencyGenotypeData genotypicData = (SimpleFrequencyGenotypeData) SimpleFrequencyGenotypeData
                 .readData(genotypicDataPath, FileType.CSV);
 
             genotypicData.setUniqueIdentifier(DATA_UID);
@@ -1147,7 +1156,7 @@ public class FileBasedDatasetServicesTest {
 
             compareFeatureData(phenotypicData, restoredData.getPhenotypicData());
 
-            SimpleGenotypeData genotypicData = (SimpleGenotypeData) SimpleGenotypeData
+            SimpleFrequencyGenotypeData genotypicData = (SimpleFrequencyGenotypeData) SimpleFrequencyGenotypeData
                 .readData(genotypicDataPath, FileType.CSV);
 
             genotypicData.setUniqueIdentifier(DATA_UID);
@@ -1218,7 +1227,7 @@ public class FileBasedDatasetServicesTest {
 
             compareFeatureData(phenotypicData, addedData.getPhenotypicData());
 
-            SimpleGenotypeData genotypicData = (SimpleGenotypeData) SimpleGenotypeData
+            SimpleFrequencyGenotypeData genotypicData = (SimpleFrequencyGenotypeData) SimpleFrequencyGenotypeData
                 .readData(genotypicDataPath, FileType.CSV);
 
             genotypicData.setUniqueIdentifier(DATA_UID);
@@ -1304,7 +1313,7 @@ public class FileBasedDatasetServicesTest {
 
             compareFeatureData(phenotypicData, restoredData.getPhenotypicData());
 
-            SimpleGenotypeData genotypicData = (SimpleGenotypeData) SimpleGenotypeData
+            SimpleFrequencyGenotypeData genotypicData = (SimpleFrequencyGenotypeData) SimpleFrequencyGenotypeData
                 .readData(genotypicDataPath, FileType.CSV);
 
             genotypicData.setUniqueIdentifier(DATA_UID);
@@ -1429,8 +1438,9 @@ public class FileBasedDatasetServicesTest {
 
             dataPath1 = Paths.get(ClassLoader.getSystemResource(FREQUENCY_GENOTYPIC_FILE).toURI());
 
-            SimpleGenotypeData data1 = (SimpleGenotypeData) SimpleGenotypeData.readData(dataPath1,
-                FileType.CSV);
+            SimpleFrequencyGenotypeData data1 = (SimpleFrequencyGenotypeData) SimpleFrequencyGenotypeData.readData(
+                    dataPath1, FileType.CSV
+            );
 
             data1.setUniqueIdentifier(DATA_UID);
             data1.setName(DATASET_NAME);
@@ -1461,8 +1471,9 @@ public class FileBasedDatasetServicesTest {
 
             dataPath2 = Paths.get(ClassLoader.getSystemResource(FREQUENCY_GENOTYPIC_FILE).toURI());
 
-            SimpleGenotypeData data2 = (SimpleGenotypeData) SimpleGenotypeData.readData(dataPath2,
-                FileType.CSV);
+            SimpleFrequencyGenotypeData data2 = (SimpleFrequencyGenotypeData) SimpleFrequencyGenotypeData.readData(
+                    dataPath2, FileType.CSV
+            );
 
             data2.setUniqueIdentifier(DATA_UID);
             data2.setName(DATASET_NAME);
@@ -1521,8 +1532,9 @@ public class FileBasedDatasetServicesTest {
 
             assertNotNull("Restored Genotypic Data not found", restoredData4.getGenotypicData());
 
-            SimpleGenotypeData data4 = (SimpleGenotypeData) SimpleGenotypeData.readData(dataPath4,
-                FileType.CSV, GenotypeDataFormat.DEFAULT);
+            SimpleDefaultGenotypeData data4 = (SimpleDefaultGenotypeData) SimpleDefaultGenotypeData.readData(
+                    dataPath4, FileType.CSV
+            );
 
             data4.setUniqueIdentifier(DATA_UID);
             data4.setName(DATASET_NAME);
@@ -1556,8 +1568,9 @@ public class FileBasedDatasetServicesTest {
 
             dataPath5 = Paths.get(ClassLoader.getSystemResource(FREQUENCY_GENOTYPIC_FILE).toURI());
 
-            SimpleGenotypeData data5 = (SimpleGenotypeData) SimpleGenotypeData.readData(dataPath5,
-                FileType.CSV);
+            SimpleFrequencyGenotypeData data5 = (SimpleFrequencyGenotypeData) SimpleFrequencyGenotypeData.readData(
+                    dataPath5, FileType.CSV
+            );
 
             data5.setUniqueIdentifier(DATA_UID);
             data5.setName(DATASET_NAME);
@@ -1922,7 +1935,7 @@ public class FileBasedDatasetServicesTest {
         assertEquals("Dataset is not the name", expected.getDataset(), actual.getDataset());
     }
 
-    private void compareGenotypeVariantData(GenotypeData expected, GenotypeData actual) {
+    private void compareGenotypeVariantData(FrequencyGenotypeData expected, FrequencyGenotypeData actual) {
 
         compareData(expected, actual);
 

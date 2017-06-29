@@ -32,7 +32,7 @@ import static org.junit.Assert.assertEquals;
 import java.util.Iterator;
 
 import org.corehunter.data.CoreHunterData;
-import org.corehunter.data.simple.SimpleGenotypeData;
+import org.corehunter.data.simple.SimpleFrequencyGenotypeData;
 import org.corehunter.objectives.distance.measures.CavalliSforzaEdwardsDistance;
 import org.corehunter.objectives.distance.measures.MissingValuesPolicy;
 import org.junit.Test;
@@ -45,7 +45,7 @@ public class CavalliSforzaEdwardsDistanceTest {
     @Test
     public void test() {
         
-        SimpleGenotypeData geno = new SimpleGenotypeData(
+        SimpleFrequencyGenotypeData geno = new SimpleFrequencyGenotypeData(
                 NAME, HEADERS_NON_UNIQUE_NAMES, MARKER_NAMES, ALLELE_NAMES, ALLELE_FREQUENCIES
         );
         CoreHunterData data = new CoreHunterData(geno);
@@ -73,7 +73,7 @@ public class CavalliSforzaEdwardsDistanceTest {
     @Test
     public void testCeilMissing() {
         
-        SimpleGenotypeData geno = new SimpleGenotypeData(
+        SimpleFrequencyGenotypeData geno = new SimpleFrequencyGenotypeData(
                 NAME, HEADERS_NON_UNIQUE_NAMES, MARKER_NAMES, ALLELE_NAMES, ALLELE_FREQUENCIES
         );
         CoreHunterData data = new CoreHunterData(geno);

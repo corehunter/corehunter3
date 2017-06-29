@@ -22,7 +22,7 @@ package org.corehunter.objectives.eval;
 import java.util.Collection;
 import java.util.Set;
 
-import org.corehunter.data.GenotypeData;
+import org.corehunter.data.FrequencyGenotypeData;
 
 /**
  * @author Herman De Beukelaer
@@ -31,13 +31,13 @@ public class CoverageEvaluation extends AllelicDiversityEvaluation {
 
     private static final double TOL = 1e-10;
     
-    public CoverageEvaluation(Collection<Integer> ids, GenotypeData data) {
+    public CoverageEvaluation(Collection<Integer> ids, FrequencyGenotypeData data) {
         super(ids, data);
     }
 
     public CoverageEvaluation(AllelicDiversityEvaluation curEval,
                               Set<Integer> add, Set<Integer> remove,
-                              GenotypeData data) {
+                              FrequencyGenotypeData data) {
         super(curEval, add, remove, data);
     }
     

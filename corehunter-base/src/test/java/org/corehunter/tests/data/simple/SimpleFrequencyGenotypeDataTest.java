@@ -20,15 +20,10 @@
 package org.corehunter.tests.data.simple;
 
 import static org.corehunter.tests.TestData.ALLELE_FREQUENCIES;
-import static org.corehunter.tests.TestData.ALLELE_FREQUENCIES_DIPLOID;
-import static org.corehunter.tests.TestData.ALLELE_FREQUENCIES_HOMOZYGOUS;
 import static org.corehunter.tests.TestData.ALLELE_NAMES;
-import static org.corehunter.tests.TestData.ALLELE_NAMES_DIPLOID;
-import static org.corehunter.tests.TestData.ALLELE_NAMES_HOMOZYGOUS;
 import static org.corehunter.tests.TestData.HEADERS_NON_UNIQUE_NAMES;
 import static org.corehunter.tests.TestData.HEADERS_UNIQUE_NAMES;
 import static org.corehunter.tests.TestData.MARKER_NAMES;
-import static org.corehunter.tests.TestData.MARKER_NAMES_DEFAULT;
 import static org.corehunter.tests.TestData.NAME;
 import static org.corehunter.tests.TestData.PRECISION;
 import static org.corehunter.tests.TestData.SET;
@@ -48,9 +43,7 @@ import java.util.Arrays;
 import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
-import org.corehunter.data.GenotypeData;
-import org.corehunter.data.GenotypeDataFormat;
-import org.corehunter.data.simple.SimpleGenotypeData;
+import org.corehunter.data.simple.SimpleFrequencyGenotypeData;
 import org.jamesframework.core.subset.SubsetSolution;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -58,11 +51,12 @@ import org.junit.Test;
 
 import uno.informatics.data.SimpleEntity;
 import uno.informatics.data.io.FileType;
+import org.corehunter.data.FrequencyGenotypeData;
 
 /**
  * @author Guy Davenport, Herman De Beukelaer
  */
-public class SimpleGenotypeDataTest {
+public class SimpleFrequencyGenotypeDataTest {
 
     private static final String TXT_IDS = "/frequency_genotypes/ids.txt";
     private static final String CSV_IDS = "/frequency_genotypes/ids.csv";
@@ -70,18 +64,7 @@ public class SimpleGenotypeDataTest {
     private static final String CSV_NO_ALLELE_NAMES = "/frequency_genotypes/no-allele-names.csv";
     private static final String FREQUENCY_LONG_FILE = "/frequency_genotypes/frequency_genotypic_data.csv";
     
-    private static final String DIPLOID_TXT_IDS = "/diploid_genotypes/ids.txt";
-    private static final String DIPLOID_CSV_IDS = "/diploid_genotypes/ids.csv";
-    private static final String DIPLOID_CSV_IDS_NAMES = "/diploid_genotypes/ids-and-names.csv";
-    private static final String DIPLOID_LONG_FILE = "/diploid_genotypes/diploid_genotypic_data.csv";
-    
-    private static final String HOMOZYGOUS_TXT_IDS = "/homozygous_genotypes/ids.txt";
-    private static final String HOMOZYGOUS_CSV_IDS = "/homozygous_genotypes/ids.csv";
-    private static final String HOMOZYGOUS_CSV_IDS_NAMES = "/homozygous_genotypes/ids-and-names.csv";
-    private static final String HOMOZYGOUS_LONG_FILE = "/homozygous_genotypes/homozygous_genotypic_data.csv";
-    
     private static final String ERRONEOUS_FILES_DIR = "/frequency_genotypes/err/";
-    private static final String DIPLOID_ERRONEOUS_FILES_DIR = "/diploid_genotypes/err/";
     private static final String TEST_OUTPUT = "target/testoutput";
     
     private static final int[] SELECTION = new int[] {
@@ -95,17 +78,13 @@ public class SimpleGenotypeDataTest {
     
     @BeforeClass
     public static void beforeClass(){
-        System.out.println("Test simple genotype variant data");
+        System.out.println("Test simple frequency genotype variant data");
     }
     
     @AfterClass
     public static void afterClass(){
         System.out.println("Done");
     }
-    
-    /*************/
-    /* FREQUENCY */
-    /*************/
     
     @Test
     public void inMemory() {
@@ -114,7 +93,7 @@ public class SimpleGenotypeDataTest {
         expectedHeaders = HEADERS_NON_UNIQUE_NAMES;
         expectedMarkerNames = MARKER_NAMES;
         expectedAlleleNames = ALLELE_NAMES;
-        testDataFrequencies(new SimpleGenotypeData(
+        testData(new SimpleFrequencyGenotypeData(
                 HEADERS_NON_UNIQUE_NAMES, MARKER_NAMES, ALLELE_NAMES, ALLELE_FREQUENCIES
         ));
     }
@@ -126,7 +105,7 @@ public class SimpleGenotypeDataTest {
         expectedHeaders = HEADERS_NON_UNIQUE_NAMES;
         expectedMarkerNames = MARKER_NAMES;
         expectedAlleleNames = ALLELE_NAMES;
-        testDataFrequencies(new SimpleGenotypeData(
+        testData(new SimpleFrequencyGenotypeData(
                 NAME, HEADERS_NON_UNIQUE_NAMES, MARKER_NAMES, ALLELE_NAMES, ALLELE_FREQUENCIES
         ));
     }
@@ -138,9 +117,12 @@ public class SimpleGenotypeDataTest {
         expectedMarkerNames = MARKER_NAMES;
         expectedAlleleNames = ALLELE_NAMES;
         System.out.println(" |- File " + dataName);
-        testDataFrequencies(SimpleGenotypeData.readData(
-            Paths.get(SimpleGenotypeDataTest.class.getResource(TXT_IDS).getPath()), FileType.TXT
-        ));
+        testData(
+                SimpleFrequencyGenotypeData.readData(
+                        Paths.get(SimpleFrequencyGenotypeDataTest.class.getResource(TXT_IDS).getPath()),
+                        FileType.TXT
+                )
+        );
     }
     
     @Test
@@ -150,9 +132,12 @@ public class SimpleGenotypeDataTest {
         expectedMarkerNames = MARKER_NAMES;
         expectedAlleleNames = ALLELE_NAMES;
         System.out.println(" |- File " + dataName);
-        testDataFrequencies(SimpleGenotypeData.readData(
-            Paths.get(SimpleGenotypeDataTest.class.getResource(CSV_IDS).getPath()), FileType.CSV
-        ));
+        testData(
+                SimpleFrequencyGenotypeData.readData(
+                        Paths.get(SimpleFrequencyGenotypeDataTest.class.getResource(CSV_IDS).getPath()),
+                        FileType.CSV
+                )
+        );
     }
     
     @Test
@@ -162,9 +147,12 @@ public class SimpleGenotypeDataTest {
         expectedMarkerNames = MARKER_NAMES;
         expectedAlleleNames = ALLELE_NAMES;
         System.out.println(" |- File " + dataName);
-        testDataFrequencies(SimpleGenotypeData.readData(
-            Paths.get(SimpleGenotypeDataTest.class.getResource(CSV_IDS_NAMES).getPath()), FileType.CSV
-        ));
+        testData(
+                SimpleFrequencyGenotypeData.readData(
+                        Paths.get(SimpleFrequencyGenotypeDataTest.class.getResource(CSV_IDS_NAMES).getPath()),
+                        FileType.CSV
+                )
+        );
     }
     
     @Test
@@ -174,15 +162,19 @@ public class SimpleGenotypeDataTest {
         expectedMarkerNames = MARKER_NAMES;
         expectedAlleleNames = UNDEFINED_ALLELE_NAMES;
         System.out.println(" |- File " + dataName);
-        testDataFrequencies(SimpleGenotypeData.readData(
-            Paths.get(SimpleGenotypeDataTest.class.getResource(CSV_NO_ALLELE_NAMES).getPath()), FileType.CSV
-        ));
+        testData(
+                SimpleFrequencyGenotypeData.readData(
+                        Paths.get(SimpleFrequencyGenotypeDataTest.class.getResource(CSV_NO_ALLELE_NAMES).getPath()),
+                        FileType.CSV
+                )
+        );
     }
     
     @Test
     public void fromCsvLargeFiles() throws IOException {
-        SimpleGenotypeData.readData(
-            Paths.get(SimpleGenotypeDataTest.class.getResource(FREQUENCY_LONG_FILE).getPath()), FileType.CSV
+        SimpleFrequencyGenotypeData.readData(
+                Paths.get(SimpleFrequencyGenotypeDataTest.class.getResource(FREQUENCY_LONG_FILE).getPath()),
+                FileType.CSV
         );
     }
     
@@ -193,7 +185,7 @@ public class SimpleGenotypeDataTest {
         expectedMarkerNames = MARKER_NAMES;
         expectedAlleleNames = UNDEFINED_ALLELE_NAMES;
         
-        SimpleGenotypeData genotypicData = new SimpleGenotypeData(expectedHeaders, 
+        SimpleFrequencyGenotypeData genotypicData = new SimpleFrequencyGenotypeData(expectedHeaders, 
                 expectedMarkerNames, expectedAlleleNames, ALLELE_FREQUENCIES) ;
         
         Path path = Paths.get(TEST_OUTPUT) ;
@@ -210,7 +202,7 @@ public class SimpleGenotypeDataTest {
         genotypicData.writeData(path, FileType.TXT);
         
         System.out.println(" |- Read written File " + dataName);
-        testData(SimpleGenotypeData.readData(path, FileType.TXT), ALLELE_FREQUENCIES);
+        testData(SimpleFrequencyGenotypeData.readData(path, FileType.TXT));
     }
     
     @Test
@@ -220,7 +212,7 @@ public class SimpleGenotypeDataTest {
         expectedMarkerNames = MARKER_NAMES;
         expectedAlleleNames = ALLELE_NAMES;
         
-        SimpleGenotypeData genotypicData = new SimpleGenotypeData(expectedHeaders, 
+        SimpleFrequencyGenotypeData genotypicData = new SimpleFrequencyGenotypeData(expectedHeaders, 
                 expectedMarkerNames, expectedAlleleNames, ALLELE_FREQUENCIES) ;
         
         Path path = Paths.get(TEST_OUTPUT) ;
@@ -235,7 +227,7 @@ public class SimpleGenotypeDataTest {
         genotypicData.writeData(path, FileType.CSV);
         
         System.out.println(" |- Read written File " + dataName);
-        testDataFrequencies(SimpleGenotypeData.readData(path, FileType.CSV));
+        testData(SimpleFrequencyGenotypeData.readData(path, FileType.CSV));
     }
     
     @Test
@@ -244,8 +236,9 @@ public class SimpleGenotypeDataTest {
         expectedMarkerNames = MARKER_NAMES;
         expectedAlleleNames = ALLELE_NAMES;
         
-        SimpleGenotypeData genotypicData = new SimpleGenotypeData(expectedHeaders, 
-                expectedMarkerNames, expectedAlleleNames, ALLELE_FREQUENCIES) ;
+        SimpleFrequencyGenotypeData genotypicData = new SimpleFrequencyGenotypeData(
+                expectedHeaders, expectedMarkerNames, expectedAlleleNames, ALLELE_FREQUENCIES
+        );
         
         Set<Integer> ids = genotypicData.getIDs();
 
@@ -270,7 +263,7 @@ public class SimpleGenotypeDataTest {
 
         System.out.println(" |- Write frequency genotypes file (with solution) " + dataName);
 
-        genotypicData.writeData(path, FileType.CSV, GenotypeDataFormat.FREQUENCY, solution, true, true, true);
+        genotypicData.writeData(path, FileType.CSV, solution, true, true, true);
 
         assertTrue("Output is not correct!",
             FileUtils
@@ -286,7 +279,7 @@ public class SimpleGenotypeDataTest {
 
         System.out.println(" |- Write frequency genotypes file (with solution) " + dataName);
 
-        genotypicData.writeData(path, FileType.CSV, GenotypeDataFormat.FREQUENCY, solution, false, true, true);
+        genotypicData.writeData(path, FileType.CSV, solution, true, true, false);
 
         assertTrue("Output is not correct!",
             FileUtils
@@ -303,7 +296,7 @@ public class SimpleGenotypeDataTest {
         expectedMarkerNames = MARKER_NAMES;
         expectedAlleleNames = ALLELE_NAMES;
         
-        SimpleGenotypeData genotypicData = new SimpleGenotypeData(expectedHeaders, 
+        SimpleFrequencyGenotypeData genotypicData = new SimpleFrequencyGenotypeData(expectedHeaders, 
                 expectedMarkerNames, expectedAlleleNames, ALLELE_FREQUENCIES) ;
         
         Set<Integer> ids = genotypicData.getIDs();
@@ -329,7 +322,7 @@ public class SimpleGenotypeDataTest {
 
         System.out.println(" |- Write frequency genotypes file (with solution) " + dataName);
 
-        genotypicData.writeData(path, FileType.CSV, GenotypeDataFormat.FREQUENCY, solution, true, true, false);
+        genotypicData.writeData(path, FileType.CSV, solution, true, false, true);
 
         assertTrue("Output is not correct!",
             FileUtils
@@ -345,7 +338,7 @@ public class SimpleGenotypeDataTest {
 
         System.out.println(" |- Write frequency genotypes file (with solution) " + dataName);
 
-        genotypicData.writeData(path, FileType.CSV, GenotypeDataFormat.FREQUENCY, solution, false, true, false);
+        genotypicData.writeData(path, FileType.CSV, solution, true, false, false);
 
         assertTrue("Output is not correct!",
             FileUtils
@@ -362,7 +355,7 @@ public class SimpleGenotypeDataTest {
         expectedMarkerNames = MARKER_NAMES;
         expectedAlleleNames = ALLELE_NAMES;
         
-        SimpleGenotypeData genotypicData = new SimpleGenotypeData(expectedHeaders, 
+        SimpleFrequencyGenotypeData genotypicData = new SimpleFrequencyGenotypeData(expectedHeaders, 
                 expectedMarkerNames, expectedAlleleNames, ALLELE_FREQUENCIES) ;
         
         Set<Integer> ids = genotypicData.getIDs();
@@ -388,7 +381,7 @@ public class SimpleGenotypeDataTest {
 
         System.out.println(" |- Write frequency genotypes file (with solution) " + dataName);
 
-        genotypicData.writeData(path, FileType.CSV, GenotypeDataFormat.FREQUENCY, solution, true, false, true);
+        genotypicData.writeData(path, FileType.CSV, solution, false, true, true);
 
         assertTrue("Output is not correct!",
             FileUtils
@@ -404,7 +397,7 @@ public class SimpleGenotypeDataTest {
 
         System.out.println(" |- Write frequency genotypes file (with solution) " + dataName);
 
-        genotypicData.writeData(path, FileType.CSV, GenotypeDataFormat.FREQUENCY, solution, false, false, true);
+        genotypicData.writeData(path, FileType.CSV, solution, false, true, false);
 
         assertTrue("Output is not correct!",
             FileUtils
@@ -418,211 +411,14 @@ public class SimpleGenotypeDataTest {
     @Test
     public void erroneousFiles() throws IOException {
         System.out.println(" |- Test erroneous files:");
-        Path dir = Paths.get(SimpleGenotypeDataTest.class.getResource(ERRONEOUS_FILES_DIR).getPath());
+        Path dir = Paths.get(SimpleFrequencyGenotypeDataTest.class.getResource(ERRONEOUS_FILES_DIR).getPath());
         try(DirectoryStream<Path> directory = Files.newDirectoryStream(dir)){
             for(Path file : directory){
                 System.out.print("  |- " + file.getFileName().toString() + ": ");
                 FileType type = file.toString().endsWith(".txt") ? FileType.TXT : FileType.CSV;
                 boolean thrown = false;
                 try {
-                    SimpleGenotypeData.readData(file, type);
-                } catch (IOException ex){
-                    thrown = true;
-                    System.out.print(ex.getMessage());
-                } finally {
-                    System.out.println();
-                }
-                assertTrue("File " + file + " should throw exception.", thrown);
-            }
-        }
-    }
-    
-    /**************/
-    /* HOMOZYGOUS */
-    /**************/
-    
-    @Test
-    public void homozygousInMemory() {
-        System.out.println(" |- In memory test (homozygous)");
-        dataName = NAME;
-        expectedHeaders = HEADERS_NON_UNIQUE_NAMES;
-        expectedMarkerNames = MARKER_NAMES_DEFAULT;
-        expectedAlleleNames = ALLELE_NAMES_HOMOZYGOUS;
-        testDataHomozygous(new SimpleGenotypeData(NAME, HEADERS_NON_UNIQUE_NAMES, MARKER_NAMES_DEFAULT,
-                                                         ALLELE_NAMES_HOMOZYGOUS, ALLELE_FREQUENCIES_HOMOZYGOUS));
-    }
-    
-    @Test
-    public void homozygousFromCsvFileWithIdsAndNames() throws IOException {
-        dataName = "ids-and-names.csv";
-        expectedHeaders = HEADERS_NON_UNIQUE_NAMES;
-        expectedMarkerNames = MARKER_NAMES_DEFAULT;
-        expectedAlleleNames = ALLELE_NAMES_HOMOZYGOUS;
-        System.out.println(" |- File homozygous/" + dataName);
-        testDataHomozygous(SimpleGenotypeData.readData(
-            Paths.get(SimpleGenotypeDataTest.class.getResource(HOMOZYGOUS_CSV_IDS_NAMES).getPath()),
-            FileType.CSV, GenotypeDataFormat.DEFAULT
-        ));
-    }
-    
-    @Test
-    public void homozygousFromTxtFileWithIds() throws IOException {
-        dataName = "ids.txt";
-        expectedHeaders = HEADERS_UNIQUE_NAMES;
-        expectedMarkerNames = MARKER_NAMES_DEFAULT;
-        expectedAlleleNames = ALLELE_NAMES_HOMOZYGOUS;
-        System.out.println(" |- File homozygous/" + dataName);
-        testDataHomozygous(SimpleGenotypeData.readData(
-            Paths.get(SimpleGenotypeDataTest.class.getResource(HOMOZYGOUS_TXT_IDS).getPath()),
-            FileType.TXT, GenotypeDataFormat.DEFAULT
-        ));
-    }
-    
-    @Test
-    public void homozygousFromCsvFileWithIds() throws IOException {
-        dataName = "ids.csv";
-        expectedHeaders = HEADERS_UNIQUE_NAMES;
-        expectedMarkerNames = MARKER_NAMES_DEFAULT;
-        expectedAlleleNames = ALLELE_NAMES_HOMOZYGOUS;
-        System.out.println(" |- File homozygous/" + dataName);
-        testDataHomozygous(SimpleGenotypeData.readData(
-            Paths.get(SimpleGenotypeDataTest.class.getResource(HOMOZYGOUS_CSV_IDS).getPath()),
-            FileType.CSV, GenotypeDataFormat.DEFAULT
-        ));
-    }
-    
-    @Test
-    public void homozygousfromCsvLargeFiles() throws IOException {
-        SimpleGenotypeData.readData(
-            Paths.get(SimpleGenotypeDataTest.class.getResource(HOMOZYGOUS_LONG_FILE).getPath()),
-            FileType.CSV, GenotypeDataFormat.DEFAULT)  ;
-    }
-    
-    @Test
-    public void homozygousToCsvFile() throws IOException {
-        dataName = "out.csv";
-        expectedHeaders = HEADERS_NON_UNIQUE_NAMES;
-        expectedMarkerNames = MARKER_NAMES_DEFAULT;
-        expectedAlleleNames = ALLELE_NAMES_HOMOZYGOUS;
-        
-        SimpleGenotypeData genotypicData = new SimpleGenotypeData(
-                expectedHeaders, expectedMarkerNames, expectedAlleleNames, ALLELE_FREQUENCIES_HOMOZYGOUS
-        );
-        
-        Path path = Paths.get(TEST_OUTPUT);
-        
-        Files.createDirectories(path);
-        
-        path = Files.createTempDirectory(path, "GenoHomozygous-Csv");
-        
-        path = Paths.get(path.toString(), dataName);
-                
-        System.out.println(" |- Write homozygous File " + dataName);
-        genotypicData.writeData(path, FileType.CSV);
-        
-        System.out.println(" |- Read written File " + dataName);
-        testDataHomozygous(SimpleGenotypeData.readData(path, FileType.CSV, GenotypeDataFormat.FREQUENCY));
-    }
-    
-    /***********/
-    /* DIPLOID */
-    /***********/
-
-    @Test
-    public void diploidInMemory() {
-        System.out.println(" |- In memory test (diploid)");
-        dataName = NAME;
-        expectedHeaders = HEADERS_NON_UNIQUE_NAMES;
-        expectedMarkerNames = MARKER_NAMES_DEFAULT;
-        expectedAlleleNames = ALLELE_NAMES_DIPLOID;
-        testDataDiploid(new SimpleGenotypeData(NAME, HEADERS_NON_UNIQUE_NAMES, MARKER_NAMES_DEFAULT,
-                                                      ALLELE_NAMES_DIPLOID, ALLELE_FREQUENCIES_DIPLOID));
-    }
-    
-    @Test
-    public void diploidFromTxtFileWithIds() throws IOException {
-        dataName = "ids.txt";
-        expectedHeaders = HEADERS_UNIQUE_NAMES;
-        expectedMarkerNames = MARKER_NAMES_DEFAULT;
-        expectedAlleleNames = ALLELE_NAMES_DIPLOID;
-        System.out.println(" |- File diploid/" + dataName);
-        testDataDiploid(SimpleGenotypeData.readData(
-            Paths.get(SimpleGenotypeDataTest.class.getResource(DIPLOID_TXT_IDS).getPath()),
-            FileType.TXT, GenotypeDataFormat.DEFAULT
-        ));
-    }
-    
-    @Test
-    public void diploidFromCsvFileWithIds() throws IOException {
-        dataName = "ids.csv";
-        expectedHeaders = HEADERS_UNIQUE_NAMES;
-        expectedMarkerNames = MARKER_NAMES_DEFAULT;
-        expectedAlleleNames = ALLELE_NAMES_DIPLOID;
-        System.out.println(" |- File diploid/" + dataName);
-        testDataDiploid(SimpleGenotypeData.readData(
-            Paths.get(SimpleGenotypeDataTest.class.getResource(DIPLOID_CSV_IDS).getPath()),
-            FileType.CSV, GenotypeDataFormat.DEFAULT
-        ));
-    }
-    
-    @Test
-    public void diploidFromCsvFileWithIdsAndNames() throws IOException {
-        dataName = "ids-and-names.csv";
-        expectedHeaders = HEADERS_NON_UNIQUE_NAMES;
-        expectedMarkerNames = MARKER_NAMES_DEFAULT;
-        expectedAlleleNames = ALLELE_NAMES_DIPLOID;
-        System.out.println(" |- File diploid/" + dataName);
-        testDataDiploid(SimpleGenotypeData.readData(
-            Paths.get(SimpleGenotypeDataTest.class.getResource(DIPLOID_CSV_IDS_NAMES).getPath()),
-            FileType.CSV, GenotypeDataFormat.DEFAULT
-        ));
-    }
-    
-    @Test
-    public void diploidFromCsvLargeFiles() throws IOException {
-        SimpleGenotypeData.readData(
-            Paths.get(SimpleGenotypeDataTest.class.getResource(DIPLOID_LONG_FILE).getPath()), FileType.CSV, 
-            GenotypeDataFormat.DEFAULT
-        );
-    }
-    
-    @Test
-    public void diploidToCsvFile() throws IOException {
-        dataName = "out.csv";
-        expectedHeaders = HEADERS_NON_UNIQUE_NAMES;
-        expectedMarkerNames = MARKER_NAMES_DEFAULT;
-        expectedAlleleNames = ALLELE_NAMES_DIPLOID;
-        
-        SimpleGenotypeData genotypicData = new SimpleGenotypeData(
-                expectedHeaders, expectedMarkerNames, expectedAlleleNames, ALLELE_FREQUENCIES_DIPLOID
-        );
-        
-        Path path = Paths.get(TEST_OUTPUT);
-        
-        Files.createDirectories(path);
-        
-        path = Files.createTempDirectory(path, "GenoDiploid-Csv");
-        
-        path = Paths.get(path.toString(), dataName);
-                
-        System.out.println(" |- Write diploid File " + dataName);
-        genotypicData.writeData(path, FileType.CSV);
-        
-        System.out.println(" |- Read written File " + dataName);
-        testDataDiploid(SimpleGenotypeData.readData(path, FileType.CSV, GenotypeDataFormat.FREQUENCY));
-    }
-    
-    @Test
-    public void diploidErroneousFiles() throws IOException {
-        System.out.println(" |- Test diploid erroneous files:");
-        Path dir = Paths.get(SimpleGenotypeDataTest.class.getResource(DIPLOID_ERRONEOUS_FILES_DIR).getPath());
-        try(DirectoryStream<Path> directory = Files.newDirectoryStream(dir)){
-            for(Path file : directory){
-                System.out.print("  |- " + file.getFileName().toString() + ": ");
-                FileType type = file.toString().endsWith(".txt") ? FileType.TXT : FileType.CSV;
-                boolean thrown = false;
-                try {
-                    SimpleGenotypeData.readData(file, type, GenotypeDataFormat.DEFAULT);
+                    SimpleFrequencyGenotypeData.readData(file, type);
                 } catch (IOException ex){
                     thrown = true;
                     System.out.print(ex.getMessage());
@@ -638,10 +434,10 @@ public class SimpleGenotypeDataTest {
     /* CHECK */
     /*********/
     
-    private void testData(GenotypeData data, Double[][][] freqs) {
+    private void testData(FrequencyGenotypeData data) {
         
         // check dataset name, if set
-        String expectedDatasetName = dataName != null ? dataName : "Multiallelic marker data";
+        String expectedDatasetName = dataName != null ? dataName : "Allele frequency data";
         assertEquals("Incorrect data name.", expectedDatasetName, data.getName());
         
         // check IDs
@@ -689,7 +485,7 @@ public class SimpleGenotypeDataTest {
             // check frequencies
             for (int m = 0; m < data.getNumberOfMarkers(); m++) {
                 for (int a = 0; a < data.getNumberOfAlleles(m); a++) {
-                    if(freqs[i][m][a] == null){
+                    if(ALLELE_FREQUENCIES[i][m][a] == null){
                         assertNull("Frequency should be missing for allele " + a
                                  + " of marker " + m + " in individual " + i + ".",
                                 data.getAlleleFrequency(i, m, a));
@@ -699,7 +495,7 @@ public class SimpleGenotypeDataTest {
                                    data.getAlleleFrequency(i, m, a));
                         assertEquals("Incorrect frequency for allele " + a
                                + " of marker " + m + " in individual " + i + ".",
-                               freqs[i][m][a],
+                               ALLELE_FREQUENCIES[i][m][a],
                                data.getAlleleFrequency(i, m, a),
                                PRECISION);
                     }
@@ -709,18 +505,6 @@ public class SimpleGenotypeDataTest {
             
         }
         
-    }
-    
-    private void testDataFrequencies(GenotypeData data) {
-        testData(data, ALLELE_FREQUENCIES);
-    }
-    
-    private void testDataDiploid(GenotypeData data) {
-        testData(data, ALLELE_FREQUENCIES_DIPLOID);
-    }
-    
-    private void testDataHomozygous(GenotypeData data) {
-        testData(data, ALLELE_FREQUENCIES_HOMOZYGOUS);
     }
     
 }
