@@ -19,7 +19,6 @@
 
 package org.corehunter.tests.data.simple;
 
-import java.io.File;
 import static org.corehunter.tests.TestData.ALLELE_OBS_DIPLOID;
 import static org.corehunter.tests.TestData.ALLELE_FREQUENCIES_DIPLOID;
 import static org.corehunter.tests.TestData.ALLELE_OBS_HOMOZYGOUS;
@@ -39,6 +38,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
+import java.io.File;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
