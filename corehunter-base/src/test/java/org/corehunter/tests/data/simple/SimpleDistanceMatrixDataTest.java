@@ -313,7 +313,7 @@ public class SimpleDistanceMatrixDataTest {
     @Test
     public void testErroneousFiles() throws IOException {
         System.out.println(" |- Test erroneous files:");
-        Path dir = Paths.get(SimpleGenotypeDataTest.class.getResource(ERRONEOUS_FILES_DIR).getPath());
+        Path dir = Paths.get(SimpleFrequencyGenotypeDataTest.class.getResource(ERRONEOUS_FILES_DIR).getPath());
         try (DirectoryStream<Path> directory = Files.newDirectoryStream(dir)) {
             for (Path file : directory) {
                 System.out.print("  |- " + file.getFileName().toString() + ": ");

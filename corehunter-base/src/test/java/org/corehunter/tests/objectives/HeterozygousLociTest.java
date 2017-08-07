@@ -36,7 +36,7 @@ import static org.corehunter.tests.TestData.SUBSET_EMPTY;
 import java.util.Random;
 
 import org.corehunter.data.CoreHunterData;
-import org.corehunter.data.simple.SimpleGenotypeData;
+import org.corehunter.data.simple.SimpleFrequencyGenotypeData;
 import org.corehunter.objectives.HeterozygousLoci;
 import org.jamesframework.core.problems.objectives.evaluations.Evaluation;
 import org.jamesframework.core.problems.objectives.evaluations.SimpleEvaluation;
@@ -55,7 +55,7 @@ public class HeterozygousLociTest extends EvaluationTest {
     @Test
     public void test() {
         
-        SimpleGenotypeData geno = new SimpleGenotypeData(
+        SimpleFrequencyGenotypeData geno = new SimpleFrequencyGenotypeData(
                 NAME, HEADERS_NON_UNIQUE_NAMES, MARKER_NAMES, ALLELE_NAMES, ALLELE_FREQUENCIES
         );
         CoreHunterData data = new CoreHunterData(geno);
@@ -97,7 +97,7 @@ public class HeterozygousLociTest extends EvaluationTest {
         
         Random rng = new Random();
         
-        SimpleGenotypeData geno = new SimpleGenotypeData(
+        SimpleFrequencyGenotypeData geno = new SimpleFrequencyGenotypeData(
                 NAME, HEADERS_NON_UNIQUE_NAMES, MARKER_NAMES, ALLELE_NAMES, ALLELE_FREQUENCIES
         );
         CoreHunterData data = new CoreHunterData(geno);

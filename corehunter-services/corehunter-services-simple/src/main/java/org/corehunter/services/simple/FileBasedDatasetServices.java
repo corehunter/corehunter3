@@ -35,11 +35,9 @@ import java.util.UUID;
 import org.apache.commons.lang3.ObjectUtils;
 import org.corehunter.data.CoreHunterData;
 import org.corehunter.data.CoreHunterDataType;
-import org.corehunter.data.GenotypeData;
+import org.corehunter.data.FrequencyGenotypeData;
 import org.corehunter.data.GenotypeDataFormat;
-import org.corehunter.data.simple.SimpleBiAllelicGenotypeData;
 import org.corehunter.data.simple.SimpleDistanceMatrixData;
-import org.corehunter.data.simple.SimpleGenotypeData;
 import org.corehunter.data.simple.SimplePhenotypeData;
 import org.corehunter.services.DatasetServices;
 
@@ -91,8 +89,8 @@ public class FileBasedDatasetServices implements DatasetServices {
      *             if the path can not be set or is invalid
      */
     protected FileBasedDatasetServices() throws IOException {
-        datasetMap = new HashMap<String, DatasetPojo>();
-        dataCache = new HashMap<String, CoreHunterData>();
+        datasetMap = new HashMap<>();
+        dataCache = new HashMap<>();
     }
 
     /**
@@ -125,7 +123,7 @@ public class FileBasedDatasetServices implements DatasetServices {
 
     @Override
     public List<Dataset> getAllDatasets() {
-        return new ArrayList<Dataset>(datasetMap.values());
+        return new ArrayList<>(datasetMap.values());
     }
 
     @Override
@@ -379,34 +377,17 @@ public class FileBasedDatasetServices implements DatasetServices {
                 }
 
                 GenotypeDataFormat genotypeDataFormat = getGenotypeDataFormat(options);
-                GenotypeData genotypeData;
+                FrequencyGenotypeData genotypeData;
 
                 try {
-                    switch (genotypeDataFormat) {
-                        case BIPARENTAL:
-                            genotypeData = SimpleBiAllelicGenotypeData.readData(copyPath, fileType);
-                            break;
-                        default:
-                            genotypeData = SimpleGenotypeData.readData(copyPath, fileType,
-                                genotypeDataFormat);
-                            break;
-                    }
+                    genotypeData = genotypeDataFormat.readData(copyPath, fileType);
                 } catch (IOException e) {
                     Files.deleteIfExists(copyPath);
                     throw e;
                 }
 
-                // TODO write data method should be on interface?
                 try {
-                    switch (genotypeDataFormat) {
-                        case BIPARENTAL:
-                            ((SimpleBiAllelicGenotypeData) genotypeData).writeData(internalPath,
-                                FileType.TXT);
-                            break;
-                        default:
-                            ((SimpleGenotypeData) genotypeData).writeData(internalPath, FileType.TXT);
-                            break;
-                    }
+                    genotypeData.writeData(internalPath, FileType.TXT);
                 } catch (IOException e) {
                     Files.deleteIfExists(copyPath);
                     throw e;
@@ -577,17 +558,7 @@ public class FileBasedDatasetServices implements DatasetServices {
                     GenotypeDataFormat genotypeDataFormat = (GenotypeDataFormat) readFromFile(
                         originalFormatPath);
 
-                    GenotypeData genotypeData;
-
-                    switch (genotypeDataFormat) {
-                        case BIPARENTAL:
-                            genotypeData = SimpleBiAllelicGenotypeData.readData(originalPath, fileType);
-                            break;
-                        default:
-                            genotypeData = SimpleGenotypeData.readData(originalPath, fileType,
-                                genotypeDataFormat);
-                            break;
-                    }
+                    FrequencyGenotypeData genotypeData = genotypeDataFormat.readData(originalPath, fileType);
 
                     return genotypeData;
                 case PHENOTYPIC:
@@ -630,7 +601,7 @@ public class FileBasedDatasetServices implements DatasetServices {
     }
 
     private void writeDatasets() throws DatasetException {
-        ArrayList<Dataset> datasets = new ArrayList<Dataset>(datasetMap.values());
+        ArrayList<Dataset> datasets = new ArrayList<>(datasetMap.values());
 
         try {
             writeToFile(Paths.get(getPath().toString(), DATASETS), datasets);
@@ -795,7 +766,7 @@ public class FileBasedDatasetServices implements DatasetServices {
 
     private CoreHunterData readCoreHunterDataInternal(String datasetId) throws IOException {
 
-        GenotypeData genotypicData = null;
+        FrequencyGenotypeData genotypicData = null;
         SimplePhenotypeData phenotypicData = null;
         SimpleDistanceMatrixData distance = null;
 
@@ -809,14 +780,7 @@ public class FileBasedDatasetServices implements DatasetServices {
 
             GenotypeDataFormat genotypeDataFormat = (GenotypeDataFormat) readFromFile(originalFormatPath);
 
-            switch (genotypeDataFormat) {
-                case BIPARENTAL:
-                    genotypicData = SimpleBiAllelicGenotypeData.readData(path, FileType.TXT);
-                    break;
-                default:
-                    genotypicData = SimpleGenotypeData.readData(path, FileType.TXT);
-                    break;
-            }
+            genotypicData = genotypeDataFormat.readData(path, FileType.TXT);
 
             dataPath = Paths.get(getPath().toString(), GENOTYPIC_PATH, datasetId + DATA_SUFFIX);
 

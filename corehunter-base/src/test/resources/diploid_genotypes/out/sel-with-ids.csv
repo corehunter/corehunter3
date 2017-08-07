@@ -1,0 +1,4 @@
+X,ID,NAME,mk1,mk1,mk2,mk2,mk3,mk3,mk4,mk4
+1,Dave,Dave,2,2,C,A,a1,a2,+,-
+3,Carol,Carol,2,3,B,B,a2,a1,+,-
+4,Eve,Eve,1,1,,,a1,a1,-,-

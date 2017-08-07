@@ -1,0 +1,6 @@
+X,ID,NAME,SELECTED,mk1,mk2,mk3,mk4
+0,Alice,Alice,false,1,B,a1,
+1,Dave,Dave,true,2,C,a1,+
+2,Bob,Bob,false,1,D,a2,+
+3,Carol,Carol,true,2,B,a2,+
+4,Eve,Eve,true,1,,a1,-

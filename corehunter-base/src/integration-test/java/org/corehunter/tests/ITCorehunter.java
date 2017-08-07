@@ -45,11 +45,10 @@ import org.corehunter.CoreHunterObjective;
 import org.corehunter.CoreHunterObjectiveType;
 import org.corehunter.data.CoreHunterData;
 import org.corehunter.data.DistanceMatrixData;
-import org.corehunter.data.GenotypeData;
 import org.corehunter.data.PhenotypeData;
 import org.corehunter.data.simple.SimpleBiAllelicGenotypeData;
 import org.corehunter.data.simple.SimpleDistanceMatrixData;
-import org.corehunter.data.simple.SimpleGenotypeData;
+import org.corehunter.data.simple.SimpleFrequencyGenotypeData;
 import org.corehunter.data.simple.SimplePhenotypeData;
 import org.corehunter.objectives.AverageAccessionToNearestEntry;
 import org.corehunter.objectives.AverageEntryToNearestEntry;
@@ -67,6 +66,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import uno.informatics.data.io.FileType;
+import org.corehunter.data.FrequencyGenotypeData;
 
 /**
  * @author Guy Davenport, Herman De Beukelaer
@@ -85,7 +85,7 @@ public class ITCorehunter {
         DistanceMatrixData distances = new SimpleDistanceMatrixData(HEADERS_UNIQUE_NAMES, DISTANCES);
         DISTANCES_DATA = new CoreHunterData(distances);
         
-        GenotypeData genotypes = new SimpleGenotypeData(
+        FrequencyGenotypeData genotypes = new SimpleFrequencyGenotypeData(
                 HEADERS_UNIQUE_NAMES, MARKER_NAMES, ALLELE_NAMES, ALLELE_FREQUENCIES
         );
         GENOTYPES_DATA = new CoreHunterData(genotypes);
@@ -208,7 +208,7 @@ public class ITCorehunter {
         
         System.out.println(" - 5 x sample n=2 from large genotype data with fixed seed (3 sec time limit) ");
         
-        GenotypeData geno = SimpleBiAllelicGenotypeData.readData(
+        FrequencyGenotypeData geno = SimpleBiAllelicGenotypeData.readData(
             Paths.get(ITCorehunter.class.getResource("/biallelic_genotypes/biallelic_genotypes_data.csv").getPath()),
             FileType.CSV
         );
@@ -244,7 +244,7 @@ public class ITCorehunter {
         
         System.out.println(" - 5 x sample n=2 from large genotype data with fixed seed (fast, 3 sec time limit) ");
         
-        GenotypeData geno = SimpleBiAllelicGenotypeData.readData(
+        FrequencyGenotypeData geno = SimpleBiAllelicGenotypeData.readData(
             Paths.get(ITCorehunter.class.getResource("/biallelic_genotypes/biallelic_genotypes_data.csv").getPath()),
             FileType.CSV
         );
@@ -282,7 +282,7 @@ public class ITCorehunter {
             " - 5 x sample n=2 from large genotype data with fixed seed (multi-obj, not normalized, 10 sec time limit)"
         );
         
-        GenotypeData geno = SimpleBiAllelicGenotypeData.readData(
+        FrequencyGenotypeData geno = SimpleBiAllelicGenotypeData.readData(
             Paths.get(ITCorehunter.class.getResource("/biallelic_genotypes/biallelic_genotypes_data.csv").getPath()),
             FileType.CSV
         );
@@ -327,7 +327,7 @@ public class ITCorehunter {
             " - 5 x sample n=2 from large genotype data with fixed seed (multi-obj, normalized, 10 sec time limit)"
         );
         
-        GenotypeData geno = SimpleBiAllelicGenotypeData.readData(
+        FrequencyGenotypeData geno = SimpleBiAllelicGenotypeData.readData(
             Paths.get(ITCorehunter.class.getResource("/biallelic_genotypes/biallelic_genotypes_data.csv").getPath()),
             FileType.CSV
         );

@@ -31,11 +31,10 @@ import java.util.stream.Collectors;
 
 import org.corehunter.data.CoreHunterData;
 import org.corehunter.data.DistanceMatrixData;
-import org.corehunter.data.GenotypeData;
 import org.corehunter.data.GenotypeDataFormat;
 import org.corehunter.data.simple.SimpleBiAllelicGenotypeData;
 import org.corehunter.data.simple.SimpleDistanceMatrixData;
-import org.corehunter.data.simple.SimpleGenotypeData;
+import org.corehunter.data.simple.SimpleFrequencyGenotypeData;
 import org.corehunter.data.simple.SimplePhenotypeData;
 import org.corehunter.listener.SimpleCoreHunterListener;
 import org.jamesframework.core.subset.SubsetSolution;
@@ -47,6 +46,8 @@ import uno.informatics.data.SimpleEntity;
 import uno.informatics.data.io.FileType;
 import uno.informatics.data.pojo.DataPojo;
 import uno.informatics.data.pojo.SimpleEntityPojo;
+import org.corehunter.data.FrequencyGenotypeData;
+import org.corehunter.data.simple.SimpleDefaultGenotypeData;
 
 /**
  * Simple API used by the R interface and as a utility class.
@@ -146,12 +147,12 @@ public class API {
     /* Genotype data */
     /* ------------- */
 
-    public static GenotypeData readGenotypeData(String file, String format) throws IOException {
-        return SimpleGenotypeData.readData(Paths.get(file), inferFileType(file),
-                GenotypeDataFormat.valueOf(format.toUpperCase()));
+    public static FrequencyGenotypeData readGenotypeData(String file, String format) throws IOException {
+        return GenotypeDataFormat.valueOf(format.toUpperCase())
+                                 .readData(Paths.get(file), inferFileType(file));
     }
     
-    public static GenotypeData createDefaultGenotypeData(String[][] data,
+    public static FrequencyGenotypeData createDefaultGenotypeData(String[][] data,
                                                          String[] ids, String[] names,
                                                          String[] columnNames){
         // check arguments
@@ -179,7 +180,7 @@ public class API {
             throw new IllegalArgumentException("Number of column names does not correspond to number of columns.");
         }
         // infer marker names and number of columns per marker
-        HashMap<String, Integer> markers = SimpleGenotypeData.inferMarkerNames(columnNames);
+        HashMap<String, Integer> markers = SimpleFrequencyGenotypeData.inferMarkerNames(columnNames);
         int numMarkers = markers.size();
         String[] markerNames = markers.keySet().toArray(new String[0]);
         Integer[] markerNumCols = markers.values().toArray(new Integer[0]);
@@ -199,10 +200,10 @@ public class API {
             }
         }
         // create and return data
-        return SimpleGenotypeData.createDefaultData(splitData, ids, names, markerNames);
+        return new SimpleDefaultGenotypeData(createHeaders(ids, names), markerNames, splitData);
     }
     
-    public static GenotypeData createBiparentalGenotypeData(int[][] alleleScores,
+    public static FrequencyGenotypeData createBiparentalGenotypeData(int[][] alleleScores,
                                                             String[] ids, String[] names,
                                                             String[] markerNames){
         // check arguments
@@ -230,7 +231,7 @@ public class API {
         return new SimpleBiAllelicGenotypeData(createHeaders(ids, names), markerNames, toIntegerMatrix(alleleScores));
     }
     
-    public static GenotypeData createFrequencyGenotypeData(double[][] frequencies,
+    public static FrequencyGenotypeData createFrequencyGenotypeData(double[][] frequencies,
                                                            String[] ids, String[] names,
                                                            String[] columnNames, String[] alleleNames){
         // check arguments
@@ -264,7 +265,7 @@ public class API {
             throw new IllegalArgumentException("Number of allele names does not correspond to number of columns.");
         }
         // infer marker names and allele counts from column names
-        HashMap<String, Integer> markers = SimpleGenotypeData.inferMarkerNames(columnNames);
+        HashMap<String, Integer> markers = SimpleFrequencyGenotypeData.inferMarkerNames(columnNames);
         int numMarkers = markers.size();
         String[] markerNames = markers.keySet().toArray(new String[0]);
         Integer[] alleleCounts = markers.values().toArray(new Integer[0]);
@@ -297,10 +298,10 @@ public class API {
                 convAlleles[m][a] = alleleNames[j++];
             }
         }
-        return new SimpleGenotypeData(createHeaders(ids, names), markerNames, convAlleles, convFreqs);
+        return new SimpleFrequencyGenotypeData(createHeaders(ids, names), markerNames, convAlleles, convFreqs);
     }
     
-    public static String[][] getAlleles(GenotypeData data){
+    public static String[][] getAlleles(FrequencyGenotypeData data){
         int numMarkers = data.getNumberOfMarkers();
         String[][] alleles = new String[numMarkers][];
         for (int m = 0; m < numMarkers; m++) {
@@ -313,7 +314,7 @@ public class API {
         return alleles;
     }
     
-    public static String[] getMarkerNames(GenotypeData data){
+    public static String[] getMarkerNames(FrequencyGenotypeData data){
         int numMarkers = data.getNumberOfMarkers();
         String[] markerNames = new String[numMarkers];
         for(int m = 0; m < numMarkers; m++){
@@ -322,7 +323,7 @@ public class API {
         return markerNames;
     }
     
-    public static double[][] getAlleleFrequencies(GenotypeData data){
+    public static double[][] getAlleleFrequencies(FrequencyGenotypeData data){
         int n = data.getSize();
         int m = data.getNumberOfMarkers();
         int numAlleles = data.getTotalNumberOfAlleles();

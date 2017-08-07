@@ -22,7 +22,6 @@ package org.corehunter.objectives;
 import java.util.Set;
 
 import org.corehunter.data.CoreHunterData;
-import org.corehunter.data.GenotypeData;
 import org.corehunter.exceptions.CoreHunterException;
 import org.corehunter.objectives.eval.HeterozygousLociEvaluation;
 import org.jamesframework.core.exceptions.IncompatibleDeltaEvaluationException;
@@ -31,6 +30,7 @@ import org.jamesframework.core.problems.objectives.evaluations.Evaluation;
 import org.jamesframework.core.search.neigh.Move;
 import org.jamesframework.core.subset.SubsetSolution;
 import org.jamesframework.core.subset.neigh.moves.SubsetMove;
+import org.corehunter.data.FrequencyGenotypeData;
 
 /**
  * Expected proportion of heterozygous loci in offspring.
@@ -42,7 +42,7 @@ public class HeterozygousLoci implements Objective<SubsetSolution, CoreHunterDat
     @Override
     public HeterozygousLociEvaluation evaluate(SubsetSolution solution, CoreHunterData data) {
         
-        GenotypeData geno = data.getGenotypicData();
+        FrequencyGenotypeData geno = data.getGenotypicData();
         
         if(geno == null){
             throw new CoreHunterException(
