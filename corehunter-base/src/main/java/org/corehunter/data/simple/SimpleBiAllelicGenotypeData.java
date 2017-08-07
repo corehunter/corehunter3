@@ -19,6 +19,8 @@
 
 package org.corehunter.data.simple;
 
+import static org.corehunter.util.CoreHunterConstants.MISSING_ALLELE_SCORE;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -47,42 +49,40 @@ import uno.informatics.data.pojo.SimpleEntityPojo;
 public class SimpleBiAllelicGenotypeData extends DataPojo implements BiAllelicGenotypeData {
 
     private static final long serialVersionUID = 1L;
+    
     private static final String ID_HEADER = "X";
     private static final String NAMES_HEADER = "NAME";
     private static final String IDENTIFIERS_HEADER = "ID";
     private static final String SELECTED_HEADER = "SELECTED";
-
     
-    private final Integer[][] alleleScores; // null element means missing value
+    private final byte[][] alleleScores; // null element means missing value
     private final String[] markerNames; // null element means no marker name assigned
 
     /**
      * Create data with name "Biallelic marker data". For details of the arguments see
-     * {@link #SimpleBiAllelicGenotypeData(String, SimpleEntity[], String[], Integer[][])}
+     * {@link #SimpleBiAllelicGenotypeData(String, SimpleEntity[], String[], byte[][])}
      * .
      * 
      * @param itemHeaders item headers (include name and/or unique identifier)
      * @param markerNames marker names
      * @param alleleScores 0/1/2 allele score matrix
      */
-    public SimpleBiAllelicGenotypeData(SimpleEntity[] itemHeaders, String[] markerNames, Integer[][] alleleScores) {
+    public SimpleBiAllelicGenotypeData(SimpleEntity[] itemHeaders, String[] markerNames, byte[][] alleleScores) {
         this("Biallelic marker data", itemHeaders, markerNames, alleleScores);
     }
 
     /**
-     * Create data with given dataset name, item headers, marker names and
-     * allele scores. The number of rows and columns of
-     * <code>alleleScores</code> indicates the number of items and markers,
-     * respectively. All entries in this matrix should be 0, 1 or 2 (or
-     * <code>null</code> for missing values).
+     * Create data with given dataset name, item headers, marker names and allele scores.
+     * The number of rows and columns of <code>alleleScores</code> indicates the number of
+     * items and markers, respectively. All entries in this matrix should be 0, 1 or 2 (or
+     * -1 for missing values).
      * <p>
      * Item headers are required but marker names are optional. If marker names
      * are given they need not be defined for all markers nor unique. Each item
      * should at least have a unique identifier (names are optional). The length
      * of <code>itemHeaders</code> and <code>markerNames</code> (if not
      * <code>null</code>) should be equal to the number of items and markers,
-     * respectively, as inferred from the dimensions of
-     * <code>alleleScores</code>.
+     * respectively, as inferred from the dimensions of <code>alleleScores</code>.
      * <p>
      * Violating any of the requirements will produce an exception.
      * <p>
@@ -102,12 +102,12 @@ public class SimpleBiAllelicGenotypeData extends DataPojo implements BiAllelicGe
      *            number of columns in <code>alleleScores</code>; can contain
      *            <code>null</code> values for markers whose name is undefined
      * @param alleleScores
-     *            allele scores, may not be <code>null</code> but can contain
-     *            <code>null</code> values (missing); dimensions indicate number
-     *            of items (rows) and markers (columns)
+     *            allele scores, may not be <code>null</code>; contains only values
+     *            0, 1 and 2, and possibly -1 in case of missing values; dimensions
+     *            indicate number of items (rows) and markers (columns)
      */
     public SimpleBiAllelicGenotypeData(String datasetName, SimpleEntity[] itemHeaders,
-                                       String[] markerNames, Integer[][] alleleScores) {
+                                       String[] markerNames, byte[][] alleleScores) {
 
         // pass dataset name and item headers to parent
         super(datasetName, itemHeaders);
@@ -119,7 +119,7 @@ public class SimpleBiAllelicGenotypeData extends DataPojo implements BiAllelicGe
             throw new IllegalArgumentException("No data (zero rows).");
         }
         for (int i = 0; i < n; i++) {
-            Integer[] geno = alleleScores[i];
+            byte[] geno = alleleScores[i];
             // check: genotype defined
             if (geno == null) {
                 throw new IllegalArgumentException(String.format("Allele scores not defined for item %d.", i));
@@ -136,7 +136,7 @@ public class SimpleBiAllelicGenotypeData extends DataPojo implements BiAllelicGe
             }
             // check values
             for (int j = 0; j < m; j++) {
-                if (geno[j] != null && (geno[j] < 0 || geno[j] > 2)) {
+                if (geno[j] != MISSING_ALLELE_SCORE && (geno[j] < 0 || geno[j] > 2)) {
                     throw new IllegalArgumentException(String.format(
                         "Unexpected value at data row %d and data column %d. Got: %d (allowed: 0, 1, 2).", i,
                         j, geno[j]));
@@ -145,7 +145,7 @@ public class SimpleBiAllelicGenotypeData extends DataPojo implements BiAllelicGe
         }
         
         // copy allele scores
-        this.alleleScores = new Integer[n][m];
+        this.alleleScores = new byte[n][m];
         for (int i = 0; i < n; i++) {
             this.alleleScores[i] = Arrays.copyOf(alleleScores[i], m);
         }
@@ -194,13 +194,10 @@ public class SimpleBiAllelicGenotypeData extends DataPojo implements BiAllelicGe
      * The dataset name is set to the name of the file to which
      * <code>filePath</code> points.
      * 
-     * @param filePath
-     *            path to file that contains the data
-     * @param type
-     *            {@link FileType#TXT} or {@link FileType#CSV}
+     * @param filePath path to file that contains the data
+     * @param type {@link FileType#TXT} or {@link FileType#CSV}
      * @return biallelic genotype data
-     * @throws IOException
-     *             if the file can not be read or is not correctly formatted
+     * @throws IOException if the file can not be read or is not correctly formatted
      */
     public static SimpleBiAllelicGenotypeData readData(Path filePath, FileType type) throws IOException {
 
@@ -291,7 +288,7 @@ public class SimpleBiAllelicGenotypeData extends DataPojo implements BiAllelicGe
 
             String[] itemNames = new String[n];
             String[] itemIdentifiers = new String[n];
-            Integer[][] alleleScores = new Integer[n][m];
+            byte[][] alleleScores = new byte[n][m];
             for (int i = 0; i < n; i++) {
 
                 String[] row = rows.get(numHeaderRows + i);
@@ -304,7 +301,7 @@ public class SimpleBiAllelicGenotypeData extends DataPojo implements BiAllelicGe
                 for (int j = 0; j < m; j++) {
                     String s = row[numHeaderCols + j];
                     try {
-                        alleleScores[i][j] = (s == null ? null : Integer.parseInt(s.trim()));
+                        alleleScores[i][j] = (s == null ? MISSING_ALLELE_SCORE : Byte.parseByte(s.trim()));
                     } catch (NumberFormatException ex) {
                         // wrap in IO exception
                         throw new IOException(String.format(
@@ -327,8 +324,10 @@ public class SimpleBiAllelicGenotypeData extends DataPojo implements BiAllelicGe
 
             try {
                 // create data
-                return new SimpleBiAllelicGenotypeData(filePath.getFileName().toString(), headers,
-                    markerNames, alleleScores);
+                return new SimpleBiAllelicGenotypeData(
+                        filePath.getFileName().toString(),
+                        headers, markerNames, alleleScores
+                );
             } catch (IllegalArgumentException ex) {
                 // convert to IO exception
                 throw new IOException(ex.getMessage());
@@ -368,17 +367,17 @@ public class SimpleBiAllelicGenotypeData extends DataPojo implements BiAllelicGe
     }
     
     @Override
-    public Integer getAlleleScore(int id, int markerIndex) {
+    public byte getAlleleScore(int id, int markerIndex) {
         return alleleScores[id][markerIndex];
     }
 
     @Override
     public Double getAlleleFrequency(int id, int markerIndex, int alleleIndex) {
-        Integer score = alleleScores[id][markerIndex];
+        byte score = alleleScores[id][markerIndex];
         if(alleleIndex < 0 || alleleIndex > 1){
             throw new ArrayIndexOutOfBoundsException(alleleIndex);
         }
-        if(score == null){
+        if(score == MISSING_ALLELE_SCORE){
             return null;
         } else {
             double f = score / 2.0;
@@ -388,7 +387,7 @@ public class SimpleBiAllelicGenotypeData extends DataPojo implements BiAllelicGe
 
     @Override
     public boolean hasMissingValues(int id, int markerIndex) {
-        return alleleScores[id][markerIndex] == null;
+        return alleleScores[id][markerIndex] == MISSING_ALLELE_SCORE;
     }
 
     @Override
@@ -506,7 +505,10 @@ public class SimpleBiAllelicGenotypeData extends DataPojo implements BiAllelicGe
                 }
                 
                 // write allele scores
-                writer.writeRowCellsAsArray(alleleScores[id]);
+                for (int j = 0; j < getSize(); j++) {
+                    writer.newColumn();
+                    writer.writeCell(alleleScores[id][j]);
+                }
                 
             }
 

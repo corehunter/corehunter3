@@ -19,6 +19,8 @@
 
 package org.corehunter.tests;
 
+import static org.corehunter.util.CoreHunterConstants.MISSING_ALLELE_SCORE;
+
 import java.util.Arrays;
 import java.util.Set;
 import java.util.TreeSet;
@@ -324,12 +326,12 @@ public class TestData {
         {"+", "-"}
     };
     
-    public static final Integer[][] ALLELE_SCORES_BIALLELIC = {
+    public static final byte[][] ALLELE_SCORES_BIALLELIC = {
         {1, 0, 2, 1, 1, 0, 0},
         {2, 0, 2, 0, 1, 2, 1},
-        {1, 0, null, 0, 1, 1, 0},
-        {1, 0, 1, 1, 1, 2, null},
-        {1, 0, null, 0, null, 2, 0}
+        {1, 0, MISSING_ALLELE_SCORE, 0, 1, 1, 0},
+        {1, 0, 1, 1, 1, 2, MISSING_ALLELE_SCORE},
+        {1, 0, MISSING_ALLELE_SCORE, 0, MISSING_ALLELE_SCORE, 2, 0}
     };
     
     public static final Double[][][] ALLELE_FREQUENCIES_BIALLELIC = {

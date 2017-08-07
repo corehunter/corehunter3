@@ -228,7 +228,7 @@ public class API {
             throw new IllegalArgumentException("Number of marker names does not correspond to number of columns.");
         }
         // create and return data
-        return new SimpleBiAllelicGenotypeData(createHeaders(ids, names), markerNames, toIntegerMatrix(alleleScores));
+        return new SimpleBiAllelicGenotypeData(createHeaders(ids, names), markerNames, toByteMatrix(alleleScores));
     }
     
     public static FrequencyGenotypeData createFrequencyGenotypeData(double[][] frequencies,
@@ -807,22 +807,23 @@ public class API {
     }
     
     /**
-     * Convert primitive to Integer matrix.
-     * All occurrences of {@link Integer#MIN_VALUE} are replaced with <code>null</code>,
-     * which is used by rJava to encode missing values (NAs in R).
+     * Convert positive integer to byte matrix.
+     * All occurrences of {@link Integer#MIN_VALUE},
+     * which is used by rJava to encode missing values (NAs in R),
+     * are replaced with -1.
      * 
-     * @param matrix primitive integer matrix
-     * @return Integer matrix
+     * @param matrix positive integer matrix
+     * @return byte matrix
      */
-    private static Integer[][] toIntegerMatrix(int[][] matrix){
-        Integer[][] conv = new Integer[matrix.length][];
-        for(int i = 0; i < conv.length; i++){
-            conv[i] = new Integer[matrix[i].length];
-            for(int j = 0; j < conv[i].length; j++){
-                conv[i][j] = (matrix[i][j] != Integer.MIN_VALUE ? matrix[i][j] : null);
+    private static byte[][] toByteMatrix(int[][] matrix){
+        byte[][] bytes = new byte[matrix.length][];
+        for(int i = 0; i < bytes.length; i++){
+            bytes[i] = new byte[matrix[i].length];
+            for(int j = 0; j < bytes[i].length; j++){
+                bytes[i][j] = (matrix[i][j] != Integer.MIN_VALUE ? (byte) matrix[i][j] : -1);
             }
         }
-        return conv;
+        return bytes;
     }
 
 }

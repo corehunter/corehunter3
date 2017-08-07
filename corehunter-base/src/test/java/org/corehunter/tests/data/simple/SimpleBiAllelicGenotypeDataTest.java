@@ -34,6 +34,8 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import static org.corehunter.util.CoreHunterConstants.MISSING_ALLELE_SCORE;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
@@ -463,7 +465,7 @@ public class SimpleBiAllelicGenotypeDataTest {
             // check scores and frequencies
             for (int m = 0; m < data.getNumberOfMarkers(); m++) {
                 for (int a = 0; a < data.getNumberOfAlleles(m); a++) {
-                    if(ALLELE_SCORES_BIALLELIC[i][m] == null){
+                    if(ALLELE_SCORES_BIALLELIC[i][m] == MISSING_ALLELE_SCORE){
                         assertNull("Allele score should be missing for marker " + m
                                  + " in individual " + i + ".",
                                 data.getAlleleScore(i, m));
