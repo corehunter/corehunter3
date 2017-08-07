@@ -48,6 +48,7 @@ import uno.informatics.data.pojo.DataPojo;
 import uno.informatics.data.pojo.SimpleEntityPojo;
 import org.corehunter.data.FrequencyGenotypeData;
 import org.corehunter.data.simple.SimpleDefaultGenotypeData;
+import org.corehunter.util.CoreHunterConstants;
 
 /**
  * Simple API used by the R interface and as a utility class.
@@ -810,7 +811,7 @@ public class API {
      * Convert positive integer to byte matrix.
      * All occurrences of {@link Integer#MIN_VALUE},
      * which is used by rJava to encode missing values (NAs in R),
-     * are replaced with -1.
+     * are replaced with {@link CoreHunterConstants#MISSING_ALLELE_SCORE}.
      * 
      * @param matrix positive integer matrix
      * @return byte matrix
@@ -820,7 +821,9 @@ public class API {
         for(int i = 0; i < bytes.length; i++){
             bytes[i] = new byte[matrix[i].length];
             for(int j = 0; j < bytes[i].length; j++){
-                bytes[i][j] = (matrix[i][j] != Integer.MIN_VALUE ? (byte) matrix[i][j] : -1);
+                bytes[i][j] = (matrix[i][j] == Integer.MIN_VALUE
+                               ? CoreHunterConstants.MISSING_ALLELE_SCORE
+                               : (byte) matrix[i][j]);
             }
         }
         return bytes;

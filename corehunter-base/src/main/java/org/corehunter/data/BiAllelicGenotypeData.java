@@ -33,12 +33,14 @@ public interface BiAllelicGenotypeData extends FrequencyGenotypeData {
      * Get the allele score of the marker for the given entry. The marker scores are encoded as 0, 1 or 2.
      * 0 is used for homozygote for one allele and 2 is used for homozygote for the other allele. 1 is used
      * to denote heterozygotes. It is not important which allele is encoded as 0 or 2, as long as it is consistent
-     * for a specific marker. If the allele score is missing this method returns -1.
+     * for a specific marker. If the allele score is missing this method returns
+     * {@link CoreHunterConstants#MISSING_ALLELE_SCORE}.
      *
      * @param id    the id of the entry, must be one of the IDs returned by {@link #getIDs()}
      * @param markerIndex the index of the marker within the range 0 to n-1, where n is the total number of markers and
      *                    is returned by {@link #getNumberOfMarkers()}
-     * @return the allele score of the marker for the given entry (0, 1 or 2); -1 if missing
+     * @return the allele score of the marker for the given entry (0, 1 or 2);
+     *         {@link CoreHunterConstants#MISSING_ALLELE_SCORE} if missing
      */
     public byte getAlleleScore(int id, int markerIndex);
     

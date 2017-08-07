@@ -34,8 +34,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-import static org.corehunter.util.CoreHunterConstants.MISSING_ALLELE_SCORE;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
@@ -46,6 +44,7 @@ import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
 import org.corehunter.data.simple.SimpleBiAllelicGenotypeData;
+import org.corehunter.util.CoreHunterConstants;
 import org.jamesframework.core.subset.SubsetSolution;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -465,13 +464,16 @@ public class SimpleBiAllelicGenotypeDataTest {
             // check scores and frequencies
             for (int m = 0; m < data.getNumberOfMarkers(); m++) {
                 for (int a = 0; a < data.getNumberOfAlleles(m); a++) {
-                    if(ALLELE_SCORES_BIALLELIC[i][m] == MISSING_ALLELE_SCORE){
-                        assertNull("Allele score should be missing for marker " + m
-                                 + " in individual " + i + ".",
-                                data.getAlleleScore(i, m));
-                        assertNull("Frequency should be missing for allele " + a
-                                 + " of marker " + m + " in individual " + i + ".",
-                                data.getAlleleFrequency(i, m, a));
+                    if(ALLELE_SCORES_BIALLELIC[i][m] == CoreHunterConstants.MISSING_ALLELE_SCORE){
+                        assertEquals(
+                            "Allele score should be missing for marker " + m + " in individual " + i + ".",
+                            CoreHunterConstants.MISSING_ALLELE_SCORE, data.getAlleleScore(i, m)
+                        );
+                        assertNull(
+                            "Frequency should be missing for allele " + a + " of marker " + m
+                            + " in individual " + i + ".",
+                            data.getAlleleFrequency(i, m, a)
+                        );
                     } else {
                         assertNotNull("Allele score should not be missing for marker " + m
                                     + " in individual " + i + ".",

@@ -31,6 +31,7 @@ import java.util.Objects;
 import java.util.Set;
 
 import org.corehunter.data.BiAllelicGenotypeData;
+import org.corehunter.util.CoreHunterConstants;
 import org.jamesframework.core.subset.SubsetSolution;
 
 import uno.informatics.common.io.IOUtilities;
@@ -75,7 +76,7 @@ public class SimpleBiAllelicGenotypeData extends DataPojo implements BiAllelicGe
      * Create data with given dataset name, item headers, marker names and allele scores.
      * The number of rows and columns of <code>alleleScores</code> indicates the number of
      * items and markers, respectively. All entries in this matrix should be 0, 1 or 2 (or
-     * -1 for missing values).
+     * {@link CoreHunterConstants#MISSING_ALLELE_SCORE} for missing values).
      * <p>
      * Item headers are required but marker names are optional. If marker names
      * are given they need not be defined for all markers nor unique. Each item
@@ -103,8 +104,9 @@ public class SimpleBiAllelicGenotypeData extends DataPojo implements BiAllelicGe
      *            <code>null</code> values for markers whose name is undefined
      * @param alleleScores
      *            allele scores, may not be <code>null</code>; contains only values
-     *            0, 1 and 2, and possibly -1 in case of missing values; dimensions
-     *            indicate number of items (rows) and markers (columns)
+     *            0, 1 and 2, and possibly {@link CoreHunterConstants#MISSING_ALLELE_SCORE}
+     *            in case of missing values; dimensions indicate number of items (rows) and
+     *            markers (columns)
      */
     public SimpleBiAllelicGenotypeData(String datasetName, SimpleEntity[] itemHeaders,
                                        String[] markerNames, byte[][] alleleScores) {
@@ -496,18 +498,18 @@ public class SimpleBiAllelicGenotypeData extends DataPojo implements BiAllelicGe
                 writer.writeCell(header.getUniqueIdentifier());
                 writer.newColumn();
                 writer.writeCell(header.getName());
-                writer.newColumn();
                 
                 // mark selection if needed
                 if (markSelection) {
-                    writer.writeCell(selected.contains(id));
                     writer.newColumn();
+                    writer.writeCell(selected.contains(id));
                 }
                 
                 // write allele scores
-                for (int j = 0; j < getSize(); j++) {
+                for (int a = 0; a < alleleScores[id].length; a++) {
                     writer.newColumn();
-                    writer.writeCell(alleleScores[id][j]);
+                    byte score = alleleScores[id][a];
+                    writer.writeCell(score == MISSING_ALLELE_SCORE ? null : score);
                 }
                 
             }

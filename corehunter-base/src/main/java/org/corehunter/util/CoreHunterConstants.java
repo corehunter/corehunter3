@@ -23,6 +23,6 @@ package org.corehunter.util;
  */
 public class CoreHunterConstants {
     
-    public static final byte MISSING_ALLELE_SCORE = -1;
+    public static final byte MISSING_ALLELE_SCORE = Byte.MIN_VALUE;
 
 }
