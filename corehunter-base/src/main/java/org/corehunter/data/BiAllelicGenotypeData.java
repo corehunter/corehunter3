@@ -19,6 +19,8 @@
 
 package org.corehunter.data;
 
+import org.corehunter.util.CoreHunterConstants;
+
 /**
  * Biallelic data contains the allele score (0/1/2) for markers that have two and only two alleles.
  * If any of the markers have three or more alleles, such as classic SSR data, then the general
