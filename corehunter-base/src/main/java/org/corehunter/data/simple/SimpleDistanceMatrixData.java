@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -273,6 +274,9 @@ public class SimpleDistanceMatrixData extends DataPojo implements DistanceMatrix
 
             // read matrix entries
             double[][] dist = new double[n][n];
+            for(double[] row : dist){
+                Arrays.fill(row, Double.NaN);
+            }
             for (int i = 0; i < n; i++) {
                 String[] row = rows.get(i + 1);
                 if (row.length - numHeaderCols < i) {
