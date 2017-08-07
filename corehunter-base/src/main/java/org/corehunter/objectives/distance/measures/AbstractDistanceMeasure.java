@@ -19,6 +19,7 @@
 
 package org.corehunter.objectives.distance.measures;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -32,7 +33,7 @@ import org.corehunter.objectives.distance.DistanceMeasure;
  */
 public abstract class AbstractDistanceMeasure implements DistanceMeasure {
     
-    private final Map<CoreHunterData, Double[][]> cache;
+    private final Map<CoreHunterData, double[][]> cache;
     private MissingValuesPolicy missingValuesPolicy;
     
     public AbstractDistanceMeasure() {
@@ -55,14 +56,20 @@ public abstract class AbstractDistanceMeasure implements DistanceMeasure {
      */
     @Override
     public double getDistance(int idX, int idY, CoreHunterData data){
-        Double[][] distances = cache.get(data);
-        if(distances != null && distances[idX][idY] != null){
+        double[][] distances = cache.get(data);
+        if(distances != null && !Double.isNaN(distances[idX][idY])){
             // return cached value
             return distances[idX][idY];
         } else {
             if(distances == null){
+                // allocate cache
                 int n = data.getSize();
-                distances = new Double[n][n];
+                distances = new double[n][n];
+                // set all values to missing (NaN)
+                for(double[] row : distances){
+                    Arrays.fill(row, Double.NaN);
+                }
+                // link cache to data
                 cache.put(data, distances);
             }
             // compute, store and return
