@@ -34,8 +34,8 @@ import static org.corehunter.tests.TestData.SET;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
 
 import java.io.IOException;
 import java.io.File;
@@ -721,13 +721,13 @@ public class SimpleDefaultGenotypeDataTest {
             for (int m = 0; m < data.getNumberOfMarkers(); m++) {
                 for (int a = 0; a < data.getNumberOfAlleles(m); a++) {
                     if(freqs[i][m][a] == null){
-                        assertNull("Frequency should be missing for allele " + a
-                                 + " of marker " + m + " in individual " + i + ".",
-                                data.getAlleleFrequency(i, m, a));
+                        assertTrue("Frequency should be missing for allele " + a
+                                   + " of marker " + m + " in individual " + i + ".",
+                                   Double.isNaN(data.getAlleleFrequency(i, m, a)));
                     } else {
-                        assertNotNull("Frequency should not be missing for allele " + a
+                        assertFalse("Frequency should not be missing for allele " + a
                                     + " of marker " + m + " in individual " + i + ".",
-                                   data.getAlleleFrequency(i, m, a));
+                                    Double.isNaN(data.getAlleleFrequency(i, m, a)));
                         assertEquals("Incorrect frequency for allele " + a
                                + " of marker " + m + " in individual " + i + ".",
                                freqs[i][m][a],

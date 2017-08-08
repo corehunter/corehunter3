@@ -90,9 +90,9 @@ public interface FrequencyGenotypeData extends Data {
      *                    returned by {@link #getNumberOfMarkers()}
      * @param alleleIndex allele index within the range 0 to a-1, where a is the number of alleles for the given marker
      *                    as returned by {@link #getNumberOfAlleles(int)}
-     * @return the relative allele frequency, <code>null</code> if missing
+     * @return the relative allele frequency, {@link Double#NaN} if missing
      */
-    public Double getAlleleFrequency(int id, int markerIndex, int alleleIndex);
+    public double getAlleleFrequency(int id, int markerIndex, int alleleIndex);
     
     /**
      * Indicates whether there are missing values (frequencies)

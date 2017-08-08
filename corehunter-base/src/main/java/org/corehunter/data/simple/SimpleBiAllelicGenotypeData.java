@@ -56,7 +56,7 @@ public class SimpleBiAllelicGenotypeData extends DataPojo implements BiAllelicGe
     private static final String IDENTIFIERS_HEADER = "ID";
     private static final String SELECTED_HEADER = "SELECTED";
     
-    private final byte[][] alleleScores; // null element means missing value
+    private final byte[][] alleleScores;
     private final String[] markerNames; // null element means no marker name assigned
 
     /**
@@ -374,13 +374,13 @@ public class SimpleBiAllelicGenotypeData extends DataPojo implements BiAllelicGe
     }
 
     @Override
-    public Double getAlleleFrequency(int id, int markerIndex, int alleleIndex) {
+    public double getAlleleFrequency(int id, int markerIndex, int alleleIndex) {
         byte score = alleleScores[id][markerIndex];
         if(alleleIndex < 0 || alleleIndex > 1){
             throw new ArrayIndexOutOfBoundsException(alleleIndex);
         }
         if(score == MISSING_ALLELE_SCORE){
-            return null;
+            return Double.NaN;
         } else {
             double f = score / 2.0;
             return alleleIndex == 1 ? f : 1.0 - f;

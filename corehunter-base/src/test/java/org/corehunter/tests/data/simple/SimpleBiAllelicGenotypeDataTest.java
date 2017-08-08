@@ -31,8 +31,8 @@ import static org.corehunter.tests.TestData.SET;
 import static org.corehunter.tests.TestData.UNDEFINED_MARKER_NAMES;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
 
 import java.io.File;
 import java.io.IOException;
@@ -469,18 +469,15 @@ public class SimpleBiAllelicGenotypeDataTest {
                             "Allele score should be missing for marker " + m + " in individual " + i + ".",
                             CoreHunterConstants.MISSING_ALLELE_SCORE, data.getAlleleScore(i, m)
                         );
-                        assertNull(
+                        assertTrue(
                             "Frequency should be missing for allele " + a + " of marker " + m
                             + " in individual " + i + ".",
-                            data.getAlleleFrequency(i, m, a)
+                            Double.isNaN(data.getAlleleFrequency(i, m, a))
                         );
                     } else {
-                        assertNotNull("Allele score should not be missing for marker " + m
-                                    + " in individual " + i + ".",
-                                   data.getAlleleScore(i, m));
-                        assertNotNull("Frequency should not be missing for allele " + a
+                        assertFalse("Frequency should not be missing for allele " + a
                                     + " of marker " + m + " in individual " + i + ".",
-                                   data.getAlleleFrequency(i, m, a));
+                                    Double.isNaN(data.getAlleleFrequency(i, m, a)));
                         assertEquals("Incorrect allele score for marker " + m
                                    + " in individual " + i + ".",
                                    ALLELE_SCORES_BIALLELIC[i][m],

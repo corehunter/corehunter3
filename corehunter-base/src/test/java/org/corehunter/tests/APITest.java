@@ -71,7 +71,7 @@ public class APITest {
     static {
         
         FrequencyGenotypeData genotypes = new SimpleFrequencyGenotypeData(
-                HEADERS_UNIQUE_NAMES, MARKER_NAMES, ALLELE_NAMES,ALLELE_FREQUENCIES
+                HEADERS_UNIQUE_NAMES, MARKER_NAMES, ALLELE_NAMES, ALLELE_FREQUENCIES
         );
         GENO_DATA = new CoreHunterData(genotypes);
         

@@ -126,8 +126,8 @@ public abstract class AllelicDiversityEvaluation implements Evaluation {
     }
     
     private double frequency(FrequencyGenotypeData data, int id, int m, int a){
-        Double freq = data.getAlleleFrequency(id, m, a);
-        return freq == null ? 0.0 : freq;
+        double freq = data.getAlleleFrequency(id, m, a);
+        return Double.isNaN(freq) ? 0.0 : freq;
     }
     
     private void resolveMissingValues(){

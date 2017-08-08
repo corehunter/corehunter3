@@ -59,14 +59,14 @@ public class SimpleFrequencyGenotypeData extends DataPojo implements FrequencyGe
     private static final String IDENTIFIERS_HEADER = "ID";
     private static final String SELECTED_HEADER = "SELECTED";
 
-    private final Double[][][] alleleFrequencies; // null element means missing value
+    private final double[][][] alleleFrequencies;
     private final String[] markerNames; // null element means no marker name assigned
     private final String[][] alleleNames; // null element means no allele name assigned
     private final int totalNumberAlleles;
 
     /**
      * Create data with name "Allele frequency data". For details of the arguments see
-     * {@link #SimpleFrequencyGenotypeData(String, SimpleEntity[], String[], String[][], Double[][][])}.
+     * {@link #SimpleFrequencyGenotypeData(String, SimpleEntity[], String[], String[][], double[][][])}.
      * 
      * @param itemHeaders item headers, specifying name and/or unique identifier
      * @param markerNames marker names
@@ -74,7 +74,7 @@ public class SimpleFrequencyGenotypeData extends DataPojo implements FrequencyGe
      * @param alleleFrequencies allele frequencies
      */
     public SimpleFrequencyGenotypeData(SimpleEntity[] itemHeaders, String[] markerNames,
-                                       String[][] alleleNames, Double[][][] alleleFrequencies) {
+                                       String[][] alleleNames, double[][][] alleleFrequencies) {
         this("Allele frequency data", itemHeaders, markerNames, alleleNames, alleleFrequencies);
     }
 
@@ -91,14 +91,14 @@ public class SimpleFrequencyGenotypeData extends DataPojo implements FrequencyGe
      * All frequencies should be positive and the values in
      * <code>alleleFrequencies[i][m]</code> should sum to one for all
      * <code>i</code> and <code>m</code>, with a precision of 0.01. Missing
-     * values are encoded as <code>null</code>. If one or more allele
-     * frequencies are missing at a certain marker for a certain individual, the
-     * remaining frequencies should sum to a value less than or equal to one.
+     * values are encoded with {@link Double#NaN}.
+     * If one or more allele frequencies are missing at a certain marker for a certain
+     * individual, the remaining frequencies should sum to a value less than or equal to one.
      * <p>
      * Item headers are required and marker/allele names are optional. If marker
      * and/or allele names are given they need not be defined for all
      * markers/alleles nor unique. Each item should at least have a unique
-     * identifier (names are optional). If not <code>null</code> the length of
+     * identifier (names are optional). If not <code>null</code>, the length of
      * each header/name array should correspond to the dimensions of
      * <code>alleleFrequencies</code> (number of individuals, markers and
      * alleles per marker).
@@ -128,13 +128,13 @@ public class SimpleFrequencyGenotypeData extends DataPojo implements FrequencyGe
      *            number of alleles of the m-th marker (can contain
      *            <code>null</code> values)
      * @param alleleFrequencies
-     *            allele frequencies, may not be <code>null</code> but can
-     *            contain <code>null</code> values (missing); dimensions
-     *            indicate number of individuals, markers and alleles per marker
+     *            allele frequencies, may not be <code>null</code>; missing values
+     *            are encoded with {@link Double#NaN}; dimensions indicate number
+     *            of individuals, markers and alleles per marker
      */
     public SimpleFrequencyGenotypeData(String datasetName, SimpleEntity[] itemHeaders,
                                        String[] markerNames, String[][] alleleNames,
-                                       Double[][][] alleleFrequencies) {
+                                       double[][][] alleleFrequencies) {
 
         // pass dataset name and item headers to parent
         super(datasetName, itemHeaders);
@@ -146,7 +146,7 @@ public class SimpleFrequencyGenotypeData extends DataPojo implements FrequencyGe
         int[] numberOfAllelesForMarker = null;
         // loop over individuals
         for (int i = 0; i < n; i++) {
-            Double[][] indFreqs = alleleFrequencies[i];
+            double[][] indFreqs = alleleFrequencies[i];
             if (indFreqs == null) {
                 throw new IllegalArgumentException("Allele frequencies not defined for individual " + i);
             }
@@ -159,33 +159,40 @@ public class SimpleFrequencyGenotypeData extends DataPojo implements FrequencyGe
             }
             // loop over markers
             for (int j = 0; j < m; j++) {
-                Double[] alleleFreqs = indFreqs[j];
+                double[] alleleFreqs = indFreqs[j];
+                // check that frequencies are defined
                 if (alleleFreqs == null) {
-                    throw new IllegalArgumentException(String
-                        .format("Allele frequencies not defined for individual %d at marker %d.", i, j));
+                    throw new IllegalArgumentException(
+                        String.format("Allele frequencies not defined for individual %d at marker %d.", i, j)
+                    );
                 }
+                // check or set number of alleles for current marker
                 if (numberOfAllelesForMarker[j] == -1) {
                     numberOfAllelesForMarker[j] = alleleFreqs.length;
                 } else if (alleleFreqs.length != numberOfAllelesForMarker[j]) {
                     throw new IllegalArgumentException(
-                        "Number of alleles per marker should be consistent across all individuals.");
+                        "Number of alleles per marker should be consistent across all individuals."
+                    );
                 }
-                // loop over alleles
-                if (Arrays.stream(alleleFreqs).filter(Objects::nonNull).anyMatch(f -> f < 0.0)) {
+                // check positive
+                if (Arrays.stream(alleleFreqs).anyMatch(f -> f < 0.0)) {
                     throw new IllegalArgumentException("All frequencies should be positive.");
                 }
-                double sum = Arrays.stream(alleleFreqs).filter(Objects::nonNull)
-                    .mapToDouble(Double::doubleValue).sum();
-                // sum should not exceed 1.0
+                // check sum <= one
+                double sum = Arrays.stream(alleleFreqs)
+                                   .filter(f -> !Double.isNaN(f))
+                                   .sum();
                 if (sum > 1.0 + SUM_TO_ONE_PRECISION) {
                     throw new IllegalArgumentException(
-                        "Allele frequency sum per marker should not exceed one.");
+                        "Allele frequency sum per marker should not exceed one."
+                    );
                 }
-                if (Arrays.stream(alleleFreqs).noneMatch(Objects::isNull)) {
-                    // no missing values: should sum to 1.0
+                // if no missing values: should sum to one
+                if (Arrays.stream(alleleFreqs).noneMatch(Double::isNaN)) {
                     if (1.0 - sum > SUM_TO_ONE_PRECISION) {
                         throw new IllegalArgumentException(
-                            "Allele frequencies for marker should sum to one.");
+                            "Allele frequencies for marker should sum to one."
+                        );
                     }
                     // normalize to avoid numerical imprecisions
                     for (int k = 0; k < alleleFreqs.length; k++) {
@@ -199,11 +206,10 @@ public class SimpleFrequencyGenotypeData extends DataPojo implements FrequencyGe
         totalNumberAlleles = Arrays.stream(numberOfAllelesForMarker).sum();
 
         // copy allele frequencies
-        this.alleleFrequencies = new Double[n][m][];
+        this.alleleFrequencies = new double[n][m][];
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < m; j++) {
-                this.alleleFrequencies[i][j] = Arrays.copyOf(alleleFrequencies[i][j],
-                    numberOfAllelesForMarker[j]);
+                this.alleleFrequencies[i][j] = Arrays.copyOf(alleleFrequencies[i][j], numberOfAllelesForMarker[j]);
             }
         }
 
@@ -213,8 +219,11 @@ public class SimpleFrequencyGenotypeData extends DataPojo implements FrequencyGe
         } else {
             if (markerNames.length != m) {
                 throw new IllegalArgumentException(
-                    String.format("Incorrect number of marker names provided. Expected: %d, actual: %d.", m,
-                        markerNames.length));
+                    String.format(
+                        "Incorrect number of marker names provided. Expected: %d, actual: %d.",
+                        m, markerNames.length
+                    )
+                );
             }
             this.markerNames = Arrays.copyOf(markerNames, m);
         }
@@ -228,8 +237,9 @@ public class SimpleFrequencyGenotypeData extends DataPojo implements FrequencyGe
         } else {
             if (alleleNames.length != m) {
                 throw new IllegalArgumentException(String.format(
-                    "Incorrect number of marker-allele names provided. Expected: %d, actual: %d.", m,
-                    alleleNames.length));
+                    "Incorrect number of marker-allele names provided. Expected: %d, actual: %d.",
+                    m, alleleNames.length
+                ));
             }
             for (int j = 0; j < m; j++) {
                 if (alleleNames[j] == null) {
@@ -237,7 +247,8 @@ public class SimpleFrequencyGenotypeData extends DataPojo implements FrequencyGe
                 } else if (alleleNames[j].length != numberOfAllelesForMarker[j]) {
                     throw new IllegalArgumentException(String.format(
                         "Incorrect number of allele names provided for marker %d. Expected: %d, actual: %d.",
-                        j, numberOfAllelesForMarker[j], alleleNames[j].length));
+                        j, numberOfAllelesForMarker[j], alleleNames[j].length
+                    ));
                 } else {
                     this.alleleNames[j] = Arrays.copyOf(alleleNames[j], numberOfAllelesForMarker[j]);
                 }
@@ -272,13 +283,13 @@ public class SimpleFrequencyGenotypeData extends DataPojo implements FrequencyGe
     }
 
     @Override
-    public Double getAlleleFrequency(int id, int markerIndex, int alleleIndex) {
+    public double getAlleleFrequency(int id, int markerIndex, int alleleIndex) {
         return alleleFrequencies[id][markerIndex][alleleIndex];
     }
 
     @Override
     public boolean hasMissingValues(int id, int markerIndex) {
-        return Arrays.stream(alleleFrequencies[id][markerIndex]).anyMatch(Objects::isNull);
+        return Arrays.stream(alleleFrequencies[id][markerIndex]).anyMatch(Double::isNaN);
     }
 
     /**
@@ -287,7 +298,7 @@ public class SimpleFrequencyGenotypeData extends DataPojo implements FrequencyGe
      * (txt) or comma (csv) character.
      * <p>
      * The file contains allele frequencies following the requirements as described in the constructor
-     * {@link #SimpleFrequencyGenotypeData(String, SimpleEntity[], String[], String[][], Double[][][])}.
+     * {@link #SimpleFrequencyGenotypeData(String, SimpleEntity[], String[], String[][], double[][][])}.
      * Missing frequencies are encoding as empty cells. The file starts with a
      * compulsory header row from which marker names and allele counts are
      * inferred. All columns corresponding to the same marker occur
@@ -340,7 +351,8 @@ public class SimpleFrequencyGenotypeData extends DataPojo implements FrequencyGe
 
         if (fileType != FileType.TXT && fileType != FileType.CSV) {
             throw new IllegalArgumentException(
-                String.format("Only file types TXT and CSV are supported. Got: %s.", fileType));
+                String.format("Only file types TXT and CSV are supported. Got: %s.", fileType)
+            );
         }
 
         // read data from file
@@ -401,7 +413,7 @@ public class SimpleFrequencyGenotypeData extends DataPojo implements FrequencyGe
             String[][] alleleNames = null;
             List<String> itemNames = new ArrayList<>();
             List<String> itemIdentifiers = new ArrayList<>();
-            List<Double[][]> alleleFreqs = new ArrayList<>();
+            List<double[][]> alleleFreqs = new ArrayList<>();
             int r = 1;
             while (reader.nextRow()) {
 
@@ -445,14 +457,14 @@ public class SimpleFrequencyGenotypeData extends DataPojo implements FrequencyGe
                     }
 
                     // group frequencies per marker
-                    Double[][] freqsPerMarker = new Double[numMarkers][];
+                    double[][] freqsPerMarker = new double[numMarkers][];
                     int fglob = numHeaderCols;
                     for (int m = 0; m < numMarkers; m++) {
-                        freqsPerMarker[m] = new Double[alleleCounts[m]];
+                        freqsPerMarker[m] = new double[alleleCounts[m]];
                         for (int f = 0; f < freqsPerMarker[m].length; f++) {
-                            Double freq;
+                            double freq;
                             try {
-                                freq = (row[fglob] == null ? null : Double.parseDouble(row[fglob]));
+                                freq = (row[fglob] == null ? Double.NaN : Double.parseDouble(row[fglob]));
                             } catch (NumberFormatException ex) {
                                 // wrap in IO exception
                                 throw new IOException(String.format(
@@ -493,7 +505,7 @@ public class SimpleFrequencyGenotypeData extends DataPojo implements FrequencyGe
             }
 
             // convert collections to arrays
-            Double[][][] alleleFreqsArray = alleleFreqs.stream().toArray(k -> new Double[k][][]);
+            double[][][] alleleFreqsArray = alleleFreqs.stream().toArray(k -> new double[k][][]);
 
             try {
                 // create data
@@ -700,9 +712,12 @@ public class SimpleFrequencyGenotypeData extends DataPojo implements FrequencyGe
                 }
                 
                 // write allele frequencies
-                for (int j = 0; j < alleleFrequencies[id].length; ++j) {
-                    writer.newColumn();
-                    writer.writeRowCellsAsArray(alleleFrequencies[id][j]);
+                for (int m = 0; m < alleleFrequencies[id].length; m++) {
+                    for(int a = 0; a < alleleFrequencies[id][m].length; a++){
+                        writer.newColumn();
+                        double freq = alleleFrequencies[id][m][a];
+                        writer.writeCell(Double.isNaN(freq) ? null : freq);
+                    }
                 }
 
             }

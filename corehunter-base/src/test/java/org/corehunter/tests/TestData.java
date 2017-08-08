@@ -112,13 +112,13 @@ public class TestData {
         "mk4"
     };
     
-    public static final Double[][][] ALLELE_FREQUENCIES = {
+    public static final double[][][] ALLELE_FREQUENCIES = {
         {
-            {null, null, null},
+            {Double.NaN, Double.NaN, Double.NaN},
             {0.5, 0.5},
             {0.0, 0.5, 0.5},
             {0.0, 0.0, 0.5, 0.5},
-            {null, null, null},
+            {Double.NaN, Double.NaN, Double.NaN},
             {0.0, 1.0},
             {1.0, 0.0}
         },
@@ -141,9 +141,9 @@ public class TestData {
             {1.0, 0.0}
         },
         {
-            {null, null, null},
+            {Double.NaN, Double.NaN, Double.NaN},
             {1.0, 0.0},
-            {null, null, null},
+            {Double.NaN, Double.NaN, Double.NaN},
             {0.0, 0.0, 1.0, 0.0},
             {0.3333333333, 0.3333333333, 0.3333333333},
             {0.0, 1.0},
@@ -156,7 +156,7 @@ public class TestData {
             {0.5, 0.0, 0.5, 0.0},
             {0.3333333333, 0.3333333333, 0.3333333333},
             {1.0, 0.0},
-            {null, null}
+            {Double.NaN, Double.NaN}
         }
     };
     

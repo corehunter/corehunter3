@@ -271,7 +271,7 @@ public class API {
         String[] markerNames = markers.keySet().toArray(new String[0]);
         Integer[] alleleCounts = markers.values().toArray(new Integer[0]);
         // split allele frequencies and names per marker
-        Double[][][] convFreqs = new Double[n][numMarkers][];
+        double[][][] convFreqs = new double[n][numMarkers][];
         for(int i = 0; i < n; i++){
             if(frequencies[i].length != c){
                 throw new IllegalArgumentException("Incorrect number of values at row " + i + ".");
@@ -279,14 +279,10 @@ public class API {
             int j = 0;
             for(int m = 0; m < numMarkers; m++){
                 int markerAlleleCount = alleleCounts[m];
-                convFreqs[i][m] = new Double[markerAlleleCount];
+                convFreqs[i][m] = new double[markerAlleleCount];
                 for(int a = 0; a < markerAlleleCount; a++){
-                    Double freq = frequencies[i][j++];
-                    // rJava encodes missing double values (NA in R) as NaN in Java
-                    if(Double.isNaN(freq)){
-                        freq = null;
-                    }
-                    convFreqs[i][m][a] = freq;
+                    // rJava already encodes missing double values (NA in R) as NaN in Java, same for Core Hunter
+                    convFreqs[i][m][a] = frequencies[i][j++];
                 }
             }
         }
