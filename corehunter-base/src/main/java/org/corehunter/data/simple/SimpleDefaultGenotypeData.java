@@ -55,7 +55,6 @@ public class SimpleDefaultGenotypeData extends SimpleFrequencyGenotypeData imple
 
     private static final String ID_HEADER = "X";
     private static final String NAMES_HEADER = "NAME";
-    private static final String ALLELE_NAMES_HEADER = "ALLELE";
     private static final String IDENTIFIERS_HEADER = "ID";
     private static final String SELECTED_HEADER = "SELECTED";
 
@@ -224,10 +223,10 @@ public class SimpleDefaultGenotypeData extends SimpleFrequencyGenotypeData imple
     }
     
     // infer allele frequencies
-    private static Double[][][] inferAlleleFrequencies(String[][][] observedAlleles, String[][] alleleNames){
+    private static double[][][] inferAlleleFrequencies(String[][][] observedAlleles, String[][] alleleNames){
         int n = observedAlleles.length;
         int numMarkers = observedAlleles[0].length;
-        Double[][][] alleleFreqs = new Double[n][numMarkers][];
+        double[][][] alleleFreqs = new double[n][numMarkers][];
         // infer freqs marker per marker
         for(int m = 0; m < numMarkers; m++){
             String[] markerAlleleNames = alleleNames[m];
@@ -240,11 +239,14 @@ public class SimpleDefaultGenotypeData extends SimpleFrequencyGenotypeData imple
             // infer freqs for each accession at the current marker
             for(int i = 0; i < n; i++){
                 String[] observed = observedAlleles[i][m];
-                Double[] freqs = new Double[numMarkerAlleles];
-                // check for missing values
+                double[] freqs = new double[numMarkerAlleles];
+                // prefill frequency array
                 if (Arrays.stream(observed).noneMatch(Objects::isNull)) {
                     // no missing values: fill with zero (no uncertainty)
                     Arrays.fill(freqs, 0.0);
+                } else {
+                    // missing values: fill with NaN
+                    Arrays.fill(freqs, Double.NaN);
                 }
                 // increase frequencies according to the observed alleles
                 double incr = 1.0 / observed.length;
@@ -257,8 +259,8 @@ public class SimpleDefaultGenotypeData extends SimpleFrequencyGenotypeData imple
         return alleleFreqs;
     }
     
-    private static void increaseFrequency(Double[] freqs, int a, double incr) {
-        freqs[a] = freqs[a] == null ? incr : freqs[a] + incr;
+    private static void increaseFrequency(double[] freqs, int a, double incr) {
+        freqs[a] = (Double.isNaN(freqs[a]) ? incr : freqs[a] + incr);
     }
     
     @Override

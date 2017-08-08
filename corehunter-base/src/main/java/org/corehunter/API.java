@@ -203,7 +203,7 @@ public class API {
         return new SimpleDefaultGenotypeData(createHeaders(ids, names), markerNames, splitData);
     }
     
-    public static FrequencyGenotypeData createBiparentalGenotypeData(int[][] alleleScores,
+    public static FrequencyGenotypeData createBiparentalGenotypeData(byte[][] alleleScores,
                                                             String[] ids, String[] names,
                                                             String[] markerNames){
         // check arguments
@@ -228,7 +228,7 @@ public class API {
             throw new IllegalArgumentException("Number of marker names does not correspond to number of columns.");
         }
         // create and return data
-        return new SimpleBiAllelicGenotypeData(createHeaders(ids, names), markerNames, toIntegerMatrix(alleleScores));
+        return new SimpleBiAllelicGenotypeData(createHeaders(ids, names), markerNames, alleleScores);
     }
     
     public static FrequencyGenotypeData createFrequencyGenotypeData(double[][] frequencies,
@@ -270,7 +270,7 @@ public class API {
         String[] markerNames = markers.keySet().toArray(new String[0]);
         Integer[] alleleCounts = markers.values().toArray(new Integer[0]);
         // split allele frequencies and names per marker
-        Double[][][] convFreqs = new Double[n][numMarkers][];
+        double[][][] convFreqs = new double[n][numMarkers][];
         for(int i = 0; i < n; i++){
             if(frequencies[i].length != c){
                 throw new IllegalArgumentException("Incorrect number of values at row " + i + ".");
@@ -278,14 +278,10 @@ public class API {
             int j = 0;
             for(int m = 0; m < numMarkers; m++){
                 int markerAlleleCount = alleleCounts[m];
-                convFreqs[i][m] = new Double[markerAlleleCount];
+                convFreqs[i][m] = new double[markerAlleleCount];
                 for(int a = 0; a < markerAlleleCount; a++){
-                    Double freq = frequencies[i][j++];
-                    // rJava encodes missing double values (NA in R) as NaN in Java
-                    if(Double.isNaN(freq)){
-                        freq = null;
-                    }
-                    convFreqs[i][m][a] = freq;
+                    // rJava already encodes missing double values (NA in R) as NaN in Java, same for Core Hunter
+                    convFreqs[i][m][a] = frequencies[i][j++];
                 }
             }
         }
@@ -334,7 +330,7 @@ public class API {
                 for(int k = 0; k < data.getNumberOfAlleles(j); k++){
                     Double freq = data.getAlleleFrequency(i, j, k);
                     // convert missing values
-                    freqs[i][a++] = (freq == null ? NA : freq);
+                    freqs[i][a++] = (Double.isNaN(freq) ? NA : freq);
                 }
             }
         }
@@ -804,25 +800,6 @@ public class API {
             }
         }
         return headers;
-    }
-    
-    /**
-     * Convert primitive to Integer matrix.
-     * All occurrences of {@link Integer#MIN_VALUE} are replaced with <code>null</code>,
-     * which is used by rJava to encode missing values (NAs in R).
-     * 
-     * @param matrix primitive integer matrix
-     * @return Integer matrix
-     */
-    private static Integer[][] toIntegerMatrix(int[][] matrix){
-        Integer[][] conv = new Integer[matrix.length][];
-        for(int i = 0; i < conv.length; i++){
-            conv[i] = new Integer[matrix[i].length];
-            for(int j = 0; j < conv[i].length; j++){
-                conv[i][j] = (matrix[i][j] != Integer.MIN_VALUE ? matrix[i][j] : null);
-            }
-        }
-        return conv;
     }
 
 }

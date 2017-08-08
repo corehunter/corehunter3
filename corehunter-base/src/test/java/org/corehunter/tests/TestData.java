@@ -22,6 +22,7 @@ package org.corehunter.tests;
 import java.util.Arrays;
 import java.util.Set;
 import java.util.TreeSet;
+import org.corehunter.util.CoreHunterConstants;
 
 import org.jamesframework.core.problems.objectives.evaluations.Evaluation;
 import org.jamesframework.core.problems.objectives.evaluations.SimpleEvaluation;
@@ -111,13 +112,13 @@ public class TestData {
         "mk4"
     };
     
-    public static final Double[][][] ALLELE_FREQUENCIES = {
+    public static final double[][][] ALLELE_FREQUENCIES = {
         {
-            {null, null, null},
+            {Double.NaN, Double.NaN, Double.NaN},
             {0.5, 0.5},
             {0.0, 0.5, 0.5},
             {0.0, 0.0, 0.5, 0.5},
-            {null, null, null},
+            {Double.NaN, Double.NaN, Double.NaN},
             {0.0, 1.0},
             {1.0, 0.0}
         },
@@ -140,9 +141,9 @@ public class TestData {
             {1.0, 0.0}
         },
         {
-            {null, null, null},
+            {Double.NaN, Double.NaN, Double.NaN},
             {1.0, 0.0},
-            {null, null, null},
+            {Double.NaN, Double.NaN, Double.NaN},
             {0.0, 0.0, 1.0, 0.0},
             {0.3333333333, 0.3333333333, 0.3333333333},
             {0.0, 1.0},
@@ -155,7 +156,7 @@ public class TestData {
             {0.5, 0.0, 0.5, 0.0},
             {0.3333333333, 0.3333333333, 0.3333333333},
             {1.0, 0.0},
-            {null, null}
+            {Double.NaN, Double.NaN}
         }
     };
     
@@ -324,12 +325,12 @@ public class TestData {
         {"+", "-"}
     };
     
-    public static final Integer[][] ALLELE_SCORES_BIALLELIC = {
+    public static final byte[][] ALLELE_SCORES_BIALLELIC = {
         {1, 0, 2, 1, 1, 0, 0},
         {2, 0, 2, 0, 1, 2, 1},
-        {1, 0, null, 0, 1, 1, 0},
-        {1, 0, 1, 1, 1, 2, null},
-        {1, 0, null, 0, null, 2, 0}
+        {1, 0, CoreHunterConstants.MISSING_ALLELE_SCORE, 0, 1, 1, 0},
+        {1, 0, 1, 1, 1, 2, CoreHunterConstants.MISSING_ALLELE_SCORE},
+        {1, 0, CoreHunterConstants.MISSING_ALLELE_SCORE, 0, CoreHunterConstants.MISSING_ALLELE_SCORE, 2, 0}
     };
     
     public static final Double[][][] ALLELE_FREQUENCIES_BIALLELIC = {
