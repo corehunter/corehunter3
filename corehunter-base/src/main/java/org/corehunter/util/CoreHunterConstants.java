@@ -23,6 +23,9 @@ package org.corehunter.util;
  */
 public class CoreHunterConstants {
     
+    /**
+     * Byte value used to indicate missing allele scores. Follows rJava convention.
+     */
     public static final byte MISSING_ALLELE_SCORE = Byte.MIN_VALUE;
 
 }

@@ -48,7 +48,6 @@ import uno.informatics.data.pojo.DataPojo;
 import uno.informatics.data.pojo.SimpleEntityPojo;
 import org.corehunter.data.FrequencyGenotypeData;
 import org.corehunter.data.simple.SimpleDefaultGenotypeData;
-import org.corehunter.util.CoreHunterConstants;
 
 /**
  * Simple API used by the R interface and as a utility class.
@@ -204,7 +203,7 @@ public class API {
         return new SimpleDefaultGenotypeData(createHeaders(ids, names), markerNames, splitData);
     }
     
-    public static FrequencyGenotypeData createBiparentalGenotypeData(int[][] alleleScores,
+    public static FrequencyGenotypeData createBiparentalGenotypeData(byte[][] alleleScores,
                                                             String[] ids, String[] names,
                                                             String[] markerNames){
         // check arguments
@@ -229,7 +228,7 @@ public class API {
             throw new IllegalArgumentException("Number of marker names does not correspond to number of columns.");
         }
         // create and return data
-        return new SimpleBiAllelicGenotypeData(createHeaders(ids, names), markerNames, toByteMatrix(alleleScores));
+        return new SimpleBiAllelicGenotypeData(createHeaders(ids, names), markerNames, alleleScores);
     }
     
     public static FrequencyGenotypeData createFrequencyGenotypeData(double[][] frequencies,
@@ -331,7 +330,7 @@ public class API {
                 for(int k = 0; k < data.getNumberOfAlleles(j); k++){
                     Double freq = data.getAlleleFrequency(i, j, k);
                     // convert missing values
-                    freqs[i][a++] = (freq == null ? NA : freq);
+                    freqs[i][a++] = (Double.isNaN(freq) ? NA : freq);
                 }
             }
         }
@@ -801,28 +800,6 @@ public class API {
             }
         }
         return headers;
-    }
-    
-    /**
-     * Convert positive integer to byte matrix.
-     * All occurrences of {@link Integer#MIN_VALUE},
-     * which is used by rJava to encode missing values (NAs in R),
-     * are replaced with {@link CoreHunterConstants#MISSING_ALLELE_SCORE}.
-     * 
-     * @param matrix positive integer matrix
-     * @return byte matrix
-     */
-    private static byte[][] toByteMatrix(int[][] matrix){
-        byte[][] bytes = new byte[matrix.length][];
-        for(int i = 0; i < bytes.length; i++){
-            bytes[i] = new byte[matrix[i].length];
-            for(int j = 0; j < bytes[i].length; j++){
-                bytes[i][j] = (matrix[i][j] == Integer.MIN_VALUE
-                               ? CoreHunterConstants.MISSING_ALLELE_SCORE
-                               : (byte) matrix[i][j]);
-            }
-        }
-        return bytes;
     }
 
 }
