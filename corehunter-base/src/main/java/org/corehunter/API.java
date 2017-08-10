@@ -418,6 +418,9 @@ public class API {
      *                                  stop conditions have been specified, the maximum time without
      *                                  improvement defaults to 10 seconds in default mode, or 2 seconds
      *                                  in fast mode.
+     * @param maxSteps Maximum number of search steps. Not used if set to a negative value.
+     * @param maxStepsWithoutImprovement Maximum number of search steps without finding an improvement.
+     *                                   Not used if set to a negative value.
      * @param seed Positive seed used for random generation to allow reproducible results.
      *             If zero or negative, no seed is applied.
      * @return Matrix containing normalization ranges.
@@ -425,24 +428,13 @@ public class API {
      */
     public static double[][] getNormalizationRanges(CoreHunterArguments args, String mode,
                                                     int timeLimit, int maxTimeWithoutImprovement,
+                                                    long maxSteps, long maxStepsWithoutImprovement,
                                                     long seed){
-        // interpret arguments
-        CoreHunterExecutionMode exMode = CoreHunterExecutionMode.DEFAULT;
-        if (mode.equals("fast")) {
-            exMode = CoreHunterExecutionMode.FAST;
-        }
-        // create Core Hunter executor
-        CoreHunter ch = new CoreHunter(exMode);
-        // set stop conditions
-        if(timeLimit > 0 || maxTimeWithoutImprovement > 0){
-            // convert to milliseconds
-            ch.setTimeLimit(1000 * timeLimit); 
-            ch.setMaxTimeWithoutImprovement(1000 * maxTimeWithoutImprovement);
-        }
-        // set seed
-        if(seed > 0){
-            ch.setSeed(seed);
-        }
+        // init Core Hunter
+        CoreHunter ch = initCoreHunter(args, mode,
+                                       timeLimit, maxTimeWithoutImprovement,
+                                       maxSteps, maxStepsWithoutImprovement,
+                                       seed);
         // determine ranges
         List<Range<Double>> rangeList = ch.normalize(args);
         // convert result
@@ -467,6 +459,9 @@ public class API {
      *                                  stop conditions have been specified, the maximum time without
      *                                  improvement defaults to 10 seconds in default mode, or 2 seconds
      *                                  in fast mode.
+     * @param maxSteps Maximum number of search steps. Not used if set to a negative value.
+     * @param maxStepsWithoutImprovement Maximum number of search steps without finding an improvement.
+     *                                   Not used if set to a negative value.
      * @param seed Positive seed used for random generation to allow reproducible results.
      *             If zero or negative, no seed is applied.
      * @param silent If <code>true</code> no output is written to the console.
@@ -474,24 +469,13 @@ public class API {
      */
     public static int[] sampleCore(CoreHunterArguments args, String mode,
                                    int timeLimit, int maxTimeWithoutImprovement,
+                                   long maxSteps, long maxStepsWithoutImprovement,
                                    long seed, boolean silent) {
-        // interpret arguments
-        CoreHunterExecutionMode exMode = CoreHunterExecutionMode.DEFAULT;
-        if (mode.equals("fast")) {
-            exMode = CoreHunterExecutionMode.FAST;
-        }
-        // create Core Hunter executor
-        CoreHunter ch = new CoreHunter(exMode);
-        // set stop conditions
-        if(timeLimit > 0 || maxTimeWithoutImprovement > 0){
-            // convert to milliseconds
-            ch.setTimeLimit(1000 * timeLimit); 
-            ch.setMaxTimeWithoutImprovement(1000 * maxTimeWithoutImprovement);
-        }
-        // set seed
-        if(seed > 0){
-            ch.setSeed(seed);
-        }
+        // init Core Hunter
+        CoreHunter ch = initCoreHunter(args, mode,
+                                       timeLimit, maxTimeWithoutImprovement,
+                                       maxSteps, maxStepsWithoutImprovement,
+                                       seed);
         // attach listener
         if (!silent) {
             ch.setListener(new SimpleCoreHunterListener());
@@ -505,6 +489,33 @@ public class API {
             ids[i++] = id;
         }
         return ids;
+    }
+    
+    private static CoreHunter initCoreHunter(CoreHunterArguments args, String mode,
+                                             int timeLimit, int maxTimeWithoutImprovement,
+                                             long maxSteps, long maxStepsWithoutImprovement,
+                                             long seed){
+        // interpret arguments
+        CoreHunterExecutionMode exMode = CoreHunterExecutionMode.DEFAULT;
+        if (mode.equals("fast")) {
+            exMode = CoreHunterExecutionMode.FAST;
+        }
+        // create Core Hunter executor
+        CoreHunter ch = new CoreHunter(exMode);
+        // set stop conditions (if any)
+        if(timeLimit > 0 || maxTimeWithoutImprovement > 0 || maxSteps > 0 || maxStepsWithoutImprovement > 0){
+            // convert time-based criteria to milliseconds
+            ch.setTimeLimit(1000 * timeLimit); 
+            ch.setMaxTimeWithoutImprovement(1000 * maxTimeWithoutImprovement);
+            // set step-based criteria
+            ch.setMaxSteps(maxSteps);
+            ch.setMaxStepsWithoutImprovement(maxStepsWithoutImprovement);
+        }
+        // set seed
+        if(seed > 0){
+            ch.setSeed(seed);
+        }
+        return ch;
     }
 
     /* ---------- */
