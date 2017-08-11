@@ -502,15 +502,11 @@ public class API {
         }
         // create Core Hunter executor
         CoreHunter ch = new CoreHunter(exMode);
-        // set stop conditions (if any)
-        if(timeLimit > 0 || maxTimeWithoutImprovement > 0 || maxSteps > 0 || maxStepsWithoutImprovement > 0){
-            // convert time-based criteria to milliseconds
-            ch.setTimeLimit(1000 * timeLimit); 
-            ch.setMaxTimeWithoutImprovement(1000 * maxTimeWithoutImprovement);
-            // set step-based criteria
-            ch.setMaxSteps(maxSteps);
-            ch.setMaxStepsWithoutImprovement(maxStepsWithoutImprovement);
-        }
+        // set stop conditions (convert time-based criteria to milliseconds)
+        ch.setTimeLimit(1000 * timeLimit); 
+        ch.setMaxTimeWithoutImprovement(1000 * maxTimeWithoutImprovement);
+        ch.setMaxSteps(maxSteps);
+        ch.setMaxStepsWithoutImprovement(maxStepsWithoutImprovement);
         // set seed
         if(seed > 0){
             ch.setSeed(seed);

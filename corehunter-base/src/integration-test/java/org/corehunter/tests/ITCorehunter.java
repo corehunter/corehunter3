@@ -129,7 +129,9 @@ public class ITCorehunter {
     @Test
     public void testMultiObjectiveConfiguration(){
         
-        System.out.println(" - multi-objective (default <= 10 sec without improvement)");
+        int imprTime = 1 * SECOND;
+        
+        System.out.format(" - multi-objective (<= %d sec without improvement)%n", imprTime);
 
         CoreHunterData data = DATA;
         
@@ -150,6 +152,7 @@ public class ITCorehunter {
         );
         CoreHunterArguments arguments = new CoreHunterArguments(data, size, chObjs);
         CoreHunter corehunter = new CoreHunter();
+        corehunter.setMaxTimeWithoutImprovement(imprTime);
         SubsetSolution result = corehunter.execute(arguments);
         
         // check: solution should be located on Pareto front
@@ -174,23 +177,28 @@ public class ITCorehunter {
     @Test
     public void testGenotypeDataWithSeed() {
         
-        System.out.println(" - 5 x sample from genotype data with fixed seed (1 sec time limit)");
+        int repeats = 10;
+        int size = 3;
+        int steps = 10;
+        
+        System.out.format(
+                " - %d x sample n=%d from genotype data with fixed seed (%d steps)%n",
+                repeats, size, steps
+        );
 
         CoreHunterData data = GENOTYPES_DATA;
         
-        int size = 3;
-        int time = 1 * SECOND;
         long seed = 42;
         
         Set<SubsetSolution> results = new HashSet<>();
-        for(int i = 0; i < 5; i++){
+        for(int i = 0; i < repeats; i++){
             // run Core Hunter
             CoreHunterArguments arguments = 
                     new CoreHunterArguments(data, size, 
                             CoreHunterObjectiveType.AV_ENTRY_TO_NEAREST_ENTRY, 
                             CoreHunterMeasure.MODIFIED_ROGERS);
             CoreHunter corehunter = new CoreHunter();
-            corehunter.setTimeLimit(time);
+            corehunter.setMaxSteps(steps);
             corehunter.setSeed(seed);
             SubsetSolution result = corehunter.execute(arguments);
             results.add(result);
@@ -206,27 +214,32 @@ public class ITCorehunter {
     @Test
     public void testLargeGenoWithSeed() throws IOException{
         
-        System.out.println(" - 5 x sample n=2 from large genotype data with fixed seed (3 sec time limit) ");
+        int repeats = 10;
+        int size = 2;
+        int steps = 10;
         
+        System.out.format(
+                " - %d x sample n=%d from large genotype data with fixed seed (%d steps)%n",
+                repeats, size, steps
+        );
+                
         FrequencyGenotypeData geno = SimpleBiAllelicGenotypeData.readData(
             Paths.get(ITCorehunter.class.getResource("/biallelic_genotypes/biallelic_genotypes_data.csv").getPath()),
             FileType.CSV
         );
         CoreHunterData data = new CoreHunterData(geno);
-        
-        int size = 2;
-        int time = 3 * SECOND;
+
         long seed = 42;
         
         Set<SubsetSolution> results = new HashSet<>();
-        for(int i = 0; i < 5; i++){
+        for(int i = 0; i < repeats; i++){
             // run Core Hunter
             CoreHunterArguments arguments = 
                     new CoreHunterArguments(data, size, 
                             CoreHunterObjectiveType.AV_ENTRY_TO_NEAREST_ENTRY, 
                             CoreHunterMeasure.MODIFIED_ROGERS);
             CoreHunter corehunter = new CoreHunter();
-            corehunter.setTimeLimit(time);
+            corehunter.setMaxSteps(steps);
             corehunter.setSeed(seed);
             SubsetSolution result = corehunter.execute(arguments);
             results.add(result);
@@ -242,27 +255,32 @@ public class ITCorehunter {
     @Test
     public void testLargeGenoWithSeedFastMode() throws IOException{
         
-        System.out.println(" - 5 x sample n=2 from large genotype data with fixed seed (fast, 3 sec time limit) ");
+        int repeats = 10;
+        int size = 2;
+        int steps = 5000;
         
+        System.out.format(
+                " - %d x sample n=%d from large genotype data with fixed seed (fast, %d steps)%n",
+                repeats, size, steps
+        );
+                
         FrequencyGenotypeData geno = SimpleBiAllelicGenotypeData.readData(
             Paths.get(ITCorehunter.class.getResource("/biallelic_genotypes/biallelic_genotypes_data.csv").getPath()),
             FileType.CSV
         );
         CoreHunterData data = new CoreHunterData(geno);
         
-        int size = 2;
-        int time = 3 * SECOND;
         long seed = 42;
         
         Set<SubsetSolution> results = new HashSet<>();
-        for(int i = 0; i < 5; i++){
+        for(int i = 0; i < repeats; i++){
             // run Core Hunter
             CoreHunterArguments arguments = 
                     new CoreHunterArguments(data, size, 
                             CoreHunterObjectiveType.AV_ENTRY_TO_NEAREST_ENTRY, 
                             CoreHunterMeasure.MODIFIED_ROGERS);
             CoreHunter corehunter = new CoreHunter(CoreHunterExecutionMode.FAST);
-            corehunter.setTimeLimit(time);
+            corehunter.setMaxSteps(steps);
             corehunter.setSeed(seed);
             SubsetSolution result = corehunter.execute(arguments);
             results.add(result);
@@ -278,8 +296,13 @@ public class ITCorehunter {
     @Test
     public void testLargeGenoMultiObjWithSeed() throws IOException{
         
-        System.out.println(
-            " - 5 x sample n=2 from large genotype data with fixed seed (multi-obj, not normalized, 10 sec time limit)"
+        int repeats = 5;
+        int size = 2;
+        int steps = 5;
+        
+        System.out.format(
+            " - %d x sample n=%d from large genotype data with fixed seed (multi-obj, not normalized, %d steps)%n",
+            repeats, size, steps
         );
         
         FrequencyGenotypeData geno = SimpleBiAllelicGenotypeData.readData(
@@ -288,12 +311,10 @@ public class ITCorehunter {
         );
         CoreHunterData data = new CoreHunterData(geno);
         
-        int size = 2;
-        int time = 10 * SECOND;
         long seed = 42;
         
         Set<SubsetSolution> results = new HashSet<>();
-        for(int i = 0; i < 5; i++){
+        for(int i = 0; i < repeats; i++){
             // run Core Hunter
             CoreHunterArguments arguments = 
                     new CoreHunterArguments(data, size, Arrays.asList(
@@ -307,7 +328,7 @@ public class ITCorehunter {
                         )
                     ), Collections.emptySet(), Collections.emptySet(), false); // disable normalization
             CoreHunter corehunter = new CoreHunter();
-            corehunter.setTimeLimit(time);
+            corehunter.setMaxSteps(steps);
             corehunter.setSeed(seed);
             SubsetSolution result = corehunter.execute(arguments);
             results.add(result);
@@ -323,8 +344,13 @@ public class ITCorehunter {
     @Test
     public void testLargeGenoMultiObjNormalizedWithSeed() throws IOException{
         
-        System.out.println(
-            " - 5 x sample n=2 from large genotype data with fixed seed (multi-obj, normalized, 10 sec time limit)"
+        int repeats = 5;
+        int size = 2;
+        int steps = 5;
+        
+        System.out.format(
+            " - %d x sample n=%d from large genotype data with fixed seed (multi-obj, normalized, %d steps)%n",
+            repeats, size, steps
         );
         
         FrequencyGenotypeData geno = SimpleBiAllelicGenotypeData.readData(
@@ -333,12 +359,10 @@ public class ITCorehunter {
         );
         CoreHunterData data = new CoreHunterData(geno);
         
-        int size = 2;
-        int time = 10 * SECOND;
         long seed = 42;
         
         Set<SubsetSolution> results = new HashSet<>();
-        for(int i = 0; i < 5; i++){
+        for(int i = 0; i < repeats; i++){
             // run Core Hunter
             CoreHunterArguments arguments = 
                     new CoreHunterArguments(data, size, Arrays.asList(
@@ -352,7 +376,7 @@ public class ITCorehunter {
                         )
                     )); // with normalization
             CoreHunter corehunter = new CoreHunter();
-            corehunter.setTimeLimit(time);
+            corehunter.setMaxSteps(steps);
             corehunter.setSeed(seed);
             SubsetSolution result = corehunter.execute(arguments);
             results.add(result);
@@ -367,7 +391,7 @@ public class ITCorehunter {
      */
     @Test
     public void testPhenotypeDataWithAlwaysSelectedIDs() {
-        
+                
         System.out.println(" - phenotype data with always selected ids");
 
         CoreHunterData data = PHENOTYPES_DATA;

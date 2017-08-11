@@ -108,8 +108,11 @@ public class CoreHunter {
      * and terminated when no improvement has been made for two seconds.
      * By default no absolute time limit, nor any step-based stop conditions,
      * are set in any of the two modes.
-     * Stop conditions can be altered with {@link #setMaxTimeWithoutImprovement(long)},
-     * {@link #setTimeLimit(long)}, {@link #setMaxSteps(long)} and {@link #setMaxStepsWithoutImprovement(long)}.
+     * Stop conditions can be altered with {@link #setTimeLimit(long)},
+     * {@link #setMaxTimeWithoutImprovement(long)}, {@link #setMaxSteps(long)}
+     * and {@link #setMaxStepsWithoutImprovement(long)}. As soon as one or more
+     * explicit stop conditions have been specified prior to execution, the default
+     * maximum time without improvement will not be applied.
      * <p>
      * In case of a multi-objective configuration with normalization enabled, a preliminary
      * random descent search is executed per objective to determine suitable normalization ranges
@@ -124,11 +127,6 @@ public class CoreHunter {
     public CoreHunter(CoreHunterExecutionMode mode) {
         // set execution mode
         this.mode = mode;
-        // set default stop conditions
-        maxTimeWithoutImprovement = DEFAULT_MAX_TIME_WITHOUT_IMPROVEMENT;
-        if(mode == CoreHunterExecutionMode.FAST){
-            maxTimeWithoutImprovement = FAST_MAX_TIME_WITHOUT_IMPROVEMENT;
-        }
         // set seed generator
         seedGenerator = new Random();
     }
@@ -278,7 +276,15 @@ public class CoreHunter {
      * @return maximum time without improvement
      */
     public long getMaxTimeWithoutImprovement(){
-        return maxTimeWithoutImprovement;
+        if(timeLimit < 0 && maxTimeWithoutImprovement < 0 && maxSteps < 0 && maxStepsWithoutImprovement < 0){
+            // no explicit stop conditions: use default
+            return mode == CoreHunterExecutionMode.DEFAULT
+                           ? DEFAULT_MAX_TIME_WITHOUT_IMPROVEMENT
+                           : FAST_MAX_TIME_WITHOUT_IMPROVEMENT;
+        } else {
+            // manually specified improvement time
+            return maxTimeWithoutImprovement;
+        }
     }
     
     /**
@@ -302,6 +308,7 @@ public class CoreHunter {
     
     /**
      * Sets the maximum number of search steps.
+     * A negative value means that no such stop condition is set.
      * 
      * @param steps search step limit
      */
@@ -311,6 +318,7 @@ public class CoreHunter {
     
     /**
      * Get the maximum allowed number of search steps without finding an improvement.
+     * A negative value means that no such stop condition is set.
      * 
      * @return maximum number of steps without improvement
      */
@@ -409,23 +417,22 @@ public class CoreHunter {
     }
 
     private Search<SubsetSolution> setStopCriteria(Search<SubsetSolution> search, boolean rescaleSteps){
-        if(timeLimit <= 0 && maxTimeWithoutImprovement <= 0 && maxSteps <= 0 && maxStepsWithoutImprovement <= 0){
-            throw new IllegalStateException(
-                "Please specify ate least one stop condition before execution."
+        if (getTimeLimit() > 0) {
+            search.addStopCriterion(new MaxRuntime(getTimeLimit(), TimeUnit.MILLISECONDS));
+        }
+        if (getMaxTimeWithoutImprovement() > 0){
+            search.addStopCriterion(
+                new MaxTimeWithoutImprovement(getMaxTimeWithoutImprovement(), TimeUnit.MILLISECONDS)
             );
         }
-        if (timeLimit > 0) {
-            search.addStopCriterion(new MaxRuntime(timeLimit, TimeUnit.MILLISECONDS));
-        }
-        if (maxTimeWithoutImprovement > 0){
-            search.addStopCriterion(new MaxTimeWithoutImprovement(maxTimeWithoutImprovement, TimeUnit.MILLISECONDS));
-        }
-        if(maxSteps > 0){
-            long steps = rescaleSteps ? maxSteps * PT_REPLICA_STEPS : maxSteps;
+        if(getMaxSteps() > 0){
+            long steps = rescaleSteps ? getMaxSteps() * PT_REPLICA_STEPS : getMaxSteps();
             search.addStopCriterion(new MaxSteps(steps));
         }
-        if(maxStepsWithoutImprovement > 0){
-            long steps = rescaleSteps ? maxStepsWithoutImprovement * PT_REPLICA_STEPS : maxStepsWithoutImprovement;
+        if(getMaxStepsWithoutImprovement() > 0){
+            long steps = rescaleSteps
+                         ? getMaxStepsWithoutImprovement() * PT_REPLICA_STEPS
+                         : getMaxStepsWithoutImprovement();
             search.addStopCriterion(new MaxStepsWithoutImprovement(steps));
         }
         return search;
