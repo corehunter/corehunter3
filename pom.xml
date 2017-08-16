@@ -332,7 +332,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>2.10.3</version>
+                <version>2.10.4</version>
                 <executions>
                     <execution>
                         <id>verify-javadoc</id>
@@ -422,7 +422,7 @@
                         <dependency>
                             <groupId>com.puppycrawl.tools</groupId>
                             <artifactId>checkstyle</artifactId>
-                            <version>6.14.1</version>
+                            <version>8.1</version>
                         </dependency>
                         <!-- include build tools containing module wide checkstyle rules -->
                         <dependency>

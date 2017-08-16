@@ -53,6 +53,8 @@ import org.jamesframework.core.search.algo.ParallelTempering;
 import org.jamesframework.core.search.algo.RandomDescent;
 import org.jamesframework.core.search.neigh.Neighbourhood;
 import org.jamesframework.core.search.stopcriteria.MaxRuntime;
+import org.jamesframework.core.search.stopcriteria.MaxSteps;
+import org.jamesframework.core.search.stopcriteria.MaxStepsWithoutImprovement;
 import org.jamesframework.core.search.stopcriteria.MaxTimeWithoutImprovement;
 import org.jamesframework.core.subset.SubsetProblem;
 import org.jamesframework.core.subset.SubsetSolution;
@@ -68,18 +70,29 @@ import org.jamesframework.ext.problems.objectives.WeightedIndex;
  */
 public class CoreHunter {
 
+    // defaults
     private static final int DEFAULT_MAX_TIME_WITHOUT_IMPROVEMENT = 10000;
     private static final int FAST_MAX_TIME_WITHOUT_IMPROVEMENT = 2000;
         
+    // parallel tempering settings
     private static final int PT_NUM_REPLICAS = 10;
+    private static final int PT_REPLICA_STEPS = 500;
     private static final double PT_MIN_TEMP = 1e-8;
     private static final double PT_MAX_TEMP = 1e-4;
     
-    private CoreHunterListener listener;
-    private long timeLimit = -1;
-    private long maxTimeWithoutImprovement = -1;
+    // execution mode
     private CoreHunterExecutionMode mode;
     
+    // search listener
+    private CoreHunterListener listener;
+
+    // stop conditions
+    private long timeLimit = -1;
+    private long maxTimeWithoutImprovement = -1;
+    private long maxSteps = -1;
+    private long maxStepsWithoutImprovement = -1;
+    
+    // random number generator used to seed other generators
     private final Random seedGenerator;
 
     public CoreHunter() {
@@ -89,32 +102,31 @@ public class CoreHunter {
     /**
      * Create Core Hunter facade with the specified mode.
      * <p>
-     * In {@link CoreHunterExecutionMode#DEFAULT} mode parallel tempering is applied
+     * In {@link CoreHunterExecutionMode#DEFAULT} mode, parallel tempering is applied
      * and terminated when no improvement has been made for ten seconds.
-     * In {@link CoreHunterExecutionMode#FAST} mode random descent is applied
+     * In {@link CoreHunterExecutionMode#FAST} mode, random descent is applied
      * and terminated when no improvement has been made for two seconds.
-     * By default no absolute time limit is set in any of the two modes.
-     * Stop conditions can be altered with {@link #setMaxTimeWithoutImprovement(long)}
-     * and {@link #setTimeLimit(long)}.
+     * By default no absolute time limit, nor any step-based stop conditions,
+     * are set in any of the two modes.
+     * Stop conditions can be altered with {@link #setTimeLimit(long)},
+     * {@link #setMaxTimeWithoutImprovement(long)}, {@link #setMaxSteps(long)}
+     * and {@link #setMaxStepsWithoutImprovement(long)}. As soon as one or more
+     * explicit stop conditions have been specified prior to execution, the default
+     * maximum time without improvement will not be applied.
      * <p>
      * In case of a multi-objective configuration with normalization enabled, a preliminary
-     * random descent search is performed per objective to determine suitable bounds based
-     * on the Pareto minima/maxima. If a time limit and/or maximum time without finding an
-     * improvement have been set, the same limit is applied to all normalization searches as
-     * well as the main multi-objective search. Normalization searches are executed in parallel
-     * which means that in case of a limited number of objectives the total execution time should
-     * usually not exceed twice the imposed search time limit.
+     * random descent search is executed per objective to determine suitable normalization ranges
+     * based on the Pareto minima/maxima. These normalization searches are executed in parallel, with
+     * the same stop conditions as used for the main search. In default mode however, any step-based
+     * stop conditions are rescaled for the random descent normalization searches, since then the main
+     * parallel tempering search executes 500 random descent steps within each replica, in a single step
+     * of the main search.
      * 
      * @param mode execution mode
      */
     public CoreHunter(CoreHunterExecutionMode mode) {
         // set execution mode
         this.mode = mode;
-        // set default stop conditions
-        maxTimeWithoutImprovement = DEFAULT_MAX_TIME_WITHOUT_IMPROVEMENT;
-        if(mode == CoreHunterExecutionMode.FAST){
-            maxTimeWithoutImprovement = FAST_MAX_TIME_WITHOUT_IMPROVEMENT;
-        }
         // set seed generator
         seedGenerator = new Random();
     }
@@ -122,7 +134,7 @@ public class CoreHunter {
     /**
      * Determine normalization ranges of all objectives in a multi-objective configuration, based on the
      * Pareto minima/maxima. Executes a random descent search per objective (in parallel).
-     * For a single-objective setting or when <code>normalize</code> is set to <code>false</code> in the
+     * For a single-objective setting, or when <code>normalize</code> is set to <code>false</code> in the
      * given <code>arguments</code>, an exception is thrown.
      * 
      * @param arguments Core Hunter arguments specifying dataset, core size and objectives
@@ -264,7 +276,15 @@ public class CoreHunter {
      * @return maximum time without improvement
      */
     public long getMaxTimeWithoutImprovement(){
-        return maxTimeWithoutImprovement;
+        if(timeLimit < 0 && maxTimeWithoutImprovement < 0 && maxSteps < 0 && maxStepsWithoutImprovement < 0){
+            // no explicit stop conditions: use default
+            return mode == CoreHunterExecutionMode.DEFAULT
+                           ? DEFAULT_MAX_TIME_WITHOUT_IMPROVEMENT
+                           : FAST_MAX_TIME_WITHOUT_IMPROVEMENT;
+        } else {
+            // manually specified improvement time
+            return maxTimeWithoutImprovement;
+        }
     }
     
     /**
@@ -275,6 +295,44 @@ public class CoreHunter {
      */
     public void setMaxTimeWithoutImprovement(long ms){
         maxTimeWithoutImprovement = ms;
+    }
+    
+    /**
+     * Get the maximum number of search steps.
+     * 
+     * @return search step limit
+     */
+    public long getMaxSteps(){
+        return maxSteps;
+    }
+    
+    /**
+     * Sets the maximum number of search steps.
+     * A negative value means that no such stop condition is set.
+     * 
+     * @param steps search step limit
+     */
+    public void setMaxSteps(long steps){
+        this.maxSteps = steps;
+    }
+    
+    /**
+     * Get the maximum allowed number of search steps without finding an improvement.
+     * A negative value means that no such stop condition is set.
+     * 
+     * @return maximum number of steps without improvement
+     */
+    public long getMaxStepsWithoutImprovement(){
+        return maxStepsWithoutImprovement;
+    }
+    
+    /**
+     * Sets the maximum allowed number of search steps without finding an improvement.
+     * 
+     * @param steps maximum number of steps without improvement
+     */
+    public void setMaxStepsWithoutImprovement(long steps){
+        this.maxStepsWithoutImprovement = steps;
     }
     
     public CoreHunterListener getListener(){
@@ -308,11 +366,15 @@ public class CoreHunter {
                                                        Objective<SubsetSolution, CoreHunterData> obj){
         LocalSearch<SubsetSolution> rd = new RandomDescent<>(createProblem(args, obj), createNeighbourhood(args));
         rd.setRandom(new Random(seedGenerator.nextLong()));
-        return setStopCriteria(rd);
+        return setStopCriteria(rd, mode == CoreHunterExecutionMode.DEFAULT);
     }
 
     private Search<SubsetSolution> createParallelTempering(CoreHunterArguments args,
                                                            Objective<SubsetSolution, CoreHunterData> obj){
+        // check running default mode
+        if(mode != CoreHunterExecutionMode.DEFAULT){
+            throw new CoreHunterException("Parallel tempering search should only be used in default mode.");
+        }
         ParallelTempering<SubsetSolution> pt = new ParallelTempering<>(
             createProblem(args, obj), createNeighbourhood(args),
             PT_NUM_REPLICAS, PT_MIN_TEMP, PT_MAX_TEMP,
@@ -323,8 +385,9 @@ public class CoreHunter {
                 return rep;
             }
         );
+        pt.setReplicaSteps(PT_REPLICA_STEPS);
         pt.setRandom(new Random(seedGenerator.nextLong()));
-        return setStopCriteria(pt);
+        return setStopCriteria(pt, false);
     }
 
     private SubsetProblem<CoreHunterData> createProblem(CoreHunterArguments args,
@@ -353,17 +416,24 @@ public class CoreHunter {
         return new SingleSwapNeighbourhood(fixed);
     }
 
-    private Search<SubsetSolution> setStopCriteria(Search<SubsetSolution> search){
-        if(timeLimit <= 0 && maxTimeWithoutImprovement <= 0){
-            throw new IllegalStateException(
-                    "Please specify time limit and/or maximum time without improvement before execution."
+    private Search<SubsetSolution> setStopCriteria(Search<SubsetSolution> search, boolean rescaleSteps){
+        if (getTimeLimit() > 0) {
+            search.addStopCriterion(new MaxRuntime(getTimeLimit(), TimeUnit.MILLISECONDS));
+        }
+        if (getMaxTimeWithoutImprovement() > 0){
+            search.addStopCriterion(
+                new MaxTimeWithoutImprovement(getMaxTimeWithoutImprovement(), TimeUnit.MILLISECONDS)
             );
         }
-        if (timeLimit > 0) {
-            search.addStopCriterion(new MaxRuntime(timeLimit, TimeUnit.MILLISECONDS));
+        if(getMaxSteps() > 0){
+            long steps = rescaleSteps ? getMaxSteps() * PT_REPLICA_STEPS : getMaxSteps();
+            search.addStopCriterion(new MaxSteps(steps));
         }
-        if (maxTimeWithoutImprovement > 0){
-            search.addStopCriterion(new MaxTimeWithoutImprovement(maxTimeWithoutImprovement, TimeUnit.MILLISECONDS));
+        if(getMaxStepsWithoutImprovement() > 0){
+            long steps = rescaleSteps
+                         ? getMaxStepsWithoutImprovement() * PT_REPLICA_STEPS
+                         : getMaxStepsWithoutImprovement();
+            search.addStopCriterion(new MaxStepsWithoutImprovement(steps));
         }
         return search;
     }
@@ -492,8 +562,7 @@ public class CoreHunter {
     }
     
     private List<Objective<SubsetSolution, CoreHunterData>> normalizeObjectives(
-            CoreHunterArguments arguments,
-            List<Objective<SubsetSolution, CoreHunterData>> objectives
+            CoreHunterArguments arguments, List<Objective<SubsetSolution, CoreHunterData>> objectives
     ){
         
         if(listener != null){
