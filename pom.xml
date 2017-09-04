@@ -30,7 +30,7 @@
     
     <scm>
         <connection>scm:git:git://github.com/corehunter/corehunter3.git</connection>
-        <developerConnection>scm:git:ssh://github.com:corehunter/corehunter3.git</developerConnection>
+        <developerConnection>scm:git:git@github.com:corehunter/corehunter3.git</developerConnection>
         <url>http://github.com/corehunter/corehunter3/tree/master</url>
     </scm>
 
