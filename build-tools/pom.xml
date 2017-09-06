@@ -9,19 +9,18 @@
     </parent>
 		
     <artifactId>build-tools</artifactId>
-    <version>3.2.1-SNAPSHOT</version>
     <name>Build Tools</name>
-		<packaging>jar</packaging>
-		
-		<build>
-			<pluginManagement>
-        <plugins>
-  	      <plugin>
-  	          <artifactId>maven-jar-plugin</artifactId>
-  	          <configuration combine.self="override" />
-  	      </plugin>
-        </plugins>
-			</pluginManagement>
+    <packaging>jar</packaging>
+    
+    <build>
+        <pluginManagement>
+            <plugins>
+                  <plugin>
+                      <artifactId>maven-jar-plugin</artifactId>
+                      <configuration combine.self="override" />
+                  </plugin>
+            </plugins>
+        </pluginManagement>
     </build>
     
 </project>
