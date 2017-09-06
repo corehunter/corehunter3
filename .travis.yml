@@ -13,7 +13,7 @@ env:
   - COMMAND="generate-test-sources javadoc:test-javadoc" # javadoc generation for test classes
 
 install:
-  - travis_retry mvn install -DskipTests -Dmaven.javadoc.skip -Dcheckstyle.skip -B -V
+  - travis_retry mvn clean install -DskipTests -Dmaven.javadoc.skip -Dcheckstyle.skip -B -V
 
 script:
   - mvn $COMMAND
