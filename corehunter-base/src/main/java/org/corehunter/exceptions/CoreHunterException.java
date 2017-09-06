@@ -24,9 +24,6 @@ package org.corehunter.exceptions;
  */
 public class CoreHunterException extends RuntimeException {
 
-    /**
-     * 
-     */
     private static final long serialVersionUID = 1L;
 
     public CoreHunterException() {

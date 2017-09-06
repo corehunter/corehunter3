@@ -30,13 +30,13 @@ import org.jamesframework.core.subset.SubsetSolution;
 
 import uno.informatics.common.io.IOUtilities;
 import uno.informatics.common.io.RowWriter;
-import uno.informatics.common.io.text.TextFileRowReader;
+import uno.informatics.common.io.text.TextFileRowWriter;
+import uno.informatics.data.DataOption;
 import uno.informatics.data.Feature;
 import uno.informatics.data.Scale;
 import uno.informatics.data.SimpleEntity;
 import uno.informatics.data.feature.array.ArrayFeatureData;
 import uno.informatics.data.io.FileType;
-import uno.informatics.data.utils.DataOption;
 
 /**
  * @author Guy Davenport, Herman De Beukelaer
@@ -150,7 +150,7 @@ public class SimplePhenotypeData extends ArrayFeatureData implements PhenotypeDa
         // write header row
         boolean markSelection = includeSelected && includeUnselected;
         try (RowWriter writer = IOUtilities.createRowWriter(
-                filePath, fileType, TextFileRowReader.REMOVE_WHITE_SPACE
+                filePath, fileType, TextFileRowWriter.ADD_QUOTES
         )) {
             
             // write internal integer id column header

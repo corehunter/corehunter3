@@ -27,26 +27,31 @@ import static org.corehunter.tests.TestData.MARKER_NAMES;
 import static org.corehunter.tests.TestData.NAME;
 import static org.corehunter.tests.TestData.PHENOTYPIC_TRAIT_FEATURES;
 import static org.corehunter.tests.TestData.PHENOTYPIC_TRAIT_VALUES_WITH_HEADERS;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+
+import java.io.IOException;
+import java.nio.file.Paths;
+import java.util.Collections;
 
 import org.corehunter.CoreHunter;
 import org.corehunter.CoreHunterArguments;
+import org.corehunter.CoreHunterExecutionMode;
 import org.corehunter.CoreHunterMeasure;
 import org.corehunter.CoreHunterObjective;
 import org.corehunter.CoreHunterObjectiveType;
 import org.corehunter.data.CoreHunterData;
 import org.corehunter.data.DistanceMatrixData;
-import org.corehunter.data.GenotypeData;
 import org.corehunter.data.PhenotypeData;
+import org.corehunter.data.simple.SimpleBiAllelicGenotypeData;
 import org.corehunter.data.simple.SimpleDistanceMatrixData;
-import org.corehunter.data.simple.SimpleGenotypeData;
+import org.corehunter.data.simple.SimpleFrequencyGenotypeData;
 import org.corehunter.data.simple.SimplePhenotypeData;
 import org.corehunter.objectives.AverageAccessionToNearestEntry;
-import org.corehunter.objectives.AverageEntryToEntry;
+import org.corehunter.objectives.AverageEntryToNearestEntry;
 import org.corehunter.objectives.HeterozygousLoci;
 import org.corehunter.objectives.distance.measures.GowerDistance;
 import org.corehunter.objectives.distance.measures.PrecomputedDistance;
@@ -56,7 +61,12 @@ import org.jamesframework.core.search.algo.exh.ExhaustiveSearch;
 import org.jamesframework.core.subset.SubsetProblem;
 import org.jamesframework.core.subset.SubsetSolution;
 import org.jamesframework.core.subset.algo.exh.SubsetSolutionIterator;
+
+import org.junit.Assert;
 import org.junit.Test;
+
+import uno.informatics.data.io.FileType;
+import org.corehunter.data.FrequencyGenotypeData;
 
 /**
  * @author Guy Davenport, Herman De Beukelaer
@@ -68,48 +78,60 @@ public class ITCorehunter {
     private static final CoreHunterData PHENOTYPES_DATA;
     private static final CoreHunterData DATA;
     
+    private static final int SECOND = 1000;
+    
     static {
+        
         DistanceMatrixData distances = new SimpleDistanceMatrixData(HEADERS_UNIQUE_NAMES, DISTANCES);
         DISTANCES_DATA = new CoreHunterData(distances);
-        GenotypeData genotypes = new SimpleGenotypeData(
+        
+        FrequencyGenotypeData genotypes = new SimpleFrequencyGenotypeData(
                 HEADERS_UNIQUE_NAMES, MARKER_NAMES, ALLELE_NAMES, ALLELE_FREQUENCIES
         );
         GENOTYPES_DATA = new CoreHunterData(genotypes);
+        
         PhenotypeData phenotypes = new SimplePhenotypeData(
                 NAME, PHENOTYPIC_TRAIT_FEATURES, PHENOTYPIC_TRAIT_VALUES_WITH_HEADERS
         );
         PHENOTYPES_DATA = new CoreHunterData(phenotypes);
+        
         DATA = new CoreHunterData(genotypes, phenotypes, distances);
     }   
     
-    /**
+    /*
      * Test execution with distance matrix.
      */
     @Test
     public void testExecuteDistanceMatrix() {
+        
+        System.out.println(" - sample from distance matrix (2 sec time limit)");
 
         CoreHunterData data = DISTANCES_DATA;
         
         int size = 2;
-        int time = 2;
-        Objective<SubsetSolution, CoreHunterData> obj = new AverageEntryToEntry(new PrecomputedDistance());
+        int time = 2 * SECOND;
 
         // run Core Hunter
         CoreHunterArguments arguments = 
                 new CoreHunterArguments(data, size, 
-                        CoreHunterObjectiveType.AV_ENTRY_TO_ENTRY, 
+                        CoreHunterObjectiveType.AV_ENTRY_TO_NEAREST_ENTRY, 
                         CoreHunterMeasure.PRECOMPUTED_DISTANCE);
         CoreHunter corehunter = new CoreHunter();
         corehunter.setTimeLimit(time);
         SubsetSolution result = corehunter.execute(arguments);
 
         // compare with optimal solution
-        assertEquals(getOptimalSolution(data, obj, size), result);
+        Objective<SubsetSolution, CoreHunterData> obj = new AverageEntryToNearestEntry(new PrecomputedDistance());
+        Assert.assertEquals(getOptimalSolution(data, obj, size), result);
 
     }
     
     @Test
     public void testMultiObjectiveConfiguration(){
+        
+        int imprTime = 1 * SECOND;
+        
+        System.out.format(" - multi-objective (<= %d sec without improvement)%n", imprTime);
 
         CoreHunterData data = DATA;
         
@@ -130,6 +152,7 @@ public class ITCorehunter {
         );
         CoreHunterArguments arguments = new CoreHunterArguments(data, size, chObjs);
         CoreHunter corehunter = new CoreHunter();
+        corehunter.setMaxTimeWithoutImprovement(imprTime);
         SubsetSolution result = corehunter.execute(arguments);
         
         // check: solution should be located on Pareto front
@@ -141,11 +164,384 @@ public class ITCorehunter {
         double aneMin = ane.evaluate(aneOpt, data).getValue();
         double aneMax = ane.evaluate(heOpt, data).getValue();
         
-        assertTrue(heValue <= heMax);
-        assertTrue(heValue >= heMin);
-        assertTrue(aneValue <= aneMax);
-        assertTrue(aneValue >= aneMin);
+        Assert.assertTrue(heValue <= heMax);
+        Assert.assertTrue(heValue >= heMin);
+        Assert.assertTrue(aneValue <= aneMax);
+        Assert.assertTrue(aneValue >= aneMin);
         
+    }
+    
+    /*
+     * Test execution with genotype data and fixed seed.
+     */
+    @Test
+    public void testGenotypeDataWithSeed() {
+        
+        int repeats = 10;
+        int size = 3;
+        int steps = 10;
+        
+        System.out.format(
+                " - %d x sample n=%d from genotype data with fixed seed (%d steps)%n",
+                repeats, size, steps
+        );
+
+        CoreHunterData data = GENOTYPES_DATA;
+        
+        long seed = 42;
+        
+        Set<SubsetSolution> results = new HashSet<>();
+        for(int i = 0; i < repeats; i++){
+            // run Core Hunter
+            CoreHunterArguments arguments = 
+                    new CoreHunterArguments(data, size, 
+                            CoreHunterObjectiveType.AV_ENTRY_TO_NEAREST_ENTRY, 
+                            CoreHunterMeasure.MODIFIED_ROGERS);
+            CoreHunter corehunter = new CoreHunter();
+            corehunter.setMaxSteps(steps);
+            corehunter.setSeed(seed);
+            SubsetSolution result = corehunter.execute(arguments);
+            results.add(result);
+        }
+        
+        Assert.assertEquals(1, results.size());
+
+    }
+    
+    /*
+     * Test execution with large genotype data and fixed seed.
+     */
+    @Test
+    public void testLargeGenoWithSeed() throws IOException{
+        
+        int repeats = 10;
+        int size = 2;
+        int steps = 10;
+        
+        System.out.format(
+                " - %d x sample n=%d from large genotype data with fixed seed (%d steps)%n",
+                repeats, size, steps
+        );
+                
+        FrequencyGenotypeData geno = SimpleBiAllelicGenotypeData.readData(
+            Paths.get(ITCorehunter.class.getResource("/biallelic_genotypes/biallelic_genotypes_data.csv").getPath()),
+            FileType.CSV
+        );
+        CoreHunterData data = new CoreHunterData(geno);
+
+        long seed = 42;
+        
+        Set<SubsetSolution> results = new HashSet<>();
+        for(int i = 0; i < repeats; i++){
+            // run Core Hunter
+            CoreHunterArguments arguments = 
+                    new CoreHunterArguments(data, size, 
+                            CoreHunterObjectiveType.AV_ENTRY_TO_NEAREST_ENTRY, 
+                            CoreHunterMeasure.MODIFIED_ROGERS);
+            CoreHunter corehunter = new CoreHunter();
+            corehunter.setMaxSteps(steps);
+            corehunter.setSeed(seed);
+            SubsetSolution result = corehunter.execute(arguments);
+            results.add(result);
+        }
+        
+        Assert.assertEquals(1, results.size());
+        
+    }
+    
+    /*
+     * Test execution with large genotype data and fixed seed, in fast mode.
+     */
+    @Test
+    public void testLargeGenoWithSeedFastMode() throws IOException{
+        
+        int repeats = 10;
+        int size = 2;
+        int steps = 5000;
+        
+        System.out.format(
+                " - %d x sample n=%d from large genotype data with fixed seed (fast, %d steps)%n",
+                repeats, size, steps
+        );
+                
+        FrequencyGenotypeData geno = SimpleBiAllelicGenotypeData.readData(
+            Paths.get(ITCorehunter.class.getResource("/biallelic_genotypes/biallelic_genotypes_data.csv").getPath()),
+            FileType.CSV
+        );
+        CoreHunterData data = new CoreHunterData(geno);
+        
+        long seed = 42;
+        
+        Set<SubsetSolution> results = new HashSet<>();
+        for(int i = 0; i < repeats; i++){
+            // run Core Hunter
+            CoreHunterArguments arguments = 
+                    new CoreHunterArguments(data, size, 
+                            CoreHunterObjectiveType.AV_ENTRY_TO_NEAREST_ENTRY, 
+                            CoreHunterMeasure.MODIFIED_ROGERS);
+            CoreHunter corehunter = new CoreHunter(CoreHunterExecutionMode.FAST);
+            corehunter.setMaxSteps(steps);
+            corehunter.setSeed(seed);
+            SubsetSolution result = corehunter.execute(arguments);
+            results.add(result);
+        }
+        
+        Assert.assertEquals(1, results.size());
+        
+    }
+    
+    /*
+     * Test execution with large genotype data, multiple objectives (not normalized), and fixed seed.
+     */
+    @Test
+    public void testLargeGenoMultiObjWithSeed() throws IOException{
+        
+        int repeats = 5;
+        int size = 2;
+        int steps = 5;
+        
+        System.out.format(
+            " - %d x sample n=%d from large genotype data with fixed seed (multi-obj, not normalized, %d steps)%n",
+            repeats, size, steps
+        );
+        
+        FrequencyGenotypeData geno = SimpleBiAllelicGenotypeData.readData(
+            Paths.get(ITCorehunter.class.getResource("/biallelic_genotypes/biallelic_genotypes_data.csv").getPath()),
+            FileType.CSV
+        );
+        CoreHunterData data = new CoreHunterData(geno);
+        
+        long seed = 42;
+        
+        Set<SubsetSolution> results = new HashSet<>();
+        for(int i = 0; i < repeats; i++){
+            // run Core Hunter
+            CoreHunterArguments arguments = 
+                    new CoreHunterArguments(data, size, Arrays.asList(
+                        new CoreHunterObjective(
+                                CoreHunterObjectiveType.AV_ENTRY_TO_NEAREST_ENTRY,
+                                CoreHunterMeasure.MODIFIED_ROGERS
+                        ),
+                        new CoreHunterObjective(
+                                CoreHunterObjectiveType.AV_ACCESSION_TO_NEAREST_ENTRY,
+                                CoreHunterMeasure.CAVALLI_SFORZA_EDWARDS
+                        )
+                    ), Collections.emptySet(), Collections.emptySet(), false); // disable normalization
+            CoreHunter corehunter = new CoreHunter();
+            corehunter.setMaxSteps(steps);
+            corehunter.setSeed(seed);
+            SubsetSolution result = corehunter.execute(arguments);
+            results.add(result);
+        }
+        
+        Assert.assertEquals(1, results.size());
+        
+    }
+    
+    /*
+     * Test execution with large genotype data, multiple objectives (normalized), and fixed seed.
+     */
+    @Test
+    public void testLargeGenoMultiObjNormalizedWithSeed() throws IOException{
+        
+        int repeats = 5;
+        int size = 2;
+        int steps = 5;
+        
+        System.out.format(
+            " - %d x sample n=%d from large genotype data with fixed seed (multi-obj, normalized, %d steps)%n",
+            repeats, size, steps
+        );
+        
+        FrequencyGenotypeData geno = SimpleBiAllelicGenotypeData.readData(
+            Paths.get(ITCorehunter.class.getResource("/biallelic_genotypes/biallelic_genotypes_data.csv").getPath()),
+            FileType.CSV
+        );
+        CoreHunterData data = new CoreHunterData(geno);
+        
+        long seed = 42;
+        
+        Set<SubsetSolution> results = new HashSet<>();
+        for(int i = 0; i < repeats; i++){
+            // run Core Hunter
+            CoreHunterArguments arguments = 
+                    new CoreHunterArguments(data, size, Arrays.asList(
+                        new CoreHunterObjective(
+                                CoreHunterObjectiveType.AV_ENTRY_TO_NEAREST_ENTRY,
+                                CoreHunterMeasure.MODIFIED_ROGERS
+                        ),
+                        new CoreHunterObjective(
+                                CoreHunterObjectiveType.AV_ACCESSION_TO_NEAREST_ENTRY,
+                                CoreHunterMeasure.CAVALLI_SFORZA_EDWARDS
+                        )
+                    )); // with normalization
+            CoreHunter corehunter = new CoreHunter();
+            corehunter.setMaxSteps(steps);
+            corehunter.setSeed(seed);
+            SubsetSolution result = corehunter.execute(arguments);
+            results.add(result);
+        }
+        
+        Assert.assertEquals(1, results.size());
+        
+    }
+    
+    /*
+     * Test execution with phenotype data and always selected IDs.
+     */
+    @Test
+    public void testPhenotypeDataWithAlwaysSelectedIDs() {
+                
+        System.out.println(" - phenotype data with always selected ids");
+
+        CoreHunterData data = PHENOTYPES_DATA;
+        
+        int size = 3;
+        int time = 1 * SECOND;
+        
+        Set<Integer> always = new HashSet<>(Arrays.asList(0, 3));
+        
+        List<CoreHunterObjective> obj = Arrays.asList(
+            new CoreHunterObjective(
+                CoreHunterObjectiveType.AV_ENTRY_TO_NEAREST_ENTRY, CoreHunterMeasure.GOWERS
+            )
+        );
+        CoreHunterArguments arguments = new CoreHunterArguments(data, size, obj, always);
+        CoreHunter corehunter = new CoreHunter();
+        corehunter.setTimeLimit(time);
+        SubsetSolution result = corehunter.execute(arguments);
+        
+        Assert.assertTrue(result.getSelectedIDs().contains(0));
+        Assert.assertTrue(result.getSelectedIDs().contains(3));
+
+    }
+    
+    /*
+     * Test execution with phenotype data and always selected IDs (fast mode).
+     */
+    @Test
+    public void testPhenotypeDataWithAlwaysSelectedIDsFastMode() {
+        
+        System.out.println(" - phenotype data with always selected ids (fast mode)");
+
+        CoreHunterData data = PHENOTYPES_DATA;
+        
+        int size = 3;
+        int time = 1 * SECOND;
+        
+        Set<Integer> always = new HashSet<>(Arrays.asList(0, 3));
+        
+        List<CoreHunterObjective> obj = Arrays.asList(
+            new CoreHunterObjective(
+                CoreHunterObjectiveType.AV_ENTRY_TO_NEAREST_ENTRY, CoreHunterMeasure.GOWERS
+            )
+        );
+        CoreHunterArguments arguments = new CoreHunterArguments(data, size, obj, always);
+        CoreHunter corehunter = new CoreHunter(CoreHunterExecutionMode.FAST);
+        corehunter.setTimeLimit(time);
+        SubsetSolution result = corehunter.execute(arguments);
+        
+        Assert.assertTrue(result.getSelectedIDs().contains(0));
+        Assert.assertTrue(result.getSelectedIDs().contains(3));
+
+    }
+    
+    /*
+     * Test execution with phenotype data and always selected IDs (multi-objective).
+     */
+    @Test
+    public void testPhenotypeDataWithAlwaysSelectedIDsMultiObj() {
+        
+        System.out.println(" - phenotype data with always selected ids (multi-objective)");
+
+        CoreHunterData data = PHENOTYPES_DATA;
+        
+        int size = 3;
+        int time = 1 * SECOND;
+        
+        Set<Integer> always = new HashSet<>(Arrays.asList(0, 3));
+        
+        List<CoreHunterObjective> obj = Arrays.asList(
+            new CoreHunterObjective(
+                CoreHunterObjectiveType.AV_ENTRY_TO_NEAREST_ENTRY, CoreHunterMeasure.GOWERS
+            ),
+            new CoreHunterObjective(
+                CoreHunterObjectiveType.AV_ACCESSION_TO_NEAREST_ENTRY, CoreHunterMeasure.GOWERS
+            )
+        );
+        CoreHunterArguments arguments = new CoreHunterArguments(data, size, obj, always);
+        CoreHunter corehunter = new CoreHunter();
+        corehunter.setTimeLimit(time);
+        SubsetSolution result = corehunter.execute(arguments);
+        
+        Assert.assertTrue(result.getSelectedIDs().contains(0));
+        Assert.assertTrue(result.getSelectedIDs().contains(3));
+
+    }
+
+    /*
+     * Test execution with phenotype data and always and never selected IDs.
+     */
+    @Test
+    public void testPhenotypeDataWithAlwaysAndNeverSelectedIDs() {
+        
+        System.out.println(" - phenotype data with always and never selected ids");
+
+        CoreHunterData data = PHENOTYPES_DATA;
+        
+        int size = 3;
+        int time = 1 * SECOND;
+        
+        Set<Integer> always = new HashSet<>(Arrays.asList(0, 3));
+        Set<Integer> never = new HashSet<>(Arrays.asList(1));
+        
+        List<CoreHunterObjective> obj = Arrays.asList(
+            new CoreHunterObjective(
+                CoreHunterObjectiveType.AV_ENTRY_TO_NEAREST_ENTRY, CoreHunterMeasure.GOWERS
+            )
+        );
+        CoreHunterArguments arguments = new CoreHunterArguments(data, size, obj, always, never);
+        CoreHunter corehunter = new CoreHunter();
+        corehunter.setTimeLimit(time);
+        SubsetSolution result = corehunter.execute(arguments);
+        
+        Assert.assertTrue(result.getSelectedIDs().contains(0));
+        Assert.assertTrue(result.getSelectedIDs().contains(3));
+        Assert.assertFalse(result.getSelectedIDs().contains(1));
+
+    }
+    
+    /*
+     * Test execution with phenotype data and always and never selected IDs (2).
+     */
+    @Test
+    public void testPhenotypeDataWithAlwaysAndNeverSelectedIDs2() {
+        
+        System.out.println(" - phenotype data with always and never selected ids (2)");
+
+        CoreHunterData data = PHENOTYPES_DATA;
+        
+        int size = 3;
+        int time = 1 * SECOND;
+        
+        Set<Integer> always = new HashSet<>(Arrays.asList(0, 3));
+        Set<Integer> never = new HashSet<>(Arrays.asList(1, 2));
+        
+        List<CoreHunterObjective> obj = Arrays.asList(
+            new CoreHunterObjective(
+                CoreHunterObjectiveType.AV_ENTRY_TO_NEAREST_ENTRY, CoreHunterMeasure.GOWERS
+            )
+        );
+        CoreHunterArguments arguments = new CoreHunterArguments(data, size, obj, always, never);
+        CoreHunter corehunter = new CoreHunter();
+        corehunter.setTimeLimit(time);
+        SubsetSolution result = corehunter.execute(arguments);
+        
+        Assert.assertEquals(
+                new HashSet<>(Arrays.asList(0, 3, 4)),
+                result.getSelectedIDs()
+        );
+
     }
     
     // get best solution through exhaustive search

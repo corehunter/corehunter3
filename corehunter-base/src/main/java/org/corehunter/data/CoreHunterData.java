@@ -46,7 +46,7 @@ public class CoreHunterData extends DataPojo implements IntegerIdentifiedData {
      */
     private static final long serialVersionUID = 1L;
     private static final List<CoreHunterMeasure> NO_MEASURES = new LinkedList<>() ;
-    private final GenotypeData genotypicData; 
+    private final FrequencyGenotypeData genotypicData; 
     private final FeatureData phenotypicData;
     private final DistanceMatrixData distancesData;
     private final List<CoreHunterObjectiveType> validObjectiveTypes;
@@ -71,7 +71,7 @@ public class CoreHunterData extends DataPojo implements IntegerIdentifiedData {
      * @param distancesData
      *            precomputed distance matrix
      */
-    public CoreHunterData(GenotypeData genotypicData,
+    public CoreHunterData(FrequencyGenotypeData genotypicData,
                           FeatureData phenotypicData, 
                           DistanceMatrixData distancesData) {
         super("Core Hunter data", mergeHeaders(genotypicData, phenotypicData, distancesData));
@@ -117,7 +117,7 @@ public class CoreHunterData extends DataPojo implements IntegerIdentifiedData {
      * @param genotypicData
      *            genotypic data (bi- or multiallelic)
      */
-    public CoreHunterData(GenotypeData genotypicData){
+    public CoreHunterData(FrequencyGenotypeData genotypicData){
         this(genotypicData, null, null);
     }
 
@@ -147,7 +147,7 @@ public class CoreHunterData extends DataPojo implements IntegerIdentifiedData {
         this(null, null, distancesData);
     }
 
-    public GenotypeData getGenotypicData() {
+    public FrequencyGenotypeData getGenotypicData() {
         return genotypicData;
     }
 
@@ -171,7 +171,7 @@ public class CoreHunterData extends DataPojo implements IntegerIdentifiedData {
         return distancesData != null;
     }
 
-    private static int inferSize(GenotypeData genotypicData,
+    private static int inferSize(FrequencyGenotypeData genotypicData,
             FeatureData phenotypicData, DistanceMatrixData distancesData){
         
         // check not all undefined
@@ -201,7 +201,7 @@ public class CoreHunterData extends DataPojo implements IntegerIdentifiedData {
     }
 
     // assumes that sizes have already been checked
-    private static SimpleEntity[] mergeHeaders(GenotypeData genotypicData,
+    private static SimpleEntity[] mergeHeaders(FrequencyGenotypeData genotypicData,
             FeatureData phenotypicData, DistanceMatrixData distancesData){
         
         int size = inferSize(genotypicData, phenotypicData, distancesData) ;

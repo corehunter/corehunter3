@@ -30,7 +30,6 @@ import java.nio.file.Paths;
 import org.corehunter.CoreHunterObjectiveType;
 import org.corehunter.data.CoreHunterData;
 import org.corehunter.data.DistanceMatrixData;
-import org.corehunter.data.GenotypeData;
 import org.corehunter.data.PhenotypeData;
 import org.corehunter.data.simple.SimpleBiAllelicGenotypeData;
 import org.corehunter.data.simple.SimpleDistanceMatrixData;
@@ -42,6 +41,7 @@ import org.junit.Test;
 
 import uno.informatics.data.SimpleEntity;
 import uno.informatics.data.io.FileType;
+import org.corehunter.data.FrequencyGenotypeData;
 
 
 /**
@@ -107,7 +107,7 @@ public class CoreHunterDataTest {
         
         DistanceMatrixData dist = readDistanceMatrixData(DISTANCES_UNIQUE_NAMES);
         PhenotypeData pheno = readPhenotypicTraitData(PHENOTYPES_UNIQUE_NAMES);
-        GenotypeData geno = readMarkerData(MARKERS_NON_UNIQUE_NAMES);
+        FrequencyGenotypeData geno = readMarkerData(MARKERS_NON_UNIQUE_NAMES);
                 
         CoreHunterData data = new CoreHunterData(geno, pheno, dist);      
     }
@@ -119,7 +119,7 @@ public class CoreHunterDataTest {
         
         DistanceMatrixData dist = readDistanceMatrixData(DISTANCES_UNIQUE_NAMES);
         PhenotypeData pheno = null;
-        GenotypeData geno = readMarkerData(MARKERS_NON_UNIQUE_NAMES);
+        FrequencyGenotypeData geno = readMarkerData(MARKERS_NON_UNIQUE_NAMES);
                 
         CoreHunterData data = new CoreHunterData(geno, pheno, dist);
         
@@ -132,7 +132,7 @@ public class CoreHunterDataTest {
         
         DistanceMatrixData dist = readDistanceMatrixData(DISTANCES_UNIQUE_NAMES);
         PhenotypeData pheno = readPhenotypicTraitData(PHENOTYPES_UNIQUE_NAMES);
-        GenotypeData geno = readMarkerData(MARKERS_NON_UNIQUE_NAMES);
+        FrequencyGenotypeData geno = readMarkerData(MARKERS_NON_UNIQUE_NAMES);
                 
         CoreHunterData data = new CoreHunterData(geno, pheno, dist);
         
@@ -145,7 +145,7 @@ public class CoreHunterDataTest {
         
         DistanceMatrixData dist = readDistanceMatrixData(DISTANCES_SMALL);
         PhenotypeData pheno = readPhenotypicTraitData(PHENOTYPES_UNIQUE_NAMES);
-        GenotypeData geno = readMarkerData(MARKERS_NON_UNIQUE_NAMES);
+        FrequencyGenotypeData geno = readMarkerData(MARKERS_NON_UNIQUE_NAMES);
                 
         CoreHunterData data = new CoreHunterData(geno, pheno, dist);
         
@@ -158,7 +158,7 @@ public class CoreHunterDataTest {
         
         DistanceMatrixData dist = readDistanceMatrixData(DISTANCES_NON_UNIQUE_NAMES);
         PhenotypeData pheno = readPhenotypicTraitData(PHENOTYPES_SAME_IDS_DIFFERENT_NAMES);
-        GenotypeData geno = readMarkerData(MARKERS_NON_UNIQUE_NAMES);
+        FrequencyGenotypeData geno = readMarkerData(MARKERS_NON_UNIQUE_NAMES);
                 
         CoreHunterData data = new CoreHunterData(geno, pheno, dist);
         
@@ -171,7 +171,7 @@ public class CoreHunterDataTest {
         
         DistanceMatrixData dist = readDistanceMatrixData(DISTANCES_UNIQUE_NAMES);
         PhenotypeData pheno = readPhenotypicTraitData(PHENOTYPES_UNIQUE_NAMES);
-        GenotypeData geno = readMarkerData(MARKERS_UNIQUE_NAMES);
+        FrequencyGenotypeData geno = readMarkerData(MARKERS_UNIQUE_NAMES);
         
         expectedHeaders = TestData.HEADERS_UNIQUE_NAMES;
         
@@ -207,7 +207,7 @@ public class CoreHunterDataTest {
         
         DistanceMatrixData dist = readDistanceMatrixData(DISTANCES_NON_UNIQUE_NAMES);
         PhenotypeData pheno = readPhenotypicTraitData(PHENOTYPES_NON_UNIQUE_NAMES);
-        GenotypeData geno = readMarkerData(MARKERS_IDS_SOME_NAMES);
+        FrequencyGenotypeData geno = readMarkerData(MARKERS_NON_UNIQUE_NAMES);
         
         expectedHeaders = TestData.HEADERS_NON_UNIQUE_NAMES;
         
@@ -274,7 +274,7 @@ public class CoreHunterDataTest {
         
         System.out.println(" |- Test with markers only");
         
-        GenotypeData markers = readMarkerData(MARKERS_UNIQUE_NAMES);
+        FrequencyGenotypeData markers = readMarkerData(MARKERS_UNIQUE_NAMES);
         expectedHeaders = TestData.HEADERS_UNIQUE_NAMES;
         
         CoreHunterData data = new CoreHunterData(markers);
@@ -349,7 +349,7 @@ public class CoreHunterDataTest {
         );
     }
     
-    private GenotypeData readMarkerData(String file) throws IOException{
+    private FrequencyGenotypeData readMarkerData(String file) throws IOException{
         return SimpleBiAllelicGenotypeData.readData(
             Paths.get(CoreHunterDataTest.class.getResource(file).getPath()),
             inferFileType(file)

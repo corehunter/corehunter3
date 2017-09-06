@@ -4,7 +4,7 @@
 
     <groupId>org.corehunter</groupId>
     <artifactId>corehunter</artifactId>
-    <version>3.1.0</version>
+    <version>3.2.0</version>
     <packaging>pom</packaging>
 
     <name>Core Hunter parent project</name>
@@ -30,14 +30,15 @@
     
     <scm>
         <connection>scm:git:git://github.com/corehunter/corehunter3.git</connection>
-        <developerConnection>scm:git:ssh://github.com:corehunter/corehunter3.git</developerConnection>
+        <developerConnection>scm:git:git@github.com:corehunter/corehunter3.git</developerConnection>
         <url>http://github.com/corehunter/corehunter3/tree/master</url>
-    </scm>
+      <tag>HEAD</tag>
+  </scm>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <informatics-common.version>1.3.0</informatics-common.version>
+        <informatics-common.version>1.5.0</informatics-common.version>
     </properties>
 
     <distributionManagement>
@@ -80,12 +81,12 @@
             <dependency>
                 <groupId>org.corehunter</groupId>
                 <artifactId>corehunter-base</artifactId>
-                <version>3.1.0</version>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.corehunter</groupId>
                 <artifactId>corehunter-services-api</artifactId>
-                <version>3.1.0</version>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.jamesframework</groupId>
@@ -311,28 +312,11 @@
                 </configuration>
             </plugin>
             
-            <!-- Checkstyle plugin -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-checkstyle-plugin</artifactId>
-                <version>2.17</version>
-                <executions>
-                    <!-- check and fail build upon violations as part of verify phase -->
-                    <execution>
-                        <id>verify</id>
-                        <phase>verify</phase>
-                        <goals>
-                            <goal>check</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            
             <!-- Verify that Javadoc can be generated on build and create javadoc jar -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>2.10.3</version>
+                <version>2.10.4</version>
                 <executions>
                     <execution>
                         <id>verify-javadoc</id>
@@ -412,23 +396,33 @@
         <pluginManagement>
             <plugins>
                 
-                <!-- Checkstyle settings -->
+                <!-- Checkstyle plugin settings -->
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-checkstyle-plugin</artifactId>
                     <version>2.17</version>
+                    <executions>
+                        <!-- check and fail build upon violations as part of verify phase -->
+                        <execution>
+                            <id>verify</id>
+                            <phase>verify</phase>
+                            <goals>
+                                <goal>check</goal>
+                            </goals>
+                        </execution>
+                    </executions>
                     <dependencies>
                         <!-- upgrade to latest checkstyle version at runtime -->
                         <dependency>
                             <groupId>com.puppycrawl.tools</groupId>
                             <artifactId>checkstyle</artifactId>
-                            <version>6.14.1</version>
+                            <version>8.1</version>
                         </dependency>
                         <!-- include build tools containing module wide checkstyle rules -->
                         <dependency>
                             <groupId>org.corehunter</groupId>
                             <artifactId>build-tools</artifactId>
-                            <version>3.1.0</version>
+                            <version>${project.version}</version>
                         </dependency>
                     </dependencies>
                     <configuration>

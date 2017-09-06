@@ -23,8 +23,8 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Set;
 
-import org.corehunter.data.GenotypeData;
 import org.jamesframework.core.problems.objectives.evaluations.Evaluation;
+import org.corehunter.data.FrequencyGenotypeData;
 
 /**
  * @author Herman De Beukelaer
@@ -45,7 +45,7 @@ public abstract class AllelicDiversityEvaluation implements Evaluation {
      * @param ids IDs of selected items
      * @param data genotype variant data
      */
-    public AllelicDiversityEvaluation(Collection<Integer> ids, GenotypeData data){
+    public AllelicDiversityEvaluation(Collection<Integer> ids, FrequencyGenotypeData data){
         
         numSelected = ids.size();
         
@@ -83,7 +83,7 @@ public abstract class AllelicDiversityEvaluation implements Evaluation {
      */
     public AllelicDiversityEvaluation(AllelicDiversityEvaluation curEval,
                                       Set<Integer> add, Set<Integer> remove,
-                                      GenotypeData data){
+                                      FrequencyGenotypeData data){
         
         int origNumSelected = curEval.numSelected;
         numSelected = origNumSelected + add.size() - remove.size();
@@ -125,9 +125,9 @@ public abstract class AllelicDiversityEvaluation implements Evaluation {
         
     }
     
-    private double frequency(GenotypeData data, int id, int m, int a){
-        Double freq = data.getAlleleFrequency(id, m, a);
-        return freq == null ? 0.0 : freq;
+    private double frequency(FrequencyGenotypeData data, int id, int m, int a){
+        double freq = data.getAlleleFrequency(id, m, a);
+        return Double.isNaN(freq) ? 0.0 : freq;
     }
     
     private void resolveMissingValues(){

@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -34,6 +35,7 @@ import uno.informatics.common.io.IOUtilities;
 import uno.informatics.common.io.RowReader;
 import uno.informatics.common.io.RowWriter;
 import uno.informatics.common.io.text.TextFileRowReader;
+import uno.informatics.common.io.text.TextFileRowWriter;
 import uno.informatics.data.SimpleEntity;
 import uno.informatics.data.io.FileType;
 import uno.informatics.data.pojo.DataPojo;
@@ -271,7 +273,10 @@ public class SimpleDistanceMatrixData extends DataPojo implements DistanceMatrix
             }
 
             // read matrix entries
-            Double[][] dist = new Double[n][n];
+            double[][] dist = new double[n][n];
+            for(double[] row : dist){
+                Arrays.fill(row, Double.NaN);
+            }
             for (int i = 0; i < n; i++) {
                 String[] row = rows.get(i + 1);
                 if (row.length - numHeaderCols < i) {
@@ -282,7 +287,7 @@ public class SimpleDistanceMatrixData extends DataPojo implements DistanceMatrix
                 }
                 for (int j = 0; j < row.length - numHeaderCols; j++) {
                     String entry = row[numHeaderCols + j];
-                    Double d = entry == null ? null : Double.parseDouble(entry);
+                    double d = (entry == null ? Double.NaN : Double.parseDouble(entry));
                     dist[i][j] = d;
                 }
             }
@@ -293,13 +298,13 @@ public class SimpleDistanceMatrixData extends DataPojo implements DistanceMatrix
                     Double d = dist[i][j];
                     if (i > j) {
                         // lower triangular
-                        if (d == null) {
+                        if (Double.isNaN(d)) {
                             throw new IOException(
                                 String.format("Missing value at row %d, col %d.", i + 1, numHeaderCols + j));
                         }
                     } else if (i == j) {
                         // diagonal
-                        if (d != null) {
+                        if (!Double.isNaN(d)) {
                             if (d > DELTA) {
                                 throw new IOException("Non-zero diagonal value at row " + (i + 1) + ".");
                             }
@@ -308,11 +313,11 @@ public class SimpleDistanceMatrixData extends DataPojo implements DistanceMatrix
                         }
                     } else {
                         // upper triangular
-                        if (dist[j][i] == null) {
+                        if (Double.isNaN(dist[j][i])) {
                             throw new IOException(
                                 String.format("Missing value at row %d, col %d.", j + 1, numHeaderCols + i));
                         }
-                        if (d != null) {
+                        if (!Double.isNaN(d)) {
                             if (Math.abs(d - dist[j][i]) > DELTA) {
                                 throw new IOException("Matrix is not symmetric.");
                             }
@@ -320,14 +325,6 @@ public class SimpleDistanceMatrixData extends DataPojo implements DistanceMatrix
                             dist[i][j] = dist[j][i];
                         }
                     }
-                }
-            }
-
-            // unbox matrix
-            double[][] distances = new double[n][n];
-            for (int i = 0; i < n; i++) {
-                for (int j = 0; j < n; j++) {
-                    distances[i][j] = dist[i][j];
                 }
             }
 
@@ -341,7 +338,7 @@ public class SimpleDistanceMatrixData extends DataPojo implements DistanceMatrix
                 }
             }
 
-            return new SimpleDistanceMatrixData(filePath.getFileName().toString(), headers, distances);
+            return new SimpleDistanceMatrixData(filePath.getFileName().toString(), headers, dist);
         }
     }
 
@@ -421,7 +418,7 @@ public class SimpleDistanceMatrixData extends DataPojo implements DistanceMatrix
         // write data to file
         boolean markSelection = includeSelected && includeUnselected;
         try (RowWriter writer = IOUtilities.createRowWriter(
-                filePath, fileType, TextFileRowReader.REMOVE_WHITE_SPACE
+                filePath, fileType, TextFileRowWriter.ADD_QUOTES
         )) {
 
             if (writer == null || !writer.ready()) {
