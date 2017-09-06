@@ -21,9 +21,14 @@ package org.corehunter;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Random;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -41,15 +46,20 @@ import org.corehunter.objectives.distance.measures.GowerDistance;
 import org.corehunter.objectives.distance.measures.ModifiedRogersDistance;
 import org.corehunter.objectives.distance.measures.PrecomputedDistance;
 import org.jamesframework.core.problems.objectives.Objective;
+import org.jamesframework.core.search.LocalSearch;
 import org.jamesframework.core.search.Search;
+import org.jamesframework.core.search.algo.MetropolisSearch;
 import org.jamesframework.core.search.algo.ParallelTempering;
 import org.jamesframework.core.search.algo.RandomDescent;
 import org.jamesframework.core.search.neigh.Neighbourhood;
 import org.jamesframework.core.search.stopcriteria.MaxRuntime;
+import org.jamesframework.core.search.stopcriteria.MaxSteps;
+import org.jamesframework.core.search.stopcriteria.MaxStepsWithoutImprovement;
 import org.jamesframework.core.search.stopcriteria.MaxTimeWithoutImprovement;
 import org.jamesframework.core.subset.SubsetProblem;
 import org.jamesframework.core.subset.SubsetSolution;
 import org.jamesframework.core.subset.neigh.SingleSwapNeighbourhood;
+import org.jamesframework.core.util.SetUtilities;
 import org.jamesframework.ext.problems.objectives.NormalizedObjective;
 import org.jamesframework.ext.problems.objectives.WeightedIndex;
 
@@ -60,17 +70,30 @@ import org.jamesframework.ext.problems.objectives.WeightedIndex;
  */
 public class CoreHunter {
 
+    // defaults
     private static final int DEFAULT_MAX_TIME_WITHOUT_IMPROVEMENT = 10000;
     private static final int FAST_MAX_TIME_WITHOUT_IMPROVEMENT = 2000;
         
+    // parallel tempering settings
     private static final int PT_NUM_REPLICAS = 10;
+    private static final int PT_REPLICA_STEPS = 500;
     private static final double PT_MIN_TEMP = 1e-8;
     private static final double PT_MAX_TEMP = 1e-4;
     
+    // execution mode
+    private CoreHunterExecutionMode mode;
+    
+    // search listener
     private CoreHunterListener listener;
+
+    // stop conditions
     private long timeLimit = -1;
     private long maxTimeWithoutImprovement = -1;
-    private CoreHunterExecutionMode mode;
+    private long maxSteps = -1;
+    private long maxStepsWithoutImprovement = -1;
+    
+    // random number generator used to seed other generators
+    private final Random seedGenerator;
 
     public CoreHunter() {
         this(CoreHunterExecutionMode.DEFAULT);
@@ -79,36 +102,39 @@ public class CoreHunter {
     /**
      * Create Core Hunter facade with the specified mode.
      * <p>
-     * In {@link CoreHunterExecutionMode#DEFAULT} mode parallel tempering is applied
+     * In {@link CoreHunterExecutionMode#DEFAULT} mode, parallel tempering is applied
      * and terminated when no improvement has been made for ten seconds.
-     * In {@link CoreHunterExecutionMode#FAST} mode random descent is applied
+     * In {@link CoreHunterExecutionMode#FAST} mode, random descent is applied
      * and terminated when no improvement has been made for two seconds.
-     * By default no absolute time limit is set in any of the two modes.
-     * Stop conditions can be altered with {@link #setMaxTimeWithoutImprovement(long)}
-     * and {@link #setTimeLimit(long)}.
+     * By default no absolute time limit, nor any step-based stop conditions,
+     * are set in any of the two modes.
+     * Stop conditions can be altered with {@link #setTimeLimit(long)},
+     * {@link #setMaxTimeWithoutImprovement(long)}, {@link #setMaxSteps(long)}
+     * and {@link #setMaxStepsWithoutImprovement(long)}. As soon as one or more
+     * explicit stop conditions have been specified prior to execution, the default
+     * maximum time without improvement will not be applied.
      * <p>
      * In case of a multi-objective configuration with normalization enabled, a preliminary
-     * random descent search is performed per objective to determine suitable bounds based
-     * on the Pareto minima/maxima. If a time limit and/or maximum time without finding an
-     * improvement have been set, the same limit is applied to all normalization searches as
-     * well as the main multi-objective search. Normalization searches are executed in parallel
-     * which means that in case of a limited number of objectives the total execution time should
-     * usually not exceed twice the imposed search time limit.
+     * random descent search is executed per objective to determine suitable normalization ranges
+     * based on the Pareto minima/maxima. These normalization searches are executed in parallel, with
+     * the same stop conditions as used for the main search. In default mode however, any step-based
+     * stop conditions are rescaled for the random descent normalization searches, since then the main
+     * parallel tempering search executes 500 random descent steps within each replica, in a single step
+     * of the main search.
      * 
      * @param mode execution mode
      */
     public CoreHunter(CoreHunterExecutionMode mode) {
+        // set execution mode
         this.mode = mode;
-        maxTimeWithoutImprovement = DEFAULT_MAX_TIME_WITHOUT_IMPROVEMENT;
-        if(mode == CoreHunterExecutionMode.FAST){
-            maxTimeWithoutImprovement = FAST_MAX_TIME_WITHOUT_IMPROVEMENT;
-        }
+        // set seed generator
+        seedGenerator = new Random();
     }
 
     /**
      * Determine normalization ranges of all objectives in a multi-objective configuration, based on the
      * Pareto minima/maxima. Executes a random descent search per objective (in parallel).
-     * For a single-objective setting or when <code>normalize</code> is set to <code>false</code> in the
+     * For a single-objective setting, or when <code>normalize</code> is set to <code>false</code> in the
      * given <code>arguments</code>, an exception is thrown.
      * 
      * @param arguments Core Hunter arguments specifying dataset, core size and objectives
@@ -127,7 +153,7 @@ public class CoreHunter {
             throw new IllegalArgumentException("Dataset not defined!");
         }
         if(!arguments.isNormalized()){
-            throw new IllegalArgumentException("Normalization is disabled.");
+            throw new IllegalArgumentException("Normalization supposed to be disabled.");
         }
         List<CoreHunterObjective> objectives = arguments.getObjectives();
         if(objectives == null || objectives.isEmpty()){
@@ -136,31 +162,24 @@ public class CoreHunter {
         if(objectives.size() < 2){
             throw new IllegalArgumentException("At least two objectives required for Pareto normalization.");
         }
-        
-        // set size and neighbourhood
-        int size = arguments.getSubsetSize();
-        Neighbourhood<SubsetSolution> neigh = new SingleSwapNeighbourhood();
+
+        // precompute seed for each normalization search to get a reproducible parallel execution
+        Map<CoreHunterObjective, Long> seeds = new HashMap<>();
+        objectives.stream().forEachOrdered(obj -> seeds.put(obj, seedGenerator.nextLong()));
         
         // optimize each objective separately (in parallel)
         List<SubsetSolution> bestSolutions = objectives.parallelStream().map(obj -> {
-            Objective<SubsetSolution, CoreHunterData> jamesObj = createObjective(data, obj);
-            // create normalization problem and search
-            SubsetProblem<CoreHunterData> problem = new SubsetProblem<>(data, jamesObj, size);
-            RandomDescent<SubsetSolution> normSearch = new RandomDescent<>(problem, neigh);
-            // set stop conditions
-            if(timeLimit > 0){
-                normSearch.addStopCriterion(new MaxRuntime(timeLimit, TimeUnit.MILLISECONDS));
+                Objective<SubsetSolution, CoreHunterData> jamesObj = createObjective(data, obj);
+                // create normalization search
+                Search<SubsetSolution> normSearch = createRandomDescent(arguments, jamesObj);
+                // use random generator with pregenerated seed!
+                normSearch.setRandom(new Random(seeds.get(obj)));
+                // execute normalization search
+                normSearch.run();
+                // return best solution
+                return normSearch.getBestSolution();
             }
-            if(maxTimeWithoutImprovement > 0){
-                normSearch.addStopCriterion(
-                        new MaxTimeWithoutImprovement(maxTimeWithoutImprovement, TimeUnit.MILLISECONDS)
-                );
-            }
-            // execute normalization search
-            normSearch.run();
-            // return best solution
-            return normSearch.getBestSolution();
-        })  .collect(Collectors.toList());
+            ).collect(Collectors.toList());
         
         // determine normalization ranges (based on Pareto maxima/minima)
         List<Range<Double>> ranges = new ArrayList<>();
@@ -203,20 +222,7 @@ public class CoreHunter {
         }
 
         // create search from arguments
-        Search<SubsetSolution> search = createSearch(arguments);
-
-        // set stop criteria
-        if(timeLimit <= 0 && maxTimeWithoutImprovement <= 0){
-            throw new IllegalStateException(
-                    "Please specify time limit and/or maximum time without improvement before execution."
-            );
-        }
-        if (timeLimit > 0) {
-            search.addStopCriterion(new MaxRuntime(timeLimit, TimeUnit.MILLISECONDS));
-        }
-        if (maxTimeWithoutImprovement > 0){
-            search.addStopCriterion(new MaxTimeWithoutImprovement(maxTimeWithoutImprovement, TimeUnit.MILLISECONDS));
-        }
+        Search<SubsetSolution> search = createMainSearch(arguments);
         
         // add search listener (if any)
         if (listener != null) {
@@ -270,7 +276,15 @@ public class CoreHunter {
      * @return maximum time without improvement
      */
     public long getMaxTimeWithoutImprovement(){
-        return maxTimeWithoutImprovement;
+        if(timeLimit < 0 && maxTimeWithoutImprovement < 0 && maxSteps < 0 && maxStepsWithoutImprovement < 0){
+            // no explicit stop conditions: use default
+            return mode == CoreHunterExecutionMode.DEFAULT
+                           ? DEFAULT_MAX_TIME_WITHOUT_IMPROVEMENT
+                           : FAST_MAX_TIME_WITHOUT_IMPROVEMENT;
+        } else {
+            // manually specified improvement time
+            return maxTimeWithoutImprovement;
+        }
     }
     
     /**
@@ -283,6 +297,44 @@ public class CoreHunter {
         maxTimeWithoutImprovement = ms;
     }
     
+    /**
+     * Get the maximum number of search steps.
+     * 
+     * @return search step limit
+     */
+    public long getMaxSteps(){
+        return maxSteps;
+    }
+    
+    /**
+     * Sets the maximum number of search steps.
+     * A negative value means that no such stop condition is set.
+     * 
+     * @param steps search step limit
+     */
+    public void setMaxSteps(long steps){
+        this.maxSteps = steps;
+    }
+    
+    /**
+     * Get the maximum allowed number of search steps without finding an improvement.
+     * A negative value means that no such stop condition is set.
+     * 
+     * @return maximum number of steps without improvement
+     */
+    public long getMaxStepsWithoutImprovement(){
+        return maxStepsWithoutImprovement;
+    }
+    
+    /**
+     * Sets the maximum allowed number of search steps without finding an improvement.
+     * 
+     * @param steps maximum number of steps without improvement
+     */
+    public void setMaxStepsWithoutImprovement(long steps){
+        this.maxStepsWithoutImprovement = steps;
+    }
+    
     public CoreHunterListener getListener(){
         return listener;
     }
@@ -290,32 +342,100 @@ public class CoreHunter {
     public void setListener(CoreHunterListener listener){
         this.listener = listener;
     }
-
-    protected Search<SubsetSolution> createSearch(CoreHunterArguments arguments) {
-
-        int size = arguments.getSubsetSize();
-
-        Objective<SubsetSolution, CoreHunterData> objective = createObjective(arguments);
-
-        SubsetProblem<CoreHunterData> problem = new SubsetProblem<>(arguments.getData(), objective, size);
-        Neighbourhood<SubsetSolution> neigh = new SingleSwapNeighbourhood();
-        
-        Search<SubsetSolution> search = createSearch(problem, neigh);
-
-        return search;
-
-    }
     
-    private Search<SubsetSolution> createSearch(SubsetProblem<CoreHunterData> problem,
-                                                Neighbourhood<SubsetSolution> neigh){
+    public void setSeed(long seed){
+        seedGenerator.setSeed(seed);
+    }
+
+    private Search<SubsetSolution> createMainSearch(CoreHunterArguments arguments) {
+
+        Objective<SubsetSolution, CoreHunterData> obj = createObjective(arguments);
+
         switch(mode){
             case DEFAULT:
-                return new ParallelTempering<>(problem, neigh, PT_NUM_REPLICAS, PT_MIN_TEMP, PT_MAX_TEMP);
+                return createParallelTempering(arguments, obj);
             case FAST:
-                return new RandomDescent<>(problem, neigh);
+                return createRandomDescent(arguments, obj);
             default:
                 throw new CoreHunterException("Unknown execution mode " + mode + ".");
         }
+
+    }
+
+    private Search<SubsetSolution> createRandomDescent(CoreHunterArguments args,
+                                                       Objective<SubsetSolution, CoreHunterData> obj){
+        LocalSearch<SubsetSolution> rd = new RandomDescent<>(createProblem(args, obj), createNeighbourhood(args));
+        rd.setRandom(new Random(seedGenerator.nextLong()));
+        return setStopCriteria(rd, mode == CoreHunterExecutionMode.DEFAULT);
+    }
+
+    private Search<SubsetSolution> createParallelTempering(CoreHunterArguments args,
+                                                           Objective<SubsetSolution, CoreHunterData> obj){
+        // check running default mode
+        if(mode != CoreHunterExecutionMode.DEFAULT){
+            throw new CoreHunterException("Parallel tempering search should only be used in default mode.");
+        }
+        ParallelTempering<SubsetSolution> pt = new ParallelTempering<>(
+            createProblem(args, obj), createNeighbourhood(args),
+            PT_NUM_REPLICAS, PT_MIN_TEMP, PT_MAX_TEMP,
+            // custom Metropolis factory to set seeds
+            (p, n, t) ->  {
+                MetropolisSearch<SubsetSolution> rep = new MetropolisSearch<>(p, n, t);
+                rep.setRandom(new Random(seedGenerator.nextLong()));
+                return rep;
+            }
+        );
+        pt.setReplicaSteps(PT_REPLICA_STEPS);
+        pt.setRandom(new Random(seedGenerator.nextLong()));
+        return setStopCriteria(pt, false);
+    }
+
+    private SubsetProblem<CoreHunterData> createProblem(CoreHunterArguments args,
+                                                        Objective<SubsetSolution, CoreHunterData> obj){
+        int size = args.getSubsetSize();
+        SubsetProblem<CoreHunterData> problem = new SubsetProblem<>(args.getData(), obj, size);
+        problem.setRandomSolutionGenerator((rnd, data) -> {
+            // create subset solution containing always selected ids
+            SubsetSolution sol = new SubsetSolution(data.getIDs(), args.getAlwaysSelected());
+            // find remaining candidates for selection
+            // (exclude both already selected and never selected ids)
+            Set<Integer> candidates = new HashSet<>(sol.getUnselectedIDs());
+            candidates.removeAll(args.getNeverSelected());
+            // randomly select more items to obtain requested size
+            sol.selectAll(SetUtilities.getRandomSubset(candidates, size - sol.getNumSelectedIDs(), rnd));
+            // return random initial solution
+            return sol;
+        });
+        return problem;
+    }
+
+    private Neighbourhood<SubsetSolution> createNeighbourhood(CoreHunterArguments args){
+        Set<Integer> fixed = new HashSet<>();
+        fixed.addAll(args.getAlwaysSelected());
+        fixed.addAll(args.getNeverSelected());
+        return new SingleSwapNeighbourhood(fixed);
+    }
+
+    private Search<SubsetSolution> setStopCriteria(Search<SubsetSolution> search, boolean rescaleSteps){
+        if (getTimeLimit() > 0) {
+            search.addStopCriterion(new MaxRuntime(getTimeLimit(), TimeUnit.MILLISECONDS));
+        }
+        if (getMaxTimeWithoutImprovement() > 0){
+            search.addStopCriterion(
+                new MaxTimeWithoutImprovement(getMaxTimeWithoutImprovement(), TimeUnit.MILLISECONDS)
+            );
+        }
+        if(getMaxSteps() > 0){
+            long steps = rescaleSteps ? getMaxSteps() * PT_REPLICA_STEPS : getMaxSteps();
+            search.addStopCriterion(new MaxSteps(steps));
+        }
+        if(getMaxStepsWithoutImprovement() > 0){
+            long steps = rescaleSteps
+                         ? getMaxStepsWithoutImprovement() * PT_REPLICA_STEPS
+                         : getMaxStepsWithoutImprovement();
+            search.addStopCriterion(new MaxStepsWithoutImprovement(steps));
+        }
+        return search;
     }
 
     private Objective<SubsetSolution, CoreHunterData> createObjective(CoreHunterArguments arguments) {
@@ -442,8 +562,7 @@ public class CoreHunter {
     }
     
     private List<Objective<SubsetSolution, CoreHunterData>> normalizeObjectives(
-            CoreHunterArguments arguments,
-            List<Objective<SubsetSolution, CoreHunterData>> objectives
+            CoreHunterArguments arguments, List<Objective<SubsetSolution, CoreHunterData>> objectives
     ){
         
         if(listener != null){

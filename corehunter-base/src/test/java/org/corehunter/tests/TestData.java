@@ -22,6 +22,7 @@ package org.corehunter.tests;
 import java.util.Arrays;
 import java.util.Set;
 import java.util.TreeSet;
+import org.corehunter.util.CoreHunterConstants;
 
 import org.jamesframework.core.problems.objectives.evaluations.Evaluation;
 import org.jamesframework.core.problems.objectives.evaluations.SimpleEvaluation;
@@ -38,7 +39,7 @@ import uno.informatics.data.pojo.SimpleFeaturePojo;
  */
 public class TestData {
 
-    public static final double PRECISION = 1e-10;
+    public static final double PRECISION = 1e-8;
 
     public static final double[][] DISTANCES = new double[][]{
         new double[]{0.0, 0.2, 0.4, 0.6, 0.8},
@@ -54,11 +55,11 @@ public class TestData {
     };
     
     public static final String[] NON_UNIQUE_NAMES = new String[]{
-        "Alice", "Unknown", "Bob", "Bob", "Carol"
+        "Alice", "Unkn\"own", "Bob", "Bob", "Car,ol"
     };
     
     public static final String[] UNIQUE_IDENTIFIERS = new String[]{
-        "Alice", "Unknown", "Bob-1", "Bob-2", "Carol"
+        "Ali,ce", "Unkn\"own", "Bob-1", "Bob'-2", "Car'ol"
     };
     
     public static final SimpleEntity[] HEADERS_UNIQUE_NAMES;
@@ -111,13 +112,13 @@ public class TestData {
         "mk4"
     };
     
-    public static final Double[][][] ALLELE_FREQUENCIES = {
+    public static final double[][][] ALLELE_FREQUENCIES = {
         {
-            {null, null, null},
+            {Double.NaN, Double.NaN, Double.NaN},
             {0.5, 0.5},
             {0.0, 0.5, 0.5},
             {0.0, 0.0, 0.5, 0.5},
-            {null, null, null},
+            {Double.NaN, Double.NaN, Double.NaN},
             {0.0, 1.0},
             {1.0, 0.0}
         },
@@ -140,9 +141,9 @@ public class TestData {
             {1.0, 0.0}
         },
         {
-            {null, null, null},
+            {Double.NaN, Double.NaN, Double.NaN},
             {1.0, 0.0},
-            {null, null, null},
+            {Double.NaN, Double.NaN, Double.NaN},
             {0.0, 0.0, 1.0, 0.0},
             {0.3333333333, 0.3333333333, 0.3333333333},
             {0.0, 1.0},
@@ -155,7 +156,40 @@ public class TestData {
             {0.5, 0.0, 0.5, 0.0},
             {0.3333333333, 0.3333333333, 0.3333333333},
             {1.0, 0.0},
+            {Double.NaN, Double.NaN}
+        }
+    };
+    
+    public static final String[][][] ALLELE_OBS_DIPLOID = {
+        {
+            {"1", "3"},
+            {"B", "B"},
+            {"a1", "a1"},
             {null, null}
+        },
+        {
+            {"2", "2"},
+            {"C", "A"},
+            {"a1", "a2"},
+            {"+", "-"}
+        },
+        {
+            {"1", "2"},
+            {"D", "D"},
+            {"a2", "a2"},
+            {"+", "+"}
+        },
+        {
+            {"2", "3"},
+            {"B", "B"},
+            {"a2", "a1"},
+            {"+", "-"}
+        },
+        {
+            {"1", "1"},
+            {null, null},
+            {"a1", "a1"},
+            {"-", "-"}
         }
     };
     
@@ -189,6 +223,39 @@ public class TestData {
             {null, null, null, null},
             {1.0, 0.0},
             {0.0, 1.0}
+        }
+    };
+    
+    public static final String[][][] ALLELE_OBS_HOMOZYGOUS = {
+        {
+            {"1"},
+            {"B"},
+            {"a1"},
+            {null}
+        },
+        {
+            {"2"},
+            {"C"},
+            {"a1"},
+            {"+"}
+        },
+        {
+            {"1"},
+            {"D"},
+            {"a2"},
+            {"+"}
+        },
+        {
+            {"2"},
+            {"B"},
+            {"a2"},
+            {"+"}
+        },
+        {
+            {"1"},
+            {null},
+            {"a1"},
+            {"-"}
         }
     };
     
@@ -258,12 +325,12 @@ public class TestData {
         {"+", "-"}
     };
     
-    public static final Integer[][] ALLELE_SCORES_BIALLELIC = {
+    public static final byte[][] ALLELE_SCORES_BIALLELIC = {
         {1, 0, 2, 1, 1, 0, 0},
         {2, 0, 2, 0, 1, 2, 1},
-        {1, 0, null, 0, 1, 1, 0},
-        {1, 0, 1, 1, 1, 2, null},
-        {1, 0, null, 0, null, 2, 0}
+        {1, 0, CoreHunterConstants.MISSING_ALLELE_SCORE, 0, 1, 1, 0},
+        {1, 0, 1, 1, 1, 2, CoreHunterConstants.MISSING_ALLELE_SCORE},
+        {1, 0, CoreHunterConstants.MISSING_ALLELE_SCORE, 0, CoreHunterConstants.MISSING_ALLELE_SCORE, 2, 0}
     };
     
     public static final Double[][][] ALLELE_FREQUENCIES_BIALLELIC = {

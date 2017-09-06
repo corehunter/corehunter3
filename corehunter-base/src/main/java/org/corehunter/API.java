@@ -26,14 +26,15 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.corehunter.data.CoreHunterData;
 import org.corehunter.data.DistanceMatrixData;
-import org.corehunter.data.GenotypeData;
 import org.corehunter.data.GenotypeDataFormat;
 import org.corehunter.data.simple.SimpleBiAllelicGenotypeData;
 import org.corehunter.data.simple.SimpleDistanceMatrixData;
-import org.corehunter.data.simple.SimpleGenotypeData;
+import org.corehunter.data.simple.SimpleFrequencyGenotypeData;
 import org.corehunter.data.simple.SimplePhenotypeData;
 import org.corehunter.listener.SimpleCoreHunterListener;
 import org.jamesframework.core.subset.SubsetSolution;
@@ -45,6 +46,8 @@ import uno.informatics.data.SimpleEntity;
 import uno.informatics.data.io.FileType;
 import uno.informatics.data.pojo.DataPojo;
 import uno.informatics.data.pojo.SimpleEntityPojo;
+import org.corehunter.data.FrequencyGenotypeData;
+import org.corehunter.data.simple.SimpleDefaultGenotypeData;
 
 /**
  * Simple API used by the R interface and as a utility class.
@@ -144,12 +147,12 @@ public class API {
     /* Genotype data */
     /* ------------- */
 
-    public static GenotypeData readGenotypeData(String file, String format) throws IOException {
-        return SimpleGenotypeData.readData(Paths.get(file), inferFileType(file),
-                GenotypeDataFormat.valueOf(format.toUpperCase()));
+    public static FrequencyGenotypeData readGenotypeData(String file, String format) throws IOException {
+        return GenotypeDataFormat.valueOf(format.toUpperCase())
+                                 .readData(Paths.get(file), inferFileType(file));
     }
     
-    public static GenotypeData createDefaultGenotypeData(String[][] data,
+    public static FrequencyGenotypeData createDefaultGenotypeData(String[][] data,
                                                          String[] ids, String[] names,
                                                          String[] columnNames){
         // check arguments
@@ -177,7 +180,7 @@ public class API {
             throw new IllegalArgumentException("Number of column names does not correspond to number of columns.");
         }
         // infer marker names and number of columns per marker
-        HashMap<String, Integer> markers = SimpleGenotypeData.inferMarkerNames(columnNames);
+        HashMap<String, Integer> markers = SimpleFrequencyGenotypeData.inferMarkerNames(columnNames);
         int numMarkers = markers.size();
         String[] markerNames = markers.keySet().toArray(new String[0]);
         Integer[] markerNumCols = markers.values().toArray(new Integer[0]);
@@ -197,10 +200,10 @@ public class API {
             }
         }
         // create and return data
-        return SimpleGenotypeData.createDefaultData(splitData, ids, names, markerNames);
+        return new SimpleDefaultGenotypeData(createHeaders(ids, names), markerNames, splitData);
     }
     
-    public static GenotypeData createBiparentalGenotypeData(int[][] alleleScores,
+    public static FrequencyGenotypeData createBiparentalGenotypeData(byte[][] alleleScores,
                                                             String[] ids, String[] names,
                                                             String[] markerNames){
         // check arguments
@@ -225,10 +228,10 @@ public class API {
             throw new IllegalArgumentException("Number of marker names does not correspond to number of columns.");
         }
         // create and return data
-        return new SimpleBiAllelicGenotypeData(createHeaders(ids, names), markerNames, toIntegerMatrix(alleleScores));
+        return new SimpleBiAllelicGenotypeData(createHeaders(ids, names), markerNames, alleleScores);
     }
     
-    public static GenotypeData createFrequencyGenotypeData(double[][] frequencies,
+    public static FrequencyGenotypeData createFrequencyGenotypeData(double[][] frequencies,
                                                            String[] ids, String[] names,
                                                            String[] columnNames, String[] alleleNames){
         // check arguments
@@ -262,12 +265,12 @@ public class API {
             throw new IllegalArgumentException("Number of allele names does not correspond to number of columns.");
         }
         // infer marker names and allele counts from column names
-        HashMap<String, Integer> markers = SimpleGenotypeData.inferMarkerNames(columnNames);
+        HashMap<String, Integer> markers = SimpleFrequencyGenotypeData.inferMarkerNames(columnNames);
         int numMarkers = markers.size();
         String[] markerNames = markers.keySet().toArray(new String[0]);
         Integer[] alleleCounts = markers.values().toArray(new Integer[0]);
         // split allele frequencies and names per marker
-        Double[][][] convFreqs = new Double[n][numMarkers][];
+        double[][][] convFreqs = new double[n][numMarkers][];
         for(int i = 0; i < n; i++){
             if(frequencies[i].length != c){
                 throw new IllegalArgumentException("Incorrect number of values at row " + i + ".");
@@ -275,14 +278,10 @@ public class API {
             int j = 0;
             for(int m = 0; m < numMarkers; m++){
                 int markerAlleleCount = alleleCounts[m];
-                convFreqs[i][m] = new Double[markerAlleleCount];
+                convFreqs[i][m] = new double[markerAlleleCount];
                 for(int a = 0; a < markerAlleleCount; a++){
-                    Double freq = frequencies[i][j++];
-                    // rJava encodes missing double values (NA in R) as NaN in Java
-                    if(Double.isNaN(freq)){
-                        freq = null;
-                    }
-                    convFreqs[i][m][a] = freq;
+                    // rJava already encodes missing double values (NA in R) as NaN in Java, same for Core Hunter
+                    convFreqs[i][m][a] = frequencies[i][j++];
                 }
             }
         }
@@ -295,10 +294,10 @@ public class API {
                 convAlleles[m][a] = alleleNames[j++];
             }
         }
-        return new SimpleGenotypeData(createHeaders(ids, names), markerNames, convAlleles, convFreqs);
+        return new SimpleFrequencyGenotypeData(createHeaders(ids, names), markerNames, convAlleles, convFreqs);
     }
     
-    public static String[][] getAlleles(GenotypeData data){
+    public static String[][] getAlleles(FrequencyGenotypeData data){
         int numMarkers = data.getNumberOfMarkers();
         String[][] alleles = new String[numMarkers][];
         for (int m = 0; m < numMarkers; m++) {
@@ -311,7 +310,7 @@ public class API {
         return alleles;
     }
     
-    public static String[] getMarkerNames(GenotypeData data){
+    public static String[] getMarkerNames(FrequencyGenotypeData data){
         int numMarkers = data.getNumberOfMarkers();
         String[] markerNames = new String[numMarkers];
         for(int m = 0; m < numMarkers; m++){
@@ -320,7 +319,7 @@ public class API {
         return markerNames;
     }
     
-    public static double[][] getAlleleFrequencies(GenotypeData data){
+    public static double[][] getAlleleFrequencies(FrequencyGenotypeData data){
         int n = data.getSize();
         int m = data.getNumberOfMarkers();
         int numAlleles = data.getTotalNumberOfAlleles();
@@ -331,7 +330,7 @@ public class API {
                 for(int k = 0; k < data.getNumberOfAlleles(j); k++){
                     Double freq = data.getAlleleFrequency(i, j, k);
                     // convert missing values
-                    freqs[i][a++] = (freq == null ? NA : freq);
+                    freqs[i][a++] = (Double.isNaN(freq) ? NA : freq);
                 }
             }
         }
@@ -385,8 +384,15 @@ public class API {
         
     public static CoreHunterArguments createArguments(CoreHunterData data, int size,
                                                       CoreHunterObjective[] objectives,
+                                                      int[] alwaysSelected,
+                                                      int[] neverSelected,
                                                       boolean normalizeMultiObjective){
-        return new CoreHunterArguments(data, size, Arrays.asList(objectives), normalizeMultiObjective);
+        Set<Integer> always = Arrays.stream(alwaysSelected).boxed().collect(Collectors.toSet());
+        Set<Integer> never = Arrays.stream(neverSelected).boxed().collect(Collectors.toSet());
+        return new CoreHunterArguments(
+                data, size, Arrays.asList(objectives),
+                always, never, normalizeMultiObjective
+        );
     }
 
     /* --------- */
@@ -406,29 +412,29 @@ public class API {
      * @param mode Execution mode, one of "default" or "fast". Only affects the default
      *             stop conditions, not the used algorithm (always random descent).
      * @param timeLimit Absolute runtime limit in seconds.
-     *                  If set to a negative value no time limit is used.
+     *                  Not used if set to a negative value.
      * @param maxTimeWithoutImprovement Maximum time without finding an improvement, in seconds.
-     *                                  If set to a negative value, the default improvement time of
-     *                                  the chosen execution mode is used: 10 seconds in default mode,
-     *                                  2 seconds in fast mode.
+     *                                  Not used if set to a negative value. In case no explicit
+     *                                  stop conditions have been specified, the maximum time without
+     *                                  improvement defaults to 10 seconds in default mode, or 2 seconds
+     *                                  in fast mode.
+     * @param maxSteps Maximum number of search steps. Not used if set to a negative value.
+     * @param maxStepsWithoutImprovement Maximum number of search steps without finding an improvement.
+     *                                   Not used if set to a negative value.
+     * @param seed Positive seed used for random generation to allow reproducible results.
+     *             If zero or negative, no seed is applied.
      * @return Matrix containing normalization ranges.
      *         One row per objective, and two columns with lower and upper bound, respectively.
      */
     public static double[][] getNormalizationRanges(CoreHunterArguments args, String mode,
-                                                    int timeLimit, int maxTimeWithoutImprovement){
-        // interpret arguments
-        CoreHunterExecutionMode exMode = CoreHunterExecutionMode.DEFAULT;
-        if (mode.equals("fast")) {
-            exMode = CoreHunterExecutionMode.FAST;
-        }
-        // create Core Hunter executor
-        CoreHunter ch = new CoreHunter(exMode);
-        if (timeLimit > 0) {
-            ch.setTimeLimit(1000 * timeLimit); // convert to milliseconds
-        }
-        if (maxTimeWithoutImprovement > 0) {
-            ch.setMaxTimeWithoutImprovement(1000 * maxTimeWithoutImprovement); // convert to milliseconds
-        }
+                                                    int timeLimit, int maxTimeWithoutImprovement,
+                                                    long maxSteps, long maxStepsWithoutImprovement,
+                                                    long seed){
+        // init Core Hunter
+        CoreHunter ch = initCoreHunter(args, mode,
+                                       timeLimit, maxTimeWithoutImprovement,
+                                       maxSteps, maxStepsWithoutImprovement,
+                                       seed);
         // determine ranges
         List<Range<Double>> rangeList = ch.normalize(args);
         // convert result
@@ -447,30 +453,30 @@ public class API {
      * @param args Core Hunter arguments including data, objective and subset size.
      * @param mode Execution mode, one of "default" or "fast".
      * @param timeLimit Absolute runtime limit in seconds.
-     *                  If set to a negative value no time limit is used.
+     *                  Not used if set to a negative value.
      * @param maxTimeWithoutImprovement Maximum time without finding an improvement, in seconds.
-     *                                  If set to a negative value, the default improvement time of
-     *                                  the chosen execution mode is used: 10 seconds in default mode,
-     *                                  2 seconds in fast mode.
+     *                                  Not used if set to a negative value. In case no explicit
+     *                                  stop conditions have been specified, the maximum time without
+     *                                  improvement defaults to 10 seconds in default mode, or 2 seconds
+     *                                  in fast mode.
+     * @param maxSteps Maximum number of search steps. Not used if set to a negative value.
+     * @param maxStepsWithoutImprovement Maximum number of search steps without finding an improvement.
+     *                                   Not used if set to a negative value.
+     * @param seed Positive seed used for random generation to allow reproducible results.
+     *             If zero or negative, no seed is applied.
      * @param silent If <code>true</code> no output is written to the console.
      * @return Indices of selected items (zero-based).
      */
     public static int[] sampleCore(CoreHunterArguments args, String mode,
                                    int timeLimit, int maxTimeWithoutImprovement,
-                                   boolean silent) {
-        // interpret arguments
-        CoreHunterExecutionMode exMode = CoreHunterExecutionMode.DEFAULT;
-        if (mode.equals("fast")) {
-            exMode = CoreHunterExecutionMode.FAST;
-        }
-        // create Core Hunter executor
-        CoreHunter ch = new CoreHunter(exMode);
-        if (timeLimit > 0) {
-            ch.setTimeLimit(1000 * timeLimit); // convert to milliseconds
-        }
-        if (maxTimeWithoutImprovement > 0) {
-            ch.setMaxTimeWithoutImprovement(1000 * maxTimeWithoutImprovement); // convert to milliseconds
-        }
+                                   long maxSteps, long maxStepsWithoutImprovement,
+                                   long seed, boolean silent) {
+        // init Core Hunter
+        CoreHunter ch = initCoreHunter(args, mode,
+                                       timeLimit, maxTimeWithoutImprovement,
+                                       maxSteps, maxStepsWithoutImprovement,
+                                       seed);
+        // attach listener
         if (!silent) {
             ch.setListener(new SimpleCoreHunterListener());
         }
@@ -483,6 +489,29 @@ public class API {
             ids[i++] = id;
         }
         return ids;
+    }
+    
+    private static CoreHunter initCoreHunter(CoreHunterArguments args, String mode,
+                                             int timeLimit, int maxTimeWithoutImprovement,
+                                             long maxSteps, long maxStepsWithoutImprovement,
+                                             long seed){
+        // interpret arguments
+        CoreHunterExecutionMode exMode = CoreHunterExecutionMode.DEFAULT;
+        if (mode.equals("fast")) {
+            exMode = CoreHunterExecutionMode.FAST;
+        }
+        // create Core Hunter executor
+        CoreHunter ch = new CoreHunter(exMode);
+        // set stop conditions (convert time-based criteria to milliseconds)
+        ch.setTimeLimit(1000 * timeLimit); 
+        ch.setMaxTimeWithoutImprovement(1000 * maxTimeWithoutImprovement);
+        ch.setMaxSteps(maxSteps);
+        ch.setMaxStepsWithoutImprovement(maxStepsWithoutImprovement);
+        // set seed
+        if(seed > 0){
+            ch.setSeed(seed);
+        }
+        return ch;
     }
 
     /* ---------- */
@@ -513,33 +542,22 @@ public class API {
      * Creates a list of default objectives, one for each type of data available, with equal weights.
      * 
      * @param coreHunterData the data for which the objectives are required
-     * @return list of default objectives
+     * @return list of default objectives (each with weight 1.0) 
      */
     public static final List<CoreHunterObjective> createDefaultObjectives(CoreHunterData coreHunterData) {
         List<CoreHunterObjective> objectives = new ArrayList<>();
 
         if (coreHunterData != null) {
-            int count = 0;
-            if (coreHunterData.hasGenotypes()) {
-                ++count;
-            }
-            if (coreHunterData.hasPhenotypes()) {
-                ++count;
-            }
-            if (coreHunterData.hasDistances()) {
-                ++count;
-            }
 
             if (coreHunterData.hasGenotypes()) {
-                objectives.add(new CoreHunterObjective(DEFAULT_OBJECTIVE, DEFAULT_GENOTYPE_MEASURE, 1.0 / count));
+                objectives.add(new CoreHunterObjective(DEFAULT_OBJECTIVE, DEFAULT_GENOTYPE_MEASURE, 1.0));
             }
             if (coreHunterData.hasPhenotypes()) {
-                objectives.add(new CoreHunterObjective(DEFAULT_OBJECTIVE, CoreHunterMeasure.GOWERS, 1.0 / count));
+                objectives.add(new CoreHunterObjective(DEFAULT_OBJECTIVE, CoreHunterMeasure.GOWERS, 1.0));
             }
             if (coreHunterData.hasDistances()) {
                 objectives.add(new CoreHunterObjective(
-                        DEFAULT_OBJECTIVE, CoreHunterMeasure.PRECOMPUTED_DISTANCE, 1.0 / count
-                ));
+                        DEFAULT_OBJECTIVE, CoreHunterMeasure.PRECOMPUTED_DISTANCE, 1.0));
             }
         }
 
@@ -789,25 +807,6 @@ public class API {
             }
         }
         return headers;
-    }
-    
-    /**
-     * Convert primitive to Integer matrix.
-     * All occurrences of {@link Integer#MIN_VALUE} are replaced with <code>null</code>,
-     * which is used by rJava to encode missing values (NAs in R).
-     * 
-     * @param matrix primitive integer matrix
-     * @return Integer matrix
-     */
-    private static Integer[][] toIntegerMatrix(int[][] matrix){
-        Integer[][] conv = new Integer[matrix.length][];
-        for(int i = 0; i < conv.length; i++){
-            conv[i] = new Integer[matrix[i].length];
-            for(int j = 0; j < conv[i].length; j++){
-                conv[i][j] = (matrix[i][j] != Integer.MIN_VALUE ? matrix[i][j] : null);
-            }
-        }
-        return conv;
     }
 
 }

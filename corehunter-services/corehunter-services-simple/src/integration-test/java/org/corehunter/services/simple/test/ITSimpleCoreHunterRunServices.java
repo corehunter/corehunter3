@@ -31,6 +31,7 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Collections;
 import java.util.List;
 
 import org.corehunter.CoreHunterMeasure;
@@ -41,7 +42,6 @@ import org.corehunter.data.CoreHunterDataType;
 import org.corehunter.objectives.AverageEntryToEntry;
 import org.corehunter.objectives.distance.measures.PrecomputedDistance;
 import org.corehunter.services.CoreHunterRun;
-import org.corehunter.services.CoreHunterRunServices;
 import org.corehunter.services.CoreHunterRunStatus;
 import org.corehunter.services.DatasetServices;
 import org.corehunter.services.simple.CoreHunterRunArgumentsPojo;
@@ -939,11 +939,11 @@ public class ITSimpleCoreHunterRunServices {
             fail(e.getMessage());
         }
 
-        CoreHunterRunArgumentsPojo arguments = new CoreHunterRunArgumentsPojo(DISTANCES_DATA, size, DATASET_UID,
-                new CoreHunterObjective(CoreHunterObjectiveType.AV_ENTRY_TO_ENTRY,
-                        CoreHunterMeasure.PRECOMPUTED_DISTANCE));
-
-        // run Core Hunter with out limits
+        // run Core Hunter without objectives
+        
+        CoreHunterRunArgumentsPojo arguments = new CoreHunterRunArgumentsPojo(
+            DISTANCES_DATA, size, DATASET_UID, Collections.emptyList()
+        );
 
         CoreHunterRun run = coreHunterRunServices.executeCoreHunter(arguments);
 

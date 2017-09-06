@@ -21,24 +21,109 @@ package org.corehunter;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.corehunter.data.CoreHunterData;
 
 public class CoreHunterArguments {
 
-    private int subsetSize;
-    private CoreHunterData data;
-    private List<CoreHunterObjective> objectives;
-    private boolean normalize;
+    private final int subsetSize;
+    private final CoreHunterData data;
+    private final List<CoreHunterObjective> objectives;
+    private final boolean normalize;
+    private final Set<Integer> alwaysSelected;
+    private final Set<Integer> neverSelected;
     
     /**
-     * Creates arguments with no objectives (private constructor).
+     * Creates a single objective configuration with no defined measure.
      * 
      * @param data the data for the run
      * @param subsetSize the desired subset size
+     * @param objective the objective type 
      */
-    private CoreHunterArguments(CoreHunterData data, int subsetSize) {
+    public CoreHunterArguments(CoreHunterData data, int subsetSize, CoreHunterObjectiveType objective) {
+        this(data, subsetSize, objective, null);
+    }
+
+    /**
+     * Creates a single objective configuration.
+     * 
+     * @param data the data for the run
+     * @param subsetSize the desired subset size
+     * @param objective the objective type 
+     * @param measure the optional measure required for the objective
+     */
+    public CoreHunterArguments(CoreHunterData data, int subsetSize,
+                               CoreHunterObjectiveType objective, CoreHunterMeasure measure) {
+        this(data, subsetSize, Collections.singletonList(new CoreHunterObjective(objective, measure)));
+        if (objective == null) {
+            throw new IllegalArgumentException("Objective not defined.");
+        }
+        if (measure == null) {
+            throw new IllegalArgumentException("Measure not defined.");
+        }
+    }
+    
+    /**
+     * Creates a single- or multi-objective configuration.
+     * Automatic normalization is enabled whenever more than one objective is included.
+     * 
+     * @param data the data for the run
+     * @param subsetSize the desired subset size
+     * @param objectives the objectives for the run
+     */
+    public CoreHunterArguments(CoreHunterData data, int subsetSize, List<CoreHunterObjective> objectives) {
+        this(data, subsetSize, objectives, Collections.emptySet());
+    }
+
+    /**
+     * Creates a single- or multi-objective configuration with a set of always selected IDs.
+     * Automatic normalization is enabled whenever more than one objective is included.
+     *
+     * @param data the data for the run
+     * @param subsetSize the desired subset size
+     * @param objectives the objectives for the run
+     * @param alwaysSelected set of IDs that will always be selected in the core
+     */
+    public CoreHunterArguments(CoreHunterData data, int subsetSize,
+                               List<CoreHunterObjective> objectives,
+                               Set<Integer> alwaysSelected) {
+        this(data, subsetSize, objectives, alwaysSelected, Collections.emptySet());
+    }
+    
+    /**
+     * Creates a single- or multi-objective configuration with a set of always and/or never selected IDs.
+     * Automatic normalization is enabled whenever more than one objective is included.
+     *
+     * @param data the data for the run
+     * @param subsetSize the desired subset size
+     * @param objectives the objectives for the run
+     * @param alwaysSelected set of IDs that will always be selected in the core
+     * @param neverSelected set of IDs that will never be selected in the core
+     */
+    public CoreHunterArguments(CoreHunterData data, int subsetSize, List<CoreHunterObjective> objectives,
+                               Set<Integer> alwaysSelected, Set<Integer> neverSelected) {
+        this(data, subsetSize, objectives, alwaysSelected, neverSelected, true);
+    }
+    
+    /**
+     * Creates a single- or multi-objective configuration with set of always and/or never selected IDs.
+     * If <code>normalize</code> is <code>true</code> automatic normalization is enabled, but
+     * only if more than one objective is included. In case of a single objective, this argument
+     * is ignored.
+     *
+     * @param data the data for the run
+     * @param subsetSize the desired subset size
+     * @param objectives the objectives for the run
+     * @param alwaysSelected set of IDs that will always be selected in the core
+     * @param neverSelected set of IDs that will never be selected in the core
+     * @param normalize indicates whether objectives should be normalized prior to execution
+     */
+    public CoreHunterArguments(CoreHunterData data, int subsetSize, List<CoreHunterObjective> objectives,
+                               Set<Integer> alwaysSelected, Set<Integer> neverSelected, boolean normalize) {
+        // set data and size
         if (data == null) {
             throw new IllegalArgumentException("Data undefined.");
         }
@@ -52,78 +137,31 @@ public class CoreHunterArguments {
         }
         this.data = data ;
         this.subsetSize = subsetSize ;
-    }
-    
-    /**
-     * Creates a single objective configuration with no defined measure.
-     * 
-     * @param data the data for the run
-     * @param subsetSize the desired subset size
-     * @param objective the objective type 
-     */
-    public CoreHunterArguments(CoreHunterData data, int subsetSize, CoreHunterObjectiveType objective) {
-        this(data, subsetSize);
-        if (objective == null) {
-            throw new IllegalArgumentException("Objective not defined.");
-        }
-        objectives = Collections.singletonList(new CoreHunterObjective(objective));
-        // no normalization for single objective configuration
-        normalize = false;
-    }
-
-    /**
-     * Creates a single objective configuration.
-     * 
-     * @param data the data for the run
-     * @param subsetSize the desired subset size
-     * @param objective the objective type 
-     * @param measure the optional measure required for the objective
-     */
-    public CoreHunterArguments(CoreHunterData data, int subsetSize,
-                               CoreHunterObjectiveType objective, CoreHunterMeasure measure) {
-        this(data, subsetSize);
-        if (objective == null) {
-            throw new IllegalArgumentException("Objective not defined.");
-        }
-        if (measure == null) {
-            throw new IllegalArgumentException("Measure not defined.");
-        }
-        objectives = Collections.singletonList(new CoreHunterObjective(objective, measure));
-        // no normalization for single objective configuration
-        normalize = false;
-    }
-    
-    /**
-     * Creates a multiple objective configuration.
-     * Automatic normalization is enabled whenever more than one objective is included.
-     * 
-     * @param data the data for the run
-     * @param subsetSize the desired subset size
-     * @param objectives the objectives for the run
-     */
-    public CoreHunterArguments(CoreHunterData data, int subsetSize, List<CoreHunterObjective> objectives) {
-        this(data, subsetSize, objectives, true);
-    }
-    
-    /**
-     * Creates a multiple objective configuration.
-     * If <code>normalize</code> is <code>true</code> automatic normalization is enabled but
-     * only if more than one objective is included. In case of a single objective this argument
-     * is ignored.
-     * 
-     * @param data the data for the run
-     * @param subsetSize the desired subset size
-     * @param objectives the objectives for the run
-     * @param normalize indicates whether objectives should be normalized prior to execution
-     */
-    public CoreHunterArguments(CoreHunterData data, int subsetSize,
-                               List<CoreHunterObjective> objectives,
-                               boolean normalize) {
-        this(data, subsetSize) ;
+        // set objectives
         if (objectives == null || objectives.isEmpty()) {
             throw new IllegalArgumentException("Objectives not defined.");
         }
         this.objectives = Collections.unmodifiableList(new ArrayList<>(objectives));
+        // store set of always/never selected ids
+        if (alwaysSelected == null) {
+            throw new IllegalArgumentException("Set of always selected IDs can not be null.");
+        }
+        if (neverSelected == null) {
+            throw new IllegalArgumentException("Set of never selected IDs can not be null.");
+        }
+        if(alwaysSelected.stream().anyMatch(neverSelected::contains)
+            || neverSelected.stream().anyMatch(alwaysSelected::contains)){
+            throw new IllegalArgumentException("Sets of always and never selected IDs should be disjoint.");
+        }
+        if(alwaysSelected.size() > subsetSize){
+            throw new IllegalArgumentException("Set of always selected IDs can not be larger than subset size.");
+        }
+        if(data.getSize() - neverSelected.size() < subsetSize){
+            throw new IllegalArgumentException("Too many never selected IDs: can not obtain requested subset size.");
+        }
+        this.alwaysSelected = Collections.unmodifiableSet(new HashSet<>(alwaysSelected));
+        this.neverSelected = Collections.unmodifiableSet(new HashSet<>(neverSelected));
+        // set normalization flag
         this.normalize = objectives.size() > 1 && normalize;
     }
 
@@ -137,6 +175,14 @@ public class CoreHunterArguments {
 
     public final int getSubsetSize() {
         return subsetSize;
+    }
+    
+    public final Set getAlwaysSelected(){
+        return alwaysSelected;
+    }
+    
+    public final Set getNeverSelected(){
+        return neverSelected;
     }
     
     public final boolean isNormalized(){

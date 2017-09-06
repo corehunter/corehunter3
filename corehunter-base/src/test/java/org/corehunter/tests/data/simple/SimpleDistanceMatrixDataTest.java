@@ -58,7 +58,8 @@ public class SimpleDistanceMatrixDataTest {
     private static final String TXT_FULL_IDS_NAMES = "/distances/full-ids-names.txt";
     private static final String CSV_LOWER_DIAG_IDS = "/distances/lower-diag-ids.csv";
     private static final String TEST_OUTPUT = "target/testoutput";
-
+    private static final String LONG_FILE = "/distances/distances_data.csv";
+    
     private static final String ERRONEOUS_FILES_DIR = "/distances/err/";
     private static final int[] SELECTION = new int[] {
         1, 3, 4
@@ -112,6 +113,13 @@ public class SimpleDistanceMatrixDataTest {
         testData(SimpleDistanceMatrixData.readData(
             Paths.get(SimpleDistanceMatrixDataTest.class.getResource(CSV_LOWER_DIAG_IDS).getPath()),
             FileType.CSV));
+    }
+    
+    @Test
+    public void fromFileLargeFiles() throws IOException {
+        SimpleDistanceMatrixData.readData(
+            Paths.get(SimpleDistanceMatrixDataTest.class.getResource(LONG_FILE).getPath()),
+            FileType.CSV);
     }
 
     @Test
@@ -305,7 +313,7 @@ public class SimpleDistanceMatrixDataTest {
     @Test
     public void testErroneousFiles() throws IOException {
         System.out.println(" |- Test erroneous files:");
-        Path dir = Paths.get(SimpleGenotypeDataTest.class.getResource(ERRONEOUS_FILES_DIR).getPath());
+        Path dir = Paths.get(SimpleFrequencyGenotypeDataTest.class.getResource(ERRONEOUS_FILES_DIR).getPath());
         try (DirectoryStream<Path> directory = Files.newDirectoryStream(dir)) {
             for (Path file : directory) {
                 System.out.print("  |- " + file.getFileName().toString() + ": ");

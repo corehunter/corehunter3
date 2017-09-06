@@ -19,16 +19,23 @@
 
 package org.corehunter.data;
 
+import java.io.IOException;
+import java.nio.file.Path;
+import org.jamesframework.core.subset.SubsetSolution;
 import uno.informatics.data.Data;
+import uno.informatics.data.io.FileType;
 
 /**
- * Genotype data contains relative frequencies of markers that have two or more alleles.
- * If all the markers used in these data have two and only two alleles, such as SNP data, then it
- * is more efficient to use the subclass {@link BiAllelicGenotypeData}.
+ * Frequency genotype data is the most general type of genotype data, containing
+ * relative frequencies of markers that have any number of alleles. If all the markers
+ * used in these data have two and only two alleles, such as SNP data, then it is more
+ * efficient to use the subtype {@link BiAllelicGenotypeData}. For datasets with a fixed
+ * number of allele observations per individuals, for each marker, the subtype
+ * {@link DefaultGenotypeData} can be used.
  *
  * @author Guy Davenport, Herman De Beukelaer
  */
-public interface GenotypeData extends Data {
+public interface FrequencyGenotypeData extends Data {
 
     /**
      * Get the total number of markers used in this dataset.
@@ -83,9 +90,9 @@ public interface GenotypeData extends Data {
      *                    returned by {@link #getNumberOfMarkers()}
      * @param alleleIndex allele index within the range 0 to a-1, where a is the number of alleles for the given marker
      *                    as returned by {@link #getNumberOfAlleles(int)}
-     * @return the relative allele frequency, <code>null</code> if missing
+     * @return the relative allele frequency, {@link Double#NaN} if missing
      */
-    public Double getAlleleFrequency(int id, int markerIndex, int alleleIndex);
+    public double getAlleleFrequency(int id, int markerIndex, int alleleIndex);
     
     /**
      * Indicates whether there are missing values (frequencies)
@@ -97,5 +104,35 @@ public interface GenotypeData extends Data {
      * @return <code>true</code> if some or all values are missing for the given marker in the given entry
      */
     public boolean hasMissingValues(int id, int markerIndex);
+    
+    /**
+     * Write data to file.
+     * 
+     * @param filePath file path
+     * @param fileType {@link FileType#TXT} or {@link FileType#CSV}
+     * @throws IOException if the data can not be written to the file
+     */
+    default public void writeData(Path filePath, FileType fileType) throws IOException {
+        // create auxiliary solution in which all IDs are selected
+        SubsetSolution all = new SubsetSolution(getIDs());
+        all.selectAll();
+        // write selected (all)
+        writeData(filePath, fileType, all, true, false, false);
+    }
+    
+    /**
+     * Write selected data to file.
+     * 
+     * @param filePath file path
+     * @param fileType {@link FileType#TXT} or {@link FileType#CSV}
+     * @param solution the solution to subset the data (selected core)
+     * @param includeSelected includes selected accessions in output file
+     * @param includeUnselected includes unselected accessions output file
+     * @param includeIndex includes accession indices, i.e. the internal integer IDs used by the solution
+     * @throws IOException if the data can not be written to the file
+     */
+    public void writeData(Path filePath, FileType fileType, SubsetSolution solution,
+                          boolean includeSelected, boolean includeUnselected, boolean includeIndex)
+                          throws IOException;
 
 }

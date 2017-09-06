@@ -49,7 +49,7 @@ import org.corehunter.data.CoreHunterData;
 import org.corehunter.data.DistanceMatrixData;
 import org.corehunter.data.PhenotypeData;
 import org.corehunter.data.simple.SimpleDistanceMatrixData;
-import org.corehunter.data.simple.SimpleGenotypeData;
+import org.corehunter.data.simple.SimpleFrequencyGenotypeData;
 import org.corehunter.data.simple.SimplePhenotypeData;
 import org.corehunter.objectives.AverageEntryToNearestEntry;
 import org.corehunter.objectives.distance.measures.CavalliSforzaEdwardsDistance;
@@ -74,7 +74,7 @@ public class AverageEntryToNearestEntryDistanceTest extends EvaluationTest {
     @Test
     public void testModifiedRogers() {
         
-        SimpleGenotypeData geno = new SimpleGenotypeData(
+        SimpleFrequencyGenotypeData geno = new SimpleFrequencyGenotypeData(
                 NAME, HEADERS_NON_UNIQUE_NAMES, MARKER_NAMES, ALLELE_NAMES, ALLELE_FREQUENCIES
         );
         CoreHunterData data = new CoreHunterData(geno);
@@ -116,7 +116,7 @@ public class AverageEntryToNearestEntryDistanceTest extends EvaluationTest {
     @Test
     public void testCavalliSforzaEdwards() {
         
-        SimpleGenotypeData geno = new SimpleGenotypeData(
+        SimpleFrequencyGenotypeData geno = new SimpleFrequencyGenotypeData(
                 NAME, HEADERS_NON_UNIQUE_NAMES, MARKER_NAMES, ALLELE_NAMES, ALLELE_FREQUENCIES
         );
         CoreHunterData data = new CoreHunterData(geno);
@@ -242,7 +242,7 @@ public class AverageEntryToNearestEntryDistanceTest extends EvaluationTest {
         
         Random rng = new Random();
         
-        SimpleGenotypeData geno = new SimpleGenotypeData(
+        SimpleFrequencyGenotypeData geno = new SimpleFrequencyGenotypeData(
                 NAME, HEADERS_NON_UNIQUE_NAMES, MARKER_NAMES, ALLELE_NAMES, ALLELE_FREQUENCIES
         );
         CoreHunterData data = new CoreHunterData(geno);

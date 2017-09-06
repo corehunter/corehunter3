@@ -22,20 +22,20 @@ package org.corehunter.objectives.eval;
 import java.util.Collection;
 import java.util.Set;
 
-import org.corehunter.data.GenotypeData;
+import org.corehunter.data.FrequencyGenotypeData;
 
 /**
  * @author Herman De Beukelaer
  */
 public class ShannonEvaluation extends AllelicDiversityEvaluation {
     
-    public ShannonEvaluation(Collection<Integer> ids, GenotypeData data) {
+    public ShannonEvaluation(Collection<Integer> ids, FrequencyGenotypeData data) {
         super(ids, data);
     }
 
     public ShannonEvaluation(AllelicDiversityEvaluation curEval,
                               Set<Integer> add, Set<Integer> remove,
-                              GenotypeData data) {
+                              FrequencyGenotypeData data) {
         super(curEval, add, remove, data);
     }
     
