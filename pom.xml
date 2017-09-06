@@ -312,23 +312,6 @@
                 </configuration>
             </plugin>
             
-            <!-- Checkstyle plugin -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-checkstyle-plugin</artifactId>
-                <version>2.17</version>
-                <executions>
-                    <!-- check and fail build upon violations as part of verify phase -->
-                    <execution>
-                        <id>verify</id>
-                        <phase>verify</phase>
-                        <goals>
-                            <goal>check</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            
             <!-- Verify that Javadoc can be generated on build and create javadoc jar -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -413,11 +396,21 @@
         <pluginManagement>
             <plugins>
                 
-                <!-- Checkstyle settings -->
+                <!-- Checkstyle plugin settings -->
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-checkstyle-plugin</artifactId>
                     <version>2.17</version>
+                    <executions>
+                        <!-- check and fail build upon violations as part of verify phase -->
+                        <execution>
+                            <id>verify</id>
+                            <phase>verify</phase>
+                            <goals>
+                                <goal>check</goal>
+                            </goals>
+                        </execution>
+                    </executions>
                     <dependencies>
                         <!-- upgrade to latest checkstyle version at runtime -->
                         <dependency>

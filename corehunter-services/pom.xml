@@ -18,4 +18,14 @@
 		<module>corehunter-services-api</module>
 		<module>corehunter-services-simple</module>
 	</modules>
+    
+    <build>
+        <plugins>
+            <!-- checkstyle -->
+            <plugin>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+    
 </project>
