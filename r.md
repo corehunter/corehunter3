@@ -1,4 +1,4 @@
-### R Package
+## R Package
 The package `corehunter` is available on CRAN and can be installed with
 
 ```R
@@ -51,7 +51,7 @@ There are numerous options when sampling a core. For example, you can change the
 
 Many examples are included in the R package as well.
 
-#### Memory limits
+### Memory limits
 Core Hunter uses the `rJava` package to execute Java code from R. By default, only part of the available memory is reserved for the Java Virtual Machine. To sample cores from large datasets you may need to increase the memory limit to several gigabytes. For example, to use 8 GB, assuming that your computer has at least that much RAM memory, set the option
 
 ```R
