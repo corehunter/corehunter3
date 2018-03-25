@@ -10,7 +10,7 @@ Core Hunter is available in 3 flavours.
 * For users looking to include CoreHunter in analytical pipelines we recommend the [R version](r). 
 * For Java programmers, you can include Core Hunter in your code as a library, extend Core Hunter or even become a contributor. For you the starting point is [Github](https://github.com/corehunter/corehunter3).
 
-Core Hunter is implemented in Java. In both cases you will need to have installed a [Java Runtime Environment (JRE)](https://java.com/download) version 8 or later.
+Core Hunter is implemented in Java. In any case you will need to have installed a [Java Runtime Environment (JRE)](https://java.com/download) version 8 or later.
 
 ## User group
 
