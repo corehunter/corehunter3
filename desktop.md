@@ -2,7 +2,7 @@
 
 ## Core Hunter Desktop version
 
-A beta version of graphical interface is available for on the [Core Hunter download](http://download.corehunter.org) site for Windows, Mac and Linux. 
+A beta version of graphical interface is available for on the [Core Hunter download](http://download.corehunter.org/products/1.0.0-SNAPSHOT/index.html) site for Windows, Mac and Linux. 
 
 ### User Guide
 
