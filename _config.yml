@@ -2,7 +2,9 @@ title: Core Hunter 3
 description: Multi-purpose core subset selection
 google_analytics: 
 show_downloads: false
-theme: jekyll-theme-cayman
 
+theme: jekyll-theme-cayman
+github:
+  is_project_page: false
 gems:
   - jekyll-mentions
