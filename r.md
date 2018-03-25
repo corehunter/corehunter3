@@ -1,3 +1,5 @@
+[< Home](index)
+
 ## R Package
 The package `corehunter` is available on CRAN and can be installed with
 
