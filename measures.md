@@ -1,3 +1,5 @@
+[< Home](index)
+
 ## Evaluation measures
 One of the main strengths of Core Hunter is that it can directly optimize a number of different evaluation measures.
 If desired, multiple measures can be simultaneously optimized as part of a weighted index. For more information on evaluation measures 
