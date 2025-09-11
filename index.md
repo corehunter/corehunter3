@@ -4,11 +4,11 @@ Core Hunter is a flexible tool to sample diverse, representative subsets from la
 Version 3 has been recoded from scratch using the [JAMES framework](http://www.jamesframework.org) which provides the applied optimization algorithms.
 
 ## Getting started with Core Hunter
-Core Hunter is available in 3 flavours.
+Core Hunter is available in 2 flavours.
 
-* For most users we recommend the [desktop version](desktop). 
 * For users looking to include CoreHunter in analytical pipelines we recommend the [R version](r). 
 * For Java programmers, you can include Core Hunter in your code as a library, extend Core Hunter or even become a contributor. For you the starting point is [Github](https://github.com/corehunter/corehunter3).
+* The desktop version has now been discontinued. 
 
 Core Hunter is implemented in Java. In any case you will need to have installed a [Java Runtime Environment (JRE)](https://java.com/download) version 8 or later.
 
@@ -26,3 +26,4 @@ Information about the supported evaluation measures is available [here](measures
 
 ## Version 2.0 website
 Looking for the old Core Hunter 2 website? It's [here](v2/).
+
